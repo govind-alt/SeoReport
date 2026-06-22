@@ -2,7 +2,7 @@
 
 > Automated SEO reporting powered by the SERanking API — enter any domain, get a full professional SEO report instantly.
 
-**Version:** 1.1 | **Team:** Govind Prajapati & Ritesh Gardare | **Repo:** github.com/govind-alt/SeoReport
+**Version:** 1.1  | **Repo:** github.com/govind-alt/SeoReport
 
 ---
 
