@@ -3,492 +3,585 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RankFlow — Client Detail</title>
+<title>RankFlow — Acme Corp</title>
+<meta name="description" content="Detailed SEO analytics for Acme Corp — keywords, backlinks, audit, analytics, competitors and reports."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.client-header-card {
-  background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 100%);
-  border-radius: var(--radius-md);
-  padding: 24px 28px;
-  margin-bottom: 24px;
-  color: white;
-  display: flex; align-items: center; gap: 20px;
-  position: relative; overflow: hidden;
-}
-.client-header-card::before {
-  content: ''; position: absolute; width: 400px; height: 400px;
-  border-radius: 50%; background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 70%);
-  top: -150px; right: -100px; pointer-events: none;
-}
-.client-logo-large {
-  width: 56px; height: 56px; border-radius: var(--radius-md);
-  background: var(--primary); display: flex; align-items: center; justify-content: center;
-  font-size: 20px; font-weight: 900; color: white; flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(79,70,229,0.4);
-}
-.metric-pill {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: var(--radius-full);
-  padding: 5px 12px;
-  font-size: 12px; font-weight: 600;
-  color: white;
-  display: inline-flex; align-items: center; gap: 5px;
-}
-.rank-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
-.rank-row:last-child { border-bottom: none; }
-.rank-pos { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
-.pos-1-3 { background: #FFF7ED; color: #C2410C; }
-.pos-4-10 { background: var(--success-light); color: var(--success); }
-.pos-11-20 { background: var(--primary-light); color: var(--primary); }
-.pos-21 { background: var(--gray-100); color: var(--text-muted); }
-.kw-url { font-size: 11px; color: var(--text-muted); }
-.issue-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px;
-}
-.issue-item:last-child { border-bottom: none; }
-.issue-count { font-size: 13px; font-weight: 700; }
-.backlink-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
-.backlink-row:last-child { border-bottom: none; }
-.da-badge { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.report-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px; border: 1px solid var(--border);
-  border-radius: var(--radius); margin-bottom: 10px;
-  transition: var(--transition-fast);
-  cursor: pointer;
-}
-.report-item:hover { background: var(--gray-50); border-color: var(--primary); }
-.report-icon { width: 40px; height: 40px; border-radius: var(--radius); background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.client-tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;overflow-x:auto;scrollbar-width:none;position:sticky;top:60px;z-index:30;}
+.client-tabs::-webkit-scrollbar{display:none;}
+.ctab{padding:11px 16px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:var(--transition-fast);}
+.ctab:hover{color:var(--text-secondary);}
+.ctab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:700;}
+.tab-panel{display:none;padding:24px;animation:fadeSlide .2s ease;}
+.tab-panel.active{display:block;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.kw-row-new{background:#F0FFF4;}
+.kw-row-lost{background:#FFF1F2;}
+.expand-row{display:none;}
+.expand-row.open{display:table-row;}
+.audit-expand-btn{font-size:11px;cursor:pointer;color:var(--primary);font-weight:500;}
+.comp-us{background:var(--primary-light);font-weight:700;}
+.error-pre{font-family:'Courier New',monospace;font-size:11px;background:rgba(239,68,68,.07);color:#7F1D1D;padding:10px;border-radius:var(--radius);line-height:1.7;margin-bottom:8px;}
 </style>
 </head>
 <body>
 <div class="app-layout">
+
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">RF</div>
-      <div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div>
-    </div>
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
     <nav class="sidebar-nav">
-      <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
-      <a class="sidebar-item active" href="clients.html"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
-      <a class="sidebar-item" href="reports.html"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
       <div class="sidebar-section-label">Configuration</div>
-      <a class="sidebar-item" href="settings.html"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
-      <a class="sidebar-item" href="#"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help & Support</span></a>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help</span></a>
     </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="sidebar-avatar">JD</div>
-        <div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-role">Agency Admin</div></div>
-      </div>
-    </div>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-role">Agency Admin</div></div></div></div>
   </aside>
 
   <div class="main-content">
+    <!-- Topbar -->
     <header class="topbar">
-      <div class="topbar-title">
-        <a href="clients.html" style="color:var(--text-muted); font-size:13px; font-weight:400;">Clients</a>
-        <span style="color:var(--text-muted); margin:0 6px;">/</span>
-        Acme Corp
+      <div style="flex:1;">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;"><a href="clients.html" style="color:var(--text-muted);">Clients</a> › <strong style="color:var(--text-primary);">Acme Corp</strong></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:16px;font-weight:800;">Acme Corp</div>
+          <span style="font-size:12px;color:var(--text-muted);">acmecorp.com</span>
+        </div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-secondary btn-sm" onclick="editClient()">✏️ Edit</button>
-        <button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">⚡ Generate Report</button>
+        <button class="date-range-btn" onclick="Toast.info('Date picker opened')">📅 Jun 2026 vs May 2026 ▾</button>
+        <span class="gsc-badge connected">✅ GSC Connected</span>
+        <button class="btn btn-secondary btn-sm" onclick="Modal.open('editClientModal')">⚙ Edit</button>
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">+ Report</button>
+        <div class="notif-bell-wrap" style="position:relative;">
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">🔔</button>
+          <div style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications</div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
+            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">You have 5 unread notifications</div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);">View all →</a></div>
+          </div>
+        </div>
       </div>
     </header>
 
-    <div class="page-content">
-      <!-- Client Header -->
-      <div class="client-header-card">
-        <div class="client-logo-large">AC</div>
-        <div style="flex:1;position:relative;z-index:1;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-            <h1 style="font-size:22px;font-weight:900;color:white;">Acme Corp</h1>
-            <span class="badge badge-success">Active</span>
-          </div>
-          <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:14px;">acmecorp.com · Contact: Jane Smith (jane@acmecorp.com)</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <span class="metric-pill">💚 Health: 76%</span>
-            <span class="metric-pill">🔑 47 Top-10 Keywords</span>
-            <span class="metric-pill">📈 8,420 Sessions/mo</span>
-            <span class="metric-pill">🔗 2,340 Backlinks</span>
-            <span class="metric-pill">📄 Last Report: Jun 1</span>
-          </div>
+    <!-- Client Tabs (sticky) -->
+    <div class="client-tabs" id="clientTabs">
+      <div class="ctab active" onclick="switchTab('overview',this)">Overview</div>
+      <div class="ctab" onclick="switchTab('keywords',this)">Keywords</div>
+      <div class="ctab" onclick="switchTab('backlinks',this)">Backlinks</div>
+      <div class="ctab" onclick="switchTab('audit',this)">Technical Audit</div>
+      <div class="ctab" onclick="switchTab('analytics',this)">Analytics</div>
+      <div class="ctab" onclick="switchTab('competitors',this)">Competitors</div>
+      <div class="ctab" onclick="switchTab('reports',this)">Reports</div>
+    </div>
+
+    <!-- ═══ TAB: OVERVIEW ═══ -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="kpi-grid kpi-grid-5" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
+        <div class="kpi-card success"><div class="kpi-label">Sessions</div><div class="kpi-value" style="font-size:24px;">8,420</div><div class="kpi-trend trend-up">↑ +16.3%</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value" style="font-size:24px;">47</div><div class="kpi-trend trend-up">↑ +4 kws</div></div>
+        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value" style="font-size:24px;">42</div><div class="kpi-trend trend-up">↑ +2 pts</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="font-size:24px;">76%</div><div class="kpi-trend trend-up">↑ +8 pts</div></div>
+        <div class="kpi-card"><div class="kpi-label">AI Visibility</div><div class="kpi-value" style="font-size:24px;">14</div><div class="kpi-trend trend-flat">ChatGPT mentions</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="chart-card" style="margin-bottom:0;">
+          <div class="chart-header"><div><div class="chart-title">Keyword Position Trend</div><div class="chart-subtitle">Top 10 count — 6 months</div></div></div>
+          <div style="height:180px;"><canvas id="kwTrendChart"></canvas></div>
         </div>
-        <div style="position:relative;z-index:1;">
-          <div style="text-align:center;">
-            <div id="healthGauge" style="position:relative;width:90px;height:90px;margin:0 auto;">
-              <svg width="90" height="90" viewBox="0 0 90 90" style="transform:rotate(-90deg);">
-                <circle cx="45" cy="45" r="35" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="9"/>
-                <circle cx="45" cy="45" r="35" fill="none" stroke="#10B981" stroke-width="9" stroke-linecap="round"
-                  stroke-dasharray="219.9" stroke-dashoffset="52.8"/>
-              </svg>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                <span style="font-size:20px;font-weight:900;color:white;">76</span>
-                <span style="font-size:9px;color:rgba(255,255,255,0.6);">/ 100</span>
-              </div>
+        <div class="chart-card" style="margin-bottom:0;">
+          <div class="chart-header"><div><div class="chart-title">Organic Traffic Trend</div><div class="chart-subtitle">Sessions — 6 months</div></div></div>
+          <div style="height:180px;"><canvas id="trafficChart"></canvas></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">+ Generate Report</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Syncing data...')">🔄 Sync Now</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('reports',null)">📄 View Reports</button>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: KEYWORDS ═══ -->
+    <div class="tab-panel" id="tab-keywords">
+      <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px;">
+        <div class="kpi-card"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:22px;">12</div><div class="kpi-trend trend-up">↑+2</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:22px;">47</div><div class="kpi-trend trend-up">↑+4</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 30</div><div class="kpi-value" style="font-size:22px;">89</div><div class="kpi-trend trend-up">↑+7</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 100</div><div class="kpi-value" style="font-size:22px;">124</div><div class="kpi-trend trend-flat">→0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:22px;">18.4</div><div class="kpi-trend trend-up">↑ Improved</div></div>
+      </div>
+      <!-- Pill Filters -->
+      <div class="pill-filters">
+        <div class="pill active" data-filter="all" data-filter-group="kw" data-filter-target="kwTable">All Keywords (124)</div>
+        <div class="pill" data-filter="new" data-filter-group="kw" data-filter-target="kwTable">🟢 New this month (8)</div>
+        <div class="pill" data-filter="lost" data-filter-group="kw" data-filter-target="kwTable">🔴 Lost this month (3)</div>
+        <div class="pill" data-filter="gainer" data-filter-group="kw" data-filter-target="kwTable">⬆ Top Gainers (20)</div>
+        <div class="pill" data-filter="loser" data-filter-group="kw" data-filter-target="kwTable">⬇ Top Losers (12)</div>
+        <div class="pill" data-filter="top3" data-filter-group="kw" data-filter-target="kwTable">📍 Top 3 (12)</div>
+        <div class="pill" data-filter="featured" data-filter-group="kw" data-filter-target="kwTable">📌 Featured Snippet (4)</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <div class="search-input-wrap" style="flex:1;min-width:200px;"><span class="search-icon">🔍</span><input type="text" class="form-input" id="kwSearch" placeholder="Search keyword..." style="padding-left:34px;"/></div>
+        <select class="form-input" style="width:150px;"><option>Position: All</option><option>Top 3</option><option>Top 10</option><option>Top 30</option><option>11–50</option></select>
+        <select class="form-input" style="width:150px;"><option>Intent: All</option><option>Informational</option><option>Commercial</option><option>Transactional</option></select>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting CSV...')">⬇ CSV</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="kwTable">
+          <thead><tr><th>#</th><th>Keyword</th><th>30d Trend</th><th>Position</th><th>Change</th><th>Volume</th><th>Difficulty</th><th>URL</th><th>SERP Features</th></tr></thead>
+          <tbody>
+            <tr data-filter="featured gainer top3"><td style="color:var(--text-muted);">1</td><td><strong>seo agency london</strong></td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:6px;"></div><div class="kw-spark-bar" style="height:8px;"></div><div class="kw-spark-bar" style="height:10px;"></div><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar up" style="height:18px;"></div></div></td>
+              <td><span class="badge badge-success">4</span></td><td style="color:var(--success);font-weight:600;">▲+3</td><td>1,600</td><td>68</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td><span class="badge badge-primary" style="font-size:10px;">Featured</span></td></tr>
+            <tr data-filter="gainer top3"><td style="color:var(--text-muted);">2</td><td><strong>local seo london</strong></td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:4px;"></div><div class="kw-spark-bar" style="height:6px;"></div><div class="kw-spark-bar" style="height:9px;"></div><div class="kw-spark-bar up" style="height:13px;"></div><div class="kw-spark-bar up" style="height:19px;"></div></div></td>
+              <td><span class="badge badge-success">2</span></td><td style="color:var(--success);font-weight:600;">▲+8</td><td>880</td><td>54</td><td style="font-size:11px;color:var(--text-muted);">/local-seo</td><td><span class="badge badge-primary" style="font-size:10px;">Local Pack</span></td></tr>
+            <tr data-filter="loser"><td style="color:var(--text-muted);">3</td><td>digital marketing uk</td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar" style="height:12px;"></div><div class="kw-spark-bar" style="height:9px;"></div><div class="kw-spark-bar down" style="height:7px;"></div><div class="kw-spark-bar down" style="height:5px;"></div></div></td>
+              <td><span class="badge badge-warning">7</span></td><td style="color:var(--danger);font-weight:600;">▼-1</td><td>2,400</td><td>72</td><td style="font-size:11px;color:var(--text-muted);">/digital-mktg</td><td>—</td></tr>
+            <tr data-filter="gainer"><td style="color:var(--text-muted);">4</td><td>seo company london</td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:5px;"></div><div class="kw-spark-bar" style="height:7px;"></div><div class="kw-spark-bar up" style="height:10px;"></div><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar up" style="height:17px;"></div></div></td>
+              <td><span class="badge badge-warning">9</span></td><td style="color:var(--success);font-weight:600;">▲+5</td><td>1,200</td><td>71</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td>—</td></tr>
+            <tr class="kw-row-new" data-filter="new gainer"><td style="color:var(--text-muted);">5</td><td><strong>seo audit tool uk</strong> <span class="badge badge-success" style="font-size:9px;">NEW</span></td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar up" style="height:14px;"></div></div></td>
+              <td><span class="badge badge-success">28</span></td><td style="color:var(--success);font-weight:600;">NEW</td><td>390</td><td>58</td><td style="font-size:11px;color:var(--text-muted);">/audit</td><td>—</td></tr>
+            <tr class="kw-row-lost" data-filter="lost"><td style="color:var(--text-muted);">6</td><td><span style="text-decoration:line-through;color:var(--text-muted);">seo tools free</span> <span class="badge badge-danger" style="font-size:9px;">LOST</span></td>
+              <td><div class="kw-sparkline"><div class="kw-spark-bar up" style="height:16px;"></div><div class="kw-spark-bar" style="height:10px;"></div><div class="kw-spark-bar down" style="height:6px;"></div><div class="kw-spark-bar down" style="height:2px;"></div><div class="kw-spark-bar" style="height:1px;"></div></div></td>
+              <td><span class="badge badge-neutral">101+</span></td><td style="color:var(--danger);font-weight:600;">LOST</td><td>5,400</td><td>82</td><td style="font-size:11px;color:var(--text-muted);">/tools</td><td>—</td></tr>
+          </tbody>
+        </table>
+        <div class="table-footer"><span>Showing 6 of 124 keywords · Sparklines show 30-day position trend</span><span style="font-size:11px;">Last updated: Today 02:14 AM</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: BACKLINKS ═══ -->
+    <div class="tab-panel" id="tab-backlinks">
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-trend trend-up">↑+2 pts</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Total Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-trend trend-up">↑+47 new</div></div>
+        <div class="kpi-card"><div class="kpi-label">Referring Domains</div><div class="kpi-value">312</div><div class="kpi-trend trend-up">↑+18</div></div>
+        <div class="kpi-card"><div class="kpi-label">Dofollow Links</div><div class="kpi-value">1,243</div><div class="kpi-trend trend-flat">67% of total</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="chart-card" style="margin-bottom:0;">
+          <div class="chart-header"><div><div class="chart-title">New vs Lost Backlinks</div><div class="chart-subtitle">6-month comparison</div></div>
+            <div class="chart-legend"><div class="legend-item"><div class="legend-dot" style="background:#10B981;"></div>New</div><div class="legend-item"><div class="legend-dot" style="background:#EF4444;"></div>Lost</div></div>
+          </div>
+          <div style="height:160px;"><canvas id="backlinkChart"></canvas></div>
+        </div>
+        <div class="chart-card" style="margin-bottom:0;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Link Type Distribution</div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+            <div style="width:80px;height:80px;border-radius:50%;background:conic-gradient(#4F46E5 0% 67%,#E2E8F0 67% 100%);flex-shrink:0;"></div>
+            <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+              <div><span style="display:inline-block;width:10px;height:10px;background:#4F46E5;border-radius:2px;margin-right:5px;"></span>Dofollow: 1,243 (67%)</div>
+              <div><span style="display:inline-block;width:10px;height:10px;background:#E2E8F0;border-radius:2px;margin-right:5px;"></span>Nofollow: 604 (33%)</div>
+              <div style="font-size:11px;color:var(--text-muted);">Gov: 3 · Edu: 8</div>
             </div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:4px;">Health Score</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Top Anchors</div>
+          <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span>seo agency london</span><span style="font-weight:600;">147</span></div><div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span>click here</span><span style="font-weight:600;">312</span></div><div class="progress-bar"><div class="progress-fill" style="width:84%;"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span>acmecorp.com</span><span style="font-weight:600;">189</span></div><div class="progress-bar"><div class="progress-fill" style="width:51%;"></div></div></div>
           </div>
         </div>
       </div>
-
-      <!-- Tabs -->
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:24px;">
-        <div class="tabs" style="padding:0 16px;border-bottom:2px solid var(--border);">
-          <div class="tab-item active" data-tab="overview" data-tab-group="client" onclick="switchTab('overview')">📊 Overview</div>
-          <div class="tab-item" data-tab="keywords" data-tab-group="client" onclick="switchTab('keywords')">🔑 Keywords</div>
-          <div class="tab-item" data-tab="backlinks" data-tab-group="client" onclick="switchTab('backlinks')">🔗 Backlinks</div>
-          <div class="tab-item" data-tab="audit" data-tab-group="client" onclick="switchTab('audit')">🛡 Audit</div>
-          <div class="tab-item" data-tab="analytics" data-tab-group="client" onclick="switchTab('analytics')">📈 Analytics</div>
-          <div class="tab-item" data-tab="competitors" data-tab-group="client" onclick="switchTab('competitors')">⚔️ Competitors</div>
-          <div class="tab-item" data-tab="reports" data-tab-group="client" onclick="switchTab('reports')">📄 Reports</div>
-        </div>
-
-        <!-- OVERVIEW TAB -->
-        <div id="tab-overview" class="tab-section active" style="padding:20px;">
-          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
-            <div class="kpi-card success"><div class="kpi-label">Total Keywords</div><div class="kpi-value">312</div><div class="kpi-trend trend-up">↑ +18 this month</div></div>
-            <div class="kpi-card"><div class="kpi-label">Top 10 Positions</div><div class="kpi-value">47</div><div class="kpi-trend trend-up">↑ +5 vs last month</div></div>
-            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-trend trend-up">↑ +12% MoM</div></div>
-            <div class="kpi-card warning"><div class="kpi-label">Site Issues</div><div class="kpi-value" style="color:var(--warning);">23</div><div class="kpi-trend trend-down">↓ -4 fixed this month</div></div>
+      <div class="table-wrapper">
+        <div class="table-header"><div class="table-title">Referring Domains</div>
+          <div class="table-actions">
+            <select class="form-input" style="width:120px;font-size:12px;"><option>Trust: Any</option><option>70+</option><option>50–70</option><option>Below 50</option></select>
+            <select class="form-input" style="width:130px;font-size:12px;"><option>Type: Any</option><option>Dofollow</option><option>Nofollow</option></select>
+            <input type="text" class="form-input" id="blSearch" placeholder="🔍 Search domain..." style="width:180px;font-size:12px;"/>
           </div>
-          <div class="grid-2">
-            <div class="chart-card" style="margin:0;">
-              <div class="chart-title" style="margin-bottom:4px;">Keyword Position Trend</div>
-              <div class="chart-subtitle" style="margin-bottom:16px;">Top 10 keywords over last 6 months</div>
-              <div style="height:200px;"><canvas id="kwTrend"></canvas></div>
-            </div>
-            <div class="chart-card" style="margin:0;">
-              <div class="chart-title" style="margin-bottom:4px;">Position Distribution</div>
-              <div class="chart-subtitle" style="margin-bottom:16px;">312 total keywords tracked</div>
-              <div style="height:200px;display:flex;align-items:center;gap:20px;">
-                <canvas id="posDistChart" style="max-width:160px;"></canvas>
-                <div style="flex:1;">
-                  <div style="display:flex;flex-direction:column;gap:8px;">
-                    <div class="legend-item"><div class="legend-dot" style="background:#C2410C;border-radius:3px;"></div><span>Pos 1–3</span><span style="margin-left:auto;font-weight:700;">24</span></div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#10B981;border-radius:3px;"></div><span>Pos 4–10</span><span style="margin-left:auto;font-weight:700;">23</span></div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#4F46E5;border-radius:3px;"></div><span>Pos 11–20</span><span style="margin-left:auto;font-weight:700;">87</span></div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#94A3B8;border-radius:3px;"></div><span>Pos 21+</span><span style="margin-left:auto;font-weight:700;">178</span></div>
-                  </div>
-                </div>
+        </div>
+        <table id="blTable">
+          <thead><tr><th>Domain</th><th>Trust Score</th><th>Backlinks</th><th>Type</th><th>First Seen</th><th>Last Active</th></tr></thead>
+          <tbody>
+            <tr><td><strong>forbes.com</strong></td><td><span style="font-weight:700;color:var(--success);">94</span></td><td>2</td><td><span class="badge badge-success">Dofollow</span></td><td>Mar 2026</td><td>Jun 2026</td></tr>
+            <tr><td><strong>searchengineland.com</strong></td><td><span style="font-weight:700;color:var(--success);">88</span></td><td>3</td><td><span class="badge badge-success">Dofollow</span></td><td>Jan 2026</td><td>Jun 2026</td></tr>
+            <tr><td><strong>moz.com</strong></td><td><span style="font-weight:700;color:var(--warning);">92</span></td><td>1</td><td><span class="badge badge-neutral">Nofollow</span></td><td>Feb 2026</td><td>May 2026</td></tr>
+            <tr><td><strong>semrush.com</strong></td><td><span style="font-weight:700;color:var(--success);">86</span></td><td>1</td><td><span class="badge badge-success">Dofollow</span></td><td>Apr 2026</td><td>Jun 2026</td></tr>
+            <tr><td><strong>ahrefs.com</strong></td><td><span style="font-weight:700;color:var(--success);">91</span></td><td>2</td><td><span class="badge badge-success">Dofollow</span></td><td>May 2026</td><td>Jun 2026</td></tr>
+          </tbody>
+        </table>
+        <div class="table-footer"><span>Showing 5 of 312 domains</span><span style="font-size:11px;color:var(--text-muted);">Sorted by: Trust Score ↓</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: AUDIT ═══ -->
+    <div class="tab-panel" id="tab-audit">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span style="font-size:12px;color:var(--text-muted);">Last audit: June 1, 2026 · Previous: May 1, 2026</span>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Running new audit...')">🔄 Run New Audit</button>
+      </div>
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Pages Crawled</div><div class="kpi-value">342</div><div class="kpi-trend trend-flat">Full crawl</div></div>
+        <div class="kpi-card"><div class="kpi-label">Indexable Pages</div><div class="kpi-value">287</div><div class="kpi-trend trend-flat">84% of total</div></div>
+        <div class="kpi-card warning"><div class="kpi-label">Non-Indexable</div><div class="kpi-value">55</div><div class="kpi-trend trend-flat">noindex / blocked</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="color:var(--success);">76%</div><div class="kpi-trend trend-up">↑ +8 pts vs May</div></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Health Score Trend</div>
+            <div style="display:flex;align-items:center;gap:20px;">
+              <div id="auditGauge" style="width:100px;height:100px;position:relative;flex-shrink:0;">
+                <svg width="100" height="100" viewBox="0 0 100 100" style="transform:rotate(-90deg);">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#F1F5F9" stroke-width="10"/>
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="60.3"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;"><div style="font-size:20px;font-weight:800;color:#10B981;">76</div><div style="font-size:9px;color:var(--text-muted);">/100</div></div>
+              </div>
+              <div style="flex:1;font-size:12px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:var(--text-muted);">May 2026</span><strong>68</strong></div>
+                <div class="progress-bar" style="margin-bottom:10px;"><div class="progress-fill warning" style="width:68%;"></div></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="color:var(--text-muted);">Jun 2026</span><strong style="color:var(--success);">76</strong></div>
+                <div class="progress-bar"><div class="progress-fill success" style="width:76%;"></div></div>
               </div>
             </div>
           </div>
         </div>
+        <div class="card">
+          <div class="card-body">
+            <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Issue Summary</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--danger);"></div><span style="font-size:13px;flex:1;">Critical</span><strong style="color:var(--danger);">3</strong><span style="font-size:11px;color:var(--success);">↓ from 11</span></div><div class="progress-bar"><div class="progress-fill danger" style="width:3%;"></div></div></div>
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--warning);"></div><span style="font-size:13px;flex:1;">Warnings</span><strong style="color:var(--warning);">18</strong><span style="font-size:11px;color:var(--success);">↓ from 23</span></div><div class="progress-bar"><div class="progress-fill warning" style="width:18%;"></div></div></div>
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#7090C0;"></div><span style="font-size:13px;flex:1;">Notices</span><strong style="color:#7090C0;">42</strong><span style="font-size:11px;color:var(--danger);">↑ from 39</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:#7090C0;"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Issues table with inline expand -->
+      <div class="table-wrapper">
+        <div class="table-header"><div class="table-title">Issues by Category</div></div>
+        <table>
+          <thead><tr><th>Issue</th><th>Severity</th><th>Count</th><th>Affected Pages</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Broken internal links</strong></td>
+              <td><span class="badge badge-danger">Critical</span></td>
+              <td>3</td>
+              <td style="font-size:12px;color:var(--text-muted);">/blog/post-14, /resources/guide-3</td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand1',this)">▶ View URLs</button></td>
+            </tr>
+            <tr class="expand-row" id="expand1" style="display:none;">
+              <td colspan="5" style="padding:0;">
+                <div class="expand-panel">
+                  <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:8px;">3 broken links found:</div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/post-14</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/resources/guide-3</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/old-services</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Missing meta descriptions</td><td><span class="badge badge-warning">Warning</span></td><td>8</td>
+              <td style="font-size:12px;color:var(--text-muted);">/blog/* (8 pages)</td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand2',this)">▶ View URLs</button></td>
+            </tr>
+            <tr class="expand-row" id="expand2" style="display:none;">
+              <td colspan="5" style="padding:0;">
+                <div class="expand-panel">
+                  <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">8 pages missing meta description:</div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/seo-tips-2026</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/link-building</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">+6 more pages</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Slow pages (&gt;3s load time)</td><td><span class="badge badge-warning">Warning</span></td><td>11</td>
+              <td style="font-size:12px;color:var(--text-muted);">Various</td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand3',this)">▶ View URLs</button></td>
+            </tr>
+            <tr class="expand-row" id="expand3" style="display:none;">
+              <td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">11 slow pages detected (avg 4.2s):</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/case-studies (5.1s)</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div></div></td>
+            </tr>
+            <tr>
+              <td>Missing H1 tags</td><td><span class="badge badge-warning">Warning</span></td><td>4</td>
+              <td style="font-size:12px;color:var(--text-muted);">4 pages</td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand4',this)">▶ View URLs</button></td>
+            </tr>
+            <tr class="expand-row" id="expand4" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">4 pages without H1:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/services/ppc</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div></div></td></tr>
+            <tr>
+              <td>Duplicate title tags</td><td><span class="badge badge-neutral">Notice</span></td><td>7</td>
+              <td style="font-size:12px;color:var(--text-muted);">7 pages</td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand5',this)">▶ View URLs</button></td>
+            </tr>
+            <tr class="expand-row" id="expand5" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;margin-bottom:8px;">7 pages with duplicate titles:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/category/seo</span><button class="btn btn-ghost btn-sm" style="font-size:11px;">Open URL →</button></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        <!-- KEYWORDS TAB -->
-        <div id="tab-keywords" class="tab-section" style="padding:20px; display:none;">
-          <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-            <div class="search-input-wrap" style="flex:1;"><span class="search-icon">🔍</span><input class="form-input" placeholder="Search keywords..." style="width:100%;"/></div>
-            <select class="form-input" style="width:auto;">
-              <option>All Positions</option><option>Top 3</option><option>Top 10</option><option>11–20</option><option>21+</option>
-            </select>
-            <select class="form-input" style="width:auto;"><option>All Locations</option><option>India</option><option>United States</option></select>
-          </div>
-          <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:16px;">
-            <div class="kpi-card" style="padding:12px;"><div class="kpi-label">All</div><div class="kpi-value" style="font-size:20px;">312</div></div>
-            <div class="kpi-card" style="padding:12px;"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:20px;color:#C2410C;">24</div></div>
-            <div class="kpi-card" style="padding:12px;"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:20px;color:var(--success);">47</div></div>
-            <div class="kpi-card" style="padding:12px;"><div class="kpi-label">11–20</div><div class="kpi-value" style="font-size:20px;color:var(--primary);">87</div></div>
-            <div class="kpi-card" style="padding:12px;"><div class="kpi-label">21+</div><div class="kpi-value" style="font-size:20px;color:var(--text-muted);">154</div></div>
-          </div>
+    <!-- ═══ TAB: ANALYTICS ═══ -->
+    <div class="tab-panel" id="tab-analytics">
+      <div id="gscConnectedState">
+        <div class="kpi-grid kpi-grid-2" style="grid-template-columns:1fr 1fr;margin-bottom:16px;">
+          <div class="kpi-card success"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-trend trend-up">↑ +16.3%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Clicks (GSC)</div><div class="kpi-value">9,840</div><div class="kpi-trend trend-up">↑ +18.3%</div></div>
+        </div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+          <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">142K</div><div class="kpi-trend trend-up">↑ +10.9%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg CTR</div><div class="kpi-value">6.93%</div><div class="kpi-trend trend-up">↑ +0.43%</div></div>
+          <div class="kpi-card success"><div class="kpi-label">Avg Position</div><div class="kpi-value">14.2</div><div class="kpi-trend trend-up">↑ Improved</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Traffic Trend — 6 Months</div><div class="chart-subtitle">Organic sessions from GSC</div></div></div>
+          <div style="height:200px;"><canvas id="analyticsChart"></canvas></div>
+        </div>
+        <div class="table-wrapper">
+          <div class="table-header"><div class="table-title">Top Performing Pages</div></div>
           <table>
-            <thead><tr><th>Keyword</th><th>Position</th><th>Change</th><th>Search Vol.</th><th>URL</th><th>Difficulty</th><th>Action</th></tr></thead>
+            <thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>CTR</th><th>Avg Position</th></tr></thead>
             <tbody>
-              <tr><td><strong>acme corp products</strong></td><td><span class="rank-pos pos-1-3">1</span></td><td class="trend-up">↑ 0</td><td>2,400</td><td><div class="kw-url">/products</div></td><td><span class="badge badge-success">Easy</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>industrial equipment suppliers</strong></td><td><span class="rank-pos pos-1-3">3</span></td><td class="trend-up">↑ 2</td><td>4,800</td><td><div class="kw-url">/solutions</div></td><td><span class="badge badge-warning">Medium</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>acme manufacturing</strong></td><td><span class="rank-pos pos-4-10">5</span></td><td class="trend-up">↑ 1</td><td>1,200</td><td><div class="kw-url">/about</div></td><td><span class="badge badge-success">Easy</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>best industrial suppliers</strong></td><td><span class="rank-pos pos-4-10">7</span></td><td class="trend-down">↓ 1</td><td>6,600</td><td><div class="kw-url">/</div></td><td><span class="badge badge-danger">Hard</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>manufacturing solutions online</strong></td><td><span class="rank-pos pos-4-10">9</span></td><td class="trend-up">↑ 4</td><td>3,200</td><td><div class="kw-url">/solutions</div></td><td><span class="badge badge-warning">Medium</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>industrial parts catalog</strong></td><td><span class="rank-pos pos-11-20">12</span></td><td class="trend-down">↓ 2</td><td>2,900</td><td><div class="kw-url">/catalog</div></td><td><span class="badge badge-warning">Medium</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
-              <tr><td><strong>buy industrial equipment</strong></td><td><span class="rank-pos pos-11-20">18</span></td><td class="trend-up">↑ 6</td><td>8,100</td><td><div class="kw-url">/shop</div></td><td><span class="badge badge-danger">Hard</span></td><td><button class="btn btn-ghost btn-sm">Track →</button></td></tr>
+              <tr><td style="font-size:12px;font-family:monospace;">/seo-services</td><td>2,340</td><td>38,200</td><td>6.1%</td><td>4.2</td></tr>
+              <tr><td style="font-size:12px;font-family:monospace;">/local-seo</td><td>1,890</td><td>24,500</td><td>7.7%</td><td>2.8</td></tr>
+              <tr><td style="font-size:12px;font-family:monospace;">/blog/seo-tips-2026</td><td>1,240</td><td>18,700</td><td>6.6%</td><td>8.4</td></tr>
+              <tr><td style="font-size:12px;font-family:monospace;">/case-studies</td><td>980</td><td>14,200</td><td>6.9%</td><td>11.2</td></tr>
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
 
-        <!-- BACKLINKS TAB -->
-        <div id="tab-backlinks" class="tab-section" style="padding:20px; display:none;">
-          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
-            <div class="kpi-card"><div class="kpi-label">Domain Authority</div><div class="kpi-value">52</div><div class="kpi-trend trend-up">↑ +2 this month</div></div>
-            <div class="kpi-card"><div class="kpi-label">Total Backlinks</div><div class="kpi-value">2,340</div><div class="kpi-trend trend-up">↑ +87 new</div></div>
-            <div class="kpi-card success"><div class="kpi-label">New This Month</div><div class="kpi-value" style="color:var(--success);">87</div><div class="kpi-trend trend-up">↑ Best month ever</div></div>
-            <div class="kpi-card warning"><div class="kpi-label">Lost This Month</div><div class="kpi-value" style="color:var(--danger);">12</div><div class="kpi-trend trend-flat">Net: +75</div></div>
-          </div>
-          <div class="grid-2" style="margin-bottom:20px;">
-            <div class="chart-card" style="margin:0;">
-              <div class="chart-title" style="margin-bottom:14px;">New vs Lost Backlinks (6 months)</div>
-              <div style="height:180px;"><canvas id="backlinkChart"></canvas></div>
-            </div>
-            <div class="chart-card" style="margin:0;">
-              <div class="chart-title" style="margin-bottom:14px;">Top Referring Domains</div>
-              <div>
-                <div class="backlink-row"><div style="display:flex;align-items:center;gap:8px;"><div class="da-badge">78</div><div><div style="font-weight:600;">techcrunch.com</div><div class="kw-url">3 links</div></div></div><span class="badge badge-success">Dofollow</span></div>
-                <div class="backlink-row"><div style="display:flex;align-items:center;gap:8px;"><div class="da-badge">65</div><div><div style="font-weight:600;">forbes.com</div><div class="kw-url">1 link</div></div></div><span class="badge badge-success">Dofollow</span></div>
-                <div class="backlink-row"><div style="display:flex;align-items:center;gap:8px;"><div class="da-badge">54</div><div><div style="font-weight:600;">industrialweek.com</div><div class="kw-url">5 links</div></div></div><span class="badge badge-neutral">Nofollow</span></div>
-                <div class="backlink-row"><div style="display:flex;align-items:center;gap:8px;"><div class="da-badge">43</div><div><div style="font-weight:600;">suppliersnow.com</div><div class="kw-url">2 links</div></div></div><span class="badge badge-success">Dofollow</span></div>
-              </div>
-            </div>
-          </div>
+    <!-- ═══ TAB: COMPETITORS ═══ -->
+    <div class="tab-panel" id="tab-competitors">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-primary btn-sm" data-modal-open="addCompetitorModal">+ Add Competitor</button>
+      </div>
+      <div class="table-wrapper" style="margin-bottom:20px;">
+        <div class="table-header"><div class="table-title">Competitor Overview</div></div>
+        <table>
+          <thead><tr><th>Domain</th><th>Trust Score</th><th>Top 10 KWs</th><th>Common KWs</th><th>Visibility</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr class="comp-us"><td><strong>acmecorp.com</strong> <span class="badge badge-primary" style="font-size:10px;">Us</span></td><td>42</td><td>47</td><td>—</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill" style="width:68%;"></div></div>68.4</div></td><td>—</td><td></td></tr>
+            <tr><td>rival-seo.co.uk</td><td><span style="color:var(--danger);font-weight:700;">58</span></td><td>67</td><td>43</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill danger" style="width:82%;"></div></div>82.1</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('rival-seo.co.uk')">🗑</button></td></tr>
+            <tr><td>seolondon.co.uk</td><td><span style="color:var(--warning);font-weight:700;">51</span></td><td>54</td><td>38</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill warning" style="width:75%;"></div></div>74.7</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('seolondon.co.uk')">🗑</button></td></tr>
+            <tr><td>digitalfirst.uk</td><td><span style="color:var(--success);font-weight:700;">47</span></td><td>49</td><td>31</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill success" style="width:71%;"></div></div>71.2</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('digitalfirst.uk')">🗑</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrapper">
+        <div class="table-header"><div class="table-title">Keyword Gap — Top Opportunities</div><button class="btn btn-ghost btn-sm" onclick="Toast.info('Loading all 34...')">View all 34 →</button></div>
+        <table>
+          <thead><tr><th>Keyword</th><th>Best Competitor Position</th><th>Our Position</th><th>Volume</th><th>Difficulty</th></tr></thead>
+          <tbody>
+            <tr><td>seo audit london</td><td>rival-seo.co.uk: <strong>3</strong></td><td style="color:var(--text-muted);">Not ranking</td><td>480</td><td><span style="color:var(--danger);">61</span></td></tr>
+            <tr><td>ecommerce seo uk</td><td>seolondon.co.uk: <strong>5</strong></td><td style="color:var(--text-muted);">Not ranking</td><td>720</td><td><span style="color:var(--danger);">69</span></td></tr>
+            <tr><td>affordable seo uk</td><td>rival-seo.co.uk: <strong>7</strong></td><td style="color:var(--text-muted);">Not ranking</td><td>1,100</td><td><span style="color:var(--warning);">58</span></td></tr>
+            <tr><td>seo consultant london</td><td>digitalfirst.uk: <strong>9</strong></td><td style="color:var(--text-muted);">Not ranking</td><td>590</td><td><span style="color:var(--warning);">55</span></td></tr>
+          </tbody>
+        </table>
+        <div class="table-footer"><span>Showing 4 of 34 keyword gaps</span></div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: REPORTS ═══ -->
+    <div class="tab-panel" id="tab-reports">
+      <!-- Auto-Schedule Config -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div><div class="card-title">Auto-Schedule</div><div class="card-subtitle">Generate and email this client's report automatically</div></div>
+          <label class="switch"><input type="checkbox" checked/><span class="switch-slider"></span></label>
         </div>
-
-        <!-- AUDIT TAB -->
-        <div id="tab-audit" class="tab-section" style="padding:20px; display:none;">
-          <div class="grid-sidebar">
-            <div>
-              <div class="kpi-grid kpi-grid-3" style="margin-bottom:20px;">
-                <div class="kpi-card success"><div class="kpi-label">Crawled Pages</div><div class="kpi-value">1,248</div><div class="kpi-trend trend-up">↑ +12 new</div></div>
-                <div class="kpi-card warning"><div class="kpi-label">Warnings</div><div class="kpi-value" style="color:var(--warning);">18</div><div class="kpi-trend trend-down">↓ -4 fixed</div></div>
-                <div class="kpi-card"><div class="kpi-label">Critical Errors</div><div class="kpi-value" style="color:var(--danger);">5</div><div class="kpi-trend trend-down">↓ -2 fixed</div></div>
-              </div>
-              <div class="table-wrapper" style="margin:0;">
-                <div class="table-header"><span class="table-title">Issue Breakdown</span></div>
-                <div style="padding:16px;">
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">Missing Meta Descriptions</div><div class="kw-url">Pages without meta description</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--danger);">38</span><span class="badge badge-danger">Critical</span></div>
-                  </div>
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">Broken Internal Links</div><div class="kw-url">404 errors from internal links</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--danger);">12</span><span class="badge badge-danger">Critical</span></div>
-                  </div>
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">Slow Page Speed</div><div class="kw-url">Pages loading > 3s on mobile</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--warning);">24</span><span class="badge badge-warning">Warning</span></div>
-                  </div>
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">Missing Alt Text</div><div class="kw-url">Images without alt attributes</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--warning);">67</span><span class="badge badge-warning">Warning</span></div>
-                  </div>
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">Duplicate Title Tags</div><div class="kw-url">Pages with identical titles</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--warning);">8</span><span class="badge badge-warning">Warning</span></div>
-                  </div>
-                  <div class="issue-item">
-                    <div><div style="font-weight:600;">HTTP Pages (No SSL)</div><div class="kw-url">Pages not on HTTPS</div></div>
-                    <div style="display:flex;align-items:center;gap:12px;"><span class="issue-count" style="color:var(--primary);">3</span><span class="badge badge-primary">Info</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="card" style="text-align:center; padding:28px 20px;">
-                <div class="card-title" style="margin-bottom:20px;">Overall Health Score</div>
-                <div style="position:relative;width:120px;height:120px;margin:0 auto 14px;">
-                  <svg width="120" height="120" viewBox="0 0 120 120" style="transform:rotate(-90deg);">
-                    <circle cx="60" cy="60" r="50" fill="none" stroke="var(--gray-200)" stroke-width="10"/>
-                    <circle cx="60" cy="60" r="50" fill="none" stroke="#10B981" stroke-width="10" stroke-linecap="round" stroke-dasharray="314.2" stroke-dashoffset="75.4"/>
-                  </svg>
-                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                    <span style="font-size:28px;font-weight:900;color:var(--text-primary);">76</span>
-                    <span style="font-size:10px;color:var(--text-muted);">/ 100</span>
-                  </div>
-                </div>
-                <div class="badge badge-success" style="font-size:13px;padding:6px 16px;">Good</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">Up from 72 last month (+4 pts)</div>
-              </div>
-              <div class="chart-card" style="margin-top:16px;">
-                <div class="chart-title" style="margin-bottom:4px;">Health Score Trend</div>
-                <div style="height:150px;"><canvas id="healthTrend"></canvas></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ANALYTICS TAB -->
-        <div id="tab-analytics" class="tab-section" style="padding:20px; display:none;">
-          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
-            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-trend trend-up">↑ +12% MoM</div></div>
-            <div class="kpi-card"><div class="kpi-label">Total Clicks (GSC)</div><div class="kpi-value">3,240</div><div class="kpi-trend trend-up">↑ +8%</div></div>
-            <div class="kpi-card success"><div class="kpi-label">Avg CTR</div><div class="kpi-value">4.2<span style="font-size:16px;font-weight:600;">%</span></div><div class="kpi-trend trend-up">↑ +0.4%</div></div>
-            <div class="kpi-card"><div class="kpi-label">Avg Position</div><div class="kpi-value">14.3</div><div class="kpi-trend trend-up">↑ +1.2</div></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title" style="margin-bottom:4px;">Organic Traffic Trend</div>
-            <div class="chart-subtitle" style="margin-bottom:16px;">Sessions over last 12 months</div>
-            <div style="height:240px;"><canvas id="trafficChart"></canvas></div>
-          </div>
-          <div class="connect-box" style="margin-top:0;">
-            <div style="font-size:28px;margin-bottom:8px;">🔍</div>
-            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Connect Google Search Console</div>
-            <div style="font-size:13px;margin-bottom:14px;">Add detailed click, impression, and query data to this client's analytics</div>
-            <button class="btn btn-primary btn-sm" onclick="Toast.success('GSC connected!')">Connect GSC for Acme Corp</button>
-          </div>
-        </div>
-
-        <!-- COMPETITORS TAB -->
-        <div id="tab-competitors" class="tab-section" style="padding:20px; display:none;">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
-            <button class="btn btn-secondary btn-sm" data-modal-open="addCompetitorModal">+ Add Competitor</button>
-          </div>
-          <div class="table-wrapper" style="margin-bottom:20px;">
-            <div class="table-header"><span class="table-title">Competitor Comparison</span></div>
-            <table>
-              <thead><tr><th>Domain</th><th>Visibility Score</th><th>Top 10 Keywords</th><th>Backlinks</th><th>DA</th><th>Trend</th></tr></thead>
-              <tbody>
-                <tr style="background:var(--primary-light);"><td><strong>acmecorp.com</strong> <span class="badge badge-primary">You</span></td><td>42%</td><td>47</td><td>2,340</td><td>52</td><td class="trend-up">↑ +4%</td></tr>
-                <tr><td>globalindustry.com</td><td>58%</td><td>89</td><td>8,120</td><td>67</td><td class="trend-up">↑ +2%</td></tr>
-                <tr><td>industrialpro.net</td><td>35%</td><td>31</td><td>1,890</td><td>44</td><td class="trend-down">↓ -1%</td></tr>
-                <tr><td>techparts.io</td><td>28%</td><td>24</td><td>1,200</td><td>38</td><td class="trend-flat">→ 0%</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="chart-card">
-            <div class="chart-title" style="margin-bottom:14px;">Visibility Score Trend (6 months)</div>
-            <div style="height:220px;"><canvas id="competitorChart"></canvas></div>
-          </div>
-        </div>
-
-        <!-- REPORTS TAB -->
-        <div id="tab-reports" class="tab-section" style="padding:20px; display:none;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <div class="page-title" style="font-size:16px;">Generated Reports</div>
-            <button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">⚡ New Report</button>
-          </div>
-          <div>
-            <div class="report-item">
-              <div class="report-icon">📊</div>
-              <div style="flex:1;">
-                <div style="font-weight:700;">June 2026 — Monthly SEO Report</div>
-                <div style="font-size:12px;color:var(--text-muted);">Generated Jun 1, 2026 · 12 pages · PDF</div>
-              </div>
-              <span class="badge badge-success">Sent ✓</span>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening report...')">👁 View</button>
-                <button class="btn btn-secondary btn-sm" onclick="Toast.success('Downloading PDF...')">⬇ PDF</button>
-                <button class="btn btn-secondary btn-sm" onclick="Toast.success('Resending report...')">📧 Resend</button>
-              </div>
-            </div>
-            <div class="report-item">
-              <div class="report-icon">📊</div>
-              <div style="flex:1;">
-                <div style="font-weight:700;">May 2026 — Monthly SEO Report</div>
-                <div style="font-size:12px;color:var(--text-muted);">Generated May 1, 2026 · 11 pages · PDF</div>
-              </div>
-              <span class="badge badge-success">Sent ✓</span>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-secondary btn-sm">👁 View</button>
-                <button class="btn btn-secondary btn-sm">⬇ PDF</button>
-                <button class="btn btn-secondary btn-sm">📧 Resend</button>
-              </div>
-            </div>
-            <div class="report-item">
-              <div class="report-icon">📊</div>
-              <div style="flex:1;">
-                <div style="font-weight:700;">Q1 2026 — Quarterly Review</div>
-                <div style="font-size:12px;color:var(--text-muted);">Generated Apr 1, 2026 · 24 pages · PDF</div>
-              </div>
-              <span class="badge badge-neutral">Draft</span>
-              <div style="display:flex;gap:6px;">
-                <button class="btn btn-secondary btn-sm">👁 View</button>
-                <button class="btn btn-primary btn-sm">⬆ Publish</button>
-              </div>
-            </div>
+        <div class="card-body">
+          <div class="schedule-row">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Day of Month</label><input class="form-input" type="number" value="1" min="1" max="28" style="width:80px;"/><div class="form-hint">1–28 only (avoids Feb issues)</div></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Time</label><input class="form-input" type="time" value="09:00" style="width:120px;"/><div class="form-hint">Agency timezone (IST)</div></div>
+            <div class="form-group" style="flex:1;margin-bottom:0;"><label class="form-label">Send to</label><input class="form-input" value="sarah@acmecorp.com, team@digitalhorizons.com"/></div>
+            <div style="padding-top:24px;"><button class="btn btn-secondary btn-sm" onclick="Toast.success('Schedule saved!')">Save</button></div>
           </div>
         </div>
       </div>
+      <!-- Report History -->
+      <div class="table-wrapper">
+        <div class="table-header"><div class="table-title">Report History</div><button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">+ Generate Report</button></div>
+        <table>
+          <thead><tr><th>Period</th><th>Type</th><th>Status</th><th>Version</th><th>Generated</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>May 2026</strong></td>
+              <td><span class="badge badge-neutral">Monthly</span></td>
+              <td><span class="badge badge-success">✅ Done</span></td>
+              <td style="font-size:11px;color:var(--text-muted);">v1</td>
+              <td style="font-size:12px;">Jun 1, 09:12</td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">🔗 Share</button><button class="btn btn-ghost btn-sm" onclick="Toast.info('Regenerating...')">🔄 Regen</button></div></td>
+            </tr>
+            <tr style="background:var(--gray-50);">
+              <td>May 2026 <span class="badge badge-neutral" style="font-size:10px;">regenerated</span></td>
+              <td><span class="badge badge-neutral">Monthly</span></td>
+              <td><span class="badge badge-success">✅ Done</span></td>
+              <td style="font-size:11px;color:var(--primary);font-weight:700;">v2 (latest)</td>
+              <td style="font-size:12px;">Jun 3, 14:20</td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">🔗 Share</button></div></td>
+            </tr>
+            <tr>
+              <td><strong>April 2026</strong></td>
+              <td><span class="badge badge-neutral">Monthly</span></td>
+              <td><span class="badge badge-success">✅ Done</span></td>
+              <td style="font-size:11px;color:var(--text-muted);">v1</td>
+              <td style="font-size:12px;">May 1, 09:08</td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button></div></td>
+            </tr>
+            <tr>
+              <td><strong>March 2026</strong></td>
+              <td><span class="badge badge-neutral">Monthly</span></td>
+              <td><span class="badge badge-danger">❌ Failed</span></td>
+              <td style="font-size:11px;color:var(--text-muted);">—</td>
+              <td style="font-size:12px;color:var(--danger);">Failed Apr 1, 09:05</td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Retrying...')">🔄 Retry</button><button class="btn btn-ghost btn-sm" onclick="toggleErrorLog()">⚠ Error Log</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Error log (hidden by default) -->
+      <div id="errorLogPanel" style="display:none;margin-top:12px;" class="error-log">
+        <div class="error-log-title">⚠ Error Details — March 2026 Report</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"><strong>Failed at:</strong> April 1, 2026 09:05:32 UTC</div>
+        <div class="error-pre">SERankingAPIError: Request failed with status 429 (Too Many Requests)<br>at fetchKeywordPositions (/lib/seranking/client.ts:84)<br>Endpoint: GET /sites/12345/positions<br>Retry count: 3/3 — all failed</div>
+        <div class="error-log-desc"><strong>Cause:</strong> SERanking API rate limit exceeded. The data sync job and report generation ran simultaneously.<br><strong>Fix:</strong> Reports now scheduled 2 hours after data sync to prevent collision.</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="Toast.success('Retry queued!')">🔄 Retry Report Generation</button>
+      </div>
     </div>
-  </div>
-</div>
+
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- Generate Report Modal -->
 <div class="modal-overlay" id="generateReportModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div><div class="modal-title">Generate Report — Acme Corp</div><div class="modal-subtitle">Create a new SEO report</div></div>
-      <button class="modal-close" data-modal-close="generateReportModal">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Report Month</label><select class="form-input"><option>June 2026</option><option>May 2026</option></select></div>
-        <div class="form-group"><label class="form-label">Report Type</label><select class="form-input"><option>Monthly Summary</option><option>Quarterly Review</option></select></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button>
-      <button class="btn btn-primary" onclick="Modal.close('generateReportModal'); Toast.success('Report generated!')">⚡ Generate</button>
-    </div>
+  <div class="modal"><div class="modal-header"><div class="modal-title">Generate Report — Acme Corp</div><button class="modal-close" data-modal-close="generateReportModal">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">Report Period</label><select class="form-input"><option>June 2026 (current month)</option><option>May 2026</option><option>April 2026</option><option>Custom range</option></select></div>
+    <div class="form-group"><label class="form-label">Send to Client</label><select class="form-input"><option>Yes — Email + Client Portal</option><option>No — Generate draft only</option></select></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button><button class="btn btn-primary" onclick="Modal.close('generateReportModal');Toast.success('Report generation queued!')">🚀 Generate</button></div>
   </div>
 </div>
 
 <!-- Add Competitor Modal -->
 <div class="modal-overlay" id="addCompetitorModal">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <div class="modal-title">Add Competitor</div>
-      <button class="modal-close" data-modal-close="addCompetitorModal">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Competitor Domain</label>
-        <input class="form-input" type="text" placeholder="competitor.com"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-modal-close="addCompetitorModal">Cancel</button>
-      <button class="btn btn-primary" onclick="Modal.close('addCompetitorModal'); Toast.success('Competitor added!')">Add</button>
-    </div>
+  <div class="modal modal-sm"><div class="modal-header"><div><div class="modal-title">Add Competitor</div><div class="modal-subtitle">Track and compare against Acme Corp</div></div><button class="modal-close" data-modal-close="addCompetitorModal">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">Competitor Domain <span class="required">*</span></label><input class="form-input" id="compDomain" placeholder="competitorsite.com" style="font-family:monospace;"/><div class="form-hint">Enter the root domain without https:// or www.</div></div>
+    <div class="form-group"><label class="form-label">Display Name (optional)</label><input class="form-input" placeholder="Competitor Agency Name"/></div>
+    <div id="compValidation" style="display:none;" class="alert alert-success" style="margin-bottom:0;">✅ Found! Domain Trust: 54 · 61 tracked keywords found</div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-modal-close="addCompetitorModal">Cancel</button>
+    <button class="btn btn-secondary btn-sm" onclick="validateCompetitor()">Validate Domain</button>
+    <button class="btn btn-primary" onclick="addCompetitor()">Add Competitor →</button>
+  </div>
+  </div>
+</div>
+
+<!-- Edit Client Modal -->
+<div class="modal-overlay" id="editClientModal">
+  <div class="modal"><div class="modal-header"><div class="modal-title">Edit Client — Acme Corp</div><button class="modal-close" data-modal-close="editClientModal">✕</button></div>
+  <div class="modal-body">
+    <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" value="Acme Corporation"/></div><div class="form-group"><label class="form-label">Industry</label><select class="form-input"><option selected>B2B SaaS</option><option>E-commerce</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">Website URL</label><input class="form-input" value="https://acmecorp.com"/></div><div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" value="sarah@acmecorp.com"/></div></div>
+    <div class="form-group"><label class="form-label">Internal Notes</label><textarea class="form-input" rows="2">E-commerce focus, target UK + US markets...</textarea></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="editClientModal">Cancel</button><button class="btn btn-primary" onclick="Modal.close('editClientModal');Toast.success('Client updated!')">Save Changes</button></div>
   </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 <script src="js/app.js"></script>
 <script>
-const months = ['Jan','Feb','Mar','Apr','May','Jun'];
-function switchTab(name) {
-  document.querySelectorAll('.tab-section').forEach(s => s.style.display = 'none');
-  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).style.display = 'block';
-  document.querySelector(`.tab-item[onclick="switchTab('${name}')"]`).classList.add('active');
-  initTabCharts(name);
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+  else {
+    const tabs = document.querySelectorAll('.ctab');
+    const names = ['overview','keywords','backlinks','audit','analytics','competitors','reports'];
+    const idx = names.indexOf(name);
+    if (tabs[idx]) tabs[idx].classList.add('active');
+  }
+  // Lazy render charts
+  if (name === 'overview' && !window._overviewCharts) initOverviewCharts();
+  if (name === 'backlinks' && !window._blChart) initBacklinkChart();
+  if (name === 'analytics' && !window._analyticsChart) initAnalyticsChart();
 }
 
-let chartInstances = {};
-function initTabCharts(tab) {
-  if (chartInstances[tab]) return;
-  chartInstances[tab] = true;
-  if (tab === 'overview') {
-    Charts.line('kwTrend', months, [
-      { label: 'Top 10', data: [38,40,42,44,45,47], borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.08)', fill: true }
-    ]);
-    Charts.doughnut('posDistChart', ['1-3','4-10','11-20','21+'], [24,23,87,178], ['#C2410C','#10B981','#4F46E5','#94A3B8']);
-  }
-  if (tab === 'backlinks') {
-    Charts.bar('backlinkChart', months, [
-      { label: 'New', data: [45,62,38,71,54,87], backgroundColor: 'rgba(16,185,129,0.7)' },
-      { label: 'Lost', data: [12,8,15,9,11,12], backgroundColor: 'rgba(239,68,68,0.6)' }
-    ]);
-  }
-  if (tab === 'audit') {
-    Charts.line('healthTrend', months, [
-      { label: 'Health', data: [68,70,69,72,74,76], borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true }
-    ]);
-  }
-  if (tab === 'analytics') {
-    Charts.line('trafficChart', ['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'], [
-      { label: 'Sessions', data: [5800,6200,6100,7400,7100,7800,7200,7600,8100,8200,7900,8420], borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.08)', fill: true }
-    ]);
-  }
-  if (tab === 'competitors') {
-    Charts.line('competitorChart', months, [
-      { label: 'Acme Corp', data: [38,39,40,41,42,42], borderColor: '#4F46E5' },
-      { label: 'Global Industry', data: [54,55,56,57,57,58], borderColor: '#10B981' },
-      { label: 'Industrial Pro', data: [36,35,35,36,35,35], borderColor: '#F59E0B' },
-    ]);
-  }
+function initOverviewCharts() {
+  window._overviewCharts = true;
+  Charts.line('kwTrendChart', ['Jan','Feb','Mar','Apr','May','Jun'], [{
+    label:'Top 10 Keywords', data:[30,33,36,40,43,47],
+    borderColor:'#4F46E5', backgroundColor:'rgba(79,70,229,0.08)', fill:true
+  }]);
+  Charts.bar('trafficChart', ['Jan','Feb','Mar','Apr','May','Jun'], [{
+    label:'Sessions', data:[5200,5800,6400,7100,7800,8420],
+    backgroundColor:'rgba(79,70,229,0.8)', borderRadius:5
+  }]);
+}
+function initBacklinkChart() {
+  window._blChart = true;
+  Charts.bar('backlinkChart', ['Jan','Feb','Mar','Apr','May','Jun'], [
+    {label:'New',data:[42,58,51,72,61,80],backgroundColor:'rgba(16,185,129,0.8)',borderRadius:4},
+    {label:'Lost',data:[28,24,36,24,32,21],backgroundColor:'rgba(239,68,68,0.7)',borderRadius:4}
+  ]);
+}
+function initAnalyticsChart() {
+  window._analyticsChart = true;
+  Charts.line('analyticsChart', ['Jan','Feb','Mar','Apr','May','Jun'], [{
+    label:'Sessions', data:[5200,5800,6400,7100,7800,8420],
+    borderColor:'#4F46E5', backgroundColor:'rgba(79,70,229,0.08)', fill:true
+  }]);
 }
 
-function editClient() { Toast.info('Opening client edit...'); window.location = 'clients.html'; }
+function toggleExpand(id, btn) {
+  const row = document.getElementById(id);
+  if (!row) return;
+  const isOpen = row.style.display !== 'none';
+  row.style.display = isOpen ? 'none' : 'table-row';
+  btn.textContent = isOpen ? '▶ View URLs' : '▼ Collapse';
+}
 
+function toggleErrorLog() {
+  const panel = document.getElementById('errorLogPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function validateCompetitor() {
+  const domain = document.getElementById('compDomain').value.trim();
+  if (!domain) { Toast.error('Enter a domain first'); return; }
+  Toast.info('Validating domain...');
+  setTimeout(() => {
+    document.getElementById('compValidation').style.display = 'flex';
+    Toast.success('Domain validated!');
+  }, 1200);
+}
+
+function addCompetitor() {
+  const domain = document.getElementById('compDomain').value.trim();
+  if (!domain) { Toast.error('Enter a domain first'); return; }
+  Modal.close('addCompetitorModal');
+  Toast.success(`${domain} added as competitor!`);
+}
+
+function removeCompetitor(domain) {
+  if (confirm(`Remove ${domain} from competitors?`)) Toast.success(`${domain} removed`);
+}
+
+// Auto-init charts when overview is active on load
 document.addEventListener('DOMContentLoaded', () => {
-  Modal.init();
-  initTabCharts('overview');
+  initOverviewCharts();
+  TableFilter.init('kwSearch', 'kwTable');
+  TableFilter.init('blSearch', 'blTable');
 });
 </script>
 </body>

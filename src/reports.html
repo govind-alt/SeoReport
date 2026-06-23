@@ -4,70 +4,22 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RankFlow — Reports</title>
+<meta name="description" content="Generate, manage and share SEO reports for all your clients from one place."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.report-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: var(--transition);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-}
-.report-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary); transform: translateY(-1px); }
-.report-card-icon {
-  width: 48px; height: 48px;
-  border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.report-card-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
-.report-card-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-.report-card-actions { display: flex; gap: 6px; margin-left: auto; align-items: center; }
-.report-viewer {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.report-preview-header {
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  color: white;
-  padding: 24px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.report-section { padding: 24px 32px; border-bottom: 1px solid var(--border); }
-.report-section:last-child { border-bottom: none; }
-.report-section-title {
-  font-size: 12px; font-weight: 800; color: var(--primary);
-  text-transform: uppercase; letter-spacing: 1px;
-  padding-bottom: 8px; border-bottom: 2px solid var(--primary-light);
-  margin-bottom: 16px; display: inline-block;
-}
-.exec-kpi { text-align: center; }
-.exec-kpi-val { font-size: 28px; font-weight: 900; color: var(--text-primary); }
-.exec-kpi-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
-.exec-kpi-trend { font-size: 12px; font-weight: 600; margin-top: 4px; }
-.reco-item {
-  display: flex; gap: 12px; padding: 12px 0;
-  border-bottom: 1px solid var(--gray-100); font-size: 13px;
-}
-.reco-item:last-child { border-bottom: none; }
-.reco-priority {
-  width: 28px; height: 28px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 800; flex-shrink: 0;
-}
-.priority-high { background: var(--danger-light); color: var(--danger); }
-.priority-med { background: var(--warning-light); color: #92400E; }
-.priority-low { background: var(--success-light); color: var(--success); }
+.report-preview{background:#fff;border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;font-size:13px;}
+.report-cover{background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);color:white;padding:28px;text-align:center;}
+.report-section{padding:20px;border-bottom:1px solid var(--border);}
+.report-section:last-child{border-bottom:none;}
+.report-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.report-kpi{background:var(--gray-50);border-radius:var(--radius);padding:12px;text-align:center;}
+.report-kpi-value{font-size:22px;font-weight:800;color:var(--text-primary);}
+.report-kpi-label{font-size:11px;color:var(--text-muted);}
+.ai-rec-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.ai-rec-item:last-child{border-bottom:none;}
+.ai-priority{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -76,12 +28,12 @@
   <aside class="sidebar">
     <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
     <nav class="sidebar-nav">
-      <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
-      <a class="sidebar-item" href="clients.html"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
-      <a class="sidebar-item active" href="reports.html"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item active"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
       <div class="sidebar-section-label">Configuration</div>
-      <a class="sidebar-item" href="settings.html"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
-      <a class="sidebar-item" href="#"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help & Support</span></a>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help &amp; Support</span></a>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-role">Agency Admin</div></div></div></div>
   </aside>
@@ -90,264 +42,249 @@
     <header class="topbar">
       <div class="topbar-title">Reports</div>
       <div class="topbar-actions">
-        <button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">⚡ Generate Report</button>
+        <button class="btn btn-secondary btn-sm" onclick="Modal.open('bulkGenerateModal')">📄 Bulk Generate</button>
+        <button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">+ Generate Report</button>
+        <div class="notif-bell-wrap" style="position:relative;">
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">🔔</button>
+          <div style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications</div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
+            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">5 unread notifications</div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);">View all →</a></div>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="page-content">
-      <div class="page-header">
+      <!-- Summary KPIs -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card success"><div class="kpi-label">Reports This Month</div><div class="kpi-value">18</div><div class="kpi-trend trend-up">↑ +3 vs last month</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total Reports</div><div class="kpi-value">38</div><div class="kpi-trend trend-flat">Across 24 clients</div></div>
+        <div class="kpi-card warning"><div class="kpi-label">Pending / Overdue</div><div class="kpi-value" style="color:var(--warning);">6</div><div class="kpi-trend trend-flat">Clients need reports</div></div>
+        <div class="kpi-card"><div class="kpi-label">Avg Gen Time</div><div class="kpi-value">2.4m</div><div class="kpi-trend trend-up">↑ 0.3m faster</div></div>
+      </div>
+
+      <!-- Layout: Table + Preview -->
+      <div style="display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start;">
+
+        <!-- Reports Table -->
         <div>
-          <div class="page-title">All Reports</div>
-          <div class="page-subtitle">View, download, and manage all generated SEO reports</div>
+          <!-- Filter bar -->
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+            <div class="search-input-wrap" style="flex:1;min-width:180px;"><span class="search-icon">🔍</span><input type="text" class="form-input" id="reportSearch" placeholder="Search client or period..." style="padding-left:34px;"/></div>
+            <select class="form-input" style="width:150px;"><option>Client: All</option><option>Acme Corp</option><option>TechStart.io</option><option>GreenLeaf Organics</option><option>BlueSky Marketing</option></select>
+            <select class="form-input" style="width:130px;" onchange="filterReportStatus(this.value)">
+              <option value="all">Status: All</option>
+              <option value="done">Completed</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+            </select>
+            <select class="form-input" style="width:130px;"><option>Period: All</option><option>Jun 2026</option><option>May 2026</option><option>Apr 2026</option></select>
+          </div>
+
+          <div class="table-wrapper">
+            <table id="reportsTable">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Period</th>
+                  <th>Status</th>
+                  <th>Generated</th>
+                  <th>Opened</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-status="done" onclick="showPreview('acme')" style="cursor:pointer;" class="active-row">
+                  <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;background:#4F46E5;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">AC</div><div><div style="font-weight:700;">Acme Corp</div><div style="font-size:11px;color:var(--text-muted);">acmecorp.com</div></div></div></td>
+                  <td><strong>Jun 2026</strong> <span class="badge badge-neutral" style="font-size:10px;">v2</span></td>
+                  <td><span class="badge badge-success">✅ Done</span></td>
+                  <td style="font-size:12px;">Jun 3, 14:20</td>
+                  <td style="font-size:12px;color:var(--success);">👁 Viewed</td>
+                  <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showPreview('acme')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();Toast.info('Downloading...')">📥</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">🔗</button></div></td>
+                </tr>
+                <tr data-status="done" onclick="showPreview('techstart')" style="cursor:pointer;">
+                  <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;background:#10B981;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">TS</div><div><div style="font-weight:700;">TechStart.io</div><div style="font-size:11px;color:var(--text-muted);">techstart.io</div></div></div></td>
+                  <td><strong>Jun 2026</strong> <span class="badge badge-neutral" style="font-size:10px;">v1</span></td>
+                  <td><span class="badge badge-success">✅ Done</span></td>
+                  <td style="font-size:12px;">Jun 1, 09:08</td>
+                  <td style="font-size:12px;color:var(--text-muted);">—</td>
+                  <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showPreview('techstart')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();Toast.info('Downloading...')">📥</button><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">🔗</button></div></td>
+                </tr>
+                <tr data-status="pending">
+                  <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;background:#F59E0B;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">GL</div><div><div style="font-weight:700;">GreenLeaf Organics</div><div style="font-size:11px;color:var(--text-muted);">greenleaf.com</div></div></div></td>
+                  <td><strong>Jun 2026</strong></td>
+                  <td><span class="badge badge-warning">⏳ Pending</span></td>
+                  <td style="font-size:12px;color:var(--text-muted);">Scheduled Jul 1</td>
+                  <td style="font-size:12px;color:var(--text-muted);">—</td>
+                  <td><div style="display:flex;gap:4px;"><button class="btn btn-primary btn-sm" onclick="Toast.success('Generating now...')">Generate Now</button></div></td>
+                </tr>
+                <tr data-status="failed">
+                  <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;background:#3B82F6;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">BS</div><div><div style="font-weight:700;">BlueSky Marketing</div><div style="font-size:11px;color:var(--text-muted);">bluesky.co.uk</div></div></div></td>
+                  <td><strong>May 2026</strong></td>
+                  <td><span class="badge badge-danger">❌ Failed</span></td>
+                  <td style="font-size:12px;color:var(--danger);">Failed Jun 1</td>
+                  <td style="font-size:12px;color:var(--text-muted);">—</td>
+                  <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.success('Retry queued!')">🔄 Retry</button><button class="btn btn-ghost btn-sm" onclick="Toast.info('Showing error...')">⚠ Log</button></div></td>
+                </tr>
+                <tr data-status="done">
+                  <td><div style="display:flex;align-items:center;gap:8px;"><div style="width:30px;height:30px;background:#4F46E5;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">AC</div><div><div style="font-weight:700;">Acme Corp</div><div style="font-size:11px;color:var(--text-muted);">acmecorp.com</div></div></div></td>
+                  <td><strong>May 2026</strong> <span class="badge badge-neutral" style="font-size:10px;">v1</span></td>
+                  <td><span class="badge badge-success">✅ Done</span></td>
+                  <td style="font-size:12px;">May 1, 09:12</td>
+                  <td style="font-size:12px;color:var(--success);">👁 Viewed 3×</td>
+                  <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading...')">📥</button><button class="btn btn-secondary btn-sm" onclick="copyShareLink()">🔗</button></div></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="table-footer"><span id="reportCount">Showing 5 of 38 reports</span><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm">← Prev</button><button class="btn btn-primary btn-sm">1</button><button class="btn btn-secondary btn-sm">2</button><button class="btn btn-secondary btn-sm">Next →</button></div></div>
+          </div>
         </div>
-        <div class="page-header-actions">
-          <select class="form-input" style="width:auto;" onchange="filterReports(this.value)">
-            <option value="">All Clients</option>
-            <option value="Acme Corp">Acme Corp</option>
-            <option value="TechStart.io">TechStart.io</option>
-            <option value="GreenLeaf Organics">GreenLeaf Organics</option>
-          </select>
-          <select class="form-input" style="width:auto;">
-            <option>All Months</option>
-            <option>June 2026</option>
-            <option>May 2026</option>
-            <option>April 2026</option>
-          </select>
-          <div class="search-input-wrap"><span class="search-icon">🔍</span><input class="form-input" placeholder="Search reports..." style="width:200px;"/></div>
-        </div>
-      </div>
 
-      <!-- KPI Row -->
-      <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
-        <div class="kpi-card"><div class="kpi-label">Total Reports</div><div class="kpi-value">38</div><div class="kpi-trend trend-up">↑ +5 this month</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Published & Sent</div><div class="kpi-value" style="color:var(--success);">31</div></div>
-        <div class="kpi-card warning"><div class="kpi-label">Draft / Pending</div><div class="kpi-value" style="color:var(--warning);">4</div></div>
-        <div class="kpi-card"><div class="kpi-label">Avg Generation Time</div><div class="kpi-value">47<span style="font-size:16px;">s</span></div><div class="kpi-trend trend-up">↑ 23% faster</div></div>
-      </div>
-
-      <!-- View Toggle: List vs Preview -->
-      <div style="display:flex;gap:10px;margin-bottom:20px;border-bottom:2px solid var(--border);">
-        <div class="tab-item active" onclick="setView('list',this)">📋 Report List</div>
-        <div class="tab-item" onclick="setView('preview',this)">👁 Report Preview</div>
-      </div>
-
-      <!-- LIST VIEW -->
-      <div id="listView">
-        <div style="display:flex;flex-direction:column;gap:10px;" id="reportsList"></div>
-      </div>
-
-      <!-- PREVIEW VIEW -->
-      <div id="previewView" style="display:none;">
-        <div style="display:flex;gap:20px;margin-bottom:20px;align-items:flex-start;">
-          <select class="form-input" style="width:300px;" onchange="selectReport(this.value)">
-            <option>Acme Corp — June 2026</option>
-            <option>TechStart.io — June 2026</option>
-            <option>GreenLeaf Organics — May 2026</option>
-          </select>
-          <button class="btn btn-primary btn-sm" onclick="Toast.success('Downloading PDF...')">⬇ Download PDF</button>
-          <button class="btn btn-secondary btn-sm" onclick="Toast.success('Sending to client...')">📧 Send to Client</button>
-          <button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">🔗 Share Link</button>
-        </div>
-
-        <!-- Report Preview -->
-        <div class="report-viewer">
-          <!-- Report Header -->
-          <div class="report-preview-header">
-            <div>
-              <div style="opacity:0.7;font-size:11px;margin-bottom:6px;">DIGITAL HORIZONS AGENCY</div>
-              <div style="font-size:22px;font-weight:900;">Monthly SEO Report</div>
-              <div style="opacity:0.7;font-size:13px;margin-top:4px;">Acme Corp · June 2026</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius);padding:12px 20px;backdrop-filter:blur(10px);">
-                <div style="font-size:32px;font-weight:900;">76</div>
+        <!-- Report Preview Panel -->
+        <div id="reportPreview" style="position:sticky;top:80px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📄 Report Preview</div>
+          <div class="report-preview" id="previewAcme">
+            <div class="report-cover">
+              <div style="font-size:11px;opacity:0.7;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">Digital Horizons Agency</div>
+              <div style="font-size:20px;font-weight:800;margin-bottom:4px;">Monthly SEO Report</div>
+              <div style="font-size:13px;opacity:0.7;">Acme Corp · June 2026</div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:var(--radius);padding:14px;margin-top:16px;">
+                <div style="font-size:28px;font-weight:900;">76</div>
                 <div style="font-size:11px;opacity:0.7;">Health Score</div>
               </div>
             </div>
-          </div>
-
-          <!-- Executive Summary -->
-          <div class="report-section">
-            <div class="report-section-title">Executive Summary</div>
-            <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
-              <div class="exec-kpi">
-                <div class="exec-kpi-val">47</div>
-                <div class="exec-kpi-label">Top 10 Rankings</div>
-                <div class="exec-kpi-trend trend-up">↑ +5</div>
-              </div>
-              <div class="exec-kpi">
-                <div class="exec-kpi-val">8,420</div>
-                <div class="exec-kpi-label">Organic Sessions</div>
-                <div class="exec-kpi-trend trend-up">↑ +12%</div>
-              </div>
-              <div class="exec-kpi">
-                <div class="exec-kpi-val">2,340</div>
-                <div class="exec-kpi-label">Total Backlinks</div>
-                <div class="exec-kpi-trend trend-up">↑ +87</div>
-              </div>
-              <div class="exec-kpi">
-                <div class="exec-kpi-val">76%</div>
-                <div class="exec-kpi-label">Site Health</div>
-                <div class="exec-kpi-trend trend-up">↑ +4pts</div>
+            <div class="report-section">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Executive Summary</div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Strong month for Acme Corp — top 10 keywords grew by 4, organic sessions up 16.3%. Site health improved 8 points to 76%. 3 critical issues resolved this month.</div>
+            </div>
+            <div class="report-section">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Key Metrics</div>
+              <div class="report-kpi-row">
+                <div class="report-kpi"><div class="report-kpi-value" style="color:var(--success);">8,420</div><div class="report-kpi-label">Sessions</div></div>
+                <div class="report-kpi"><div class="report-kpi-value">47</div><div class="report-kpi-label">Top 10 KWs</div></div>
+                <div class="report-kpi"><div class="report-kpi-value">76%</div><div class="report-kpi-label">Health</div></div>
               </div>
             </div>
-            <div class="alert alert-success" style="margin-top:16px;margin-bottom:0;">
-              🏆 <strong>Key wins this month:</strong> Ranked #1 for "acme corp products" · Fixed 12 broken links · 87 new referring domains acquired
+            <div class="report-section">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🤖 AI Recommendations</div>
+              <div class="ai-rec-item"><div class="ai-priority" style="background:var(--danger);"></div><div style="font-size:12px;"><strong>Fix 3 broken internal links</strong> — Pages /blog/post-14 and /resources/guide-3 have broken links affecting crawlability.</div></div>
+              <div class="ai-rec-item"><div class="ai-priority" style="background:var(--warning);"></div><div style="font-size:12px;"><strong>Optimize 8 blog pages</strong> — Add meta descriptions to /blog/* pages to improve CTR.</div></div>
+              <div class="ai-rec-item"><div class="ai-priority" style="background:var(--primary);"></div><div style="font-size:12px;"><strong>Target "seo audit london"</strong> — Competitor ranks #3, you have no position. High volume opportunity (480/mo).</div></div>
+            </div>
+            <div class="report-section" style="background:var(--gray-50);">
+              <div style="font-size:11px;color:var(--text-muted);text-align:center;">Prepared by Digital Horizons Agency · Confidential</div>
             </div>
           </div>
-
-          <!-- Keyword Rankings -->
-          <div class="report-section">
-            <div class="report-section-title">Keyword Rankings</div>
-            <div style="height:160px; margin-bottom:16px;"><canvas id="previewKwChart"></canvas></div>
-            <table>
-              <thead><tr><th>Keyword</th><th>Position</th><th>Change</th><th>Search Volume</th></tr></thead>
-              <tbody>
-                <tr><td><strong>acme corp products</strong></td><td>1</td><td class="trend-up">↑ 0</td><td>2,400</td></tr>
-                <tr><td><strong>industrial equipment suppliers</strong></td><td>3</td><td class="trend-up">↑ 2</td><td>4,800</td></tr>
-                <tr><td><strong>best industrial suppliers</strong></td><td>7</td><td class="trend-down">↓ 1</td><td>6,600</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Recommendations -->
-          <div class="report-section">
-            <div class="report-section-title">AI Recommendations</div>
-            <div>
-              <div class="reco-item">
-                <div class="reco-priority priority-high">H</div>
-                <div><strong>Fix 38 missing meta descriptions</strong> — Pages without meta descriptions have 30% lower CTR. Add unique descriptions to boost organic clicks immediately.</div>
-              </div>
-              <div class="reco-item">
-                <div class="reco-priority priority-high">H</div>
-                <div><strong>Resolve 12 broken internal links</strong> — Broken links hurt crawlability and user experience. Fix or redirect each 404 to the correct page.</div>
-              </div>
-              <div class="reco-item">
-                <div class="reco-priority priority-med">M</div>
-                <div><strong>Optimize page speed for mobile</strong> — 24 pages load slower than 3s on mobile. Compress images and defer non-critical JavaScript.</div>
-              </div>
-              <div class="reco-item">
-                <div class="reco-priority priority-low">L</div>
-                <div><strong>Increase content around "buy industrial equipment"</strong> — Currently ranking #18 for this high-volume keyword. A dedicated landing page could move it into top 10.</div>
+          <div class="report-preview" id="previewTechstart" style="display:none;">
+            <div class="report-cover" style="background:linear-gradient(135deg,#10B981 0%,#059669 100%);">
+              <div style="font-size:11px;opacity:0.7;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">Digital Horizons Agency</div>
+              <div style="font-size:20px;font-weight:800;margin-bottom:4px;">Monthly SEO Report</div>
+              <div style="font-size:13px;opacity:0.7;">TechStart.io · June 2026</div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:var(--radius);padding:14px;margin-top:16px;"><div style="font-size:28px;font-weight:900;">89</div><div style="font-size:11px;opacity:0.7;">Health Score</div></div>
+            </div>
+            <div class="report-section">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Executive Summary</div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">Exceptional performance — TechStart.io achieved its highest health score at 89%. Keywords in Top 10 grew to 87, traffic up significantly to 12,340 sessions.</div>
+            </div>
+            <div class="report-section">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Key Metrics</div>
+              <div class="report-kpi-row">
+                <div class="report-kpi"><div class="report-kpi-value" style="color:var(--success);">12,340</div><div class="report-kpi-label">Sessions</div></div>
+                <div class="report-kpi"><div class="report-kpi-value">87</div><div class="report-kpi-label">Top 10 KWs</div></div>
+                <div class="report-kpi"><div class="report-kpi-value" style="color:var(--success);">89%</div><div class="report-kpi-label">Health</div></div>
               </div>
             </div>
+            <div class="report-section" style="background:var(--gray-50);"><div style="font-size:11px;color:var(--text-muted);text-align:center;">Prepared by Digital Horizons Agency · Confidential</div></div>
           </div>
-
-          <!-- Footer -->
-          <div style="padding:16px 32px; background:var(--gray-50); display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted);">
-            <span>Confidential — Prepared by Digital Horizons Agency for Acme Corp only.</span>
-            <span>Generated Jun 1, 2026 · Powered by RankFlow</span>
+          <div style="display:flex;gap:8px;margin-top:12px;" id="previewActions">
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="Toast.info('Downloading PDF...')">📥 Download PDF</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="copyShareLink()">🔗 Share Link</button>
+            <button class="btn btn-ghost btn-sm" onclick="Toast.info('Sending email...')">📧</button>
           </div>
         </div>
-      </div>
 
+      </div><!-- /grid -->
     </div><!-- /page-content -->
-  </div>
-</div>
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- Generate Report Modal -->
 <div class="modal-overlay" id="generateReportModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div><div class="modal-title">Generate New Report</div><div class="modal-subtitle">Create an SEO report for a client</div></div>
-      <button class="modal-close" data-modal-close="generateReportModal">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Client <span style="color:var(--danger)">*</span></label>
-        <select class="form-input"><option value="">Select client...</option><option>Acme Corp</option><option>TechStart.io</option><option>GreenLeaf Organics</option></select>
+  <div class="modal"><div class="modal-header"><div><div class="modal-title">Generate New Report</div><div class="modal-subtitle">Create a branded SEO report for a client</div></div><button class="modal-close" data-modal-close="generateReportModal">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">Select Client <span class="required">*</span></label><select class="form-input"><option value="">Choose client...</option><option>Acme Corp</option><option>TechStart.io</option><option>GreenLeaf Organics</option><option>BlueSky Marketing</option></select></div>
+    <div class="form-group"><label class="form-label">Report Period</label><select class="form-input"><option>June 2026 (current)</option><option>May 2026</option><option>April 2026</option></select></div>
+    <div class="form-group"><label class="form-label">Include Sections</label>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> Executive Summary</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> Keyword Rankings</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> Organic Traffic (GSC)</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> Backlink Profile</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> Technical Audit</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);"/> AI Recommendations</label>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Report Period</label><select class="form-input"><option>June 2026</option><option>May 2026</option></select></div>
-        <div class="form-group"><label class="form-label">Format</label><select class="form-input"><option>Monthly Summary</option><option>Quarterly</option></select></div>
-      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button>
-      <button class="btn btn-primary" onclick="generateReport()">⚡ Generate Report</button>
+    <div class="form-group"><label class="form-label">Delivery</label><select class="form-input"><option>Email + Client Portal</option><option>Draft only (no send)</option></select></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button><button class="btn btn-primary" onclick="generateReport()">🚀 Generate Report</button></div>
+  </div>
+</div>
+
+<!-- Bulk Generate Modal -->
+<div class="modal-overlay" id="bulkGenerateModal">
+  <div class="modal"><div class="modal-header"><div><div class="modal-title">Bulk Generate Reports</div><div class="modal-subtitle">Generate reports for multiple clients at once</div></div><button class="modal-close" data-modal-close="bulkGenerateModal">✕</button></div>
+  <div class="modal-body">
+    <div class="alert alert-info">This will generate June 2026 reports for all selected clients and send them automatically.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <label style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;"><input type="checkbox" checked style="accent-color:var(--primary);"/><div style="width:28px;height:28px;background:#4F46E5;border-radius:5px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;">AC</div>Acme Corp <span class="badge badge-neutral" style="margin-left:auto;">Last: Jun 3</span></label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;"><input type="checkbox" checked style="accent-color:var(--primary);"/><div style="width:28px;height:28px;background:#10B981;border-radius:5px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;">TS</div>TechStart.io <span class="badge badge-neutral" style="margin-left:auto;">Last: Jun 1</span></label>
+      <label style="display:flex;align-items:center;gap:10px;padding:10px;border:2px solid var(--warning);border-radius:var(--radius);cursor:pointer;font-size:13px;background:var(--warning-light);"><input type="checkbox" checked style="accent-color:var(--primary);"/><div style="width:28px;height:28px;background:#F59E0B;border-radius:5px;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;">GL</div>GreenLeaf Organics <span class="badge badge-warning" style="margin-left:auto;">⚠ Overdue</span></label>
     </div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="bulkGenerateModal">Cancel</button><button class="btn btn-primary" onclick="bulkGenerate()">🚀 Generate 3 Reports</button></div>
   </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 <script src="js/app.js"></script>
 <script>
-const reportsData = [
-  { client: 'Acme Corp', domain: 'acmecorp.com', period: 'June 2026', type: 'Monthly', pages: 12, status: 'sent', color: '#4F46E5', date: 'Jun 1, 2026', health: 76 },
-  { client: 'TechStart.io', domain: 'techstart.io', period: 'June 2026', type: 'Monthly', pages: 14, status: 'sent', color: '#10B981', date: 'Jun 1, 2026', health: 89 },
-  { client: 'GreenLeaf Organics', domain: 'greenleaf.com', period: 'May 2026', type: 'Monthly', pages: 10, status: 'overdue', color: '#F59E0B', date: 'May 1, 2026', health: 62 },
-  { client: 'BlueSky Marketing', domain: 'bluesky.co.uk', period: 'June 2026', type: 'Monthly', pages: 13, status: 'sent', color: '#3B82F6', date: 'Jun 1, 2026', health: 84 },
-  { client: 'Nexus Digital', domain: 'nexus.com', period: 'June 2026', type: 'Monthly', pages: 0, status: 'draft', color: '#EF4444', date: '—', health: 41 },
-  { client: 'Acme Corp', domain: 'acmecorp.com', period: 'Q1 2026', type: 'Quarterly', pages: 24, status: 'draft', color: '#4F46E5', date: 'Apr 1, 2026', health: 72 },
-  { client: 'TechStart.io', domain: 'techstart.io', period: 'May 2026', type: 'Monthly', pages: 13, status: 'sent', color: '#10B981', date: 'May 1, 2026', health: 87 },
-  { client: 'PeakSEO Agency', domain: 'peakseo.com', period: 'June 2026', type: 'Monthly', pages: 11, status: 'sent', color: '#8B5CF6', date: 'Jun 1, 2026', health: 73 },
-];
+document.addEventListener('DOMContentLoaded', () => {
+  TableFilter.init('reportSearch', 'reportsTable');
+});
 
-function getStatusBadge(s) {
-  const map = { sent: 'badge-success', draft: 'badge-neutral', overdue: 'badge-danger' };
-  const labels = { sent: '✓ Sent', draft: '📝 Draft', overdue: '⚠ Overdue' };
-  return `<span class="badge ${map[s]}">${labels[s]}</span>`;
-}
-function getInitials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
-
-function renderList(data) {
-  document.getElementById('reportsList').innerHTML = data.map(r => `
-    <div class="report-card" onclick="document.querySelector('[onclick*=setView]').click()">
-      <div class="report-card-icon" style="background:${r.color}20;">📊</div>
-      <div style="display:flex;align-items:center;gap:10px;width:160px;">
-        <div style="width:32px;height:32px;border-radius:6px;background:${r.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;flex-shrink:0;">${getInitials(r.client)}</div>
-        <div><div style="font-weight:700;font-size:13px;">${r.client}</div><div style="font-size:11px;color:var(--text-muted);">${r.domain}</div></div>
-      </div>
-      <div style="flex:1;">
-        <div class="report-card-title">${r.period} — ${r.type} SEO Report</div>
-        <div class="report-card-meta">Generated ${r.date}${r.pages ? ' · ' + r.pages + ' pages · PDF' : ' · Not yet generated'}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        ${getStatusBadge(r.status)}
-        <div style="text-align:center;min-width:50px;">
-          <div style="font-size:15px;font-weight:800;color:${r.health >= 70 ? 'var(--success)' : r.health >= 50 ? 'var(--warning)' : 'var(--danger)'};">${r.health}%</div>
-          <div style="font-size:9px;color:var(--text-muted);">Health</div>
-        </div>
-      </div>
-      <div class="report-card-actions" onclick="event.stopPropagation()">
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button>
-        ${r.status !== 'draft' ? `<button class="btn btn-secondary btn-sm" onclick="Toast.success('Downloading PDF...')">⬇ PDF</button>` : ''}
-        ${r.status === 'draft' ? `<button class="btn btn-primary btn-sm" onclick="Toast.success('Report published!')">⬆ Publish</button>` : `<button class="btn btn-secondary btn-sm" onclick="Toast.success('Resending...')">📧 Resend</button>`}
-      </div>
-    </div>`).join('');
+function showPreview(client) {
+  document.getElementById('previewAcme').style.display = 'none';
+  document.getElementById('previewTechstart').style.display = 'none';
+  if (client === 'acme') document.getElementById('previewAcme').style.display = 'block';
+  if (client === 'techstart') document.getElementById('previewTechstart').style.display = 'block';
+  document.querySelectorAll('#reportsTable tbody tr').forEach(r => r.style.background = '');
+  event.currentTarget.style.background = 'var(--primary-light)';
 }
 
-let listData = [...reportsData];
-function filterReports(client) {
-  listData = client ? reportsData.filter(r => r.client === client) : [...reportsData];
-  renderList(listData);
-}
-
-let activeTabEl = null;
-function setView(view, el) {
-  document.querySelectorAll('[onclick*="setView"]').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
-  document.getElementById('previewView').style.display = view === 'preview' ? 'block' : 'none';
-  if (view === 'preview') {
-    setTimeout(() => {
-      Charts.line('previewKwChart', ['Jan','Feb','Mar','Apr','May','Jun'], [
-        { label: 'Top 10', data: [38,40,42,44,45,47], borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.08)', fill: true }
-      ]);
-    }, 100);
-  }
+function filterReportStatus(val) {
+  document.querySelectorAll('#reportsTable tbody tr').forEach(row => {
+    row.style.display = (val === 'all' || row.dataset.status === val) ? '' : 'none';
+  });
 }
 
 function generateReport() {
   Modal.close('generateReportModal');
   Toast.info('Generating report...');
-  setTimeout(() => Toast.success('Report generated! View it in the list.'), 2000);
+  setTimeout(() => Toast.success('Report generated and sent to client!'), 2000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderList(reportsData);
-  Modal.init();
-});
+function bulkGenerate() {
+  Modal.close('bulkGenerateModal');
+  Toast.info('Bulk generation queued for 3 clients...');
+  setTimeout(() => Toast.success('3 reports generated successfully!'), 2500);
+}
+
+function copyShareLink() {
+  navigator.clipboard?.writeText(window.location.origin + '/reports/share/abc123').catch(() => {});
+  Toast.success('Share link copied to clipboard!');
+}
 </script>
 </body>
 </html>

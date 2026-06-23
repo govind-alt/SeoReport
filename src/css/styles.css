@@ -1291,3 +1291,231 @@ select.form-input {
   border-radius: var(--radius);
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ─── Pill Filters (Keyword filters) ─── */
+.pill-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-strong);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: var(--surface);
+  white-space: nowrap;
+}
+.pill:hover { border-color: var(--primary); color: var(--primary); }
+.pill.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+/* ─── Bulk Action Bar ─── */
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  font-size: 13px;
+  animation: slideUp 0.2s ease;
+}
+.bulk-count { color: var(--primary); font-weight: 700; }
+.bulk-clear { margin-left: auto; cursor: pointer; color: var(--text-muted); font-size: 18px; }
+.bulk-clear:hover { color: var(--text-primary); }
+
+/* ─── Row Actions (⋯ menu) ─── */
+.row-menu-btn {
+  width: 28px; height: 28px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text-muted);
+  cursor: pointer; background: none; border: none;
+  transition: var(--transition-fast);
+}
+.row-menu-btn:hover { background: var(--gray-100); color: var(--text-primary); }
+
+/* ─── Keyword Sparkline (mini bar chart) ─── */
+.kw-sparkline {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+}
+.kw-spark-bar {
+  width: 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--gray-300);
+  min-height: 2px;
+  transition: var(--transition-fast);
+}
+.kw-spark-bar.up { background: var(--success); }
+.kw-spark-bar.down { background: var(--danger); }
+
+/* ─── Date Range Picker Button ─── */
+.date-range-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+.date-range-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ─── GSC Status Badge ─── */
+.gsc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gsc-badge.connected { background: var(--success-light); color: var(--success); border: 1px solid #A7F3D0; }
+.gsc-badge.disconnected { background: var(--danger-light); color: var(--danger); border: 1px solid #FECACA; }
+.gsc-badge.limited { background: var(--warning-light); color: #92400E; border: 1px solid #FDE68A; }
+
+/* ─── Sync Bar ─── */
+.sync-bar {
+  background: var(--success-light);
+  border-bottom: 1px solid #A7F3D0;
+  padding: 7px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #065F46;
+}
+
+/* ─── Tag Input ─── */
+.tag-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  min-height: 40px;
+  align-items: center;
+  cursor: text;
+}
+.tag-input-wrap:focus-within { border-color: var(--primary); box-shadow: var(--shadow-glow); }
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+}
+.tag-remove { cursor: pointer; font-size: 14px; opacity: 0.7; }
+.tag-remove:hover { opacity: 1; }
+
+/* ─── Collapsible Panel ─── */
+.collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  transition: var(--transition-fast);
+}
+.collapsible-header:hover { background: var(--gray-50); }
+.collapsible-body {
+  padding: 0 16px 12px;
+  animation: fadeIn 0.2s ease;
+}
+.collapsible-arrow { transition: transform 0.2s ease; font-size: 12px; }
+.collapsible.open .collapsible-arrow { transform: rotate(90deg); }
+
+/* ─── Error Log Panel ─── */
+.error-log {
+  background: var(--danger-light);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.error-log-title { font-size: 12px; font-weight: 700; color: var(--danger); margin-bottom: 8px; }
+.error-log-code {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #7F1D1D;
+  background: rgba(239,68,68,0.08);
+  padding: 10px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.error-log-desc { font-size: 11px; color: var(--text-secondary); }
+
+/* ─── Report Schedule Config ─── */
+.schedule-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.schedule-row .form-group { margin-bottom: 0; }
+
+/* ─── Inline Expand Panel ─── */
+.expand-panel {
+  background: var(--gray-50);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  animation: slideUp 0.15s ease;
+}
+.expand-url-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+.expand-url-item:last-child { margin-bottom: 0; }
+
+/* ─── Responsive ─── */
+@media (max-width: 1280px) {
+  .kpi-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-sidebar { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .kpi-grid-4, .kpi-grid-3 { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .topbar { padding: 0 16px; }
+  .page-content { padding: 16px; }
+}
+
