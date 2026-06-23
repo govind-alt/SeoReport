@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Clients</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+.client-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.client-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary); }
+.client-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.client-logo {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: white; flex-shrink: 0;
+}
+.client-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.client-stat-val { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+.client-stat-label { font-size: 10px; color: var(--text-muted); }
+.health-indicator {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block; margin-right: 5px;
+}
+.view-toggle { display: flex; gap: 4px; background: var(--gray-100); padding: 4px; border-radius: var(--radius); }
+.view-btn {
+  padding: 6px 10px; border-radius: 5px; font-size: 13px;
+  cursor: pointer; transition: var(--transition-fast); background: none; border: none;
+  color: var(--text-muted);
+}
+.view-btn.active { background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">RF</div>
+      <div>
+        <div class="sidebar-logo-text">RankFlow</div>
+        <div class="sidebar-logo-sub">Digital Horizons</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a class="sidebar-item active" href="clients.html"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a class="sidebar-item" href="reports.html"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <div class="sidebar-section-label">Configuration</div>
+      <a class="sidebar-item" href="settings.html"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a class="sidebar-item" href="#"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help & Support</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">JD</div>
+        <div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-role">Agency Admin</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Clients</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" data-modal-open="addClientModal">+ Add Client</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">All Clients</div>
+          <div class="page-subtitle">Manage and monitor all your agency clients</div>
+        </div>
+        <div class="page-header-actions">
+          <div class="view-toggle">
+            <button class="view-btn active" id="viewTable" onclick="setView('table')">≡ Table</button>
+            <button class="view-btn" id="viewGrid" onclick="setView('grid')">⊞ Grid</button>
+          </div>
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input class="form-input" id="clientSearch" placeholder="Search clients..." oninput="filterClients(this.value)" style="width:230px;"/>
+          </div>
+          <select class="form-input" style="width:auto; font-size:12px;" onchange="filterByHealth(this.value)">
+            <option value="">All Health Scores</option>
+            <option value="good">Healthy (70+)</option>
+            <option value="fair">Fair (50–69)</option>
+            <option value="poor">Poor (&lt;50)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
+        <div class="kpi-card success">
+          <div class="kpi-label">Total Clients</div>
+          <div class="kpi-value">24</div>
+          <div class="kpi-trend trend-up">↑ +2 this month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Healthy (70+)</div>
+          <div class="kpi-value" style="color:var(--success);">14</div>
+          <div class="kpi-trend trend-flat">58% of clients</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Needs Attention</div>
+          <div class="kpi-value" style="color:var(--warning);">7</div>
+          <div class="kpi-trend trend-flat">29% of clients</div>
+        </div>
+        <div class="kpi-card warning">
+          <div class="kpi-label">Critical (&lt;50)</div>
+          <div class="kpi-value" style="color:var(--danger);">3</div>
+          <div class="kpi-trend trend-up">↑ +1 from last month</div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div id="tableView" class="table-wrapper">
+        <div class="table-header">
+          <span class="table-title">Client List</span>
+          <div class="table-actions">
+            <button class="btn btn-secondary btn-sm" onclick="exportClients()">⬇ Export</button>
+          </div>
+        </div>
+        <table id="clientTable">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Health Score</th>
+              <th>Top 10 KWs</th>
+              <th>Monthly Traffic</th>
+              <th>Backlinks</th>
+              <th>Last Report</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="table-footer">
+          <span>Showing <span id="tableCount">8</span> of 24 clients</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm">← Prev</button>
+            <button class="btn btn-secondary btn-sm" style="background:var(--primary);color:white;">1</button>
+            <button class="btn btn-ghost btn-sm">2</button>
+            <button class="btn btn-ghost btn-sm">3</button>
+            <button class="btn btn-ghost btn-sm">Next →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid View -->
+      <div id="gridView" style="display:none; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px;"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ─── Add/Edit Client Modal ─── -->
+<div class="modal-overlay" id="addClientModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalClientTitle">Add New Client</div>
+        <div class="modal-subtitle">Connect a client to their SERanking project</div>
+      </div>
+      <button class="modal-close" data-modal-close="addClientModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Client Name <span style="color:var(--danger)">*</span></label>
+          <input class="form-input" id="clientName" type="text" placeholder="Acme Corporation" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Domain <span style="color:var(--danger)">*</span></label>
+          <input class="form-input" id="clientDomain" type="text" placeholder="acmecorp.com" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contact Name</label>
+          <input class="form-input" type="text" placeholder="Jane Smith"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Email</label>
+          <input class="form-input" type="email" placeholder="jane@acmecorp.com"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">SERanking Project</label>
+        <select class="form-input">
+          <option value="">Select SERanking project...</option>
+          <option>Acme Corp (site_12345)</option>
+          <option>TechStart (site_23456)</option>
+          <option>GreenLeaf (site_34567)</option>
+          <option>+ Import from SERanking</option>
+        </select>
+        <div class="form-hint">Link to an existing SERanking project for data sync</div>
+      </div>
+      <div class="separator" style="height:1px; background:var(--border); margin:18px 0;"></div>
+      <div style="margin-bottom:12px; font-weight:700; font-size:13px;">Report Schedule</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Auto-Generate Reports</label>
+          <select class="form-input">
+            <option>Monthly (1st of each month)</option>
+            <option>Quarterly</option>
+            <option>Manual only</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Send Report Via</label>
+          <select class="form-input">
+            <option>Email + Client Portal</option>
+            <option>Email only</option>
+            <option>Client Portal only</option>
+            <option>Don't send automatically</option>
+          </select>
+        </div>
+      </div>
+      <div class="separator" style="height:1px; background:var(--border); margin:18px 0;"></div>
+      <div style="margin-bottom:12px; font-weight:700; font-size:13px;">Google Search Console</div>
+      <div class="connect-box" id="gscBox">
+        <div style="font-size:28px; margin-bottom:8px;">🔗</div>
+        <div style="font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:4px;">Connect Google Search Console</div>
+        <div style="font-size:12px; margin-bottom:12px;">Add organic traffic & click data to this client's reports</div>
+        <button class="btn btn-primary btn-sm" onclick="connectGSC()">Connect GSC</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-modal-close="addClientModal">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+const clientData = [
+  { name: 'Acme Corp', domain: 'acmecorp.com', health: 76, top10: 47, traffic: '8,420', backlinks: '2,340', lastReport: 'Jun 1', status: 'active', color: '#4F46E5' },
+  { name: 'TechStart.io', domain: 'techstart.io', health: 89, top10: 87, traffic: '12,340', backlinks: '4,120', lastReport: 'Jun 1', status: 'active', color: '#10B981' },
+  { name: 'GreenLeaf Organics', domain: 'greenleaf.com', health: 62, top10: 23, traffic: '3,210', backlinks: '890', lastReport: 'May 1', status: 'overdue', color: '#F59E0B' },
+  { name: 'BlueSky Marketing', domain: 'bluesky.co.uk', health: 84, top10: 56, traffic: '7,890', backlinks: '3,210', lastReport: 'Jun 1', status: 'active', color: '#3B82F6' },
+  { name: 'Nexus Digital', domain: 'nexus.com', health: 41, top10: 12, traffic: '1,840', backlinks: '340', lastReport: 'Apr 1', status: 'critical', color: '#EF4444' },
+  { name: 'PeakSEO Agency', domain: 'peakseo.com', health: 73, top10: 38, traffic: '5,670', backlinks: '1,890', lastReport: 'Jun 1', status: 'active', color: '#8B5CF6' },
+  { name: 'BrightPath Co.', domain: 'brightpath.co', health: 91, top10: 94, traffic: '14,230', backlinks: '5,670', lastReport: 'Jun 1', status: 'active', color: '#06B6D4' },
+  { name: 'SolarEdge Media', domain: 'solaredge.media', health: 55, top10: 19, traffic: '2,450', backlinks: '670', lastReport: 'May 1', status: 'overdue', color: '#F97316' },
+];
+
+function getHealthColor(h) {
+  if (h >= 70) return 'var(--success)';
+  if (h >= 50) return 'var(--warning)';
+  return 'var(--danger)';
+}
+function getStatusBadge(s) {
+  const map = { active: 'badge-success', overdue: 'badge-warning', critical: 'badge-danger' };
+  const labels = { active: 'Active', overdue: 'Overdue', critical: 'Critical' };
+  return `<span class="badge ${map[s]}">${labels[s]}</span>`;
+}
+function getInitials(name) { return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+
+function renderTable(data) {
+  document.getElementById('tableBody').innerHTML = data.map(c => `
+    <tr onclick="window.location='client-detail.html'" style="cursor:pointer;">
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:var(--radius);background:${c.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;">${getInitials(c.name)}</div>
+          <div><div style="font-weight:600;">${c.name}</div><div style="font-size:11px;color:var(--text-muted);">${c.domain}</div></div>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:70px;height:6px;background:var(--gray-200);border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${c.health}%;background:${getHealthColor(c.health)};border-radius:99px;"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:${getHealthColor(c.health)};">${c.health}%</span>
+        </div>
+      </td>
+      <td><span style="color:var(--success);font-weight:600;">↑</span> ${c.top10}</td>
+      <td>${c.traffic}</td>
+      <td>${c.backlinks}</td>
+      <td><span class="badge ${c.status === 'overdue' || c.status === 'critical' ? 'badge-warning' : 'badge-success'}">${c.lastReport}</span></td>
+      <td>${getStatusBadge(c.status)}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <a href="client-detail.html" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">View</a>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editClient('${c.name}')">Edit</button>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();Modal.open('generateModal')">Report</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('tableCount').textContent = data.length;
+}
+
+function renderGrid(data) {
+  const grid = document.getElementById('gridView');
+  grid.innerHTML = data.map(c => `
+    <div class="client-card" onclick="window.location='client-detail.html'">
+      <div class="client-card-header">
+        <div style="width:40px;height:40px;border-radius:var(--radius);background:${c.color};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;">${getInitials(c.name)}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;">${c.name}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${c.domain}</div>
+        </div>
+        ${getStatusBadge(c.status)}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="flex:1;height:6px;background:var(--gray-200);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:${c.health}%;background:${getHealthColor(c.health)};border-radius:99px;"></div>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:${getHealthColor(c.health)};">${c.health}%</span>
+      </div>
+      <div class="client-stats">
+        <div><div class="client-stat-val">${c.top10}</div><div class="client-stat-label">Top 10 KWs</div></div>
+        <div><div class="client-stat-val">${c.traffic}</div><div class="client-stat-label">Sessions</div></div>
+        <div><div class="client-stat-val">${c.backlinks}</div><div class="client-stat-label">Backlinks</div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+        <a href="client-detail.html" class="btn btn-secondary btn-sm" style="flex:1;justify-content:center;" onclick="event.stopPropagation()">View Detail</a>
+        <button class="btn btn-primary btn-sm" style="flex:1;" onclick="event.stopPropagation()">Generate Report</button>
+      </div>
+    </div>`).join('');
+}
+
+let currentView = 'table';
+function setView(view) {
+  currentView = view;
+  document.getElementById('viewTable').classList.toggle('active', view === 'table');
+  document.getElementById('viewGrid').classList.toggle('active', view === 'grid');
+  document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+  document.getElementById('gridView').style.display = view === 'grid' ? 'grid' : 'none';
+}
+
+let filteredData = [...clientData];
+function filterClients(q) {
+  filteredData = clientData.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.domain.toLowerCase().includes(q.toLowerCase()));
+  renderTable(filteredData);
+  renderGrid(filteredData);
+}
+function filterByHealth(val) {
+  filteredData = clientData.filter(c => {
+    if (!val) return true;
+    if (val === 'good') return c.health >= 70;
+    if (val === 'fair') return c.health >= 50 && c.health < 70;
+    if (val === 'poor') return c.health < 50;
+  });
+  renderTable(filteredData);
+  renderGrid(filteredData);
+}
+function editClient(name) { document.getElementById('modalClientTitle').textContent = 'Edit Client — ' + name; Modal.open('addClientModal'); }
+function saveClient() { Modal.close('addClientModal'); Toast.success('Client saved successfully!'); }
+function exportClients() { Toast.info('Exporting client list as CSV...'); }
+function connectGSC() {
+  document.getElementById('gscBox').innerHTML = '<div style="color:var(--success);font-weight:700;">✅ Google Search Console connected!</div>';
+  Toast.success('GSC connected successfully!');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderTable(clientData);
+  renderGrid(clientData);
+  Modal.init();
+});
+</script>
+</body>
+</html>

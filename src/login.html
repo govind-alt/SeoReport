@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Sign In</title>
+<meta name="description" content="Sign in to RankFlow — SEO Report Automation platform for agencies."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary: #4F46E5; --primary-hover: #4338CA; --primary-light: #EEF2FF;
+  --success: #10B981; --success-light: #ECFDF5; --warning: #F59E0B;
+  --danger: #EF4444; --danger-light: #FEF2F2;
+  --gray-50: #F8FAFC; --gray-100: #F1F5F9; --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1; --gray-400: #94A3B8; --gray-500: #64748B;
+  --gray-600: #475569; --gray-700: #334155; --gray-800: #1E293B; --gray-900: #0F172A;
+  --bg: #F1F5F9; --surface: #FFFFFF; --border: #E2E8F0; --border-strong: #CBD5E1;
+  --text-primary: #0F172A; --text-secondary: #475569; --text-muted: #94A3B8;
+  --radius: 8px; --radius-md: 10px; --radius-lg: 14px; --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 8px 10px rgba(0,0,0,0.04);
+  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 0 3px rgba(79,70,229,0.15);
+  --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--gray-900);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-hover); }
+
+/* Auth Layout */
+.auth-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+.auth-brand-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.auth-brand-panel::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 70%);
+  top: -100px; right: -200px;
+  pointer-events: none;
+}
+.auth-brand-panel::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.brand-icon {
+  width: 44px; height: 44px;
+  background: var(--primary);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 900; color: white;
+  box-shadow: 0 8px 20px rgba(79,70,229,0.4);
+}
+.brand-name { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
+.brand-tagline { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.brand-hero { position: relative; z-index: 1; padding: 40px 0; }
+.brand-hero-title {
+  font-size: 38px; font-weight: 900; color: white;
+  line-height: 1.2; letter-spacing: -1px; margin-bottom: 16px;
+}
+.brand-hero-title span { color: #A5B4FC; }
+.brand-hero-desc { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 360px; }
+.brand-features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+.brand-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: rgba(255,255,255,0.7);
+}
+.brand-feature-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.brand-feature-text { font-size: 13px; line-height: 1.5; }
+.brand-feature-title { font-weight: 600; color: white; display: block; }
+.brand-testimonial {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  margin-top: 28px;
+}
+.brand-testimonial blockquote {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.testimonial-author {
+  display: flex; align-items: center; gap: 10px;
+}
+.testimonial-avatar {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white;
+}
+.testimonial-name { font-size: 12px; font-weight: 600; color: white; }
+.testimonial-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+.auth-form-panel {
+  width: 480px;
+  flex-shrink: 0;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 44px;
+  overflow-y: auto;
+}
+.form-header { margin-bottom: 32px; }
+.form-header-title { font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; margin-bottom: 6px; }
+.form-header-desc { font-size: 14px; color: var(--text-muted); }
+
+/* Tabs inside auth */
+.auth-tabs {
+  display: flex;
+  background: var(--gray-100);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 28px;
+  gap: 4px;
+}
+.auth-tab {
+  flex: 1;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+.auth-panel { display: none; }
+.auth-panel.active { display: block; }
+
+/* Form elements */
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+.form-label .req { color: var(--danger); margin-left: 2px; }
+.form-input {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: 13px;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: var(--transition);
+  outline: none;
+  font-family: inherit;
+  appearance: none;
+}
+.form-input:focus { border-color: var(--primary); box-shadow: var(--shadow-glow); }
+.form-input.error { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+.form-input.success { border-color: var(--success); }
+.form-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+.form-error { font-size: 11px; color: var(--danger); margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* Input with icon */
+.input-with-icon { position: relative; }
+.input-with-icon .form-input { padding-right: 40px; }
+.input-icon-btn {
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); cursor: pointer; font-size: 16px; background: none; border: none;
+  padding: 2px; transition: var(--transition);
+}
+.input-icon-btn:hover { color: var(--text-secondary); }
+
+/* Subdomain input */
+.subdomain-group { display: flex; }
+.subdomain-group .form-input { border-radius: var(--radius) 0 0 var(--radius); }
+.subdomain-suffix {
+  background: var(--gray-100);
+  border: 1.5px solid var(--border-strong);
+  border-left: none;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  display: flex; align-items: center;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 20px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  border: 1.5px solid transparent; transition: var(--transition);
+  width: 100%; outline: none; font-family: inherit;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--primary); color: white; border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--primary-hover); border-color: var(--primary-hover);
+  transform: translateY(-1px); box-shadow: var(--shadow-md);
+}
+.btn-secondary {
+  background: var(--surface); color: var(--text-secondary); border-color: var(--border-strong);
+}
+.btn-secondary:hover { background: var(--gray-50); color: var(--text-primary); }
+.btn-google {
+  background: white; color: var(--text-secondary);
+  border: 1.5px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+.btn-google:hover { background: var(--gray-50); box-shadow: var(--shadow-md); }
+.btn-ghost {
+  background: transparent; color: var(--primary);
+  border-color: transparent; font-size: 13px;
+  width: auto; padding: 4px 0;
+}
+.btn-ghost:hover { text-decoration: underline; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+/* Password strength */
+.strength-bars {
+  display: flex; gap: 4px; margin-top: 8px;
+}
+.strength-bar {
+  flex: 1; height: 4px; border-radius: var(--radius-full);
+  background: var(--gray-200); transition: var(--transition);
+}
+.strength-bar.weak { background: var(--danger); }
+.strength-bar.fair { background: var(--warning); }
+.strength-bar.good { background: var(--success); }
+.strength-bar.strong { background: #059669; }
+.strength-text { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+/* OTP input */
+.otp-group {
+  display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;
+}
+.otp-input {
+  width: 48px; height: 56px;
+  text-align: center; font-size: 22px; font-weight: 700;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition);
+  font-family: 'Inter', monospace;
+}
+.otp-input:focus { border-color: var(--primary); box-shadow: var(--shadow-glow); }
+.otp-input.filled { border-color: var(--primary); background: var(--primary-light); }
+
+/* Divider */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-muted); font-size: 12px; margin: 20px 0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Alert */
+.alert {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: var(--radius);
+  font-size: 13px; margin-bottom: 16px; line-height: 1.5;
+}
+.alert-success { background: var(--success-light); color: #065F46; border: 1px solid #A7F3D0; }
+.alert-danger { background: var(--danger-light); color: #991B1B; border: 1px solid #FECACA; }
+.alert-info { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+
+/* Checkbox */
+.checkbox-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--text-secondary); cursor: pointer;
+}
+.checkbox-row input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--primary);
+  cursor: pointer; flex-shrink: 0; margin-top: 1px;
+}
+
+/* Misc */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 11px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.font-bold { font-weight: 700; }
+.separator { height: 1px; background: var(--border); margin: 20px 0; }
+.link { color: var(--primary); cursor: pointer; font-weight: 600; }
+.link:hover { color: var(--primary-hover); text-decoration: underline; }
+.form-footer {
+  text-align: center; font-size: 13px; color: var(--text-muted);
+  margin-top: 24px;
+}
+
+/* Forgot password state toggle */
+.forgot-state { display: none; }
+.forgot-state.active { display: block; }
+
+/* Stepper for onboarding preview */
+.stepper { display: flex; align-items: center; margin-bottom: 0; }
+.step-item { display: flex; align-items: center; flex: 1; }
+.step-circle {
+  width: 28px; height: 28px; border-radius: var(--radius-full);
+  border: 2px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  flex-shrink: 0; transition: var(--transition);
+  background: var(--surface);
+}
+.step-circle.active { background: var(--primary); border-color: var(--primary); color: white; }
+.step-circle.done { background: var(--success); border-color: var(--success); color: white; }
+.step-label-text { font-size: 10px; color: var(--text-muted); margin-left: 7px; white-space: nowrap; }
+.step-label-text.active { color: var(--primary); font-weight: 600; }
+.step-line { flex: 1; height: 2px; background: var(--border); margin: 0 10px; }
+.step-line.done { background: var(--success); }
+
+/* Success/confetti panel */
+.success-panel {
+  text-align: center; padding: 20px 0;
+}
+.success-icon { font-size: 56px; margin-bottom: 14px; }
+.success-title { font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+.success-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .auth-brand-panel { display: none; }
+  .auth-form-panel { width: 100%; padding: 40px 28px; }
+}
+
+/* Animations */
+@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeSlideIn 0.4s ease; }
+</style>
+</head>
+<body>
+<div class="auth-layout">
+
+  <!-- ─── Brand Panel ─── -->
+  <div class="auth-brand-panel">
+    <div class="brand-logo">
+      <div class="brand-icon">RF</div>
+      <div>
+        <div class="brand-name">RankFlow</div>
+        <div class="brand-tagline">SEO Report Automation</div>
+      </div>
+    </div>
+
+    <div class="brand-hero">
+      <h1 class="brand-hero-title">Automate your<br/><span>SEO reports.</span><br/>Impress every client.</h1>
+      <p class="brand-hero-desc">RankFlow pulls data from SERanking and generates beautiful, branded monthly SEO reports — automatically. Save hours every month.</p>
+
+      <div class="brand-testimonial" style="margin-top: 32px;">
+        <blockquote>"RankFlow cut our reporting time from 8 hours to 20 minutes per client. Our clients love the reports, and we love the extra time."</blockquote>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">SR</div>
+          <div>
+            <div class="testimonial-name">Sarah Reynolds</div>
+            <div class="testimonial-role">Founder, PixelRank Agency</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-features">
+      <div class="brand-feature">
+        <div class="brand-feature-icon">📊</div>
+        <div class="brand-feature-text">
+          <span class="brand-feature-title">Automated Data Sync</span>
+          Daily SERanking sync — rankings, backlinks, audits, and GSC data all in one place.
+        </div>
+      </div>
+      <div class="brand-feature">
+        <div class="brand-feature-icon">🎨</div>
+        <div class="brand-feature-text">
+          <span class="brand-feature-title">White-Label Reports</span>
+          Fully branded PDF reports with your logo and colors — clients never see RankFlow.
+        </div>
+      </div>
+      <div class="brand-feature">
+        <div class="brand-feature-icon">⚡</div>
+        <div class="brand-feature-text">
+          <span class="brand-feature-title">Multi-Client Dashboard</span>
+          Manage all clients, track health scores, and generate reports from one dashboard.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Form Panel ─── -->
+  <div class="auth-form-panel">
+
+    <!-- Auth Tabs -->
+    <div class="auth-tabs" id="authTabs">
+      <div class="auth-tab active" id="tabSignIn" onclick="switchTab('signin')">Sign In</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</div>
+    </div>
+
+    <!-- ─── SIGN IN PANEL ─── -->
+    <div class="auth-panel active animate-in" id="panelSignin">
+      <div class="form-header">
+        <div class="form-header-title">Welcome back 👋</div>
+        <div class="form-header-desc">Sign in to your agency dashboard</div>
+      </div>
+
+      <div class="alert alert-danger" id="loginError" style="display:none">
+        ❌ Invalid email or password. Please try again.
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email Address</label>
+          <input class="form-input" id="loginEmail" type="email" placeholder="john@agency.com" autocomplete="email" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">
+            Password
+            <a class="link" style="float:right; font-size:12px; font-weight:500;" onclick="showForgot()">Forgot password?</a>
+          </label>
+          <div class="input-with-icon">
+            <input class="form-input" id="loginPassword" type="password" placeholder="••••••••••" autocomplete="current-password" required/>
+            <button type="button" class="input-icon-btn" id="togglePwd" onclick="togglePassword('loginPassword', this)">👁</button>
+          </div>
+        </div>
+        <div class="checkbox-row mb-4">
+          <input type="checkbox" id="rememberMe" checked/>
+          <label for="rememberMe">Remember me for 30 days</label>
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginBtn">
+          <span id="loginBtnText">Sign In</span>
+        </button>
+      </form>
+
+      <div class="divider">or continue with</div>
+      <a href="dashboard.html" class="btn btn-google">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </a>
+
+      <div class="form-footer">
+        No account? <span class="link" onclick="switchTab('register')">Sign up free</span>
+        &nbsp;·&nbsp; Client? <a href="#" class="link" style="font-weight:500;">Client portal →</a>
+      </div>
+    </div>
+
+    <!-- ─── REGISTER PANEL ─── -->
+    <div class="auth-panel animate-in" id="panelRegister">
+      <div class="form-header">
+        <div class="form-header-title">Start for free 🚀</div>
+        <div class="form-header-desc">14-day trial, no credit card required</div>
+      </div>
+
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-row mb-4">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="firstName">First Name <span class="req">*</span></label>
+            <input class="form-input" id="firstName" type="text" placeholder="John" required/>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="lastName">Last Name <span class="req">*</span></label>
+            <input class="form-input" id="lastName" type="text" placeholder="Doe" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="workEmail">Work Email <span class="req">*</span></label>
+          <input class="form-input" id="workEmail" type="email" placeholder="john@youragency.com" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="agencyName">Agency Name <span class="req">*</span></label>
+          <input class="form-input" id="agencyName" type="text" placeholder="Digital Horizons Agency"
+            oninput="updateSubdomain(this.value)" required/>
+          <div class="form-hint">Shown on all client reports</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="subdomain">Agency Subdomain <span class="req">*</span></label>
+          <div class="subdomain-group">
+            <input class="form-input success" id="subdomain" type="text" placeholder="digital-horizons"
+              oninput="checkSubdomain(this.value)"/>
+            <div class="subdomain-suffix">.rankflow.app</div>
+          </div>
+          <div class="form-hint" id="subdomainStatus" style="color:var(--success)">✓ Available! Your dashboard: digital-horizons.rankflow.app</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Password <span class="req">*</span></label>
+          <div class="input-with-icon">
+            <input class="form-input" id="regPassword" type="password" placeholder="Min. 8 characters"
+              oninput="updateStrength(this.value)" required/>
+            <button type="button" class="input-icon-btn" onclick="togglePassword('regPassword', this)">👁</button>
+          </div>
+          <div class="strength-bars">
+            <div class="strength-bar" id="sb1"></div>
+            <div class="strength-bar" id="sb2"></div>
+            <div class="strength-bar" id="sb3"></div>
+            <div class="strength-bar" id="sb4"></div>
+          </div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirmPwd">Confirm Password <span class="req">*</span></label>
+          <input class="form-input" id="confirmPwd" type="password" placeholder="••••••••••" required/>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-row mb-3">
+            <input type="checkbox" id="agreeTerms" required/>
+            <label for="agreeTerms">I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a></label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="marketing"/>
+            <label for="marketing">I'd like to receive product updates and tips (optional)</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Agency Account →</button>
+      </form>
+
+      <div class="form-footer">
+        Already have an account? <span class="link" onclick="switchTab('signin')">Sign in</span>
+      </div>
+    </div>
+
+    <!-- ─── FORGOT PASSWORD PANEL ─── -->
+    <div class="auth-panel animate-in" id="panelForgot">
+      <div style="font-size:36px; margin-bottom:12px;">🔑</div>
+      <div class="form-header">
+        <div class="form-header-title">Forgot password?</div>
+        <div class="form-header-desc">Enter your email and we'll send a reset link</div>
+      </div>
+
+      <div class="forgot-state active" id="forgotRequest">
+        <div class="form-group">
+          <label class="form-label" for="forgotEmail">Email Address</label>
+          <input class="form-input" id="forgotEmail" type="email" placeholder="john@agency.com"/>
+        </div>
+        <button class="btn btn-primary mb-3" onclick="sendResetLink()">Send Reset Link</button>
+        <div class="text-center"><span class="link btn-ghost" onclick="showSignin()">← Back to login</span></div>
+      </div>
+
+      <div class="forgot-state" id="forgotSent">
+        <div class="alert alert-success">✅ Reset link sent! Check your inbox (and spam folder).</div>
+        <div class="text-center text-sm text-muted mb-4">We sent a link to <strong id="forgotEmailDisplay"></strong></div>
+        <button class="btn btn-secondary mb-3" onclick="showSignin()">← Back to login</button>
+        <div class="text-center text-sm">
+          <span class="text-muted">Didn't receive it? </span>
+          <span class="link" onclick="sendResetLink()">Resend email</span>
+        </div>
+      </div>
+
+      <div class="forgot-state" id="forgotReset">
+        <div class="alert alert-info">⏱ This link expires in 24 hours</div>
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <div class="input-with-icon">
+            <input class="form-input" id="newPassword" type="password" placeholder="Min. 8 characters" oninput="updateStrength2(this.value)"/>
+            <button type="button" class="input-icon-btn" onclick="togglePassword('newPassword', this)">👁</button>
+          </div>
+          <div class="strength-bars">
+            <div class="strength-bar" id="sb5"></div><div class="strength-bar" id="sb6"></div>
+            <div class="strength-bar" id="sb7"></div><div class="strength-bar" id="sb8"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input class="form-input" id="confirmNewPwd" type="password" placeholder="••••••••••"/>
+        </div>
+        <a href="dashboard.html" class="btn btn-primary">Update Password & Sign In</a>
+      </div>
+    </div>
+
+    <!-- ─── VERIFY EMAIL PANEL ─── -->
+    <div class="auth-panel animate-in" id="panelVerify">
+      <div class="success-panel">
+        <div class="success-icon">📧</div>
+        <div class="success-title">Check your inbox</div>
+        <div class="success-desc">We've sent a verification link to<br/><strong id="verifyEmailDisplay">john@youragency.com</strong><br/>Click the link to activate your account.</div>
+        <div class="alert alert-success mb-4">✅ Verification email sent! Check your spam folder if you don't see it.</div>
+        <button class="btn btn-primary mb-3" onclick="window.open('https://mail.google.com', '_blank')">Open Gmail →</button>
+        <button class="btn btn-secondary mb-4" onclick="showOTP()">Enter verification code instead</button>
+      </div>
+
+      <div id="otpSection" style="display:none; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div class="text-center text-sm text-muted mb-3">Enter the 6-digit code from your email</div>
+        <div class="otp-group" id="otpGroup">
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,0)"/>
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,1)"/>
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,2)"/>
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,3)"/>
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,4)"/>
+          <input class="otp-input" maxlength="1" type="text" oninput="otpNext(this,5)"/>
+        </div>
+        <button class="btn btn-primary" onclick="verifyOTP()">Verify Code</button>
+      </div>
+
+      <div class="form-footer">
+        Wrong email? <span class="link" onclick="switchTab('register')">Change email address</span>
+      </div>
+    </div>
+
+  </div><!-- /auth-form-panel -->
+</div><!-- /auth-layout -->
+
+<script>
+  // ─── Tab switching ───
+  function switchTab(tab) {
+    ['signin','register','forgot','verify'].forEach(t => {
+      document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.remove('active');
+    });
+    ['tabSignIn','tabRegister'].forEach(t => document.getElementById(t)?.classList.remove('active'));
+
+    const panels = { signin:'panelSignin', register:'panelRegister', forgot:'panelForgot', verify:'panelVerify' };
+    const active = document.getElementById(panels[tab]);
+    if (active) { active.classList.add('active'); active.classList.remove('animate-in'); void active.offsetWidth; active.classList.add('animate-in'); }
+    if (tab === 'signin') document.getElementById('tabSignIn')?.classList.add('active');
+    if (tab === 'register') document.getElementById('tabRegister')?.classList.add('active');
+  }
+  function showForgot() { switchTab('forgot'); document.getElementById('forgotRequest').classList.add('active'); }
+  function showSignin() { switchTab('signin'); }
+
+  // ─── Login ───
+  function handleLogin(e) {
+    e.preventDefault();
+    const btn = document.getElementById('loginBtn');
+    const txt = document.getElementById('loginBtnText');
+    btn.disabled = true; txt.textContent = 'Signing in...';
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+  }
+
+  // ─── Register ───
+  function handleRegister(e) {
+    e.preventDefault();
+    const email = document.getElementById('workEmail').value;
+    document.getElementById('verifyEmailDisplay').textContent = email;
+    switchTab('verify');
+  }
+
+  // ─── Password toggle ───
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁' : '🙈';
+  }
+
+  // ─── Password strength ───
+  function calcStrength(pwd) {
+    let s = 0;
+    if (pwd.length >= 8) s++;
+    if (pwd.length >= 12) s++;
+    if (/[A-Z]/.test(pwd)) s++;
+    if (/[0-9]/.test(pwd)) s++;
+    if (/[^A-Za-z0-9]/.test(pwd)) s++;
+    return Math.min(4, s);
+  }
+  function updateStrength(pwd) {
+    const score = calcStrength(pwd);
+    const levels = ['','weak','fair','good','strong'];
+    const labels = ['','🔴 Weak','🟡 Fair','🟢 Good','💪 Strong'];
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById('sb' + i);
+      bar.className = 'strength-bar' + (i <= score ? ' ' + levels[score] : '');
+    }
+    document.getElementById('strengthText').textContent = labels[score] || '';
+  }
+  function updateStrength2(pwd) {
+    const score = calcStrength(pwd);
+    const levels = ['','weak','fair','good','strong'];
+    for (let i = 5; i <= 8; i++) {
+      const bar = document.getElementById('sb' + i);
+      bar.className = 'strength-bar' + (i - 4 <= score ? ' ' + levels[score] : '');
+    }
+  }
+
+  // ─── Subdomain ───
+  function updateSubdomain(name) {
+    const sub = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    document.getElementById('subdomain').value = sub;
+    checkSubdomain(sub);
+  }
+  function checkSubdomain(val) {
+    const status = document.getElementById('subdomainStatus');
+    const input = document.getElementById('subdomain');
+    if (val.length > 3) {
+      status.style.color = 'var(--success)';
+      status.textContent = `✓ Available! Your dashboard: ${val}.rankflow.app`;
+      input.className = 'form-input success';
+    } else {
+      status.style.color = 'var(--text-muted)';
+      status.textContent = 'Enter a subdomain (min. 4 characters)';
+      input.className = 'form-input';
+    }
+  }
+
+  // ─── Forgot password ───
+  function sendResetLink() {
+    const email = document.getElementById('forgotEmail').value || 'john@agency.com';
+    document.getElementById('forgotEmailDisplay').textContent = email;
+    document.querySelectorAll('.forgot-state').forEach(s => s.classList.remove('active'));
+    document.getElementById('forgotSent').classList.add('active');
+  }
+
+  // ─── OTP ───
+  function showOTP() {
+    document.getElementById('otpSection').style.display = 'block';
+    document.querySelector('.otp-input').focus();
+  }
+  function otpNext(input, idx) {
+    input.classList.add('filled');
+    const inputs = document.querySelectorAll('.otp-input');
+    if (input.value && idx < 5) inputs[idx + 1].focus();
+  }
+  function verifyOTP() {
+    window.location.href = 'onboarding.html';
+  }
+</script>
+</body>
+</html>

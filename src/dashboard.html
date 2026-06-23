@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Agency Dashboard</title>
+<meta name="description" content="RankFlow agency dashboard — manage SEO clients, track performance, and generate reports."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* Dashboard-specific overrides */
+.usage-card { background: linear-gradient(135deg, var(--primary-light) 0%, #F0EFFE 100%); }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--gray-100);
+  font-size: 13px;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; background: var(--gray-100);
+}
+.activity-text { flex: 1; line-height: 1.5; }
+.activity-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.client-domain { font-size: 11px; color: var(--text-muted); }
+.health-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.health-bar-track {
+  flex: 1; height: 6px;
+  background: var(--gray-200); border-radius: var(--radius-full); overflow: hidden;
+}
+.health-bar-fill {
+  height: 100%; border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+.health-good { background: var(--success); }
+.health-warn { background: var(--warning); }
+.health-bad { background: var(--danger); }
+.health-score { font-size: 12px; font-weight: 700; min-width: 32px; }
+.report-badge-overdue { background: var(--danger-light); color: #991B1B; }
+.sync-info { font-size: 11px; color: var(--success); }
+.kpi-sparkline { margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">RF</div>
+      <div>
+        <div class="sidebar-logo-text">RankFlow</div>
+        <div class="sidebar-logo-sub">Digital Horizons</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-item active" href="dashboard.html" data-page="dashboard">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-label">Dashboard</span>
+      </a>
+      <a class="sidebar-item" href="clients.html" data-page="clients">
+        <span class="sidebar-item-icon">👥</span>
+        <span class="sidebar-item-label">Clients</span>
+        <span class="sidebar-badge">24</span>
+      </a>
+      <a class="sidebar-item" href="reports.html" data-page="reports">
+        <span class="sidebar-item-icon">📄</span>
+        <span class="sidebar-item-label">Reports</span>
+        <span class="sidebar-badge">38</span>
+      </a>
+
+      <div class="sidebar-section-label">Configuration</div>
+      <a class="sidebar-item" href="settings.html" data-page="settings">
+        <span class="sidebar-item-icon">⚙️</span>
+        <span class="sidebar-item-label">Settings</span>
+      </a>
+      <a class="sidebar-item" href="#" onclick="Toast.info('Help center opening...')">
+        <span class="sidebar-item-icon">❓</span>
+        <span class="sidebar-item-label">Help & Support</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="toggleDropdown('userMenu')">
+        <div class="sidebar-avatar">JD</div>
+        <div>
+          <div class="sidebar-user-name">John Doe</div>
+          <div class="sidebar-user-role">Agency Admin</div>
+        </div>
+        <span style="color:var(--sidebar-text); margin-left:auto; font-size:12px;">⌄</span>
+      </div>
+      <div id="userMenu" style="display:none; background:rgba(255,255,255,0.05); border-radius:var(--radius); padding:4px; margin-top:6px;">
+        <a href="settings.html" class="sidebar-item" style="font-size:12px; padding:7px 10px; margin:0;">⚙️ &nbsp;Account Settings</a>
+        <a href="login.html" class="sidebar-item" style="font-size:12px; padding:7px 10px; margin:0; color:#FC8181;">🚪 &nbsp;Sign Out</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── Main Content ─── -->
+  <div class="main-content">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">
+        Good morning, John 👋
+        <span class="topbar-subtitle">June 2026</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="syncData()">🔄 Sync Data</button>
+        <button class="btn btn-primary btn-sm" data-modal-open="generateReportModal">+ Generate Report</button>
+        <div class="relative">
+          <button class="topbar-icon-btn" id="notifBtn" data-dropdown-toggle="notifDropdown">
+            🔔
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header">
+              <span style="font-size:14px; font-weight:700;">Notifications</span>
+              <span class="link" style="font-size:12px;" onclick="markAllRead()">Mark all read</span>
+            </div>
+            <div class="notif-item unread">
+              <div class="notif-avatar">📊</div>
+              <div>
+                <div class="notif-text">Report for <strong>GreenLeaf Organics</strong> is overdue — June report not generated yet</div>
+                <div class="notif-time">2 hours ago</div>
+              </div>
+              <div class="notif-unread-dot"></div>
+            </div>
+            <div class="notif-item unread">
+              <div class="notif-avatar">🔄</div>
+              <div>
+                <div class="notif-text">Data sync completed — All 24 projects updated successfully</div>
+                <div class="notif-time">Today at 2:14 AM</div>
+              </div>
+              <div class="notif-unread-dot"></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-avatar">👤</div>
+              <div>
+                <div class="notif-text"><strong>Sarah</strong> accepted the client portal invite for BlueSky Marketing</div>
+                <div class="notif-time">Yesterday</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-avatar">📄</div>
+              <div>
+                <div class="notif-text">May report for <strong>TechStart.io</strong> was downloaded by client</div>
+                <div class="notif-time">2 days ago</div>
+              </div>
+            </div>
+            <div style="padding:10px 16px; text-align:center; border-top:1px solid var(--border);">
+              <a href="#" class="link" style="font-size:12px;">View all notifications →</a>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-icon-btn" title="Settings" onclick="window.location='settings.html'">⚙️</div>
+      </div>
+    </header>
+
+    <!-- Setup Banner -->
+    <div class="status-banner warning" style="border-radius:0; margin:0; border-left:none; border-right:none; border-top:none; padding:10px 24px;">
+      ⚡ <strong>Finish setup:</strong> Connect Google Search Console to unlock organic traffic data.
+      <a href="settings.html" class="link" style="font-size:12px;">Connect GSC →</a>
+      <button onclick="this.parentElement.remove()" style="margin-left:auto; background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:16px;">&times;</button>
+    </div>
+
+    <!-- Sync Status -->
+    <div style="background:var(--success-light); border-bottom:1px solid #A7F3D0; padding:8px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span class="sync-info">✅ Data last synced: Today at 2:14 AM — All 24 projects updated</span>
+      <span style="font-size:11px; color:var(--text-muted);">Next sync: Tomorrow at 2:00 AM</span>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content">
+
+      <!-- Usage Bar -->
+      <div class="usage-card" style="display:flex; gap:24px; align-items:center; flex-wrap:wrap; padding:14px 20px; border-radius:var(--radius-md); margin-bottom:20px; border:1px solid rgba(79,70,229,0.1);">
+        <div style="flex:1; min-width:120px;">
+          <div class="usage-item-label">Plan</div>
+          <div class="usage-item-value" style="color:var(--primary);">Agency Professional</div>
+        </div>
+        <div style="flex:1; min-width:120px;">
+          <div class="usage-item-label">Sites Used</div>
+          <div class="usage-item-value">23 / 50</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:46%"></div></div>
+        </div>
+        <div style="flex:1; min-width:120px;">
+          <div class="usage-item-label">Keywords Tracked</div>
+          <div class="usage-item-value">1,847 / 5,000</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:37%"></div></div>
+        </div>
+        <div style="flex:1; min-width:120px;">
+          <div class="usage-item-label">API Credits Left</div>
+          <div class="usage-item-value">8,400</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Redirecting to billing...')">Upgrade Plan</button>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card success">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-label">Active Clients</div>
+          <div class="kpi-value" id="kv1">0</div>
+          <div class="kpi-trend trend-flat">↔ No change this month</div>
+          <div class="kpi-sparkline">
+            <svg width="80" height="24" viewBox="0 0 80 24">
+              <polyline points="0,18 16,16 32,14 48,12 64,10 80,8" fill="none" stroke="var(--success)" stroke-width="2" opacity="0.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📄</div>
+          <div class="kpi-label">Reports This Month</div>
+          <div class="kpi-value" id="kv2">0</div>
+          <div class="kpi-trend trend-up">↑ +3 vs last month</div>
+          <div class="kpi-sparkline">
+            <svg width="80" height="24" viewBox="0 0 80 24">
+              <polyline points="0,20 16,18 32,15 48,13 64,10 80,6" fill="none" stroke="var(--primary)" stroke-width="2" opacity="0.5"/>
+            </svg>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">💯</div>
+          <div class="kpi-label">Avg Health Score</div>
+          <div class="kpi-value" id="kv3">0<span style="font-size:16px; font-weight:600;">%</span></div>
+          <div class="kpi-trend trend-up">↑ +4pts avg vs last month</div>
+        </div>
+        <div class="kpi-card warning">
+          <div class="kpi-icon">⚠️</div>
+          <div class="kpi-label">Pending Reports</div>
+          <div class="kpi-value" id="kv4" style="color:var(--warning);">0</div>
+          <div class="kpi-trend trend-flat">6 clients need reports</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div class="chart-card" style="margin:0;">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Reports Generated</div>
+              <div class="chart-subtitle">Last 6 months</div>
+            </div>
+            <select class="form-input" style="width:auto; font-size:12px; padding:6px 10px;" onchange="">
+              <option>Last 6 months</option>
+              <option>Last 12 months</option>
+            </select>
+          </div>
+          <div style="height:220px; position:relative;">
+            <canvas id="reportsChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card" style="margin:0;">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Client Health Distribution</div>
+              <div class="chart-subtitle">Current snapshot</div>
+            </div>
+          </div>
+          <div style="height:220px; position:relative; display:flex; align-items:center; gap:20px;">
+            <canvas id="healthChart" style="max-width:180px;"></canvas>
+            <div style="flex:1;">
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div class="legend-item"><div class="legend-dot" style="background:#10B981;border-radius:3px;"></div> <span style="font-size:12px;">Healthy (70–100)</span><span style="margin-left:auto;font-size:12px;font-weight:700;">14</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;border-radius:3px;"></div> <span style="font-size:12px;">Fair (50–69)</span><span style="margin-left:auto;font-size:12px;font-weight:700;">7</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#EF4444;border-radius:3px;"></div> <span style="font-size:12px;">Poor (&lt;50)</span><span style="margin-left:auto;font-size:12px;font-weight:700;">3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Health Table + Activity Feed -->
+      <div class="grid-sidebar" style="margin-bottom:0;">
+
+        <!-- Client Table -->
+        <div class="table-wrapper" style="margin:0;">
+          <div class="table-header">
+            <span class="table-title">Client Health Overview</span>
+            <div class="table-actions">
+              <div class="search-input-wrap">
+                <span class="search-icon">🔍</span>
+                <input class="form-input" id="clientSearch" placeholder="Search clients..." oninput="filterClients(this.value)"/>
+              </div>
+              <button class="btn btn-secondary btn-sm">Filter ▾</button>
+            </div>
+          </div>
+          <table id="clientTable">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Health</th>
+                <th>Top 10 Keywords</th>
+                <th>Sessions</th>
+                <th>Last Report</th>
+                <th>Next Report</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clientTableBody"></tbody>
+          </table>
+          <div class="table-footer">
+            <span>Showing <span id="clientCount">3</span> of 24 clients</span>
+            <a href="clients.html" class="link" style="font-size:12px;">View all clients →</a>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="card" style="margin:0; height: fit-content;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Activity</div>
+              <div class="card-subtitle">Last 24 hours</div>
+            </div>
+          </div>
+          <div class="card-body" style="padding:14px 18px; max-height:480px; overflow-y:auto;">
+            <div class="activity-item">
+              <div class="activity-icon">📄</div>
+              <div class="activity-text">
+                June report generated for <strong>Acme Corp</strong>
+                <div class="activity-time">Just now</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🔄</div>
+              <div class="activity-text">
+                Data sync completed — 24 projects updated
+                <div class="activity-time">2:14 AM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📧</div>
+              <div class="activity-text">
+                Report emailed to <strong>TechStart.io</strong> client
+                <div class="activity-time">Yesterday, 6:00 PM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">👤</div>
+              <div class="activity-text">
+                New client <strong>BlueSky Marketing</strong> added
+                <div class="activity-time">Yesterday, 2:30 PM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">🔗</div>
+              <div class="activity-text">
+                <strong>Sarah</strong> accepted client portal invite
+                <div class="activity-time">Yesterday, 10:00 AM</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon">📊</div>
+              <div class="activity-text">
+                GreenLeaf audit improved to <strong>76%</strong>
+                <div class="activity-time">2 days ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ─── Generate Report Modal ─── -->
+<div class="modal-overlay" id="generateReportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Generate Report</div>
+        <div class="modal-subtitle">Create a new SEO report for a client</div>
+      </div>
+      <button class="modal-close" data-modal-close="generateReportModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Client <span style="color:var(--danger)">*</span></label>
+        <select class="form-input">
+          <option value="">Select client...</option>
+          <option>Acme Corp</option>
+          <option>TechStart.io</option>
+          <option>GreenLeaf Organics</option>
+          <option>BlueSky Marketing</option>
+          <option>Nexus Digital</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Report Month</label>
+          <select class="form-input">
+            <option>June 2026</option><option>May 2026</option><option>April 2026</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Report Type</label>
+          <select class="form-input">
+            <option>Monthly Summary</option>
+            <option>Quarterly Review</option>
+            <option>Custom Range</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:14px;">
+        <label class="form-label">Include Sections</label>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--primary);"> Executive Summary
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--primary);"> Keyword Rankings
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--primary);"> Organic Traffic (GSC)
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--primary);"> Backlink Profile
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:var(--primary);"> Technical Audit
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" style="accent-color:var(--primary);"> Competitor Analysis
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button>
+      <button class="btn btn-primary" onclick="generateReport()">⚡ Generate Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script>
+// ─── Mock Data ───
+const clients = [
+  { name: 'Acme Corp', domain: 'acmecorp.com', health: 76, top10: 47, sessions: '8,420', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'good', overdue: false },
+  { name: 'TechStart.io', domain: 'techstart.io', health: 89, top10: 87, sessions: '12,340', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'good', overdue: false },
+  { name: 'GreenLeaf Organics', domain: 'greenleaf.com', health: 62, top10: 23, sessions: '3,210', lastReport: 'May 1', nextReport: 'Jun 1', status: 'warn', overdue: true },
+  { name: 'BlueSky Marketing', domain: 'bluesky.co.uk', health: 84, top10: 56, sessions: '7,890', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'good', overdue: false },
+  { name: 'Nexus Digital', domain: 'nexus.com', health: 41, top10: 12, sessions: '1,840', lastReport: 'Apr 1', nextReport: 'Jun 1', status: 'bad', overdue: true },
+];
+
+function getHealthClass(h) {
+  if (h >= 70) return 'health-good';
+  if (h >= 50) return 'health-warn';
+  return 'health-bad';
+}
+
+function renderClients(data) {
+  const tbody = document.getElementById('clientTableBody');
+  tbody.innerHTML = data.map(c => `
+    <tr onclick="window.location='client-detail.html'" style="cursor:pointer;">
+      <td>
+        <div style="font-weight:600;">${c.name}</div>
+        <div class="client-domain">${c.domain}</div>
+      </td>
+      <td>
+        <div class="health-bar-wrap">
+          <div class="health-bar-track" style="width:90px;">
+            <div class="health-bar-fill ${getHealthClass(c.health)}" style="width:${c.health}%"></div>
+          </div>
+          <span class="health-score" style="color:${c.health >= 70 ? 'var(--success)' : c.health >= 50 ? 'var(--warning)' : 'var(--danger)'};">${c.health}%</span>
+        </div>
+      </td>
+      <td>
+        <span style="color:var(--success); font-weight:600;">↑</span> ${c.top10}
+      </td>
+      <td>${c.sessions}</td>
+      <td><span class="badge ${c.overdue ? 'badge-warning' : 'badge-success'}">${c.lastReport}</span></td>
+      <td style="color:${c.overdue ? 'var(--danger)' : 'var(--text-muted)'}; font-size:12px;">${c.nextReport}${c.overdue ? ' ⚠' : ''}</td>
+      <td>
+        <div style="display:flex;gap:5px;">
+          <a href="client-detail.html" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">View</a>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); Modal.open('generateReportModal')">Report</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('clientCount').textContent = data.length;
+}
+
+function filterClients(q) {
+  const filtered = clients.filter(c => c.name.toLowerCase().includes(q.toLowerCase()) || c.domain.toLowerCase().includes(q.toLowerCase()));
+  renderClients(filtered);
+}
+
+// ─── Sync Data ───
+function syncData() {
+  const btn = event.target;
+  btn.textContent = '🔄 Syncing...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '🔄 Sync Data';
+    btn.disabled = false;
+    Toast.success('Data synced successfully — 24 projects updated');
+  }, 1800);
+}
+
+// ─── Generate Report ───
+function generateReport() {
+  Modal.close('generateReportModal');
+  Toast.info('Generating report... this may take a moment.');
+  setTimeout(() => { Toast.success('Report generated! Check the Reports tab.'); }, 2200);
+}
+
+// ─── Notifications ───
+function toggleDropdown(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+function markAllRead() {
+  document.querySelectorAll('.notif-item.unread').forEach(n => n.classList.remove('unread'));
+  document.querySelector('.notif-dot').style.display = 'none';
+  Toast.success('All notifications marked as read');
+}
+
+// ─── Animate KPIs ───
+document.addEventListener('DOMContentLoaded', () => {
+  renderClients(clients.slice(0, 3));
+
+  // Animate KPI counters
+  setTimeout(() => {
+    animateNumber(document.getElementById('kv1'), 24);
+    animateNumber(document.getElementById('kv2'), 18);
+    animateNumber(document.getElementById('kv3'), 79);
+    animateNumber(document.getElementById('kv4'), 3);
+  }, 200);
+
+  // Reports Chart
+  Charts.bar('reportsChart',
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    [{ data: [12, 15, 14, 18, 16, 21], backgroundColor: 'rgba(79,70,229,0.15)', borderColor: '#4F46E5', borderWidth: 2 }]
+  );
+
+  // Health Doughnut
+  Charts.doughnut('healthChart',
+    ['Healthy', 'Fair', 'Poor'],
+    [14, 7, 3],
+    ['#10B981', '#F59E0B', '#EF4444']
+  );
+
+  Modal.init();
+  Dropdown.init();
+});
+
+function toggleDropdown(id) {
+  const el = document.getElementById(id);
+  if (el.style.display === 'none') el.style.display = 'block';
+  else el.style.display = 'none';
+}
+</script>
+</body>
+</html>

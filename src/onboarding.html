@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Setup Your Workspace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary: #4F46E5; --primary-hover: #4338CA; --primary-light: #EEF2FF;
+  --success: #10B981; --success-light: #ECFDF5; --warning: #F59E0B;
+  --danger: #EF4444; --gray-100: #F1F5F9; --gray-200: #E2E8F0; --gray-300: #CBD5E1;
+  --gray-400: #94A3B8; --gray-500: #64748B; --gray-800: #1E293B; --gray-900: #0F172A;
+  --surface: #fff; --border: #E2E8F0; --border-strong: #CBD5E1;
+  --text-primary: #0F172A; --text-secondary: #475569; --text-muted: #94A3B8;
+  --radius: 8px; --radius-md: 10px; --radius-lg: 14px; --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
+  --shadow-glow: 0 0 0 3px rgba(79,70,229,0.15);
+  --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(135deg,#0F172A 0%,#1E1B4B 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;}
+.ob-wrapper{width:100%;max-width:680px;}
+.ob-header{text-align:center;margin-bottom:32px;}
+.ob-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;}
+.ob-logo-icon{width:44px;height:44px;background:var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:white;box-shadow:0 8px 20px rgba(79,70,229,0.4);}
+.ob-logo-text{font-size:22px;font-weight:800;color:white;}
+.ob-tagline{font-size:14px;color:rgba(255,255,255,0.5);margin-top:6px;}
+.ob-title{font-size:28px;font-weight:900;color:white;margin-bottom:8px;letter-spacing:-0.5px;}
+.ob-subtitle{font-size:14px;color:rgba(255,255,255,0.6);}
+
+/* Stepper */
+.stepper{display:flex;align-items:center;margin-bottom:32px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-lg);padding:16px 20px;backdrop-filter:blur(10px);}
+.step-item{display:flex;align-items:center;flex:1;}
+.step-circle{width:32px;height:32px;border-radius:var(--radius-full);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);flex-shrink:0;transition:var(--transition);background:rgba(255,255,255,0.05);}
+.step-circle.active{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 4px 12px rgba(79,70,229,0.4);}
+.step-circle.done{background:var(--success);border-color:var(--success);color:white;}
+.step-label{font-size:11px;color:rgba(255,255,255,0.4);margin-left:8px;white-space:nowrap;font-weight:500;}
+.step-label.active{color:white;font-weight:700;}
+.step-label.done{color:rgba(255,255,255,0.7);}
+.step-line{flex:1;height:2px;background:rgba(255,255,255,0.1);margin:0 12px;transition:var(--transition);}
+.step-line.done{background:var(--success);}
+
+/* Card */
+.ob-card{background:var(--surface);border-radius:var(--radius-lg);box-shadow:0 24px 60px rgba(0,0,0,0.4);overflow:hidden;}
+.ob-card-header{padding:24px 28px;border-bottom:1px solid var(--border);}
+.ob-card-title{font-size:18px;font-weight:800;color:var(--text-primary);}
+.ob-card-subtitle{font-size:13px;color:var(--text-muted);margin-top:4px;}
+.ob-card-body{padding:28px;}
+.ob-card-footer{padding:16px 28px;border-top:1px solid var(--border);background:var(--gray-100);display:flex;justify-content:space-between;align-items:center;}
+
+/* Step panels */
+.step-panel{display:none;animation:fadeSlide 0.3s ease;}
+.step-panel.active{display:block;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* Form */
+.form-group{margin-bottom:18px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:6px;}
+.form-input{width:100%;padding:10px 13px;border:1.5px solid var(--border-strong);border-radius:var(--radius);font-size:13px;color:var(--text-primary);background:var(--surface);transition:var(--transition);outline:none;font-family:inherit;appearance:none;}
+.form-input:focus{border-color:var(--primary);box-shadow:var(--shadow-glow);}
+.form-hint{font-size:11px;color:var(--text-muted);margin-top:5px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:var(--transition);font-family:inherit;outline:none;text-decoration:none;}
+.btn-primary{background:var(--primary);color:white;border-color:var(--primary);}
+.btn-primary:hover{background:var(--primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.btn-secondary{background:var(--surface);color:var(--text-secondary);border-color:var(--border-strong);}
+.btn-secondary:hover{background:var(--gray-100);}
+.btn-ghost{background:transparent;color:var(--text-muted);border-color:transparent;font-size:13px;}
+.btn-ghost:hover{color:var(--text-primary);}
+
+/* Upload zone */
+.upload-zone{border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:24px;text-align:center;cursor:pointer;transition:var(--transition);background:var(--gray-100);}
+.upload-zone:hover{border-color:var(--primary);background:var(--primary-light);}
+
+/* Project item */
+.project-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;transition:var(--transition);}
+.project-item:hover{border-color:var(--primary);background:var(--primary-light);}
+.project-item.selected{border-color:var(--primary);background:var(--primary-light);}
+.project-check{width:20px;height:20px;border-radius:4px;border:2px solid var(--border-strong);margin-left:auto;display:flex;align-items:center;justify-content:center;font-size:11px;transition:var(--transition);}
+.project-item.selected .project-check{background:var(--primary);border-color:var(--primary);color:white;}
+
+/* Color picker */
+.color-swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.color-swatch{width:32px;height:32px;border-radius:var(--radius);cursor:pointer;border:3px solid transparent;transition:var(--transition);}
+.color-swatch.selected{border-color:var(--text-primary);transform:scale(1.1);}
+
+/* Success */
+.success-anim{text-align:center;padding:16px 0;}
+.success-icon-large{font-size:64px;margin-bottom:16px;animation:bounceIn 0.6s cubic-bezier(0.68,-0.55,0.27,1.55);}
+@keyframes bounceIn{0%{transform:scale(0);}60%{transform:scale(1.1);}100%{transform:scale(1);}}
+
+.progress-steps{display:flex;gap:6px;align-items:center;}
+.progress-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:var(--transition);}
+.progress-dot.active{background:var(--primary);transform:scale(1.2);}
+.progress-dot.done{background:var(--success);}
+</style>
+</head>
+<body>
+<div class="ob-wrapper">
+  <!-- Header -->
+  <div class="ob-header">
+    <div class="ob-logo">
+      <div class="ob-logo-icon">RF</div>
+      <div class="ob-logo-text">RankFlow</div>
+    </div>
+    <div class="ob-title">Let's set up your workspace 🚀</div>
+    <div class="ob-subtitle">Complete 4 quick steps to start generating SEO reports</div>
+  </div>
+
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step-item">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label active" id="sl1">Agency Profile</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label" id="sl2">Connect SERanking</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label" id="sl3">Import Projects</div>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc4">4</div>
+      <div class="step-label" id="sl4">Branding</div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="ob-card">
+
+    <!-- ─── STEP 1: Agency Profile ─── -->
+    <div class="step-panel active" id="panel1">
+      <div class="ob-card-header">
+        <div class="ob-card-title">Step 1: Agency Profile</div>
+        <div class="ob-card-subtitle">Tell us about your agency — this appears on all client reports</div>
+      </div>
+      <div class="ob-card-body">
+        <div class="form-group">
+          <div class="form-label">Agency Logo</div>
+          <div class="upload-zone" onclick="Toast && Toast.info('File picker opened...')">
+            <div style="font-size:32px;margin-bottom:8px;">🖼</div>
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Upload your agency logo</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">PNG, SVG or JPG · Recommended 200×60px · Max 2MB</div>
+            <div class="btn btn-secondary" style="width:auto;font-size:12px;padding:7px 14px;">📁 Choose File</div>
+          </div>
+          <div class="form-hint" style="text-align:right;"><a href="#" style="color:var(--primary);font-size:12px;" onclick="nextStep()">Skip for now →</a></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Agency Display Name <span style="color:var(--danger)">*</span></label>
+            <input class="form-input" id="agencyDisplayName" value="Digital Horizons Agency"/>
+            <div class="form-hint">Shown on all client reports</div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Agency Website</label>
+            <input class="form-input" id="agencyWebsite" value="https://digitalhorizons.com"/>
+          </div>
+        </div>
+        <div style="height:16px;"></div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Timezone <span style="color:var(--danger)">*</span></label>
+            <select class="form-input">
+              <option selected>(GMT+05:30) Asia/Kolkata</option>
+              <option>(GMT+00:00) UTC</option>
+              <option>(GMT-05:00) US Eastern</option>
+              <option>(GMT+01:00) Europe/London</option>
+              <option>(GMT+08:00) Asia/Singapore</option>
+              <option>(GMT+10:00) Australia/Sydney</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Report Language</label>
+            <select class="form-input">
+              <option>English</option>
+              <option>Spanish</option>
+              <option>French</option>
+              <option>German</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="ob-card-footer">
+        <a href="login.html" class="btn btn-ghost">← Back to Login</a>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="progress-steps">
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <button class="btn btn-primary" onclick="nextStep()">Continue → Step 2</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP 2: Connect SERanking ─── -->
+    <div class="step-panel" id="panel2">
+      <div class="ob-card-header">
+        <div class="ob-card-title">Step 2: Connect SERanking API</div>
+        <div class="ob-card-subtitle">Required to sync keyword rankings, backlinks, and audit data</div>
+      </div>
+      <div class="ob-card-body">
+        <div style="background:var(--primary-light);border:1px solid rgba(79,70,229,0.2);border-radius:var(--radius-md);padding:16px;margin-bottom:20px;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <span style="font-size:20px;">🔑</span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Where to find your API key</div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">
+                1. Log in to <strong>SERanking.com</strong><br/>
+                2. Go to Account → API → Generate API key<br/>
+                3. Copy the key and paste it below
+              </div>
+              <a href="https://seranking.com" target="_blank" style="font-size:12px;color:var(--primary);font-weight:600;margin-top:6px;display:inline-block;">Open SERanking →</a>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SERanking API Key <span style="color:var(--danger)">*</span></label>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="seRankingKey" type="text" placeholder="Paste your API key here..." style="flex:1;font-family:monospace;" oninput="validateKeyInput(this.value)"/>
+            <button class="btn btn-primary" id="validateBtn" onclick="validateKey()" style="white-space:nowrap;">Validate Key</button>
+          </div>
+          <div class="form-hint">Key is stored AES-256 encrypted — never visible in plaintext after saving</div>
+        </div>
+        <div id="keyStatus" style="display:none;"></div>
+        <div style="padding:16px;background:var(--gray-100);border-radius:var(--radius);margin-top:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">API Plan Details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:12px;">
+            <div><div style="font-weight:700;font-size:16px;">10,000</div><div style="color:var(--text-muted);">Monthly API units</div></div>
+            <div><div style="font-weight:700;font-size:16px;">50</div><div style="color:var(--text-muted);">Max projects</div></div>
+            <div><div style="font-weight:700;font-size:16px;">Daily</div><div style="color:var(--text-muted);">Sync frequency</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ob-card-footer">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="progress-steps">
+            <div class="progress-dot done"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <button class="btn btn-ghost" onclick="nextStep()">Skip for now</button>
+          <button class="btn btn-primary" id="step2NextBtn" onclick="nextStep()">Continue → Step 3</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP 3: Import Projects ─── -->
+    <div class="step-panel" id="panel3">
+      <div class="ob-card-header">
+        <div class="ob-card-title">Step 3: Import Projects</div>
+        <div class="ob-card-subtitle">Select which SERanking projects to import as clients</div>
+      </div>
+      <div class="ob-card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:13px;color:var(--text-muted);">8 projects found in your SERanking account</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;" onclick="selectAll()">Select All</button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="clearAll()">Clear All</button>
+          </div>
+        </div>
+        <div id="projectList">
+          <div class="project-item selected" onclick="toggleProject(this)" data-name="Acme Corp">
+            <div style="width:36px;height:36px;border-radius:var(--radius);background:#4F46E5;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;">AC</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">Acme Corp</div>
+              <div style="font-size:11px;color:var(--text-muted);">acmecorp.com · 312 keywords tracked</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-right:8px;">site_12345</div>
+            <div class="project-check">✓</div>
+          </div>
+          <div class="project-item selected" onclick="toggleProject(this)">
+            <div style="width:36px;height:36px;border-radius:var(--radius);background:#10B981;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;">TS</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">TechStart.io</div>
+              <div style="font-size:11px;color:var(--text-muted);">techstart.io · 487 keywords tracked</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-right:8px;">site_23456</div>
+            <div class="project-check">✓</div>
+          </div>
+          <div class="project-item" onclick="toggleProject(this)">
+            <div style="width:36px;height:36px;border-radius:var(--radius);background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;">GL</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">GreenLeaf Organics</div>
+              <div style="font-size:11px;color:var(--text-muted);">greenleaf.com · 156 keywords tracked</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-right:8px;">site_34567</div>
+            <div class="project-check"></div>
+          </div>
+          <div class="project-item" onclick="toggleProject(this)">
+            <div style="width:36px;height:36px;border-radius:var(--radius);background:#3B82F6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;">BS</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">BlueSky Marketing</div>
+              <div style="font-size:11px;color:var(--text-muted);">bluesky.co.uk · 224 keywords tracked</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-right:8px;">site_45678</div>
+            <div class="project-check"></div>
+          </div>
+          <div class="project-item" onclick="toggleProject(this)">
+            <div style="width:36px;height:36px;border-radius:var(--radius);background:#EF4444;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;">ND</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">Nexus Digital</div>
+              <div style="font-size:11px;color:var(--text-muted);">nexus.com · 89 keywords tracked</div>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-right:8px;">site_56789</div>
+            <div class="project-check"></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">
+          <span id="selectedCount">2</span> of 5 projects selected · You can add or remove projects later from Settings
+        </div>
+      </div>
+      <div class="ob-card-footer">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="progress-steps">
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+          </div>
+          <button class="btn btn-primary" onclick="nextStep()">Continue → Step 4</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP 4: Branding ─── -->
+    <div class="step-panel" id="panel4">
+      <div class="ob-card-header">
+        <div class="ob-card-title">Step 4: Branding Setup</div>
+        <div class="ob-card-subtitle">Customize how reports look for your clients</div>
+      </div>
+      <div class="ob-card-body">
+        <div class="form-row" style="margin-bottom:18px;">
+          <div>
+            <label class="form-label">Primary Brand Color</label>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <input type="color" id="brandColor" value="#4F46E5" oninput="updateBrandPreview(this.value)" style="width:40px;height:40px;border:1.5px solid var(--border-strong);border-radius:var(--radius);cursor:pointer;padding:2px;"/>
+              <input class="form-input" id="brandHex" value="#4F46E5" style="flex:1;" oninput="document.getElementById('brandColor').value=this.value;updateBrandPreview(this.value)"/>
+            </div>
+            <div class="color-swatches">
+              <div class="color-swatch selected" style="background:#4F46E5;" onclick="applyColor('#4F46E5')"></div>
+              <div class="color-swatch" style="background:#10B981;" onclick="applyColor('#10B981')"></div>
+              <div class="color-swatch" style="background:#EF4444;" onclick="applyColor('#EF4444')"></div>
+              <div class="color-swatch" style="background:#F59E0B;" onclick="applyColor('#F59E0B')"></div>
+              <div class="color-swatch" style="background:#0F172A;" onclick="applyColor('#0F172A')"></div>
+              <div class="color-swatch" style="background:#EC4899;" onclick="applyColor('#EC4899')"></div>
+              <div class="color-swatch" style="background:#8B5CF6;" onclick="applyColor('#8B5CF6')"></div>
+              <div class="color-swatch" style="background:#06B6D4;" onclick="applyColor('#06B6D4')"></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Live Preview</label>
+            <div id="brandPreview" style="border-radius:var(--radius-md);padding:16px;text-align:center;color:white;background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);transition:var(--transition);">
+              <div style="font-size:13px;opacity:0.7;margin-bottom:4px;">DIGITAL HORIZONS</div>
+              <div style="font-size:18px;font-weight:900;">Monthly SEO Report</div>
+              <div style="opacity:0.7;font-size:11px;margin-top:2px;">Acme Corp — June 2026</div>
+              <div style="background:rgba(255,255,255,0.15);border-radius:var(--radius);padding:10px;margin-top:12px;">
+                <div style="font-size:22px;font-weight:900;">76</div>
+                <div style="font-size:10px;opacity:0.7;">Health Score</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Report Font</label>
+            <select class="form-input">
+              <option>Inter</option><option>Roboto</option><option>Outfit</option><option>Poppins</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Footer Text</label>
+            <input class="form-input" value="Prepared by Digital Horizons Agency"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Portal Message (optional)</label>
+          <input class="form-input" placeholder="e.g. Contact us at reports@youragency.com with any questions"/>
+        </div>
+      </div>
+      <div class="ob-card-footer">
+        <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="progress-steps">
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot done"></div>
+            <div class="progress-dot active"></div>
+          </div>
+          <button class="btn btn-ghost" onclick="finish()">Skip</button>
+          <button class="btn btn-primary" onclick="finish()">🚀 Finish Setup</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── STEP 5: Success ─── -->
+    <div class="step-panel" id="panel5">
+      <div class="ob-card-body" style="padding:40px;">
+        <div class="success-anim">
+          <div class="success-icon-large">🎉</div>
+          <div style="font-size:24px;font-weight:900;color:var(--text-primary);margin-bottom:8px;">You're all set!</div>
+          <div style="font-size:14px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;">
+            Your RankFlow workspace is ready. We're importing your projects and<br/>will have your first data sync ready within minutes.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;">
+            <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:var(--primary);">2</div>
+              <div style="font-size:11px;color:var(--text-muted);">Projects Imported</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:var(--success);">Active</div>
+              <div style="font-size:11px;color:var(--text-muted);">SERanking Sync</div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;">
+              <div style="font-size:24px;font-weight:900;color:var(--primary);">2:00 AM</div>
+              <div style="font-size:11px;color:var(--text-muted);">Daily Sync Time</div>
+            </div>
+          </div>
+          <a href="dashboard.html" class="btn btn-primary" style="width:100%;font-size:15px;padding:13px;">Go to Dashboard →</a>
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+            <a href="clients.html" style="color:var(--primary);">Add more clients</a> &nbsp;·&nbsp;
+            <a href="settings.html" style="color:var(--primary);">Complete settings</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /ob-card -->
+</div><!-- /ob-wrapper -->
+
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+
+function nextStep() {
+  if (currentStep < totalSteps) {
+    setStep(currentStep + 1);
+  } else {
+    finish();
+  }
+}
+function prevStep() {
+  if (currentStep > 1) setStep(currentStep - 1);
+}
+function setStep(step) {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel' + step).classList.add('active');
+
+  for (let i = 1; i <= 4; i++) {
+    const circle = document.getElementById('sc' + i);
+    const label = document.getElementById('sl' + i);
+    const line = document.getElementById('line' + i);
+    circle.className = 'step-circle' + (i < step ? ' done' : i === step ? ' active' : '');
+    circle.textContent = i < step ? '✓' : i;
+    label.className = 'step-label' + (i < step ? ' done' : i === step ? ' active' : '');
+    if (line) line.className = 'step-line' + (i < step ? ' done' : '');
+  }
+  currentStep = step;
+}
+function finish() {
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel5').classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const circle = document.getElementById('sc' + i);
+    if (circle) { circle.className = 'step-circle done'; circle.textContent = '✓'; }
+    const label = document.getElementById('sl' + i);
+    if (label) label.className = 'step-label done';
+    const line = document.getElementById('line' + i);
+    if (line) line.className = 'step-line done';
+  }
+}
+
+function validateKey() {
+  const val = document.getElementById('seRankingKey').value.trim();
+  const status = document.getElementById('keyStatus');
+  if (!val) { status.innerHTML = '<div style="color:var(--danger);font-size:12px;margin-top:8px;">⚠ Please enter your API key</div>'; status.style.display='block'; return; }
+  const btn = document.getElementById('validateBtn');
+  btn.textContent = 'Validating...'; btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'Validate Key'; btn.disabled = false;
+    status.innerHTML = '<div style="background:var(--success-light);border:1px solid #A7F3D0;color:#065F46;padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-top:8px;">✅ API key validated! Found 8 projects in your SERanking account.</div>';
+    status.style.display = 'block';
+  }, 1400);
+}
+function validateKeyInput(val) {
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = val.length < 10;
+}
+
+function toggleProject(el) {
+  el.classList.toggle('selected');
+  const check = el.querySelector('.project-check');
+  check.textContent = el.classList.contains('selected') ? '✓' : '';
+  updateCount();
+}
+function updateCount() {
+  const count = document.querySelectorAll('.project-item.selected').length;
+  document.getElementById('selectedCount').textContent = count;
+}
+function selectAll() { document.querySelectorAll('.project-item').forEach(p => { p.classList.add('selected'); p.querySelector('.project-check').textContent = '✓'; }); updateCount(); }
+function clearAll() { document.querySelectorAll('.project-item').forEach(p => { p.classList.remove('selected'); p.querySelector('.project-check').textContent = ''; }); updateCount(); }
+
+function applyColor(color) {
+  document.getElementById('brandColor').value = color;
+  document.getElementById('brandHex').value = color;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+  event.target.classList.add('selected');
+  updateBrandPreview(color);
+}
+function updateBrandPreview(color) {
+  document.getElementById('brandPreview').style.background = `linear-gradient(135deg, ${color} 0%, ${darken(color,30)} 100%)`;
+}
+function darken(hex, amount) {
+  const r = Math.max(0, parseInt(hex.slice(1,3),16) - amount);
+  const g = Math.max(0, parseInt(hex.slice(3,5),16) - amount);
+  const b = Math.max(0, parseInt(hex.slice(5,7),16) - amount);
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+</script>
+</body>
+</html>
