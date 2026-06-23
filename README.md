@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://via.placeholder.com/120x120/6366f1/ffffff?text=RF" alt="RankFlow Logo" width="80" height="80" style="border-radius: 20px;" />
+  <img src="src/assets/logo.png" alt="RankFlow Logo" width="80" height="80" style="border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
   <h1 align="center">RankFlow — SEO Report Automation</h1>
   <p align="center">
     <strong>A multi-tenant SaaS platform that automates monthly SEO report generation for SEO agencies and their clients.</strong>
@@ -21,23 +21,27 @@ It is designed as a Multi-Tenant SaaS platform with three distinct portal experi
 
 ## 📁 Repository Structure
 
-We are currently operating in a two-phase development lifecycle. **Phase 1 (UI/UX Prototype) is 100% complete.**
+We are currently operating in a two-phase development lifecycle. **Phase 1 (UI/UX Prototype) is complete, and Phase 2 (Next.js Application) is in progress.**
 
 ```text
 SEOReportAutomationApp/
-├── README.md                 ← You are here
+├── app/                      ← Phase 2: Next.js App Router (React Components)
+│   ├── (dashboard)/          ← Agency Dashboard Routes
+│   ├── globals.css           ← Tailwind CSS + Design Tokens
+│   └── layout.tsx            ← Root React Layout
+├── components/               ← Phase 2: Reusable React UI Components
+│   └── ui/                   (Sidebar, Topbar, KPI Cards)
+├── prisma/                   ← Phase 3: Database ORM
+│   └── schema.prisma         (Multi-tenant Postgres Schema)
 ├── src/                      ← Phase 1: High-Fidelity HTML/CSS Frontend Prototype
-│   ├── index.html            (Marketing Landing Page)
-│   ├── login.html            (Authentication Flow)
-│   ├── dashboard.html        (Agency Dashboard)
-│   ├── reports.html          (Automated Report Management)
-│   ├── report-pdf.html       (Printable PDF Output Template)
-│   ├── client-portal-*.html  (End-Client Read-Only Portal)
-│   ├── superadmin-*.html     (SaaS Owner Global Dashboard)
-│   ├── css/                  (Vanilla CSS Design System)
-│   └── js/                   (Frontend Interactivity & Charts)
+│   ├── dashboard.html        (Original HTML Prototype)
+│   ├── css/styles.css        (Original Vanilla CSS Design System)
+│   └── ...                   (Other HTML templates)
 ├── docs/                     ← Architecture & Scope Specifications
-└── AI_PROJECT_CONTEXT.md     ← AI Generation Context
+│   ├── AI_PROJECT_CONTEXT.md (AI Context rules)
+│   └── AGENTS.md             (Subagent documentation)
+├── public/                   ← Static assets (Logos, Fonts)
+└── README.md                 ← You are here
 ```
 
 ---
@@ -53,19 +57,21 @@ The `src/` directory contains the fully responsive, production-ready frontend te
 
 ---
 
-## 🏗️ Phase 2: Next.js Full-Stack Migration (Incoming)
+## 🏗️ Phase 2: Next.js Full-Stack Application (In Progress)
 
-The next step for this repository is migrating the pristine HTML/CSS templates into a robust React application.
+The HTML/CSS templates from Phase 1 are currently being migrated into a robust React application in the root `app/` directory.
 
 **Target Tech Stack:**
 - **Framework:** Next.js (App Router)
-- **Database:** PostgreSQL (via Supabase)
+- **Database:** PostgreSQL
 - **ORM:** Prisma
-- **Auth:** NextAuth.js
-- **Styling:** TailwindCSS (porting existing design tokens)
-- **Background Jobs:** Inngest (for automated monthly SERanking syncing)
+- **Styling:** TailwindCSS v4 + Custom Design Tokens
+- **Components:** React Server Components (RSC)
 
-*The `src/` directory will soon be refactored into Next.js components and routes.*
+**To run the Phase 2 Next.js App:**
+1. Run `npm install`
+2. Run `npm run dev`
+3. Open `http://localhost:3000/dashboard`
 
 ---
 
