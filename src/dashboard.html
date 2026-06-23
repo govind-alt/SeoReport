@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -537,7 +537,8 @@ document.addEventListener('DOMContentLoaded', () => {
   Charts.doughnut('reportStatusChart',
     ['Done','Pending','Failed'],
     [18,6,1],
-    ['#10B981','#F59E0B','#EF4444']
+    ['#10B981','#F59E0B','#EF4444'],
+    { plugins: { legend: { display: false } } }
   );
 });
 
