@@ -1,97 +1,79 @@
 /* ═══════════════════════════════════════════
-   RankFlow — Core Application JS
-   Version 2.0 — Full Wireframe Implementation
+   RankFlow — App.js v3.0 GODMODE
+   All interactions fixed and bulletproof
    ═══════════════════════════════════════════ */
 
-/* ─── Toast Notifications ─── */
-const Toast = {
-  container: null,
-  init() {
-    this.container = document.getElementById('toastContainer');
-    if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.id = 'toastContainer';
-      this.container.className = 'toast-container';
-      document.body.appendChild(this.container);
-    }
-  },
-  show(message, type = 'info', duration = 3500) {
-    if (!this.container) this.init();
-    const icons = { success: '✅', danger: '❌', warning: '⚠️', info: 'ℹ️' };
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span style="font-size:16px;flex-shrink:0;">${icons[type]}</span><span style="flex:1;">${message}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:16px;padding:0;flex-shrink:0;">✕</button>`;
-    this.container.appendChild(toast);
-    requestAnimationFrame(() => { requestAnimationFrame(() => { toast.classList.add('show'); }); });
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 400);
-    }, duration);
-  },
-  success(msg) { this.show(msg, 'success'); },
-  error(msg) { this.show(msg, 'danger'); },
-  warning(msg) { this.show(msg, 'warning'); },
-  info(msg) { this.show(msg, 'info'); }
-};
+'use strict';
 
-/* ─── Modal Manager ─── */
-const Modal = {
-  init() {
-    // Open triggers
-    document.querySelectorAll('[data-modal-open]').forEach(btn => {
-      btn.addEventListener('click', () => Modal.open(btn.dataset.modalOpen));
-    });
-    // Close triggers
-    document.querySelectorAll('[data-modal-close]').forEach(btn => {
-      btn.addEventListener('click', () => Modal.close(btn.dataset.modalClose));
-    });
-    // Close on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) Modal.close(overlay.id);
-      });
-    });
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.active').forEach(o => Modal.close(o.id));
+/* ─── Toast System ─── */
+const Toast = {
+  _container: null,
+  _get() {
+    if (!this._container) {
+      this._container = document.getElementById('toastContainer');
+      if (!this._container) {
+        this._container = document.createElement('div');
+        this._container.id = 'toastContainer';
+        this._container.className = 'toast-container';
+        document.body.appendChild(this._container);
       }
-    });
+    }
+    return this._container;
   },
-  open(id) {
-    const overlay = document.getElementById(id);
-    if (overlay) { overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+  show(msg, type = 'info', duration = 3500) {
+    const icons = { success: '✅', danger: '❌', warning: '⚠️', info: 'ℹ️' };
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.innerHTML = `
+      <span style="font-size:16px;flex-shrink:0;">${icons[type] || 'ℹ️'}</span>
+      <span style="flex:1;font-size:13px;line-height:1.4;">${msg}</span>
+      <button style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:18px;line-height:1;padding:0 0 0 6px;flex-shrink:0;" onclick="this.closest('.toast').remove()">×</button>`;
+    this._get().appendChild(t);
+    requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, duration);
+    return t;
   },
-  close(id) {
-    const overlay = document.getElementById(id);
-    if (overlay) { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+  success(m) { return this.show(m, 'success'); },
+  error(m) { return this.show(m, 'danger'); },
+  warning(m) { return this.show(m, 'warning'); },
+  info(m) { return this.show(m, 'info'); },
+  loading(m) {
+    const t = this.show(`<span class="spinner">⟳</span> ${m}`, 'info', 30000);
+    return { dismiss: () => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); } };
   }
 };
 
-/* ─── Tab Manager ─── */
-const Tabs = {
-  init(containerId) {
-    const container = containerId ? document.getElementById(containerId) : document;
-    if (!container) return;
-    container.querySelectorAll('.tab-item').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const group = tab.dataset.tabGroup || tab.closest('[data-tab-group]')?.dataset.tabGroup || 'default';
-        const target = tab.dataset.tab;
-        // Deactivate all in same group
-        const tabBar = tab.closest('.tabs');
-        if (tabBar) {
-          tabBar.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        }
-        // Hide all content panels for this group
-        container.querySelectorAll(`.tab-content[data-tab-group="${group}"]`).forEach(panel => {
-          panel.classList.remove('active');
-        });
-        // Activate selected
-        tab.classList.add('active');
-        const panel = container.querySelector(`.tab-content[data-tab="${target}"][data-tab-group="${group}"]`);
-        if (panel) panel.classList.add('active');
-      });
+/* ─── Modal System ─── */
+const Modal = {
+  init() {
+    // data-modal-open triggers
+    document.querySelectorAll('[data-modal-open]').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); Modal.open(btn.dataset.modalOpen); });
     });
+    // data-modal-close triggers
+    document.querySelectorAll('[data-modal-close]').forEach(btn => {
+      btn.addEventListener('click', () => Modal.close(btn.dataset.modalClose));
+    });
+    // Close on backdrop click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => { if (e.target === overlay) Modal.close(overlay.id); });
+    });
+    // ESC key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(o => Modal.close(o.id));
+    });
+  },
+  open(id) {
+    const el = document.getElementById(id);
+    if (!el) { console.warn(`Modal #${id} not found`); return; }
+    el.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  },
+  close(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('active');
+    document.body.style.overflow = '';
   }
 };
 
@@ -99,80 +81,126 @@ const Tabs = {
 const NotifDropdown = {
   init() {
     document.querySelectorAll('[data-notif-toggle]').forEach(bell => {
-      bell.addEventListener('click', (e) => {
+      bell.addEventListener('click', e => {
         e.stopPropagation();
         const dropdown = document.getElementById(bell.dataset.notifToggle || 'notifDropdown');
-        if (dropdown) {
-          const isOpen = dropdown.classList.contains('open');
-          // Close all other dropdowns first
-          document.querySelectorAll('.notif-dropdown.open').forEach(d => d.classList.remove('open'));
-          if (!isOpen) dropdown.classList.add('open');
-        }
+        if (!dropdown) return;
+        const isOpen = dropdown.classList.contains('open');
+        document.querySelectorAll('.notif-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.dropdown-menu.open').forEach(d => d.classList.remove('open'));
+        if (!isOpen) dropdown.classList.add('open');
       });
     });
+
     // Mark all read
     document.querySelectorAll('[data-mark-read]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.notif-item.unread').forEach(item => item.classList.remove('unread'));
-        document.querySelectorAll('.notif-count-badge').forEach(b => b.style.display = 'none');
-        document.querySelectorAll('.notif-dot').forEach(d => d.style.display = 'none');
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
+        document.querySelectorAll('.notif-count, .notif-unread-dot').forEach(b => b.style.display = 'none');
+        document.querySelectorAll('.notif-count-badge').forEach(b => b.textContent = '0');
         Toast.success('All notifications marked as read');
       });
     });
-    // Close on outside click
+
     document.addEventListener('click', () => {
       document.querySelectorAll('.notif-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.dropdown-menu.open').forEach(d => d.classList.remove('open'));
     });
   }
 };
 
-/* ─── Dropdown Manager ─── */
+/* ─── Dropdown Menus ─── */
 const Dropdown = {
   init() {
     document.querySelectorAll('[data-dropdown]').forEach(trigger => {
-      trigger.addEventListener('click', (e) => {
+      trigger.addEventListener('click', e => {
         e.stopPropagation();
         const menu = document.getElementById(trigger.dataset.dropdown);
         if (!menu) return;
         const isOpen = menu.classList.contains('open');
         document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
+        document.querySelectorAll('.notif-dropdown.open').forEach(d => d.classList.remove('open'));
         if (!isOpen) menu.classList.add('open');
       });
-    });
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
     });
   }
 };
 
-/* ─── Table Search & Filter ─── */
+/* ─── Client Tabs (detail page) ─── */
+const ClientTabs = {
+  current: 'overview',
+  init() {
+    document.querySelectorAll('.ctab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const name = tab.dataset.tab || tab.textContent.trim().toLowerCase().replace(/\s+/g, '-');
+        this.show(name, tab);
+      });
+    });
+  },
+  show(name, el) {
+    this.current = name;
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+    const panel = document.getElementById('tab-' + name);
+    if (panel) panel.classList.add('active');
+    if (el) { el.classList.add('active'); }
+    else {
+      const tab = document.querySelector(`.ctab[data-tab="${name}"]`);
+      if (tab) tab.classList.add('active');
+    }
+    // Fire chart init if needed
+    document.dispatchEvent(new CustomEvent('tabchange', { detail: { name } }));
+  }
+};
+
+/* ─── Settings Nav ─── */
+const SettingsNav = {
+  init() {
+    document.querySelectorAll('.settings-nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const section = item.dataset.section;
+        if (!section) return;
+        document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+        item.classList.add('active');
+        const panel = document.getElementById('panel-' + section);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  }
+};
+
+/* ─── Table Search ─── */
 const TableFilter = {
-  init(searchInputId, tableId) {
-    const input = document.getElementById(searchInputId);
+  init(inputId, tableId) {
+    const input = document.getElementById(inputId);
     const table = document.getElementById(tableId);
     if (!input || !table) return;
     input.addEventListener('input', () => {
       const q = input.value.toLowerCase();
-      table.querySelectorAll('tbody tr').forEach(row => {
+      table.querySelectorAll('tbody tr:not(.expand-row)').forEach(row => {
         row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
       });
     });
   }
 };
 
-/* ─── Pill Filter (Keywords page) ─── */
+/* ─── Pill Filters ─── */
 const PillFilter = {
   init() {
     document.querySelectorAll('.pill[data-filter]').forEach(pill => {
       pill.addEventListener('click', () => {
         const group = pill.dataset.filterGroup || 'default';
+        const filter = pill.dataset.filter;
+        const targetId = pill.dataset.filterTarget;
         document.querySelectorAll(`.pill[data-filter-group="${group}"]`).forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        const filter = pill.dataset.filter;
-        const targetTable = document.getElementById(pill.dataset.filterTarget);
-        if (!targetTable) return;
-        targetTable.querySelectorAll('tbody tr[data-filter]').forEach(row => {
-          if (filter === 'all' || row.dataset.filter === filter) {
+        if (!targetId) return;
+        const table = document.getElementById(targetId);
+        if (!table) return;
+        table.querySelectorAll('tbody tr[data-filter]').forEach(row => {
+          if (filter === 'all' || (row.dataset.filter || '').split(' ').includes(filter)) {
             row.style.display = '';
           } else {
             row.style.display = 'none';
@@ -183,227 +211,71 @@ const PillFilter = {
   }
 };
 
-/* ─── Bulk Select (Clients table) ─── */
+/* ─── Bulk Select ─── */
 const BulkSelect = {
-  init(tableId, bulkBarId) {
+  init(tableId, barId) {
     const table = document.getElementById(tableId);
-    const bar = document.getElementById(bulkBarId);
+    const bar = document.getElementById(barId);
     if (!table || !bar) return;
     const masterCb = table.querySelector('thead input[type="checkbox"]');
-    const rows = table.querySelectorAll('tbody input[type="checkbox"]');
+    const getRows = () => [...table.querySelectorAll('tbody input[type="checkbox"].row-checkbox')];
     const countEl = bar.querySelector('.bulk-count');
 
-    const updateBar = () => {
-      const selected = [...rows].filter(cb => cb.checked).length;
-      if (selected > 0) {
-        bar.style.display = 'flex';
-        if (countEl) countEl.textContent = `${selected} client${selected > 1 ? 's' : ''} selected`;
-      } else {
-        bar.style.display = 'none';
-      }
+    const update = () => {
+      const rows = getRows();
+      const n = rows.filter(cb => cb.checked).length;
+      bar.style.display = n > 0 ? 'flex' : 'none';
+      if (countEl) countEl.textContent = `${n} client${n !== 1 ? 's' : ''} selected`;
+      if (masterCb) masterCb.indeterminate = n > 0 && n < rows.length;
     };
 
     if (masterCb) {
       masterCb.addEventListener('change', () => {
-        rows.forEach(cb => { cb.checked = masterCb.checked; });
-        updateBar();
+        getRows().forEach(cb => cb.checked = masterCb.checked);
+        update();
       });
     }
-    rows.forEach(cb => cb.addEventListener('change', () => {
-      if (masterCb) masterCb.indeterminate = [...rows].some(c => c.checked) && ![...rows].every(c => c.checked);
-      updateBar();
-    }));
+    getRows().forEach(cb => cb.addEventListener('change', update));
 
     const clearBtn = bar.querySelector('.bulk-clear');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        rows.forEach(cb => cb.checked = false);
-        if (masterCb) masterCb.checked = false;
-        bar.style.display = 'none';
-      });
-    }
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      getRows().forEach(cb => cb.checked = false);
+      if (masterCb) { masterCb.checked = false; masterCb.indeterminate = false; }
+      bar.style.display = 'none';
+    });
   }
 };
 
-/* ─── Audit Inline Expand ─── */
+/* ─── Audit URL Expand ─── */
 const AuditExpand = {
   init() {
     document.querySelectorAll('[data-expand-target]').forEach(btn => {
       btn.addEventListener('click', () => {
         const target = document.getElementById(btn.dataset.expandTarget);
         if (!target) return;
-        const isOpen = target.style.display !== 'none' && target.style.display !== '';
+        const isOpen = target.style.display === 'table-row';
         target.style.display = isOpen ? 'none' : 'table-row';
         btn.textContent = isOpen ? '▶ View URLs' : '▼ Collapse';
+        btn.style.color = isOpen ? 'var(--primary)' : 'var(--success)';
       });
     });
   }
 };
 
-/* ─── Collapsible Panels ─── */
-const Collapsible = {
-  init() {
-    document.querySelectorAll('.collapsible-header').forEach(header => {
-      const panel = header.closest('.collapsible');
-      const body = panel?.querySelector('.collapsible-body');
-      if (!body) return;
-      body.style.display = 'none'; // Start collapsed
-      header.addEventListener('click', () => {
-        const isOpen = panel.classList.contains('open');
-        if (isOpen) {
-          panel.classList.remove('open');
-          body.style.display = 'none';
-        } else {
-          panel.classList.add('open');
-          body.style.display = 'block';
-        }
-      });
-    });
-  }
-};
-
-/* ─── View Toggle (Table/Grid) ─── */
-const ViewToggle = {
-  init() {
-    document.querySelectorAll('[data-view-toggle]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const view = btn.dataset.viewToggle;
-        const group = btn.dataset.group || 'default';
-        // Toggle buttons
-        document.querySelectorAll(`[data-view-toggle][data-group="${group}"]`).forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        // Toggle views
-        document.querySelectorAll(`[data-view][data-view-group="${group}"]`).forEach(v => {
-          v.style.display = v.dataset.view === view ? '' : 'none';
-        });
-      });
-    });
-  }
-};
-
-/* ─── Health Score Gauge ─── */
-const Gauge = {
-  render(containerId, score, maxScore = 100) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const radius = 40;
-    const circumference = 2 * Math.PI * radius;
-    const pct = score / maxScore;
-    const offset = circumference * (1 - pct);
-    const color = score >= 80 ? '#10B981' : score >= 60 ? '#F59E0B' : '#EF4444';
-    container.innerHTML = `
-      <div class="gauge-container">
-        <div class="gauge">
-          <svg class="gauge-svg" width="100" height="100" viewBox="0 0 100 100">
-            <circle class="gauge-track" cx="50" cy="50" r="${radius}" stroke-dasharray="${circumference}"/>
-            <circle class="gauge-fill" cx="50" cy="50" r="${radius}"
-              stroke="${color}" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"/>
-          </svg>
-          <div class="gauge-text">
-            <div class="gauge-value" style="color:${color};">${score}</div>
-            <div class="gauge-label">/ ${maxScore}</div>
-          </div>
-        </div>
-      </div>`;
-  }
-};
-
-/* ─── Chart.js Helpers ─── */
-const Charts = {
-  bar(canvasId, labels, datasets, opts = {}) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx || !window.Chart) return null;
-    return new Chart(ctx, {
-      type: 'bar',
-      data: { labels, datasets },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: datasets.length > 1 } },
-        scales: {
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 } } },
-          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
-        },
-        ...opts
-      }
-    });
-  },
-  line(canvasId, labels, datasets, opts = {}) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx || !window.Chart) return null;
-    return new Chart(ctx, {
-      type: 'line',
-      data: { labels, datasets },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: datasets.length > 1 } },
-        scales: {
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 } } },
-          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
-        },
-        elements: { point: { radius: 3 }, line: { tension: 0.4 } },
-        ...opts
-      }
-    });
-  },
-  doughnut(canvasId, labels, data, colors, opts = {}) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx || !window.Chart) return null;
-    return new Chart(ctx, {
-      type: 'doughnut',
-      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
-      options: {
-        responsive: true, maintainAspectRatio: false, cutout: '70%',
-        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
-        ...opts
-      }
-    });
-  }
-};
-
-/* ─── Password Strength Checker ─── */
-const PasswordStrength = {
-  check(password) {
-    let score = 0;
-    if (password.length >= 8) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-    return { score, level: ['', 'weak', 'fair', 'good', 'strong'][score] };
-  },
-  render(inputId, barId) {
+/* ─── Delete Confirmation ─── */
+const DeleteConfirm = {
+  init(inputId, btnId, word = 'DELETE') {
     const input = document.getElementById(inputId);
-    const bars = document.querySelectorAll(`#${barId} .strength-bar`);
-    if (!input) return;
-    input.addEventListener('input', () => {
-      const { score, level } = this.check(input.value);
-      bars.forEach((bar, i) => {
-        bar.className = `strength-bar ${i < score ? level : ''}`;
-      });
-    });
-  }
-};
-
-/* ─── Date Range Picker (simple dropdown) ─── */
-const DatePicker = {
-  init() {
-    document.querySelectorAll('.date-range-btn').forEach(btn => {
-      const menu = btn.nextElementSibling;
-      if (!menu || !menu.classList.contains('date-range-menu')) return;
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-      });
-      menu.querySelectorAll('[data-period]').forEach(opt => {
-        opt.addEventListener('click', () => {
-          btn.querySelector('.date-range-label').textContent = opt.textContent;
-          menu.style.display = 'none';
-          Toast.info(`Showing data for: ${opt.textContent}`);
-        });
-      });
-    });
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.date-range-menu').forEach(m => m.style.display = 'none');
-    });
+    const btn = document.getElementById(btnId);
+    if (!input || !btn) return;
+    const check = () => {
+      const ok = input.value === word;
+      btn.disabled = !ok;
+      btn.style.opacity = ok ? '1' : '0.4';
+      btn.style.cursor = ok ? 'pointer' : 'not-allowed';
+    };
+    check();
+    input.addEventListener('input', check);
   }
 };
 
@@ -414,12 +286,13 @@ const TagInput = {
     if (!wrapper) return;
     const input = wrapper.querySelector('input');
     if (!input) return;
-    input.addEventListener('keydown', (e) => {
+    input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && input.value.trim()) {
         e.preventDefault();
         const tag = document.createElement('span');
         tag.className = 'tag';
-        tag.innerHTML = `${input.value.trim()}<span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
+        const val = input.value.trim();
+        tag.innerHTML = `${val} <span class="tag-remove" onclick="this.parentElement.remove()">×</span>`;
         wrapper.insertBefore(tag, input);
         input.value = '';
       }
@@ -427,52 +300,253 @@ const TagInput = {
   }
 };
 
-/* ─── Delete Confirmation (Type "DELETE") ─── */
-const DeleteConfirm = {
-  init(inputId, btnId) {
+/* ─── Password Strength ─── */
+const PasswordStrength = {
+  score(pw) {
+    let s = 0;
+    if (pw.length >= 8) s++;
+    if (/[A-Z]/.test(pw)) s++;
+    if (/[0-9]/.test(pw)) s++;
+    if (/[^A-Za-z0-9]/.test(pw)) s++;
+    return s;
+  },
+  init(inputId, barsId) {
     const input = document.getElementById(inputId);
-    const btn = document.getElementById(btnId);
-    if (!input || !btn) return;
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
+    if (!input) return;
+    const bars = document.querySelectorAll(`#${barsId} .strength-bar`);
+    const labels = ['', 'weak', 'fair', 'good', 'strong'];
     input.addEventListener('input', () => {
-      const enabled = input.value === 'DELETE';
-      btn.disabled = !enabled;
-      btn.style.opacity = enabled ? '1' : '0.5';
+      const s = this.score(input.value);
+      bars.forEach((bar, i) => { bar.className = `strength-bar${i < s ? ' ' + labels[s] : ''}`; });
     });
   }
 };
 
-/* ─── Initialize on DOMContentLoaded ─── */
+/* ─── Chart.js Wrappers ─── */
+const Charts = {
+  _instances: {},
+  _palette: {
+    primary: 'rgba(99,102,241,0.85)',
+    primaryLight: 'rgba(99,102,241,0.12)',
+    success: 'rgba(16,185,129,0.85)',
+    danger: 'rgba(239,68,68,0.8)',
+    warning: 'rgba(245,158,11,0.85)',
+    info: 'rgba(59,130,246,0.85)',
+    purple: 'rgba(139,92,246,0.85)'
+  },
+  _defaults() {
+    if (!window.Chart) return;
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = '#94A3B8';
+    Chart.defaults.plugins.legend.display = false;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#0F172A';
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: 700 };
+    Chart.defaults.scale.grid.color = 'rgba(0,0,0,0.04)';
+    Chart.defaults.scale.border.display = false;
+  },
+  destroy(id) {
+    if (this._instances[id]) { this._instances[id].destroy(); delete this._instances[id]; }
+  },
+  line(id, labels, datasets, opts = {}) {
+    if (!window.Chart) return;
+    this.destroy(id);
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    const inst = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: datasets.length > 1, position: 'top', labels: { boxWidth: 10, padding: 16 } } },
+        scales: {
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { padding: 6 } },
+          x: { grid: { display: false }, ticks: { padding: 4 } }
+        },
+        elements: { point: { radius: 4, hoverRadius: 6 }, line: { tension: 0.4, borderWidth: 2 } },
+        ...opts
+      }
+    });
+    this._instances[id] = inst;
+    return inst;
+  },
+  bar(id, labels, datasets, opts = {}) {
+    if (!window.Chart) return;
+    this.destroy(id);
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    const inst = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: datasets.length > 1, position: 'top', labels: { boxWidth: 10, padding: 16 } } },
+        scales: {
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { padding: 6 } },
+          x: { grid: { display: false }, ticks: { padding: 4 } }
+        },
+        ...opts
+      }
+    });
+    this._instances[id] = inst;
+    return inst;
+  },
+  doughnut(id, labels, data, colors, opts = {}) {
+    if (!window.Chart) return;
+    this.destroy(id);
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    const inst = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 4 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '72%',
+        plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+        ...opts
+      }
+    });
+    this._instances[id] = inst;
+    return inst;
+  }
+};
+
+/* ─── Global View Switch (table/grid) ─── */
+function switchView(view, groupEl) {
+  const group = groupEl ? groupEl.dataset.viewGroup || 'default' : 'default';
+  document.querySelectorAll(`[data-view-group="${group}"] .view-toggle-btn`).forEach(b => b.classList.remove('active'));
+  if (groupEl) groupEl.classList.add('active');
+  document.querySelectorAll(`[data-view="${view}"][data-view-group="${group}"]`).forEach(el => el.style.display = '');
+  const views = ['table', 'grid'].filter(v => v !== view);
+  views.forEach(v => document.querySelectorAll(`[data-view="${v}"][data-view-group="${group}"]`).forEach(el => el.style.display = 'none'));
+}
+
+/* ─── Global Tab Switch for client-detail ─── */
+function switchTab(name, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('tab-' + name);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+  document.dispatchEvent(new CustomEvent('tabchange', { detail: { name } }));
+}
+
+/* ─── Global Settings Panel Switch ─── */
+function showSettings(section, el) {
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + section);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+/* ─── Report Preview ─── */
+function showPreview(client, rowEl) {
+  // Hide all previews
+  document.querySelectorAll('.report-preview-block').forEach(p => p.style.display = 'none');
+  const target = document.getElementById('preview-' + client);
+  if (target) target.style.display = 'block';
+  // Highlight row
+  document.querySelectorAll('#reportsTable tbody tr').forEach(r => r.style.background = '');
+  if (rowEl) rowEl.style.background = 'linear-gradient(90deg,#EEF2FF,#F8F9FF)';
+}
+
+/* ─── Collapse Audit Rows ─── */
+function toggleExpand(id, btn) {
+  const row = document.getElementById(id);
+  if (!row) return;
+  const isOpen = row.style.display === 'table-row';
+  row.style.display = isOpen ? 'none' : 'table-row';
+  if (btn) {
+    btn.textContent = isOpen ? '▶ View URLs' : '▼ Collapse';
+    btn.style.color = isOpen ? 'var(--primary)' : 'var(--success)';
+  }
+}
+
+/* ─── GSC Connect ─── */
+function connectGSC() {
+  const loader = Toast.loading('Redirecting to Google OAuth...');
+  setTimeout(() => {
+    loader.dismiss();
+    const notConn = document.getElementById('gscNotConnected');
+    const conn = document.getElementById('gscConnected');
+    if (notConn) notConn.style.display = 'none';
+    if (conn) conn.style.display = 'block';
+    Toast.success('✅ Google Search Console connected! 8 properties found.');
+  }, 1800);
+}
+
+function disconnectGSC() {
+  if (!confirm('Disconnect Google Search Console? Analytics data will become unavailable.')) return;
+  const notConn = document.getElementById('gscNotConnected');
+  const conn = document.getElementById('gscConnected');
+  if (conn) conn.style.display = 'none';
+  if (notConn) notConn.style.display = 'block';
+  Toast.warning('GSC disconnected.');
+}
+
+/* ─── Report Sharing ─── */
+function copyShareLink() {
+  const link = `${location.origin}/reports/share/rf-${Math.random().toString(36).slice(2,8)}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(() => Toast.success('Share link copied! Valid for 30 days.'));
+  } else {
+    Toast.info('Share link: ' + link);
+  }
+}
+
+/* ─── Delete Confirmation Check ─── */
+function checkDeleteConfirm(val) {
+  const btn = document.getElementById('deleteConfirmBtn');
+  if (!btn) return;
+  const ok = val === 'DELETE';
+  btn.disabled = !ok;
+  btn.style.opacity = ok ? '1' : '0.4';
+}
+
+function confirmDeleteAgency() {
+  if (!confirm('Final warning: Delete your entire agency and all data?')) return;
+  Toast.error('Agency deletion queued. Check your email to confirm.');
+  setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+}
+
+/* ─── Page Init ─── */
 document.addEventListener('DOMContentLoaded', () => {
-  Toast.init();
+  // Chart defaults
+  Charts._defaults();
+
+  // Core systems
   Modal.init();
-  Tabs.init();
   NotifDropdown.init();
   Dropdown.init();
   PillFilter.init();
   AuditExpand.init();
-  Collapsible.init();
-  ViewToggle.init();
-  DatePicker.init();
+  ClientTabs.init();
+  SettingsNav.init();
 
-  // Initialize bulk select if applicable
+  // Bulk select
   if (document.getElementById('clientsTable')) {
     BulkSelect.init('clientsTable', 'bulkActionBar');
   }
 
-  // Initialize delete confirmation if applicable
+  // Delete confirm
   if (document.getElementById('deleteConfirmInput')) {
-    DeleteConfirm.init('deleteConfirmInput', 'deleteConfirmBtn');
+    DeleteConfirm.init('deleteConfirmInput', 'deleteConfirmBtn', 'DELETE');
   }
 
   // Tag inputs
   document.querySelectorAll('[data-tag-input]').forEach(w => TagInput.init(w.id));
 
-  // Password strength meters
+  // Password strength
   if (document.getElementById('passwordInput')) {
-    PasswordStrength.render('passwordInput', 'strengthBars');
+    PasswordStrength.init('passwordInput', 'strengthBars');
   }
 
-  console.log('✅ RankFlow App v2.0 initialized');
+  // Notif badge hide on hover
+  document.querySelectorAll('.notif-count').forEach(badge => {
+    setTimeout(() => { if (badge.textContent === '0') badge.style.display = 'none'; }, 0);
+  });
+
+  console.log('🚀 RankFlow v3.0 — GODMODE active');
 });
