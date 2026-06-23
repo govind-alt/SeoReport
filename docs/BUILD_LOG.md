@@ -23,7 +23,7 @@ All production-ready HTML wireframes are located in `src/`.
 
 ### 2. Marketing & Auth Pages
 - `index.html`: Public marketing site explaining the product.
-- `login.html`: Unified authentication page. Contains a **Role Selector** (Agency / Client / Admin) that dynamically routes the user to the correct portal upon sign-in.
+- `login.html`: Unified authentication page. Contains a **Role Selector** (Agency / Client / Admin) that dynamically routes the user to the correct portal upon sign-in. All login paths (Standard, Google, Password Reset) pass through a centralized `routeToRoleDashboard()` JavaScript function.
 - `onboarding.html`: The multi-step agency setup wizard.
 
 ### 3. Agency Portal (Core SaaS)
@@ -52,6 +52,10 @@ To view the prototype locally:
 npx serve src -p 3000
 ```
 Then open `http://localhost:3000/login.html` in your browser.
+
+### Live Deployment
+The project is configured for continuous deployment to **GitHub Pages**. 
+Any push to the `main` branch automatically triggers the `.github/workflows/pages.yml` workflow, which deploys the `src/` directory to the live public URL: `https://govind-alt.github.io/SeoReport/`.
 
 ## Next Steps (Phase 2)
 The next major architectural shift is the Next.js App Router migration.
