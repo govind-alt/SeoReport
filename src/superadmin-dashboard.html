@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Superadmin — Global Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ── Superadmin Dark Theme Override ── */
+:root {
+  --bg: #09090b; /* Zinc 950 */
+  --surface: #18181b; /* Zinc 900 */
+  --border: #27272a; /* Zinc 800 */
+  --border-strong: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  
+  --primary: #8b5cf6; /* Violet */
+  --primary-hover: #7c3aed;
+  --primary-light: rgba(139,92,246,0.15);
+  
+  --sidebar-bg: #09090b;
+  --sidebar-border: #27272a;
+}
+body { background: var(--bg); color: var(--text-primary); }
+.topbar { background: rgba(9,9,11,0.8); border-color: var(--border); }
+.kpi-card, .chart-card, table, .table-wrapper { background: var(--surface); border-color: var(--border); box-shadow: none; color: var(--text-primary); }
+.kpi-value { color: var(--text-primary); }
+th { background: #0f0f11; color: var(--text-secondary); border-color: var(--border); }
+td { border-color: var(--border); }
+.btn-secondary { background: var(--surface); border-color: var(--border-strong); color: var(--text-primary); }
+.btn-secondary:hover { background: #27272a; border-color: #52525b; }
+.form-input { background: var(--bg); border-color: var(--border-strong); color: var(--text-primary); }
+.form-input:focus { border-color: var(--primary); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon" style="background:#8b5cf6;">SA</div>
+      <div>
+        <div class="sidebar-logo-text" style="color:white;">RankFlow</div>
+        <div class="sidebar-logo-sub">Superadmin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" style="margin-top:20px;">
+      <a href="superadmin-dashboard.html" class="sidebar-item active">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-label">Global Metrics</span>
+      </a>
+      <a href="superadmin-agencies.html" class="sidebar-item">
+        <span class="sidebar-item-icon">🏢</span>
+        <span class="sidebar-item-label">Tenant Agencies</span>
+        <span class="sidebar-badge">12</span>
+      </a>
+      <a href="#" class="sidebar-item">
+        <span class="sidebar-item-icon">💳</span>
+        <span class="sidebar-item-label">Subscriptions</span>
+      </a>
+      <a href="#" class="sidebar-item">
+        <span class="sidebar-item-icon">⚙️</span>
+        <span class="sidebar-item-label">System Settings</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="Logout.confirm()">🚪 Exit Superadmin</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Global Platform Metrics</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm">Refresh Data</button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      
+      <!-- KPI Grid -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
+        <div class="kpi-card success">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-label">Monthly Recurring Revenue (MRR)</div>
+          <div class="kpi-value">$14,250</div>
+          <div class="kpi-trend trend-up">↑ +12% MoM</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🏢</div>
+          <div class="kpi-label">Active Agencies</div>
+          <div class="kpi-value">48</div>
+          <div class="kpi-trend trend-up">↑ +3 new this month</div>
+        </div>
+        <div class="kpi-card warning">
+          <div class="kpi-icon">🔌</div>
+          <div class="kpi-label">SERanking API Quota</div>
+          <div class="kpi-value" style="color:var(--warning);">8.2M</div>
+          <div class="kpi-trend" style="color:var(--warning);">⚠ 82% of 10M limit used</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📄</div>
+          <div class="kpi-label">Reports Generated (YTD)</div>
+          <div class="kpi-value">1,420</div>
+          <div class="kpi-trend trend-up">↑ Smooth operation</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Revenue & Subscriptions Growth</div>
+          </div>
+          <div class="chart-body" style="height:300px;">
+            <canvas id="mrrChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Plan Distribution</div>
+          </div>
+          <div class="chart-body" style="height:300px;display:flex;align-items:center;justify-content:center;">
+            <canvas id="planChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent System Logs -->
+      <h2 style="font-size:16px;font-weight:700;margin-bottom:12px;">Recent System Events</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Type</th>
+              <th>Tenant / User</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-size:12px;color:var(--text-secondary);">2026-06-23 14:20:01</td>
+              <td><span class="badge badge-success">Webhook</span></td>
+              <td><code>digital-horizons</code></td>
+              <td style="font-size:13px;">Successfully processed Stripe payment (inv_12345)</td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:var(--text-secondary);">2026-06-23 13:45:12</td>
+              <td><span class="badge badge-warning">API Limit</span></td>
+              <td><code>seo-ninjas</code></td>
+              <td style="font-size:13px;">Tenant reached 90% of monthly report limit (45/50)</td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:var(--text-secondary);">2026-06-23 12:10:05</td>
+              <td><span class="badge badge-primary">New Signup</span></td>
+              <td><code>marketing-pro</code></td>
+              <td style="font-size:13px;">New tenant registered and activated Pro plan trial</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // We customize Chart.js default font color for dark mode
+  Chart.defaults.color = '#a1a1aa';
+  Chart.defaults.borderColor = '#27272a';
+  
+  Charts.line('mrrChart', 
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    [8500, 9200, 10500, 11800, 12700, 14250]
+  );
+  
+  Charts.doughnut('planChart',
+    ['Starter ($99)', 'Pro ($249)', 'Enterprise ($499)'],
+    [25, 18, 5],
+    ['#3B82F6', '#8B5CF6', '#10B981'],
+    { plugins: { legend: { position: 'bottom' } } }
+  );
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RankFlow — Automated SEO Reporting for Agencies</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ── Reset & Base ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; line-height: 1.6; overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Utilities ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: #6366f1; color: white; border: none; box-shadow: 0 4px 14px rgba(99,102,241,0.4); }
+.btn-primary:hover { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.5); }
+.btn-secondary { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+.btn-secondary:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Header ── */
+header { position: fixed; top: 0; left: 0; right: 0; background: rgba(15,23,42,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 100; }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; color: white; }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.nav-links { display: flex; gap: 32px; }
+.nav-links a { font-size: 14px; font-weight: 500; color: #cbd5e1; transition: color 0.2s; }
+.nav-links a:hover { color: white; }
+
+/* ── Hero ── */
+.hero { padding: 160px 0 100px; text-align: center; position: relative; }
+.hero::before { content: ''; position: absolute; top: -20%; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%); pointer-events: none; }
+.hero h1 { font-size: 56px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 24px; color: white; }
+.hero h1 span { background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 20px; color: #94a3b8; max-width: 600px; margin: 0 auto 40px; }
+.hero-buttons { display: flex; justify-content: center; gap: 16px; }
+
+/* ── Dashboard Mockup ── */
+.mockup-wrap { max-width: 1000px; margin: 0 auto 100px; border-radius: 16px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 24px 80px rgba(0,0,0,0.5); overflow: hidden; position: relative; }
+.mockup-header { height: 32px; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; }
+.mockup-dot:nth-child(1) { background: #ef4444; }
+.mockup-dot:nth-child(2) { background: #eab308; }
+.mockup-dot:nth-child(3) { background: #22c55e; }
+.mockup-body { padding: 40px; text-align: left; }
+.mockup-kpi { display: flex; gap: 16px; margin-bottom: 24px; }
+.mockup-card { flex: 1; height: 100px; background: rgba(255,255,255,0.05); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+
+/* ── Features ── */
+.features { padding: 100px 0; background: #0b1120; }
+.section-title { text-align: center; font-size: 36px; font-weight: 800; margin-bottom: 60px; color: white; letter-spacing: -0.5px; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.feature-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.05); padding: 40px 32px; border-radius: 16px; text-align: left; transition: transform 0.2s; }
+.feature-card:hover { transform: translateY(-5px); border-color: rgba(99,102,241,0.5); }
+.feature-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(99,102,241,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 24px; }
+.feature-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: white; }
+.feature-desc { font-size: 15px; color: #94a3b8; line-height: 1.6; }
+
+/* ── Pricing ── */
+.pricing { padding: 100px 0; }
+.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1000px; margin: 0 auto; }
+.pricing-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 40px; text-align: left; }
+.pricing-card.popular { border-color: #6366f1; position: relative; box-shadow: 0 12px 40px rgba(99,102,241,0.15); }
+.popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #6366f1; color: white; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+.price { font-size: 48px; font-weight: 900; color: white; margin: 24px 0 8px; letter-spacing: -1px; }
+.price span { font-size: 16px; font-weight: 500; color: #94a3b8; }
+.feature-list { list-style: none; margin: 32px 0; }
+.feature-list li { margin-bottom: 16px; font-size: 15px; color: #cbd5e1; display: flex; align-items: center; gap: 10px; }
+.feature-list li::before { content: '✓'; color: #10b981; font-weight: 800; }
+
+/* ── Footer ── */
+footer { padding: 60px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: #64748b; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav-inner">
+    <div class="logo">
+      <div class="logo-icon">RF</div>
+      RankFlow
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="login.html" style="color:white;font-weight:700;">Log In</a>
+      <a href="onboarding.html" class="btn btn-primary" style="padding:8px 16px;font-size:13px;border-radius:6px;color:white;">Start Free Trial</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Automate your agency's<br><span>SEO reporting</span></h1>
+    <p>Connect your SERanking account once. Generate beautiful, 100% white-labeled PDF and web reports for all your clients automatically on the 1st of every month.</p>
+    <div class="hero-buttons">
+      <a href="onboarding.html" class="btn btn-primary" style="padding:16px 32px;font-size:16px;">Start 14-Day Free Trial</a>
+      <a href="#features" class="btn btn-secondary" style="padding:16px 32px;font-size:16px;">See How it Works</a>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="mockup-wrap">
+    <div class="mockup-header">
+      <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+    </div>
+    <div class="mockup-body">
+      <div style="font-size:24px;font-weight:800;color:white;margin-bottom:24px;">Agency Dashboard</div>
+      <div class="mockup-kpi">
+        <div class="mockup-card" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.2);"></div>
+        <div class="mockup-card"></div>
+        <div class="mockup-card"></div>
+        <div class="mockup-card"></div>
+      </div>
+      <div style="display:flex;gap:16px;">
+        <div style="flex:2;height:250px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.05);"></div>
+        <div style="flex:1;height:250px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.05);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="features" class="features">
+  <div class="container">
+    <h2 class="section-title">Everything an SEO agency needs</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#8b5cf6;">⚡</div>
+        <div class="feature-title">Native SERanking Sync</div>
+        <div class="feature-desc">Connect your SERanking API key once. We automatically pull keyword rankings, backlinks, audit scores, and competitor data for every client.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#10b981;">🎨</div>
+        <div class="feature-title">100% White-Labeled</div>
+        <div class="feature-desc">Your logo, your brand colors, your custom domain (reports.youragency.com). Your clients will never know RankFlow exists.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#3b82f6;">🤖</div>
+        <div class="feature-title">AI Recommendations</div>
+        <div class="feature-desc">Our AI analyzes ranking drops and site audit issues to automatically write a custom "Next Steps" action plan for every single report.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#f59e0b;">📄</div>
+        <div class="feature-title">Automated PDFs</div>
+        <div class="feature-desc">Wake up on the 1st of the month to perfectly formatted PDF reports ready to send. No more wrestling with Google Looker Studio layouts.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#ef4444;">📊</div>
+        <div class="feature-title">Google Search Console</div>
+        <div class="feature-desc">Seamlessly blend SERanking keyword data with real Google Search Console clicks and impressions for a complete performance picture.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="color:#ec4899;">🔐</div>
+        <div class="feature-title">Client Portal</div>
+        <div class="feature-desc">Give your clients a read-only login to view their metrics live, or send them secure, password-less share links to view web reports.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="pricing">
+  <div class="container">
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3 style="font-size:20px;color:white;">Starter</h3>
+        <p style="color:#94a3b8;font-size:14px;margin-top:8px;">For freelancers and small teams.</p>
+        <div class="price">$99<span>/mo</span></div>
+        <ul class="feature-list">
+          <li>Up to 10 clients</li>
+          <li>Automated PDF Exports</li>
+          <li>SERanking Integration</li>
+          <li>Basic White-labeling</li>
+        </ul>
+        <a href="onboarding.html" class="btn btn-secondary" style="width:100%;">Start Free Trial</a>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">Most Popular</div>
+        <h3 style="font-size:20px;color:white;">Pro</h3>
+        <p style="color:#94a3b8;font-size:14px;margin-top:8px;">For growing SEO agencies.</p>
+        <div class="price">$249<span>/mo</span></div>
+        <ul class="feature-list">
+          <li>Up to 50 clients</li>
+          <li>Custom Domain (CNAME)</li>
+          <li>Client Portal Logins</li>
+          <li>AI Recommendations</li>
+        </ul>
+        <a href="onboarding.html" class="btn btn-primary" style="width:100%;">Start Free Trial</a>
+      </div>
+      <div class="pricing-card">
+        <h3 style="font-size:20px;color:white;">Enterprise</h3>
+        <p style="color:#94a3b8;font-size:14px;margin-top:8px;">For large scale operations.</p>
+        <div class="price">$499<span>/mo</span></div>
+        <ul class="feature-list">
+          <li>Unlimited clients</li>
+          <li>Dedicated Account Manager</li>
+          <li>Custom Webhooks & API</li>
+          <li>SLA Guarantee</li>
+        </ul>
+        <a href="onboarding.html" class="btn btn-secondary" style="width:100%;">Contact Sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div style="font-size:20px;font-weight:800;color:white;margin-bottom:16px;">RankFlow</div>
+    <p>&copy; 2026 Digital Horizons Inc. All rights reserved.</p>
+    <div style="display:flex;justify-content:center;gap:24px;margin-top:16px;">
+      <a href="#">Terms of Service</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Security</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
