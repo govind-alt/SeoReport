@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankFlow — Wireframes</title>
+  <style>
+    :root {
+      --wire-bg: #f4f5f7;
+      --wire-surface: #ffffff;
+      --wire-border: #c8ccd4;
+      --wire-border-dark: #8c94a4;
+      --wire-text: #1e2030;
+      --wire-text-light: #5c6478;
+      --wire-text-muted: #9aa0b4;
+      --wire-fill: #dde1e8;
+      --wire-fill-dark: #b8bfcc;
+      --wire-fill-accent: #c4c8d6;
+      --wire-primary: #4a5270;
+      --wire-success: #5a7a60;
+      --wire-danger: #8a4a4a;
+      --wire-warn: #8a7040;
+      --sidebar-w: 220px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1d2e;
+      color: var(--wire-text);
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV ── */
+    .top-nav {
+      background: #12141f;
+      border-bottom: 1px solid #2a2d40;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-nav .brand {
+      display: flex; align-items: center; gap: 10px;
+      color: #e0e4f0; font-weight: 700; font-size: 15px;
+    }
+    .top-nav .brand-icon {
+      width: 28px; height: 28px; background: #4a5270;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: #fff;
+    }
+    .screen-selector {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .screen-selector select {
+      background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8;
+      padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer;
+    }
+    .nav-btns { display: flex; gap: 8px; }
+    .nav-btn {
+      background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8;
+      padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: #3a3d54; color: #fff; }
+    .screen-counter { color: #606478; font-size: 12px; }
+
+    /* ── SCREEN AREA ── */
+    .screen-area {
+      display: flex; justify-content: center; align-items: flex-start;
+      padding: 28px 24px; min-height: calc(100vh - 52px);
+    }
+
+    .wireframe-wrapper {
+      width: 100%; max-width: 1100px;
+    }
+    .screen-label {
+      color: #8890a8; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      margin-bottom: 10px;
+    }
+    .screen-title {
+      color: #e0e4f0; font-size: 18px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .screen-desc {
+      color: #606478; font-size: 13px; margin-bottom: 20px;
+    }
+
+    /* ── WIREFRAME CHROME ── */
+    .wf-chrome {
+      background: var(--wire-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid #2a2d40;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .wf-chrome-bar {
+      background: #e0e3ea;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 7px;
+      border-bottom: 1px solid var(--wire-border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #e07070; }
+    .dot-y { background: #e0c070; }
+    .dot-g { background: #70c070; }
+    .wf-url {
+      flex: 1; background: #fff; border: 1px solid var(--wire-border);
+      border-radius: 12px; height: 20px; margin: 0 10px;
+      display: flex; align-items: center; padding: 0 10px;
+      font-size: 10px; color: var(--wire-text-muted);
+    }
+
+    /* ── LAYOUT PRIMITIVES ── */
+    .wf-body { padding: 0; min-height: 600px; }
+
+    /* Sidebar + Content layout */
+    .wf-layout { display: flex; min-height: 600px; }
+    .wf-sidebar {
+      width: var(--sidebar-w); background: var(--wire-surface);
+      border-right: 1px solid var(--wire-border); flex-shrink: 0;
+      display: flex; flex-direction: column;
+    }
+    .wf-sidebar-logo {
+      padding: 16px 16px 12px; border-bottom: 1px solid var(--wire-border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo-box {
+      width: 32px; height: 32px; background: var(--wire-fill-dark);
+      border-radius: 6px; border: 1px dashed var(--wire-border-dark);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--wire-text-muted);
+    }
+    .logo-text { font-size: 12px; font-weight: 700; color: var(--wire-primary); }
+    .logo-sub { font-size: 9px; color: var(--wire-text-muted); }
+
+    .wf-sidebar-nav { padding: 8px 8px; flex: 1; }
+    .nav-section-label {
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--wire-text-muted);
+      padding: 8px 8px 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 8px; border-radius: 6px; font-size: 12px;
+      color: var(--wire-text-light); cursor: pointer;
+      margin-bottom: 1px;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: var(--wire-fill); color: var(--wire-primary); font-weight: 600;
+    }
+    .nav-icon { width: 14px; height: 14px; background: var(--wire-fill-dark); border-radius: 3px; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto; background: var(--wire-fill-dark);
+      color: var(--wire-text-light); font-size: 9px;
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .wf-sidebar-footer {
+      padding: 12px 12px; border-top: 1px solid var(--wire-border);
+    }
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; background: var(--wire-fill); border-radius: 8px;
+    }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--wire-fill-dark); border: 1px dashed var(--wire-border-dark); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--wire-text-muted); }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 11px; font-weight: 600; color: var(--wire-text); }
+    .user-role { font-size: 9px; color: var(--wire-text-muted); }
+
+    .wf-content { flex: 1; overflow: hidden; }
+
+    /* Top bar */
+    .wf-topbar {
+      height: 52px; background: var(--wire-surface);
+      border-bottom: 1px solid var(--wire-border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 12px;
+    }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--wire-text); flex: 1; }
+    .topbar-actions { display: flex; gap: 8px; }
+
+    /* Buttons */
+    .wf-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: 600;
+      cursor: pointer; border: 1px solid transparent;
+    }
+    .wf-btn-primary { background: var(--wire-primary); color: #fff; border-color: var(--wire-primary); }
+    .wf-btn-secondary { background: var(--wire-surface); color: var(--wire-text-light); border-color: var(--wire-border); }
+    .wf-btn-danger { background: #f8ecec; color: var(--wire-danger); border-color: #e0c4c4; }
+    .wf-btn-sm { padding: 4px 10px; font-size: 10px; }
+    .wf-btn-ghost { background: transparent; color: var(--wire-text-muted); border-color: var(--wire-border); }
+
+    /* Content area */
+    .wf-main { padding: 24px; }
+
+    /* Cards / KPI */
+    .kpi-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card {
+      background: var(--wire-surface); border: 1px solid var(--wire-border);
+      border-radius: 8px; padding: 16px;
+    }
+    .kpi-label { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--wire-text); line-height: 1; }
+    .kpi-change { font-size: 10px; margin-top: 4px; }
+    .kpi-change.up { color: var(--wire-success); }
+    .kpi-change.down { color: var(--wire-danger); }
+    .kpi-change.neutral { color: var(--wire-text-muted); }
+
+    /* Tables */
+    .wf-table-wrap { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-table-header { padding: 14px 16px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; justify-content: space-between; }
+    .wf-table-title { font-size: 13px; font-weight: 700; color: var(--wire-text); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--wire-fill); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--wire-text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--wire-border); }
+    td { padding: 9px 12px; font-size: 11px; color: var(--wire-text); border-bottom: 1px solid var(--wire-fill); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--wire-fill); }
+
+    /* Chart placeholder */
+    .chart-box {
+      background: var(--wire-surface); border: 1px solid var(--wire-border);
+      border-radius: 8px; padding: 16px; margin-bottom: 20px;
+    }
+    .chart-title { font-size: 12px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 12px; }
+    .chart-placeholder {
+      background: var(--wire-fill); border-radius: 6px;
+      display: flex; align-items: flex-end; justify-content: space-around;
+      padding: 16px 12px 0; gap: 4px;
+    }
+    .chart-bar { background: var(--wire-fill-dark); border-radius: 3px 3px 0 0; flex: 1; min-width: 20px; }
+    .chart-line-placeholder {
+      background: var(--wire-fill); border-radius: 6px; padding: 16px;
+      position: relative; overflow: hidden;
+    }
+    .chart-line-svg { width: 100%; height: 80px; }
+
+    /* Section header */
+    .section-header { margin-bottom: 16px; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--wire-text); margin-bottom: 3px; }
+    .section-desc { font-size: 11px; color: var(--wire-text-muted); }
+
+    /* Search / Filter bar */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .wf-input {
+      background: var(--wire-surface); border: 1px solid var(--wire-border);
+      border-radius: 6px; padding: 7px 12px; font-size: 11px;
+      color: var(--wire-text-light); flex: 1; min-width: 160px;
+    }
+    .wf-select {
+      background: var(--wire-surface); border: 1px solid var(--wire-border);
+      border-radius: 6px; padding: 7px 12px; font-size: 11px;
+      color: var(--wire-text-light);
+    }
+
+    /* Tabs */
+    .wf-tabs {
+      display: flex; border-bottom: 1px solid var(--wire-border);
+      margin-bottom: 20px; gap: 2px;
+    }
+    .wf-tab {
+      padding: 8px 16px; font-size: 11px; font-weight: 500;
+      color: var(--wire-text-muted); cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .wf-tab.active { color: var(--wire-primary); border-bottom-color: var(--wire-primary); font-weight: 700; }
+
+    /* Badge / Tag */
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .badge-success { background: #e6f0e8; color: var(--wire-success); }
+    .badge-danger { background: #f0e6e6; color: var(--wire-danger); }
+    .badge-warn { background: #f0ece0; color: var(--wire-warn); }
+    .badge-neutral { background: var(--wire-fill); color: var(--wire-text-muted); }
+    .badge-primary { background: #e8eaf4; color: var(--wire-primary); }
+
+    /* Arrow indicators */
+    .up-arrow { color: var(--wire-success); }
+    .down-arrow { color: var(--wire-danger); }
+
+    /* Cards grid */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .wf-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+
+    /* Auth / Form styles */
+    .auth-wrapper { min-height: 600px; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; padding: 32px; }
+    .auth-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 12px; padding: 32px; width: 380px; }
+    .auth-logo { text-align: center; margin-bottom: 24px; }
+    .auth-logo-box { width: 44px; height: 44px; background: var(--wire-fill-dark); border-radius: 10px; border: 1px dashed var(--wire-border-dark); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--wire-text-muted); }
+    .auth-title { font-size: 18px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .auth-subtitle { font-size: 11px; color: var(--wire-text-muted); }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--wire-text); margin-bottom: 5px; }
+    .form-input { display: block; width: 100%; padding: 9px 12px; border: 1px solid var(--wire-border); border-radius: 6px; font-size: 12px; color: var(--wire-text-light); background: var(--wire-fill); }
+    .form-input-hint { font-size: 9px; color: var(--wire-text-muted); margin-top: 3px; }
+    .form-divider { text-align: center; font-size: 10px; color: var(--wire-text-muted); margin: 14px 0; position: relative; }
+    .form-divider::before, .form-divider::after { content:''; position: absolute; top: 50%; width: calc(50% - 20px); height: 1px; background: var(--wire-border); }
+    .form-divider::before { left: 0; }
+    .form-divider::after { right: 0; }
+    .form-link { font-size: 10px; color: var(--wire-primary); text-decoration: none; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+
+    /* Wizard / Steps */
+    .wizard-steps { display: flex; align-items: center; margin-bottom: 28px; }
+    .wizard-step { display: flex; align-items: center; flex: 1; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--wire-border-dark); background: var(--wire-surface); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--wire-text-muted); flex-shrink: 0; }
+    .step-circle.active { background: var(--wire-primary); border-color: var(--wire-primary); color: #fff; }
+    .step-circle.done { background: var(--wire-success); border-color: var(--wire-success); color: #fff; }
+    .step-label { font-size: 10px; color: var(--wire-text-muted); margin-left: 6px; }
+    .step-label.active { color: var(--wire-primary); font-weight: 700; }
+    .step-connector { flex: 1; height: 1px; background: var(--wire-border); margin: 0 8px; }
+    .step-connector.done { background: var(--wire-success); }
+
+    /* Gauge / Health score */
+    .gauge-wrap { text-align: center; padding: 16px; }
+    .gauge-ring { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--wire-primary) 0% 76%, var(--wire-fill) 76% 100%); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
+    .gauge-inner { width: 72px; height: 72px; border-radius: 50%; background: var(--wire-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .gauge-value { font-size: 18px; font-weight: 800; color: var(--wire-text); }
+    .gauge-max { font-size: 9px; color: var(--wire-text-muted); }
+    .gauge-label { font-size: 11px; font-weight: 600; color: var(--wire-text); }
+
+    /* Report view */
+    .report-header { background: var(--wire-primary); color: #fff; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .report-header-logo { width: 80px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,0.7); }
+    .report-header-info { text-align: right; }
+    .report-header-title { font-size: 16px; font-weight: 800; }
+    .report-header-meta { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+    .report-section { padding: 20px 32px; border-bottom: 1px solid var(--wire-border); }
+    .report-section-title { font-size: 13px; font-weight: 800; color: var(--wire-primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--wire-fill); }
+
+    /* Annotation label */
+    .annotation { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; color: #8860c0; background: #f0e8ff; border: 1px solid #d8c0f0; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+
+    /* Progress bar */
+    .progress-bar { height: 6px; background: var(--wire-fill); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; background: var(--wire-primary); border-radius: 3px; }
+
+    /* Icon placeholders */
+    .icon-sm { width: 16px; height: 16px; background: var(--wire-fill-dark); border-radius: 3px; display: inline-block; }
+    .icon-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* Separator */
+    .divider { border: none; border-top: 1px solid var(--wire-border); margin: 16px 0; }
+
+    /* Two col layout */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+    /* Toast */
+    .toast { position: absolute; bottom: 16px; right: 16px; background: var(--wire-text); color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 11px; display: flex; align-items: center; gap: 8px; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--wire-text-muted); }
+    .empty-state-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--wire-fill); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .empty-state-title { font-size: 13px; font-weight: 700; color: var(--wire-text); margin-bottom: 6px; }
+    .empty-state-desc { font-size: 11px; margin-bottom: 14px; }
+
+    /* Notification dot */
+    .notif-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--wire-danger); display: inline-block; }
+
+    /* Breadcrumb */
+    .breadcrumb { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 12px; }
+    .breadcrumb span { color: var(--wire-primary); }
+
+    /* Client header */
+    .client-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--wire-border); }
+    .client-logo { width: 44px; height: 44px; border-radius: 8px; background: var(--wire-fill); border: 1px dashed var(--wire-border-dark); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--wire-text-muted); flex-shrink: 0; }
+    .client-meta { flex: 1; }
+    .client-name { font-size: 18px; font-weight: 800; color: var(--wire-text); }
+    .client-url { font-size: 11px; color: var(--wire-text-muted); }
+
+    /* Screen display control */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* Annotations panel */
+    .annotations-panel {
+      background: #12141f; border-top: 1px solid #2a2d40;
+      padding: 12px 24px; display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .ann-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #8890a8; }
+    .ann-bullet { width: 8px; height: 8px; border-radius: 2px; background: #8860c0; flex-shrink: 0; }
+
+    /* Switch */
+    .wf-switch { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .switch-track { width: 32px; height: 18px; border-radius: 9px; background: var(--wire-fill-dark); position: relative; flex-shrink: 0; }
+    .switch-track.on { background: var(--wire-primary); }
+    .switch-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; }
+    .switch-track.on .switch-thumb { left: 16px; }
+    .switch-label { font-size: 11px; color: var(--wire-text); }
+    .switch-sub { font-size: 10px; color: var(--wire-text-muted); }
+
+    /* Color swatch */
+    .color-swatch { width: 28px; height: 28px; border-radius: 5px; border: 1px solid var(--wire-border); }
+
+    /* Breadcrumb pages */
+    .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .page-h1 { font-size: 18px; font-weight: 800; color: var(--wire-text); }
+    .page-sub { font-size: 11px; color: var(--wire-text-muted); margin-top: 3px; }
+
+    /* Alert box */
+    .alert { padding: 10px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .alert-warn { background: #fdf8e8; border: 1px solid #e8d888; color: #705820; }
+    .alert-danger { background: #fdf0f0; border: 1px solid #e8c0c0; color: #7a2828; }
+    .alert-success { background: #f0fdf4; border: 1px solid #c0e8c8; color: #286048; }
+    .alert-info { background: #f0f4fd; border: 1px solid #c0ccf0; color: #283878; }
+
+    /* Inline chevron */
+    .chevron::after { content: ' ›'; }
+
+    /* Modal overlay */
+    .modal-overlay { background: rgba(0,0,0,0.15); position: relative; padding: 40px; min-height: 600px; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 12px; padding: 24px; width: 520px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .modal-sub { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 20px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--wire-border); }
+
+    /* Image / logo placeholder */
+    .img-placeholder { background: var(--wire-fill); border: 1px dashed var(--wire-border-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--wire-text-muted); font-size: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAVIGATION -->
+<div class="top-nav">
+  <div class="brand">
+    <div class="brand-icon">RF</div>
+    RankFlow — Wireframes
+  </div>
+  <div class="screen-selector">
+    <select id="screenSelect" onchange="gotoScreen(this.value)">
+      <option value="0">01 — Login Page</option>
+      <option value="1">02 — Agency Registration</option>
+      <option value="2">03 — Onboarding Wizard (4 Steps)</option>
+      <option value="3">04 — Agency Dashboard (Home)</option>
+      <option value="4">05 — Clients List</option>
+      <option value="5">06 — Add / Edit Client</option>
+      <option value="6">07 — Client Overview Tab</option>
+      <option value="7">08 — Client Keywords Tab</option>
+      <option value="8">09 — Client Backlinks Tab</option>
+      <option value="9">10 — Client Technical Audit Tab</option>
+      <option value="10">11 — Client Analytics Tab</option>
+      <option value="11">12 — Client Competitors Tab</option>
+      <option value="12">13 — Client Reports Tab</option>
+      <option value="13">14 — Report Wizard (Generate)</option>
+      <option value="14">15 — Web Report View</option>
+      <option value="15">16 — Reports List (All Clients)</option>
+      <option value="16">17 — Settings: General</option>
+      <option value="17">18 — Settings: Branding</option>
+      <option value="18">19 — Settings: API Keys</option>
+      <option value="19">20 — Settings: Team Management</option>
+      <option value="20">21 — Settings: Scheduling</option>
+      <option value="21">22 — Client Portal: Dashboard</option>
+      <option value="22">23 — Client Portal: Report View</option>
+      <option value="23">24 — Public Shareable Report</option>
+      <option value="24">25 — Super Admin Dashboard</option>
+    </select>
+    <span class="screen-counter" id="screenCounter">1 / 25</span>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="prevScreen()">← Prev</button>
+    <button class="nav-btn" onclick="nextScreen()">Next →</button>
+  </div>
+</div>
+
+<div class="screen-area">
+<div class="wireframe-wrapper">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 01: LOGIN -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+  <div class="screen-label">Screen 01</div>
+  <div class="screen-title">Login Page</div>
+  <div class="screen-desc">Entry point for agency admins and team members. Supports email/password and Google SSO.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/login</div></div>
+    <div class="auth-wrapper">
+      <div style="max-width:420px; width:100%;">
+        <div class="auth-logo">
+          <div class="auth-logo-box">LOGO</div>
+          <div style="font-size:20px; font-weight:800; color:var(--wire-primary);">RankFlow</div>
+          <div style="font-size:11px; color:var(--wire-text-muted);">SEO Report Automation</div>
+        </div>
+        <div class="auth-card">
+          <div class="auth-title">Welcome back 👋</div>
+          <div class="auth-subtitle">Sign in to your agency dashboard</div>
+          <div style="height:16px;"></div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <div class="form-input">john@agency.com</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="form-input">••••••••••</div>
+            <div style="text-align:right; margin-top:4px;"><a class="form-link">Forgot password?</a></div>
+          </div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; padding:10px;">Sign In</div>
+          <div class="form-divider" style="margin:16px 0;">or</div>
+          <div class="wf-btn wf-btn-secondary" style="width:100%; justify-content:center; padding:10px;">
+            <div class="icon-sm"></div> Continue with Google
+          </div>
+          <div style="text-align:center; margin-top:16px; font-size:11px; color:var(--wire-text-muted);">
+            Don't have an account? <a class="form-link">Sign up free</a>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:16px; font-size:10px; color:var(--wire-text-muted);">
+          Client? <a class="form-link">Access client portal →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Email + password auth via NextAuth Credentials provider</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Google SSO via NextAuth Google provider</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Separate link for client portal login</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Redirect to /dashboard after success</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 02: AGENCY REGISTRATION -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-1">
+  <div class="screen-label">Screen 02</div>
+  <div class="screen-title">Agency Registration</div>
+  <div class="screen-desc">Self-signup form for new agencies. Creates agency tenant + admin user account.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/register</div></div>
+    <div class="auth-wrapper">
+      <div style="max-width:460px; width:100%;">
+        <div class="auth-logo">
+          <div class="auth-logo-box">LOGO</div>
+          <div style="font-size:20px; font-weight:800; color:var(--wire-primary);">Create Agency Account</div>
+          <div style="font-size:11px; color:var(--wire-text-muted);">Start automating your SEO reports in minutes</div>
+        </div>
+        <div class="auth-card">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">First Name</label><div class="form-input">John</div></div>
+            <div class="form-group"><label class="form-label">Last Name</label><div class="form-input">Doe</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">Work Email</label><div class="form-input">john@youragency.com</div></div>
+          <div class="form-group">
+            <label class="form-label">Agency Name</label>
+            <div class="form-input">Digital Horizons Agency</div>
+            <div class="form-input-hint">This will be displayed on all reports</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Agency Subdomain</label>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <div class="form-input" style="flex:1;">digital-horizons</div>
+              <span style="font-size:11px; color:var(--wire-text-muted);">.rankflow.app</span>
+            </div>
+            <div class="form-input-hint" style="color:var(--wire-success);">✓ digital-horizons.rankflow.app is available</div>
+          </div>
+          <div class="form-group"><label class="form-label">Password</label><div class="form-input">••••••••••</div></div>
+          <div class="form-group"><label class="form-label">Confirm Password</label><div class="form-input">••••••••••</div></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+            <div style="width:14px; height:14px; border:1px solid var(--wire-border-dark); border-radius:3px; background:var(--wire-fill);"></div>
+            <span style="font-size:10px; color:var(--wire-text-muted);">I agree to the Terms of Service and Privacy Policy</span>
+          </div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; padding:10px;">Create Agency Account</div>
+          <div style="text-align:center; margin-top:12px; font-size:11px; color:var(--wire-text-muted);">
+            Already have an account? <a class="form-link">Sign in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Auto-generates subdomain from agency name</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Real-time subdomain availability check (debounced API call)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Creates agency record + admin user in same transaction</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Sends verification email via Resend after signup</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 03: ONBOARDING WIZARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+  <div class="screen-label">Screen 03</div>
+  <div class="screen-title">Onboarding Wizard — Step 2: Connect SERanking</div>
+  <div class="screen-desc">4-step wizard shown on first login. Step shown: API key connection & project import.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/onboarding</div></div>
+    <div class="wf-body" style="padding:32px; background:var(--wire-fill);">
+      <div style="max-width:620px; margin:0 auto;">
+        <div style="text-align:center; margin-bottom:28px;">
+          <div style="font-size:18px; font-weight:800; color:var(--wire-text);">Welcome to RankFlow! 🎉</div>
+          <div style="font-size:12px; color:var(--wire-text-muted); margin-top:4px;">Let's set up your workspace in 4 quick steps</div>
+        </div>
+        <div class="wizard-steps">
+          <div class="wizard-step">
+            <div class="step-circle done">✓</div>
+            <div class="step-label">Agency Profile</div>
+          </div>
+          <div class="step-connector done"></div>
+          <div class="wizard-step">
+            <div class="step-circle active">2</div>
+            <div class="step-label active">Connect SERanking</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="wizard-step">
+            <div class="step-circle">3</div>
+            <div class="step-label">Import Projects</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="wizard-step">
+            <div class="step-circle">4</div>
+            <div class="step-label">Branding</div>
+          </div>
+        </div>
+        <div class="wf-card" style="margin-bottom:16px;">
+          <div style="font-size:14px; font-weight:700; color:var(--wire-text); margin-bottom:4px;">Connect Your SERanking Account</div>
+          <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:20px;">Your API key is encrypted and stored securely. It's never exposed to the browser.</div>
+          <div class="form-group">
+            <label class="form-label">SERanking API Key</label>
+            <div style="display:flex; gap:8px;">
+              <div class="form-input" style="flex:1; font-family:monospace; font-size:11px;">api_key_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+              <div class="wf-btn wf-btn-primary">Validate →</div>
+            </div>
+            <div class="form-input-hint"><a class="form-link">Where to find my API key?</a></div>
+          </div>
+          <div class="alert alert-success">✓ API key validated! Plan: <strong>Agency</strong> · Sites: 23/50 · Credits: 8,400</div>
+          <div style="background:var(--wire-fill); border-radius:8px; padding:14px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+            <div style="text-align:center;"><div style="font-size:18px; font-weight:700; color:var(--wire-text);">Agency</div><div style="font-size:9px; color:var(--wire-text-muted);">Plan</div></div>
+            <div style="text-align:center;"><div style="font-size:18px; font-weight:700; color:var(--wire-text);">23 / 50</div><div style="font-size:9px; color:var(--wire-text-muted);">Sites Used</div></div>
+            <div style="text-align:center;"><div style="font-size:18px; font-weight:700; color:var(--wire-text);">8,400</div><div style="font-size:9px; color:var(--wire-text-muted);">API Credits</div></div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <div class="wf-btn wf-btn-secondary">← Back</div>
+          <div class="wf-btn wf-btn-primary">Continue to Import Projects →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Step 1: Agency name, logo upload</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 2: SERanking API key + validation (shown)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 3: Sync projects from /sites, map to clients</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 4: Brand colors + email settings</div>
+    <div class="ann-item"><div class="ann-bullet"></div>API key encrypted with AES-256 before DB storage</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 04: AGENCY DASHBOARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+  <div class="screen-label">Screen 04</div>
+  <div class="screen-title">Agency Dashboard — Home</div>
+  <div class="screen-desc">Main landing page after login. Shows agency-wide KPIs, client health table, and recent activity.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/dashboard</div></div>
+    <div class="wf-layout" style="min-height:640px;">
+      <!-- Sidebar -->
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div><div class="logo-sub">Digital Horizons</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item active"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients <span class="nav-badge">24</span></div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports <span class="nav-badge">8</span></div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+          <div class="nav-item"><div class="nav-icon"></div> Help</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">Agency Admin</div></div></div></div>
+      </div>
+      <!-- Content -->
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">Good morning, John 👋 <span style="font-size:11px; font-weight:400; color:var(--wire-text-muted);">June 2024</span></div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm"><div class="icon-sm"></div> Sync Data</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Active Clients</div><div class="kpi-value">24</div><div class="kpi-change neutral">↔ No change</div></div>
+            <div class="kpi-card"><div class="kpi-label">Reports This Month</div><div class="kpi-value">18</div><div class="kpi-change up">↑ 3 more than last month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Keywords Tracked</div><div class="kpi-value">1,847</div><div class="kpi-change up">↑ 124 this week</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg Health Score</div><div class="kpi-value">79%</div><div class="kpi-change up">↑ +4 pts vs last month</div></div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header">
+              <div class="wf-table-title">Client Health Overview</div>
+              <div style="display:flex; gap:8px;">
+                <div class="wf-input" style="max-width:160px; padding:5px 10px;">Search clients...</div>
+                <div class="wf-btn wf-btn-ghost wf-btn-sm">Filter ▾</div>
+              </div>
+            </div>
+            <table>
+              <tr><th>Client</th><th>Website</th><th>Health</th><th>Top 10 KW</th><th>Traffic</th><th>Last Report</th><th>Actions</th></tr>
+              <tr><td><strong>Acme Corp</strong></td><td style="color:var(--wire-text-muted);">acmecorp.com</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:76%;"></div></div><span>76%</span></div></td><td><span class="up-arrow">↑</span> 47</td><td>8,420</td><td><span class="badge badge-success">Jun 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><strong>TechStart Inc</strong></td><td style="color:var(--wire-text-muted);">techstart.io</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:89%;"></div></div><span>89%</span></div></td><td><span class="up-arrow">↑</span> 87</td><td>12,340</td><td><span class="badge badge-success">Jun 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><strong>GreenLeaf Studio</strong></td><td style="color:var(--wire-text-muted);">greenleaf.com</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:62%;"></div></div><span>62%</span></div></td><td><span class="down-arrow">↓</span> 23</td><td>3,210</td><td><span class="badge badge-warn">May 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><strong>BlueSky Marketing</strong></td><td style="color:var(--wire-text-muted);">bluesky.co.uk</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:91%;"></div></div><span>91%</span></div></td><td><span class="up-arrow">↑</span> 203</td><td>24,700</td><td><span class="badge badge-success">Jun 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">Showing 4 of 24 clients · <a class="form-link">View all →</a></div>
+          </div>
+          <div class="wf-card">
+            <div class="wf-table-title" style="margin-bottom:12px;">Recent Activity</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle"><span style="font-size:14px;">✅</span></div><span><strong>Report generated:</strong> Acme Corp — June 2024</span><span style="margin-left:auto; color:var(--wire-text-muted);">1h ago</span></div>
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle"><span style="font-size:14px;">🔄</span></div><span><strong>Data synced:</strong> All 24 projects updated</span><span style="margin-left:auto; color:var(--wire-text-muted);">3h ago</span></div>
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle"><span style="font-size:14px;">✅</span></div><span><strong>Report generated:</strong> TechStart Inc — June 2024</span><span style="margin-left:auto; color:var(--wire-text-muted);">5h ago</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>KPI cards pull from aggregated snapshots table</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Health score = SERanking audit health_score</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Traffic from analytics snapshot (organic_sessions)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Last Report badge: green = current month, yellow = previous month</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 05: CLIENTS LIST -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+  <div class="screen-label">Screen 05</div>
+  <div class="screen-title">Clients List</div>
+  <div class="screen-desc">All agency clients with search, filter, pagination. Bulk actions available.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients</div></div>
+    <div class="wf-layout" style="min-height:580px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div><div class="logo-sub">Digital Horizons</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients <span class="nav-badge">24</span></div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">Clients</div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Import CSV</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm">+ Add Client</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input" style="max-width:280px;">🔍  Search clients...</div>
+            <div class="wf-select">Status: All ▾</div>
+            <div class="wf-select">Industry: All ▾</div>
+            <div class="wf-select">Sort: Name A–Z ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th style="width:30px;"><input type="checkbox" /></th><th>Client Name</th><th>Website</th><th>Industry</th><th>SERanking Project</th><th>Status</th><th>Added</th><th>Actions</th></tr>
+              <tr><td><input type="checkbox" /></td><td><div style="display:flex; align-items:center; gap:8px;"><div class="client-logo" style="width:28px; height:28px; font-size:8px;">LOGO</div><strong>Acme Corp</strong></div></td><td style="color:var(--wire-text-muted);">acmecorp.com</td><td>B2B SaaS</td><td style="font-family:monospace; font-size:10px;">site_12345</td><td><span class="badge badge-success">Active</span></td><td>Jan 2024</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><div style="display:flex; align-items:center; gap:8px;"><div class="client-logo" style="width:28px; height:28px; font-size:8px;">LOGO</div><strong>TechStart Inc</strong></div></td><td style="color:var(--wire-text-muted);">techstart.io</td><td>Technology</td><td style="font-family:monospace; font-size:10px;">site_23456</td><td><span class="badge badge-success">Active</span></td><td>Feb 2024</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><div style="display:flex; align-items:center; gap:8px;"><div class="client-logo" style="width:28px; height:28px; font-size:8px;">LOGO</div><strong>GreenLeaf Studio</strong></div></td><td style="color:var(--wire-text-muted);">greenleaf.com</td><td>Design</td><td style="font-family:monospace; font-size:10px;">site_34567</td><td><span class="badge badge-warn">Needs Attention</span></td><td>Mar 2024</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><div style="display:flex; align-items:center; gap:8px;"><div class="client-logo" style="width:28px; height:28px; font-size:8px;">LOGO</div><strong>BlueSky Marketing</strong></div></td><td style="color:var(--wire-text-muted);">bluesky.co.uk</td><td>Marketing</td><td style="font-family:monospace; font-size:10px;">site_45678</td><td><span class="badge badge-success">Active</span></td><td>Jan 2024</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><div style="display:flex; align-items:center; gap:8px;"><div class="client-logo" style="width:28px; height:28px; font-size:8px; background:var(--wire-fill); border:1px dashed var(--wire-border-dark);">LOGO</div><strong>RetailPro Ltd</strong></div></td><td style="color:var(--wire-text-muted);">retailpro.co.uk</td><td>E-commerce</td><td><span class="badge badge-neutral">Not linked</span></td><td><span class="badge badge-neutral">Inactive</span></td><td>Apr 2024</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div></td></tr>
+            </table>
+            <div style="padding:10px 16px; display:flex; align-items:center; justify-content:space-between; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">
+              <span>24 clients total</span>
+              <div style="display:flex; gap:4px;">
+                <div class="wf-btn wf-btn-ghost wf-btn-sm">← Prev</div>
+                <div class="wf-btn wf-btn-primary wf-btn-sm">1</div>
+                <div class="wf-btn wf-btn-ghost wf-btn-sm">2</div>
+                <div class="wf-btn wf-btn-ghost wf-btn-sm">3</div>
+                <div class="wf-btn wf-btn-ghost wf-btn-sm">Next →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Checkbox for bulk actions (bulk report gen, archive)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>"Not linked" = no SERanking project mapped yet</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Import CSV for bulk client creation</div>
+    <div class="ann-item"><div class="ann-bullet"></div>10 clients per page, server-side pagination</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 06: ADD/EDIT CLIENT -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-5">
+  <div class="screen-label">Screen 06</div>
+  <div class="screen-title">Add / Edit Client</div>
+  <div class="screen-desc">Modal form for creating or editing a client. Links to SERanking project.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/new</div></div>
+    <div class="wf-layout" style="min-height:580px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">← Clients / <span style="color:var(--wire-primary);">Add New Client</span></div>
+        </div>
+        <div class="wf-main" style="max-width:680px;">
+          <div class="wf-card">
+            <div style="font-size:14px; font-weight:700; margin-bottom:16px;">Client Information</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Client / Company Name *</label><div class="form-input">Acme Corporation</div></div>
+              <div class="form-group"><label class="form-label">Industry</label><div class="form-input">B2B SaaS</div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Website URL *</label><div class="form-input">https://acmecorp.com</div></div>
+              <div class="form-group"><label class="form-label">Contact Email</label><div class="form-input">sarah@acmecorp.com</div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Contact Name</label><div class="form-input">Sarah Miller</div></div>
+              <div class="form-group"><label class="form-label">Client Logo</label>
+                <div class="img-placeholder" style="height:38px;">Click to upload logo (PNG/SVG)</div>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Internal Notes</label><div class="form-input" style="height:48px;">E-commerce focus, target UK + US markets...</div></div>
+          </div>
+          <div class="wf-card" style="margin-top:12px;">
+            <div style="font-size:14px; font-weight:700; margin-bottom:4px;">SERanking Project Link</div>
+            <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:14px;">Connect this client to an existing SERanking project to pull SEO data.</div>
+            <div class="form-group">
+              <label class="form-label">SERanking Project</label>
+              <div class="form-input">▾ Acme Corp (acmecorp.com) — site_12345</div>
+              <div class="form-input-hint">Shows all unlinked projects from your SERanking account</div>
+            </div>
+            <div class="alert alert-info" style="margin-top:8px;">ℹ️ Data will sync automatically every night. <a class="form-link">Sync now →</a></div>
+          </div>
+          <div class="wf-card" style="margin-top:12px;">
+            <div style="font-size:14px; font-weight:700; margin-bottom:14px;">Client Portal Access</div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Enable client portal access</div><div class="switch-sub">Client can log in to view their reports</div></div></div>
+            <div style="margin-top:12px;" class="form-group">
+              <label class="form-label">Client Portal Email</label>
+              <div class="form-input">sarah@acmecorp.com</div>
+              <div class="form-input-hint">An invite email will be sent to this address</div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <div class="wf-btn wf-btn-secondary">Cancel</div>
+            <div class="wf-btn wf-btn-primary">Save Client</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>SERanking project dropdown from cached GET /sites</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Invite email sent via Resend when portal access enabled</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Logo stored in Supabase Storage</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 07: CLIENT OVERVIEW TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-6">
+  <div class="screen-label">Screen 07</div>
+  <div class="screen-title">Client Detail — Overview Tab</div>
+  <div class="screen-desc">High-level SEO snapshot for a single client with KPIs, trend chart, and quick actions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/overview</div></div>
+    <div class="wf-layout" style="min-height:640px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div style="display:flex; flex-direction:column; gap:1px; flex:1;">
+            <div style="font-size:10px; color:var(--wire-text-muted);">Clients / <span style="color:var(--wire-primary);">Acme Corp</span></div>
+            <div style="font-size:15px; font-weight:700; color:var(--wire-text);">Acme Corp — acmecorp.com</div>
+          </div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">⚙ Edit Client</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div>
+          </div>
+        </div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab active">Overview</div>
+          <div class="wf-tab">Keywords</div>
+          <div class="wf-tab">Backlinks</div>
+          <div class="wf-tab">Audit</div>
+          <div class="wf-tab">Analytics</div>
+          <div class="wf-tab">Competitors</div>
+          <div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:12px;">Showing data for: <strong>May 2024</strong> vs <strong>April 2024</strong></div>
+          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4 keywords</div></div>
+            <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-change up">↑ +2 pts</div></div>
+            <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+          </div>
+          <div class="two-col">
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Keyword Position Trend</div>
+              <div class="chart-subtitle">Top 10 keywords — 6 months</div>
+              <div class="chart-placeholder" style="height:100px; position:relative; padding:0; align-items:flex-end;">
+                <svg width="100%" height="100%" viewBox="0 0 400 100" class="chart-line-svg">
+                  <polyline fill="none" stroke="#8c94a4" stroke-width="2" points="0,72 70,65 140,58 210,50 280,40 350,28"/>
+                  <polyline fill="none" stroke="#b8bfcc" stroke-width="1.5" stroke-dasharray="4,3" points="0,55 70,52 140,48 210,44 280,38 350,25"/>
+                  <text x="0" y="96" fill="#9aa0b4" font-size="8">Jan</text>
+                  <text x="60" y="96" fill="#9aa0b4" font-size="8">Feb</text>
+                  <text x="125" y="96" fill="#9aa0b4" font-size="8">Mar</text>
+                  <text x="195" y="96" fill="#9aa0b4" font-size="8">Apr</text>
+                  <text x="262" y="96" fill="#9aa0b4" font-size="8">May</text>
+                  <text x="325" y="96" fill="#9aa0b4" font-size="8">Jun</text>
+                </svg>
+              </div>
+              <div style="display:flex; gap:14px; margin-top:8px; font-size:9px; color:var(--wire-text-muted);">
+                <div><span style="display:inline-block; width:16px; height:2px; background:var(--wire-primary); vertical-align:middle;"></span> Top 10</div>
+                <div><span style="display:inline-block; width:16px; height:2px; background:var(--wire-fill-dark); vertical-align:middle; border-top:2px dashed;"></span> Top 30</div>
+              </div>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Traffic Trend</div>
+              <div class="chart-subtitle">Organic sessions — 6 months</div>
+              <div class="chart-placeholder" style="height:100px;">
+                <div class="chart-bar" style="height:55%;"></div>
+                <div class="chart-bar" style="height:62%;"></div>
+                <div class="chart-bar" style="height:68%;"></div>
+                <div class="chart-bar" style="height:74%;"></div>
+                <div class="chart-bar" style="height:82%;"></div>
+                <div class="chart-bar" style="height:100%; background:var(--wire-primary);"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <div class="wf-btn wf-btn-primary">+ Generate Report</div>
+            <div class="wf-btn wf-btn-secondary">🔄 Sync Data Now</div>
+            <div class="wf-btn wf-btn-secondary">📄 View Reports</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>KPIs from latest keyword_snapshot + traffic_snapshot records</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Comparison period auto-calculated (previous month)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Charts: Recharts LineChart (positions) + BarChart (traffic)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 08: KEYWORDS TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-7">
+  <div class="screen-label">Screen 08</div>
+  <div class="screen-title">Client Detail — Keywords Tab</div>
+  <div class="screen-desc">Full keyword ranking table with position distribution, top movers, and export.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/keywords</div></div>
+    <div class="wf-layout" style="min-height:640px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Keywords</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Export CSV</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab active">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr); margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:20px;">12</div><div class="kpi-change up">↑+2</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:20px;">47</div><div class="kpi-change up">↑+4</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 30</div><div class="kpi-value" style="font-size:20px;">89</div><div class="kpi-change up">↑+7</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 100</div><div class="kpi-value" style="font-size:20px;">124</div><div class="kpi-change neutral">↔ 0</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:20px;">18.4</div><div class="kpi-change up">↑ Improved</div></div>
+          </div>
+          <div class="filter-bar">
+            <div class="wf-input">🔍  Search keyword...</div>
+            <div class="wf-select">Position: All ▾</div>
+            <div class="wf-select">Intent: All ▾</div>
+            <div class="wf-select">SERP Feature: Any ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>#</th><th>Keyword</th><th>Position</th><th>Change</th><th>Volume</th><th>Difficulty</th><th>URL</th><th>SERP Features</th></tr>
+              <tr><td style="color:var(--wire-text-muted);">1</td><td><strong>seo agency london</strong></td><td><span class="badge badge-success">4</span></td><td class="up-arrow">▲ +3</td><td>1,600</td><td>68</td><td style="font-size:10px; color:var(--wire-text-muted);">/seo-services</td><td><span class="badge badge-neutral">Featured</span></td></tr>
+              <tr><td style="color:var(--wire-text-muted);">2</td><td><strong>local seo london</strong></td><td><span class="badge badge-success">2</span></td><td class="up-arrow">▲ +8</td><td>880</td><td>54</td><td style="font-size:10px; color:var(--wire-text-muted);">/local-seo</td><td><span class="badge badge-neutral">Local Pack</span></td></tr>
+              <tr><td style="color:var(--wire-text-muted);">3</td><td>digital marketing uk</td><td><span class="badge badge-warn">7</span></td><td class="down-arrow">▼ -1</td><td>2,400</td><td>72</td><td style="font-size:10px; color:var(--wire-text-muted);">/digital-mktg</td><td>—</td></tr>
+              <tr><td style="color:var(--wire-text-muted);">4</td><td>seo company london</td><td><span class="badge badge-warn">9</span></td><td class="up-arrow">▲ +5</td><td>1,200</td><td>71</td><td style="font-size:10px; color:var(--wire-text-muted);">/seo-services</td><td>—</td></tr>
+              <tr><td style="color:var(--wire-text-muted);">5</td><td>ppc agency london</td><td><span class="badge badge-success">3</span></td><td style="color:var(--wire-text-muted);">→ 0</td><td>720</td><td>65</td><td style="font-size:10px; color:var(--wire-text-muted);">/ppc</td><td><span class="badge badge-neutral">Ad</span></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">Showing 5 of 124 keywords · Page 1 of 13</div>
+          </div>
+          <div class="two-col">
+            <div class="wf-card"><div class="wf-table-title" style="color:var(--wire-success); margin-bottom:10px;">🏆 Top Gainers</div>
+              <div style="font-size:11px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>local seo london</span><span class="up-arrow">▲ +8</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>seo company london</span><span class="up-arrow">▲ +5</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>seo agency london</span><span class="up-arrow">▲ +3</span></div>
+              </div>
+            </div>
+            <div class="wf-card"><div class="wf-table-title" style="color:var(--wire-danger); margin-bottom:10px;">📉 Top Losers</div>
+              <div style="font-size:11px; display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>seo consultant uk</span><span class="down-arrow">▼ -3</span></div>
+                <div style="display:flex; justify-content:space-between;"><span>digital marketing uk</span><span class="down-arrow">▼ -1</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Data from GET /sites/{id}/positions via keyword_snapshot table</div>
+    <div class="ann-item"><div class="ann-bullet"></div>TanStack Table v8 for sorting/filtering/pagination</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Export CSV triggers server-side CSV generation</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 09: BACKLINKS TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-8">
+  <div class="screen-label">Screen 09</div>
+  <div class="screen-title">Client Detail — Backlinks Tab</div>
+  <div class="screen-desc">Domain trust, backlink metrics, new/lost backlinks chart, and referring domains table.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/backlinks</div></div>
+    <div class="wf-layout" style="min-height:600px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item active"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Backlinks</div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab active">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-change up">↑ +2 pts</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-change up">↑ +47 new</div></div>
+            <div class="kpi-card"><div class="kpi-label">Referring Domains</div><div class="kpi-value">312</div><div class="kpi-change up">↑ +18 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Dofollow / Nofollow</div><div class="kpi-value" style="font-size:16px;">1,243 / 604</div><div class="kpi-change neutral">67% Dofollow</div></div>
+          </div>
+          <div class="two-col">
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">New vs Lost Backlinks (6 months)</div>
+              <div class="chart-placeholder" style="height:100px; gap:8px;">
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:60%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:40%; width:14px; background:#c4a0a0;"></div></div>
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:74%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:34%; width:14px; background:#c4a0a0;"></div></div>
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:68%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:50%; width:14px; background:#c4a0a0;"></div></div>
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:94%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:32%; width:14px; background:#c4a0a0;"></div></div>
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:76%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:44%; width:14px; background:#c4a0a0;"></div></div>
+                <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:2px; justify-content:flex-end;"><div class="chart-bar" style="height:100%; width:14px; background:#a0c0a4;"></div><div class="chart-bar" style="height:28%; width:14px; background:#c4a0a0;"></div></div>
+              </div>
+              <div style="display:flex; gap:14px; margin-top:8px; font-size:9px; color:var(--wire-text-muted);">
+                <div><span style="display:inline-block; width:10px; height:10px; background:#a0c0a4; border-radius:2px; vertical-align:middle; margin-right:3px;"></span>New</div>
+                <div><span style="display:inline-block; width:10px; height:10px; background:#c4a0a0; border-radius:2px; vertical-align:middle; margin-right:3px;"></span>Lost</div>
+              </div>
+            </div>
+            <div class="wf-card" style="margin-bottom:0;">
+              <div class="wf-table-title" style="margin-bottom:12px;">Top Anchor Texts</div>
+              <div style="font-size:11px; display:flex; flex-direction:column; gap:8px;">
+                <div><div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>seo agency london</span><span>147</span></div><div class="progress-bar"><div class="progress-fill" style="width:40%;"></div></div></div>
+                <div><div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>acmecorp.com</span><span>189</span></div><div class="progress-bar"><div class="progress-fill" style="width:50%;"></div></div></div>
+                <div><div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>click here</span><span>312</span></div><div class="progress-bar"><div class="progress-fill" style="width:84%;"></div></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-table-wrap" style="margin-top:16px;">
+            <div class="wf-table-header"><div class="wf-table-title">Top Referring Domains</div></div>
+            <table>
+              <tr><th>Domain</th><th>Domain Trust</th><th>Backlinks</th><th>Type</th><th>First Seen</th></tr>
+              <tr><td>forbes.com</td><td>94</td><td>2</td><td><span class="badge badge-success">Dofollow</span></td><td>Mar 2024</td></tr>
+              <tr><td>searchengineland.com</td><td>88</td><td>3</td><td><span class="badge badge-success">Dofollow</span></td><td>Jan 2024</td></tr>
+              <tr><td>moz.com</td><td>92</td><td>1</td><td><span class="badge badge-neutral">Nofollow</span></td><td>Feb 2024</td></tr>
+              <tr><td>techradar.com</td><td>84</td><td>4</td><td><span class="badge badge-success">Dofollow</span></td><td>Nov 2023</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Data from GET /sites/{id}/backlinks/summary → backlink_snapshot table</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Domain Trust from SERanking domain_trust field</div>
+    <div class="ann-item"><div class="ann-bullet"></div>New/Lost chart uses 6 months of snapshots</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 10: AUDIT TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-9">
+  <div class="screen-label">Screen 10</div>
+  <div class="screen-title">Client Detail — Technical Audit Tab</div>
+  <div class="screen-desc">Site health score gauge, issue severity breakdown, category table, and crawl stats.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/audit</div></div>
+    <div class="wf-layout" style="min-height:600px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Clients</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Technical Audit</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">🔄 Run New Audit</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab active">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div style="font-size:10px; color:var(--wire-text-muted); margin-bottom:16px;">Last audit: June 1, 2024 · Crawled: 342 pages</div>
+          <div class="three-col">
+            <div class="wf-card" style="text-align:center; grid-column:span 1;">
+              <div class="gauge-wrap">
+                <div style="font-size:11px; font-weight:700; color:var(--wire-text); margin-bottom:12px;">Site Health Score</div>
+                <div class="gauge-ring"><div class="gauge-inner"><div class="gauge-value">76</div><div class="gauge-max">/100</div></div></div>
+                <div class="gauge-label" style="margin-top:8px; color:var(--wire-success);">↑ +8 pts vs last month</div>
+              </div>
+            </div>
+            <div class="wf-card" style="grid-column:span 2;">
+              <div class="wf-table-title" style="margin-bottom:12px;">Issue Breakdown</div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; align-items:center; gap:12px;"><span style="width:10px; height:10px; border-radius:50%; background:var(--wire-danger); display:inline-block; flex-shrink:0;"></span><span style="font-size:11px; flex:1;">Critical Issues</span><strong style="font-size:16px; color:var(--wire-danger);">3</strong><span style="font-size:10px; color:var(--wire-text-muted);">↓ from 11</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:3%; background:var(--wire-danger);"></div></div>
+                <div style="display:flex; align-items:center; gap:12px;"><span style="width:10px; height:10px; border-radius:50%; background:var(--wire-warn); display:inline-block; flex-shrink:0;"></span><span style="font-size:11px; flex:1;">Warnings</span><strong style="font-size:16px; color:var(--wire-warn);">18</strong><span style="font-size:10px; color:var(--wire-text-muted);">↓ from 23</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:18%; background:var(--wire-warn);"></div></div>
+                <div style="display:flex; align-items:center; gap:12px;"><span style="width:10px; height:10px; border-radius:50%; background:#7090c0; display:inline-block; flex-shrink:0;"></span><span style="font-size:11px; flex:1;">Notices</span><strong style="font-size:16px; color:#7090c0;">42</strong><span style="font-size:10px; color:var(--wire-text-muted);">↑ from 39</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:42%; background:#7090c0;"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header"><div class="wf-table-title">Issues by Category</div></div>
+            <table>
+              <tr><th>Issue</th><th>Severity</th><th>Count</th><th>Affected Pages</th><th>Action</th></tr>
+              <tr><td>Broken internal links</td><td><span class="badge badge-danger">Critical</span></td><td>3</td><td style="font-size:10px; color:var(--wire-text-muted);">/blog/post-14, /resources/...</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View URLs</div></td></tr>
+              <tr><td>Missing meta descriptions</td><td><span class="badge badge-warn">Warning</span></td><td>8</td><td style="font-size:10px; color:var(--wire-text-muted);">/blog/* (8 pages)</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View URLs</div></td></tr>
+              <tr><td>Slow page load (&gt;3s)</td><td><span class="badge badge-warn">Warning</span></td><td>11</td><td style="font-size:10px; color:var(--wire-text-muted);">Various</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View URLs</div></td></tr>
+              <tr><td>Duplicate content</td><td><span class="badge badge-warn">Warning</span></td><td>2</td><td style="font-size:10px; color:var(--wire-text-muted);">/services, /services/</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View URLs</div></td></tr>
+              <tr><td>Redirect chains (3+)</td><td><span class="badge badge-primary">Notice</span></td><td>6</td><td style="font-size:10px; color:var(--wire-text-muted);">/old-blog/*</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">View URLs</div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Health score from GET /sites/{id}/audit (health_score field)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Issue categories from GET /sites/{id}/audit/issues</div>
+    <div class="ann-item"><div class="ann-bullet"></div>"Run New Audit" calls POST /v1/site-audit/audits/standard</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Gauge chart using CSS conic-gradient (no library needed)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 11: ANALYTICS TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-10">
+  <div class="screen-label">Screen 11</div>
+  <div class="screen-title">Client Detail — Analytics Tab</div>
+  <div class="screen-desc">Organic traffic, GSC metrics (clicks, impressions, CTR, avg position), top queries and pages.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/analytics</div></div>
+    <div class="wf-layout" style="min-height:600px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Clients</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Analytics & Traffic</div><div class="topbar-actions"><div class="wf-select" style="font-size:11px;">Period: May 2024 ▾</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab active">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Clicks (GSC)</div><div class="kpi-value">9,840</div><div class="kpi-change up">↑ +18.3% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">142K</div><div class="kpi-change up">↑ +10.9% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg CTR</div><div class="kpi-value">6.93%</div><div class="kpi-change up">↑ +0.43%</div></div>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Traffic Trend — 6 Months</div>
+            <div class="chart-subtitle">Organic sessions and total clicks (GSC)</div>
+            <div style="height:90px; background:var(--wire-fill); border-radius:6px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+              <svg width="100%" height="100%" viewBox="0 0 600 90" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#8c94a4" stroke-width="2.5" points="0,72 100,65 200,55 300,44 400,34 500,22 600,14"/>
+                <polyline fill="none" stroke="#b8bfcc" stroke-width="1.5" stroke-dasharray="5,3" points="0,68 100,60 200,50 300,40 400,30 500,18 600,10"/>
+              </svg>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="wf-table-wrap" style="margin-bottom:0;">
+              <div class="wf-table-header"><div class="wf-table-title">Top Queries (GSC)</div></div>
+              <table>
+                <tr><th>Query</th><th>Clicks</th><th>CTR</th><th>Pos</th></tr>
+                <tr><td>seo services london</td><td>342</td><td>8.14%</td><td>3.2</td></tr>
+                <tr><td>seo agency london</td><td>289</td><td>7.61%</td><td>4.1</td></tr>
+                <tr><td>local seo london</td><td>267</td><td>12.71%</td><td>2.3</td></tr>
+                <tr><td>digital marketing uk</td><td>198</td><td>3.54%</td><td>7.8</td></tr>
+                <tr><td>ppc management</td><td>187</td><td>6.68%</td><td>3.5</td></tr>
+              </table>
+            </div>
+            <div class="wf-table-wrap" style="margin-bottom:0;">
+              <div class="wf-table-header"><div class="wf-table-title">Top Pages (GSC)</div></div>
+              <table>
+                <tr><th>Page</th><th>Clicks</th><th>CTR</th></tr>
+                <tr><td style="font-size:10px;">/seo-services</td><td>1,240</td><td>6.74%</td></tr>
+                <tr><td style="font-size:10px;">/local-seo</td><td>987</td><td>10.07%</td></tr>
+                <tr><td style="font-size:10px;">/ (Homepage)</td><td>876</td><td>3.62%</td></tr>
+                <tr><td style="font-size:10px;">/digital-marketing</td><td>654</td><td>5.40%</td></tr>
+                <tr><td style="font-size:10px;">/ppc</td><td>543</td><td>7.14%</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Sessions from GET /sites/{id}/analytics</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Clicks/Impressions/CTR from GET /sites/{id}/analytics/gsc</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Top queries from GET /sites/{id}/analytics/gsc/queries</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 12: COMPETITORS TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-11">
+  <div class="screen-label">Screen 12</div>
+  <div class="screen-title">Client Detail — Competitors Tab</div>
+  <div class="screen-desc">Side-by-side competitor comparison: domain trust, keyword overlap, visibility trend.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/competitors</div></div>
+    <div class="wf-layout" style="min-height:580px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Clients</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Competitors</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">+ Add Competitor</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab active">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-table-wrap">
+            <div class="wf-table-header"><div class="wf-table-title">Competitive Overview</div></div>
+            <table>
+              <tr><th>Domain</th><th>Domain Trust</th><th>Top 10 Keywords</th><th>Common Keywords</th><th>Visibility Score</th><th>Status</th></tr>
+              <tr style="background:var(--wire-fill);"><td><strong>acmecorp.com</strong> <span class="badge badge-primary">Us</span></td><td>42</td><td>47</td><td>—</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:68%;"></div></div>68.4</div></td><td>—</td></tr>
+              <tr><td>rival-seo.co.uk</td><td>58</td><td>67</td><td>43</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:82%;"></div></div>82.1</div></td><td><span class="badge badge-warn">Ahead</span></td></tr>
+              <tr><td>seolondon.co.uk</td><td>51</td><td>54</td><td>38</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:75%;"></div></div>74.7</div></td><td><span class="badge badge-warn">Ahead</span></td></tr>
+              <tr><td>digitalfirst.uk</td><td>47</td><td>49</td><td>31</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:71%;"></div></div>71.2</div></td><td><span class="badge badge-warn">Ahead</span></td></tr>
+            </table>
+          </div>
+          <div class="chart-box">
+            <div class="chart-title">Visibility Score Trend vs Competitors</div>
+            <div class="chart-subtitle">6 months — higher is better</div>
+            <div style="height:100px; background:var(--wire-fill); border-radius:6px; position:relative; overflow:hidden;">
+              <svg width="100%" height="100%" viewBox="0 0 600 100" preserveAspectRatio="none">
+                <polyline fill="none" stroke="#4a5270" stroke-width="3" points="0,60 100,54 200,48 300,40 400,32 500,22 600,16"/>
+                <polyline fill="none" stroke="#9aa0b4" stroke-width="1.5" stroke-dasharray="5,3" points="0,28 100,24 200,22 300,20 400,18 500,16 600,14"/>
+                <polyline fill="none" stroke="#b8bfcc" stroke-width="1.5" stroke-dasharray="3,3" points="0,40 100,36 200,34 300,28 400,26 500,22 600,18"/>
+              </svg>
+            </div>
+            <div style="display:flex; gap:14px; margin-top:8px; font-size:9px; color:var(--wire-text-muted);">
+              <span><span style="display:inline-block; width:16px; height:3px; background:#4a5270; vertical-align:middle;"></span> Acme Corp</span>
+              <span><span style="display:inline-block; width:16px; height:2px; background:#9aa0b4; vertical-align:middle;"></span> Rival SEO</span>
+              <span><span style="display:inline-block; width:16px; height:2px; background:#b8bfcc; vertical-align:middle;"></span> SEO London</span>
+            </div>
+          </div>
+          <div class="wf-card">
+            <div class="wf-table-title" style="margin-bottom:12px;">Keyword Gap — Opportunities</div>
+            <table style="border:none;">
+              <tr><th>Keyword</th><th>Rival Position</th><th>Your Position</th><th>Volume</th><th>Difficulty</th></tr>
+              <tr><td>seo audit london</td><td>3</td><td style="color:var(--wire-text-muted);">Not ranking</td><td>480</td><td>61</td></tr>
+              <tr><td>ecommerce seo uk</td><td>5</td><td style="color:var(--wire-text-muted);">Not ranking</td><td>720</td><td>69</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Data from GET /sites/{id}/competitors</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Visibility score calculated by SERanking</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Keyword gap from competitor keyword positions</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 13: REPORTS TAB -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-12">
+  <div class="screen-label">Screen 13</div>
+  <div class="screen-title">Client Detail — Reports Tab</div>
+  <div class="screen-desc">History of all generated reports for this client with status, actions, and schedule config.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/reports</div></div>
+    <div class="wf-layout" style="min-height:560px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Clients</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Acme Corp — Reports</div><div class="topbar-actions"><div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); margin:0; border-bottom:1px solid var(--wire-border);">
+          <div class="wf-tab">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab active">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div class="wf-card" style="margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <div><div class="wf-table-title">Auto-Schedule</div><div style="font-size:10px; color:var(--wire-text-muted);">Automatically generate and email report on a set schedule</div></div>
+              <div class="switch-track on"><div class="switch-thumb"></div></div>
+            </div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:11px;">
+              <div class="form-group" style="margin:0;"><label class="form-label">Day of Month</label><div class="form-input" style="width:80px;">1</div></div>
+              <div class="form-group" style="margin:0;"><label class="form-label">Time (UTC)</label><div class="form-input" style="width:100px;">09:00</div></div>
+              <div class="form-group" style="flex:1; margin:0;"><label class="form-label">Send Report To</label><div class="form-input">sarah@acmecorp.com, team@agency.com</div></div>
+              <div style="display:flex; align-items:flex-end;"><div class="wf-btn wf-btn-secondary wf-btn-sm">Save Schedule</div></div>
+            </div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header"><div class="wf-table-title">Report History</div></div>
+            <table>
+              <tr><th>Period</th><th>Type</th><th>Status</th><th>Generated</th><th>Emailed</th><th>Actions</th></tr>
+              <tr><td><strong>May 2024</strong></td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-success">✅ Completed</span></td><td>Jun 1, 09:12</td><td>Jun 1, 09:15</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div><div class="wf-btn wf-btn-secondary wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td><strong>April 2024</strong></td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-success">✅ Completed</span></td><td>May 1, 09:08</td><td>May 1, 09:10</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div><div class="wf-btn wf-btn-secondary wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td><strong>March 2024</strong></td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-success">✅ Completed</span></td><td>Apr 1, 09:15</td><td>Apr 1, 09:17</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div><div class="wf-btn wf-btn-secondary wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td>Q1 2024</td><td><span class="badge badge-primary">Quarterly</span></td><td><span class="badge badge-success">✅ Completed</span></td><td>Apr 5, 10:00</td><td>Apr 5, 10:03</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div></div></td></tr>
+              <tr><td>Feb 2024 (Custom)</td><td><span class="badge badge-neutral">Custom</span></td><td><span class="badge badge-danger">❌ Failed</span></td><td>Mar 2, 09:05</td><td>—</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">🔄 Retry</div><div class="wf-btn wf-btn-secondary wf-btn-sm">⚠ Details</div></div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Schedule stored in report_schedules table</div>
+    <div class="ann-item"><div class="ann-bullet"></div>PDF download from Supabase Storage URL</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Share button copies /r/[slug] shareable link</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Failed reports show retry button + error details</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 14: REPORT GENERATION WIZARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-13">
+  <div class="screen-label">Screen 14</div>
+  <div class="screen-title">Report Generation Wizard — Step 3: Configure Sections</div>
+  <div class="screen-desc">4-step wizard to generate a new report. Step shown: toggle report sections on/off.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/reports/generate</div></div>
+    <div class="wf-layout" style="min-height:600px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item"><div class="nav-icon"></div> Dashboard</div><div class="nav-item"><div class="nav-icon"></div> Clients</div><div class="nav-item active"><div class="nav-icon"></div> Reports</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Generate New Report</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">✕ Cancel</div></div></div>
+        <div class="wf-main">
+          <div class="wizard-steps" style="margin-bottom:24px;">
+            <div class="wizard-step"><div class="step-circle done">✓</div><div class="step-label">Select Client</div></div>
+            <div class="step-connector done"></div>
+            <div class="wizard-step"><div class="step-circle done">✓</div><div class="step-label">Report Period</div></div>
+            <div class="step-connector done"></div>
+            <div class="wizard-step"><div class="step-circle active">3</div><div class="step-label active">Configure Sections</div></div>
+            <div class="step-connector"></div>
+            <div class="wizard-step"><div class="step-circle">4</div><div class="step-label">Delivery</div></div>
+          </div>
+          <div class="two-col" style="gap:20px;">
+            <div>
+              <div class="wf-card" style="margin-bottom:12px;">
+                <div style="font-size:12px; font-weight:700; color:var(--wire-text); margin-bottom:4px;">Selected: Acme Corp</div>
+                <div style="font-size:10px; color:var(--wire-text-muted);">Period: May 1–31, 2024 · vs April 2024</div>
+              </div>
+              <div class="wf-card">
+                <div style="font-size:13px; font-weight:700; margin-bottom:14px;">Report Sections</div>
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Executive Summary</div><div class="switch-sub">KPI scorecard + highlights</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Keyword Rankings</div><div class="switch-sub">Position table + movers</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Organic Traffic</div><div class="switch-sub">Sessions + GSC data</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Backlink Profile</div><div class="switch-sub">Domain trust + referring domains</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Technical Audit</div><div class="switch-sub">Health score + issues</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Competitor Analysis</div><div class="switch-sub">Comparison vs 3 competitors</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track"><div class="switch-thumb"></div></div><div><div class="switch-label" style="color:var(--wire-text-muted);">AI Search Visibility</div><div class="switch-sub">ChatGPT / Gemini presence (optional)</div></div></div>
+                <hr class="divider">
+                <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Recommendations</div><div class="switch-sub">Next month action items</div></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="wf-card">
+                <div style="font-size:13px; font-weight:700; margin-bottom:14px;">Executive Notes</div>
+                <div style="font-size:10px; color:var(--wire-text-muted); margin-bottom:8px;">Optional: Add custom notes for the executive summary section</div>
+                <div class="form-input" style="height:100px; resize:none;">This month, Acme Corp saw significant improvements in organic search visibility...</div>
+              </div>
+              <div class="wf-card" style="margin-top:12px;">
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Report Preview</div>
+                <div style="background:var(--wire-fill); border-radius:6px; padding:12px; font-size:10px; color:var(--wire-text-muted); line-height:1.8;">
+                  <div>📋 Executive Summary</div>
+                  <div>🔑 Keyword Rankings</div>
+                  <div>📈 Organic Traffic</div>
+                  <div>🔗 Backlink Profile</div>
+                  <div>🔧 Technical Audit</div>
+                  <div>🥊 Competitor Analysis</div>
+                  <div style="color:var(--wire-fill-dark);">🤖 AI Visibility (off)</div>
+                  <div>💡 Recommendations</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px;">
+            <div class="wf-btn wf-btn-secondary">← Back</div>
+            <div class="wf-btn wf-btn-primary">Continue to Delivery →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Step 1: Select client + SERanking project</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 2: Month picker + comparison period</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 3: Section toggles (shown) + executive notes</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 4: Email recipients + share link options</div>
+    <div class="ann-item"><div class="ann-bullet"></div>On submit: triggers Inngest background job</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 15: WEB REPORT VIEW -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-14">
+  <div class="screen-label">Screen 15</div>
+  <div class="screen-title">Web Report View — Full Report (Scrollable)</div>
+  <div class="screen-desc">Interactive web report with all 8 sections. Used for in-browser viewing and public share link.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/reports/rpt_abc123</div></div>
+    <div class="wf-body" style="background:var(--wire-surface);">
+      <!-- Report Header -->
+      <div class="report-header">
+        <div>
+          <div class="report-header-logo">AGENCY LOGO</div>
+          <div style="font-size:10px; opacity:0.7; margin-top:4px;">Digital Horizons Agency</div>
+        </div>
+        <div class="report-header-info">
+          <div class="report-header-title">Monthly SEO Report</div>
+          <div class="report-header-meta">Acme Corp · May 1–31, 2024</div>
+          <div class="report-header-meta">Generated: June 1, 2024</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+          <div style="background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; font-size:10px; cursor:pointer;">📥 Download PDF</div>
+          <div style="background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; font-size:10px; cursor:pointer;">🔗 Share Link</div>
+        </div>
+      </div>
+
+      <!-- S0: Executive Summary -->
+      <div class="report-section">
+        <div class="report-section-title">01 — Executive Summary</div>
+        <div class="kpi-grid kpi-grid-4" style="margin-bottom:16px;">
+          <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3% vs Apr</div></div>
+          <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4 this month</div></div>
+          <div class="kpi-card"><div class="kpi-label">Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-change up">↑ +47 new</div></div>
+          <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+        </div>
+        <div style="background:var(--wire-fill); border-radius:8px; padding:14px; font-size:11px; line-height:1.7; color:var(--wire-text-light);">
+          📝 <em>This month, Acme Corp achieved significant growth in organic search visibility. Keywords in the top 10 increased by 4, and organic traffic grew by 16.3%...</em>
+        </div>
+        <div class="two-col" style="margin-top:14px;">
+          <div class="wf-card"><div style="font-size:11px; font-weight:700; color:var(--wire-success); margin-bottom:8px;">🏆 Top Wins</div><div style="font-size:10px; line-height:1.8; color:var(--wire-text-light);">✅ 'local seo london' jumped to position 2 (+8)<br>✅ Traffic all-time high: 8,420 sessions<br>✅ 47 new backlinks acquired</div></div>
+          <div class="wf-card"><div style="font-size:11px; font-weight:700; color:var(--wire-warn); margin-bottom:8px;">⚠ Watch Areas</div><div style="font-size:10px; line-height:1.8; color:var(--wire-text-light);">⚠ 3 critical broken links pending fix<br>⚠ 'uk digital marketing' dropped to #11</div></div>
+        </div>
+      </div>
+
+      <!-- S1: Keyword Rankings (compressed) -->
+      <div class="report-section">
+        <div class="report-section-title">02 — Keyword Rankings</div>
+        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr); margin-bottom:16px;">
+          <div class="kpi-card"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:20px;">12</div><div class="kpi-change up">↑+2</div></div>
+          <div class="kpi-card"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:20px;">47</div><div class="kpi-change up">↑+4</div></div>
+          <div class="kpi-card"><div class="kpi-label">Top 30</div><div class="kpi-value" style="font-size:20px;">89</div><div class="kpi-change up">↑+7</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value" style="font-size:20px;">124</div><div class="kpi-change neutral">→ 0</div></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">Position Distribution — 6 Month Trend</div>
+          <div style="height:70px; background:var(--wire-fill); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--wire-text-muted); font-size:10px;">[ Stacked Area Chart — Jan to Jun 2024 ]</div>
+        </div>
+        <div class="wf-table-wrap">
+          <table>
+            <tr><th>Keyword</th><th>Position</th><th>Change</th><th>Volume</th><th>Difficulty</th></tr>
+            <tr><td>seo agency london</td><td><span class="badge badge-success">4</span></td><td class="up-arrow">▲+3</td><td>1,600</td><td>68</td></tr>
+            <tr><td>local seo london</td><td><span class="badge badge-success">2</span></td><td class="up-arrow">▲+8</td><td>880</td><td>54</td></tr>
+            <tr><td>digital marketing uk</td><td><span class="badge badge-warn">7</span></td><td class="down-arrow">▼-1</td><td>2,400</td><td>72</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Footer hint -->
+      <div style="padding:16px 32px; border-top:1px solid var(--wire-border); display:flex; justify-content:space-between; align-items:center; background:var(--wire-fill);">
+        <div style="font-size:10px; color:var(--wire-text-muted);">Sections: Analytics · Backlinks · Technical Audit · Competitors · Recommendations ↓ (scrollable)</div>
+        <div style="font-size:10px; color:var(--wire-text-muted);">Prepared by Digital Horizons Agency · Confidential</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Brand colors applied dynamically from agency.primaryColor</div>
+    <div class="ann-item"><div class="ann-bullet"></div>PDF button triggers /api/reports/{id}/pdf → Puppeteer</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Charts rendered client-side with Recharts</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Share link is /r/{shareSlug} — no auth required</div>
+    <div class="ann-item"><div class="ann-bullet"></div>All 8 sections continue below (truncated for wireframe)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 16: REPORTS LIST (ALL CLIENTS) -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-15">
+  <div class="screen-label">Screen 16</div>
+  <div class="screen-title">Reports — All Clients</div>
+  <div class="screen-desc">Agency-wide view of all generated reports across all clients with status, filters, and bulk actions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/reports</div></div>
+    <div class="wf-layout" style="min-height:560px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item"><div class="nav-icon"></div> Dashboard</div><div class="nav-item"><div class="nav-icon"></div> Clients</div><div class="nav-item active"><div class="nav-icon"></div> Reports <span class="nav-badge">38</span></div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">All Reports</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">⚡ Bulk Generate</div><div class="wf-btn wf-btn-primary wf-btn-sm">+ New Report</div></div></div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input" style="max-width:220px;">🔍  Search client or period...</div>
+            <div class="wf-select">Client: All ▾</div>
+            <div class="wf-select">Status: All ▾</div>
+            <div class="wf-select">Period: All ▾</div>
+          </div>
+          <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+            <div class="kpi-card"><div class="kpi-label">Total Reports</div><div class="kpi-value">38</div><div class="kpi-change neutral">All time</div></div>
+            <div class="kpi-card"><div class="kpi-label">This Month</div><div class="kpi-value">18</div><div class="kpi-change up">↑ 3 vs last month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Completed</div><div class="kpi-value">35</div><div class="kpi-change up">92% success rate</div></div>
+            <div class="kpi-card"><div class="kpi-label">Failed</div><div class="kpi-value">3</div><div class="kpi-change down">↑ Needs attention</div></div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>Client</th><th>Period</th><th>Type</th><th>Status</th><th>Generated</th><th>Emailed To</th><th>Actions</th></tr>
+              <tr><td><strong>Acme Corp</strong></td><td>May 2024</td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-success">✅ Done</span></td><td>Jun 1, 09:12</td><td>sarah@acmecorp.com</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div></div></td></tr>
+              <tr><td><strong>TechStart</strong></td><td>May 2024</td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-success">✅ Done</span></td><td>Jun 1, 09:08</td><td>cto@techstart.io</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 PDF</div></div></td></tr>
+              <tr><td><strong>GreenLeaf</strong></td><td>May 2024</td><td><span class="badge badge-neutral">Monthly</span></td><td><span style="color:#888; font-size:11px;">⏳ Generating...</span></td><td>—</td><td>—</td><td><div class="wf-btn wf-btn-secondary wf-btn-sm">Cancel</div></td></tr>
+              <tr><td><strong>BlueSky Mktg</strong></td><td>May 2024</td><td><span class="badge badge-neutral">Monthly</span></td><td><span class="badge badge-danger">❌ Failed</span></td><td>Jun 1, 09:20</td><td>—</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">🔄 Retry</div><div class="wf-btn wf-btn-secondary wf-btn-sm">⚠ Logs</div></div></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">38 reports total · Page 1 of 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>"Bulk Generate" creates reports for all clients for selected month</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Status updates in real-time via polling or SSE</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Logs button shows Inngest job error trace</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 17: SETTINGS GENERAL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-16">
+  <div class="screen-label">Screen 17</div>
+  <div class="screen-title">Settings — General</div>
+  <div class="screen-desc">Agency name, subdomain, contact info, and danger zone (delete agency).</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/general</div></div>
+    <div class="wf-layout" style="min-height:560px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item"><div class="nav-icon"></div> Dashboard</div><div class="nav-item"><div class="nav-icon"></div> Clients</div><div class="nav-item"><div class="nav-icon"></div> Reports</div><div class="nav-item active"><div class="nav-icon"></div> Settings</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings</div></div>
+        <div style="display:flex; min-height:calc(100% - 52px);">
+          <div style="width:160px; border-right:1px solid var(--wire-border); padding:12px 8px;">
+            <div class="nav-item active" style="font-size:11px;">General</div>
+            <div class="nav-item" style="font-size:11px;">Branding</div>
+            <div class="nav-item" style="font-size:11px;">API Keys</div>
+            <div class="nav-item" style="font-size:11px;">Team</div>
+            <div class="nav-item" style="font-size:11px;">Billing</div>
+            <div class="nav-item" style="font-size:11px;">Notifications</div>
+          </div>
+          <div class="wf-main" style="flex:1;">
+            <div class="section-header"><div class="section-title">General Settings</div><div class="section-desc">Manage your agency profile and account information</div></div>
+            <div class="wf-card" style="margin-bottom:16px;">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Agency Information</div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Agency Name</label><div class="form-input">Digital Horizons Agency</div></div>
+                <div class="form-group"><label class="form-label">Subdomain</label><div style="display:flex; align-items:center; gap:4px;"><div class="form-input">digital-horizons</div><span style="font-size:10px; color:var(--wire-text-muted);">.rankflow.app</span></div></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Contact Email</label><div class="form-input">admin@digitalhorizons.com</div></div>
+                <div class="form-group"><label class="form-label">Phone</label><div class="form-input">+44 20 1234 5678</div></div>
+              </div>
+              <div class="form-group"><label class="form-label">Agency Website</label><div class="form-input">https://digitalhorizons.com</div></div>
+              <div style="display:flex; justify-content:flex-end; margin-top:8px;"><div class="wf-btn wf-btn-primary wf-btn-sm">Save Changes</div></div>
+            </div>
+            <div class="wf-card" style="margin-bottom:16px;">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Custom Domain</div>
+              <div class="form-group"><label class="form-label">Custom Domain (optional)</label><div class="form-input">reports.digitalhorizons.com</div><div class="form-input-hint">Point a CNAME record to <code>cname.rankflow.app</code> to use your own domain</div></div>
+              <div class="alert alert-success" style="margin-top:8px;">✓ Domain verified and active</div>
+              <div style="display:flex; justify-content:flex-end;"><div class="wf-btn wf-btn-secondary wf-btn-sm">Verify Domain</div></div>
+            </div>
+            <div class="wf-card" style="border-color:#e8c0c0;">
+              <div style="font-size:12px; font-weight:700; color:var(--wire-danger); margin-bottom:10px;">⚠ Danger Zone</div>
+              <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:10px;">Deleting your agency will permanently remove all clients, reports, and data. This action cannot be undone.</div>
+              <div class="wf-btn wf-btn-danger wf-btn-sm">Delete Agency</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Subdomain change requires uniqueness validation</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Custom domain verified via DNS TXT record check</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Delete agency requires typing "DELETE" to confirm</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 18: SETTINGS BRANDING -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-17">
+  <div class="screen-label">Screen 18</div>
+  <div class="screen-title">Settings — Branding</div>
+  <div class="screen-desc">Logo, brand colors, font, email sender name — all used in reports and client portal.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/branding</div></div>
+    <div class="wf-layout" style="min-height:580px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Settings</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings / Branding</div></div>
+        <div style="display:flex; min-height:calc(100% - 52px);">
+          <div style="width:160px; border-right:1px solid var(--wire-border); padding:12px 8px;">
+            <div class="nav-item" style="font-size:11px;">General</div>
+            <div class="nav-item active" style="font-size:11px;">Branding</div>
+            <div class="nav-item" style="font-size:11px;">API Keys</div>
+            <div class="nav-item" style="font-size:11px;">Team</div>
+            <div class="nav-item" style="font-size:11px;">Billing</div>
+          </div>
+          <div style="display:flex; flex:1; gap:0;">
+            <div class="wf-main" style="flex:1;">
+              <div class="section-header"><div class="section-title">White-Label Branding</div><div class="section-desc">Customize how reports look for your clients</div></div>
+              <div class="wf-card" style="margin-bottom:14px;">
+                <div style="font-size:12px; font-weight:700; margin-bottom:12px;">Agency Logo</div>
+                <div style="display:flex; align-items:center; gap:16px;">
+                  <div class="img-placeholder" style="width:120px; height:48px;">Current Logo</div>
+                  <div>
+                    <div class="wf-btn wf-btn-secondary wf-btn-sm" style="margin-bottom:6px;">Upload New Logo</div>
+                    <div style="font-size:9px; color:var(--wire-text-muted);">PNG or SVG, recommended 200×60px<br>Max 2MB</div>
+                  </div>
+                </div>
+              </div>
+              <div class="wf-card" style="margin-bottom:14px;">
+                <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Brand Colors</div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                  <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:11px;">Primary Color</span><div style="display:flex; align-items:center; gap:8px;"><div class="color-swatch" style="background:#4a5270;"></div><div class="form-input" style="width:90px; font-family:monospace; font-size:10px;">#4A5270</div></div></div>
+                  <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:11px;">Secondary Color</span><div style="display:flex; align-items:center; gap:8px;"><div class="color-swatch" style="background:#8B5CF6;"></div><div class="form-input" style="width:90px; font-family:monospace; font-size:10px;">#8B5CF6</div></div></div>
+                  <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:11px;">Accent Color</span><div style="display:flex; align-items:center; gap:8px;"><div class="color-swatch" style="background:#EC4899;"></div><div class="form-input" style="width:90px; font-family:monospace; font-size:10px;">#EC4899</div></div></div>
+                </div>
+              </div>
+              <div class="wf-card" style="margin-bottom:14px;">
+                <div style="font-size:12px; font-weight:700; margin-bottom:12px;">Typography & Email</div>
+                <div class="form-group"><label class="form-label">Font Family</label><div class="form-input">Inter ▾</div></div>
+                <div class="form-row">
+                  <div class="form-group"><label class="form-label">Email From Name</label><div class="form-input">Digital Horizons Reports</div></div>
+                  <div class="form-group"><label class="form-label">Email From Address</label><div class="form-input">reports@digitalhorizons.com</div></div>
+                </div>
+              </div>
+              <div style="display:flex; justify-content:flex-end;"><div class="wf-btn wf-btn-primary">Save Branding</div></div>
+            </div>
+            <div style="width:220px; border-left:1px solid var(--wire-border); padding:20px 16px; background:var(--wire-fill);">
+              <div style="font-size:11px; font-weight:700; margin-bottom:12px;">Live Preview</div>
+              <div style="background:var(--wire-primary); color:#fff; padding:10px; border-radius:6px 6px 0 0; font-size:9px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="img-placeholder" style="width:60px; height:22px; background:rgba(255,255,255,0.2); border:none; color:rgba(255,255,255,0.6); font-size:8px;">LOGO</div>
+                <div style="text-align:right;"><div style="font-weight:700; font-size:9px;">Monthly SEO Report</div><div style="opacity:0.7; font-size:8px;">Acme Corp · May 2024</div></div>
+              </div>
+              <div style="background:var(--wire-surface); border:1px solid var(--wire-border); border-top:none; border-radius:0 0 6px 6px; padding:10px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+                  <div style="background:var(--wire-fill); border-radius:4px; padding:6px; font-size:8px; text-align:center;"><div style="font-size:12px; font-weight:700;">8,420</div>Sessions</div>
+                  <div style="background:var(--wire-fill); border-radius:4px; padding:6px; font-size:8px; text-align:center;"><div style="font-size:12px; font-weight:700;">47</div>Top 10</div>
+                </div>
+                <div style="height:30px; background:var(--wire-fill); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--wire-text-muted);">[ Chart Area ]</div>
+              </div>
+              <div style="font-size:9px; color:var(--wire-text-muted); margin-top:8px; text-align:center;">Preview updates on save</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Colors stored as hex in agencies.primaryColor field</div>
+    <div class="ann-item"><div class="ann-bullet"></div>CSS custom properties injected in report renderer</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Preview updates immediately on color change</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 19: SETTINGS API KEYS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-18">
+  <div class="screen-label">Screen 19</div>
+  <div class="screen-title">Settings — API Keys</div>
+  <div class="screen-desc">Connect SERanking API key. Encrypted storage, validation, rotation support.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/api-keys</div></div>
+    <div class="wf-layout" style="min-height:500px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Settings</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings / API Keys</div></div>
+        <div style="display:flex; min-height:calc(100% - 52px);">
+          <div style="width:160px; border-right:1px solid var(--wire-border); padding:12px 8px;">
+            <div class="nav-item" style="font-size:11px;">General</div>
+            <div class="nav-item" style="font-size:11px;">Branding</div>
+            <div class="nav-item active" style="font-size:11px;">API Keys</div>
+            <div class="nav-item" style="font-size:11px;">Team</div>
+          </div>
+          <div class="wf-main" style="flex:1; max-width:640px;">
+            <div class="section-header"><div class="section-title">API Keys</div><div class="section-desc">Connect your SERanking account to pull SEO data</div></div>
+            <div class="wf-card" style="margin-bottom:16px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <div><div style="font-size:12px; font-weight:700;">SERanking API Key</div><div style="font-size:10px; color:var(--wire-text-muted);">Used to fetch keyword, backlink, audit, and analytics data</div></div>
+                <span class="badge badge-success">✓ Connected</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Current Key (masked)</label>
+                <div style="display:flex; gap:8px;">
+                  <div class="form-input" style="flex:1; font-family:monospace; font-size:11px; color:var(--wire-text-muted);">sk_live_••••••••••••••••••••••••••••</div>
+                  <div class="wf-btn wf-btn-secondary wf-btn-sm">👁 Reveal</div>
+                </div>
+              </div>
+              <div style="background:var(--wire-fill); border-radius:8px; padding:12px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div style="text-align:center; font-size:10px;"><div style="font-size:14px; font-weight:700;">Agency</div><div style="color:var(--wire-text-muted);">Plan</div></div>
+                <div style="text-align:center; font-size:10px;"><div style="font-size:14px; font-weight:700;">23 / 50</div><div style="color:var(--wire-text-muted);">Sites Used</div></div>
+                <div style="text-align:center; font-size:10px;"><div style="font-size:14px; font-weight:700;">8,400</div><div style="color:var(--wire-text-muted);">API Credits</div></div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <div class="wf-btn wf-btn-secondary wf-btn-sm">🔄 Rotate Key</div>
+                <div class="wf-btn wf-btn-secondary wf-btn-sm">📋 Test Connection</div>
+                <div class="wf-btn wf-btn-danger wf-btn-sm">🗑 Disconnect</div>
+              </div>
+            </div>
+            <div class="wf-card">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Update API Key</div>
+              <div class="form-group"><label class="form-label">New SERanking API Key</label>
+                <div style="display:flex; gap:8px;">
+                  <div class="form-input" style="flex:1; font-family:monospace; font-size:11px;">api_key_new_key_here...</div>
+                  <div class="wf-btn wf-btn-primary wf-btn-sm">Validate & Save</div>
+                </div>
+                <div class="form-input-hint"><a class="form-link" href="#">How to find my SERanking API key →</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Key encrypted with AES-256 before DB storage</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Reveal shows key for 30 seconds then re-masks</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Validate calls GET /v1/account/subscription to confirm key</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 20: SETTINGS TEAM -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-19">
+  <div class="screen-label">Screen 20</div>
+  <div class="screen-title">Settings — Team Management</div>
+  <div class="screen-desc">Invite, manage, and set roles for agency team members.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/team</div></div>
+    <div class="wf-layout" style="min-height:520px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Settings</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings / Team</div><div class="topbar-actions"><div class="wf-btn wf-btn-primary wf-btn-sm">+ Invite Member</div></div></div>
+        <div style="display:flex; min-height:calc(100% - 52px);">
+          <div style="width:160px; border-right:1px solid var(--wire-border); padding:12px 8px;">
+            <div class="nav-item" style="font-size:11px;">General</div>
+            <div class="nav-item" style="font-size:11px;">Branding</div>
+            <div class="nav-item" style="font-size:11px;">API Keys</div>
+            <div class="nav-item active" style="font-size:11px;">Team</div>
+            <div class="nav-item" style="font-size:11px;">Billing</div>
+          </div>
+          <div class="wf-main" style="flex:1;">
+            <div class="alert alert-info" style="margin-bottom:16px;">ℹ️ You are on the <strong>Professional</strong> plan — up to 5 team members. <a class="form-link">Upgrade for unlimited →</a></div>
+            <div class="wf-table-wrap">
+              <div class="wf-table-header"><div class="wf-table-title">Team Members (3/5)</div></div>
+              <table>
+                <tr><th>Member</th><th>Email</th><th>Role</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
+                <tr><td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar">JD</div><strong>John Doe</strong> <span class="badge badge-primary">You</span></div></td><td>john@agency.com</td><td><span class="badge badge-primary">Agency Admin</span></td><td>Jan 2024</td><td><span class="badge badge-success">Active</span></td><td style="color:var(--wire-text-muted); font-size:10px;">—</td></tr>
+                <tr><td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar">SM</div>Sarah Manager</div></td><td>sarah@agency.com</td><td><div class="form-input" style="display:inline-block; padding:3px 8px; font-size:10px; width:auto;">Team Member ▾</div></td><td>Feb 2024</td><td><span class="badge badge-success">Active</span></td><td><div class="wf-btn wf-btn-danger wf-btn-sm">Remove</div></td></tr>
+                <tr><td><div style="display:flex; align-items:center; gap:8px;"><div class="avatar">TW</div>Tom Writer</div></td><td>tom@agency.com</td><td><div class="form-input" style="display:inline-block; padding:3px 8px; font-size:10px; width:auto;">Team Member ▾</div></td><td>Mar 2024</td><td><span class="badge badge-success">Active</span></td><td><div class="wf-btn wf-btn-danger wf-btn-sm">Remove</div></td></tr>
+              </table>
+            </div>
+            <div class="wf-card" style="margin-top:16px;">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Invite New Member</div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Email Address</label><div class="form-input">colleague@agency.com</div></div>
+                <div class="form-group"><label class="form-label">Role</label><div class="form-input">Team Member ▾</div></div>
+                <div style="display:flex; align-items:flex-end;"><div class="wf-btn wf-btn-primary wf-btn-sm">Send Invite</div></div>
+              </div>
+              <div style="font-size:10px; color:var(--wire-text-muted);">They'll receive an email with a link to join your agency workspace.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Role dropdown: Agency Admin, Team Member</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Invite sent via Resend with temp token link</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Member limit enforced by plan (5 for Professional)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 21: SETTINGS SCHEDULING -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-20">
+  <div class="screen-label">Screen 21</div>
+  <div class="screen-title">Settings — Scheduling & Notifications</div>
+  <div class="screen-desc">Configure global report scheduling defaults and notification channels (email, Slack).</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/notifications</div></div>
+    <div class="wf-layout" style="min-height:500px;">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">RankFlow</div></div></div>
+        <div class="wf-sidebar-nav"><div class="nav-item active"><div class="nav-icon"></div> Settings</div></div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings / Scheduling & Notifications</div></div>
+        <div style="display:flex; min-height:calc(100% - 52px);">
+          <div style="width:160px; border-right:1px solid var(--wire-border); padding:12px 8px;">
+            <div class="nav-item" style="font-size:11px;">General</div>
+            <div class="nav-item" style="font-size:11px;">Branding</div>
+            <div class="nav-item" style="font-size:11px;">API Keys</div>
+            <div class="nav-item" style="font-size:11px;">Team</div>
+            <div class="nav-item" style="font-size:11px;">Billing</div>
+            <div class="nav-item active" style="font-size:11px;">Notifications</div>
+          </div>
+          <div class="wf-main" style="flex:1; max-width:640px;">
+            <div class="wf-card" style="margin-bottom:16px;">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Global Report Schedule Defaults</div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Default Day of Month</label><div class="form-input">1 (1st of month)</div></div>
+                <div class="form-group"><label class="form-label">Default Time (UTC)</label><div class="form-input">09:00</div></div>
+              </div>
+              <div class="form-group"><label class="form-label">Always CC (agency email)</label><div class="form-input">reports@digitalhorizons.com</div></div>
+              <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Auto-schedule for all new clients</div><div class="switch-sub">New clients will automatically have monthly reports enabled</div></div></div>
+              <div style="display:flex; justify-content:flex-end; margin-top:10px;"><div class="wf-btn wf-btn-primary wf-btn-sm">Save Defaults</div></div>
+            </div>
+            <div class="wf-card" style="margin-bottom:16px;">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Email Notifications</div>
+              <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Report generated notification</div><div class="switch-sub">Email when a report is successfully generated</div></div></div>
+              <hr class="divider">
+              <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Report failed notification</div><div class="switch-sub">Email when report generation fails</div></div></div>
+              <hr class="divider">
+              <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Data sync notification</div><div class="switch-sub">Weekly summary of data sync status</div></div></div>
+            </div>
+            <div class="wf-card">
+              <div style="font-size:12px; font-weight:700; margin-bottom:14px;">Slack Webhook (Optional)</div>
+              <div class="form-group"><label class="form-label">Slack Webhook URL</label><div class="form-input">https://hooks.slack.com/services/T00/B00/xxxx</div></div>
+              <div class="form-group"><label class="form-label">Notify on</label>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+                  <div style="display:flex; align-items:center; gap:4px; font-size:10px;"><input type="checkbox" checked> Report Generated</div>
+                  <div style="display:flex; align-items:center; gap:4px; font-size:10px;"><input type="checkbox" checked> Report Failed</div>
+                  <div style="display:flex; align-items:center; gap:4px; font-size:10px;"><input type="checkbox"> Data Sync</div>
+                </div>
+              </div>
+              <div class="wf-btn wf-btn-secondary wf-btn-sm">Test Webhook</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Global defaults used when creating new client schedules</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Slack webhook called after Inngest job completes</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Individual clients can override global schedule settings</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 22: CLIENT PORTAL DASHBOARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-21">
+  <div class="screen-label">Screen 22</div>
+  <div class="screen-title">Client Portal — Dashboard</div>
+  <div class="screen-desc">Read-only dashboard for end clients. Shows their SEO summary and report history. Agency-branded.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/c/dashboard</div></div>
+    <div class="wf-body">
+      <!-- Agency branded header -->
+      <div style="background:var(--wire-primary); color:#fff; padding:12px 24px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="img-placeholder" style="width:80px; height:28px; background:rgba(255,255,255,0.2); border:none; color:rgba(255,255,255,0.6); font-size:8px;">AGENCY LOGO</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; font-size:11px;">
+          <span>Welcome, Sarah Miller 👋</span>
+          <div style="background:rgba(255,255,255,0.2); padding:4px 10px; border-radius:6px; cursor:pointer; font-size:10px;">Sign Out</div>
+        </div>
+      </div>
+      <div style="padding:24px; max-width:900px; margin:0 auto;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:18px; font-weight:800; color:var(--wire-text);">📊 Your SEO Performance</div>
+          <div style="font-size:12px; color:var(--wire-text-muted); margin-top:3px;">Acme Corp · acmecorp.com · Last updated: June 1, 2024</div>
+        </div>
+        <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
+          <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4 this month</div></div>
+          <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+          <div class="kpi-card"><div class="kpi-label">Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-change up">↑ +47 new</div></div>
+        </div>
+        <div class="chart-box" style="margin-bottom:24px;">
+          <div class="chart-title">Traffic Trend — Last 6 Months</div>
+          <div class="chart-placeholder" style="height:80px; gap:8px;">
+            <div class="chart-bar" style="height:55%;"></div><div class="chart-bar" style="height:62%;"></div><div class="chart-bar" style="height:68%;"></div><div class="chart-bar" style="height:74%;"></div><div class="chart-bar" style="height:82%;"></div><div class="chart-bar" style="height:100%; background:var(--wire-primary);"></div>
+          </div>
+        </div>
+        <div class="wf-table-wrap">
+          <div class="wf-table-header"><div class="wf-table-title">Your Reports</div></div>
+          <table>
+            <tr><th>Period</th><th>Type</th><th>Status</th><th>Generated</th><th>Actions</th></tr>
+            <tr><td><strong>May 2024</strong></td><td>Monthly</td><td><span class="badge badge-success">✅ Ready</span></td><td>June 1, 2024</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View Report</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 Download PDF</div></div></td></tr>
+            <tr><td><strong>April 2024</strong></td><td>Monthly</td><td><span class="badge badge-success">✅ Ready</span></td><td>May 1, 2024</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View Report</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 Download PDF</div></div></td></tr>
+            <tr><td><strong>March 2024</strong></td><td>Monthly</td><td><span class="badge badge-success">✅ Ready</span></td><td>Apr 1, 2024</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View Report</div><div class="wf-btn wf-btn-secondary wf-btn-sm">📥 Download PDF</div></div></td></tr>
+          </table>
+        </div>
+        <div style="margin-top:32px; text-align:center; font-size:10px; color:var(--wire-text-muted);">
+          Powered by Digital Horizons Agency · <a class="form-link">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Agency branded (logo, colors from agency.branding)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Client only sees their own data (RLS enforced)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>No sidebar navigation (simplified UI)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Route: /c/* (client portal sub-path)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 23: CLIENT PORTAL REPORT VIEW -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-22">
+  <div class="screen-label">Screen 23</div>
+  <div class="screen-title">Client Portal — Report View (Read-Only)</div>
+  <div class="screen-desc">Client sees the same interactive report as the agency, but read-only. Agency branded.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/c/reports/rpt_abc123</div></div>
+    <div class="wf-body" style="background:var(--wire-surface);">
+      <div style="background:var(--wire-primary); padding:12px 24px; display:flex; align-items:center; justify-content:space-between;">
+        <div class="img-placeholder" style="width:80px; height:28px; background:rgba(255,255,255,0.2); border:none; color:rgba(255,255,255,0.6); font-size:8px;">AGENCY LOGO</div>
+        <div style="color:#fff; font-size:11px; display:flex; align-items:center; gap:12px;">
+          <span>Acme Corp · May 2024 Report</span>
+          <div style="background:rgba(255,255,255,0.2); padding:5px 12px; border-radius:6px; cursor:pointer; font-size:10px;">📥 Download PDF</div>
+          <a style="color:rgba(255,255,255,0.7); font-size:10px; cursor:pointer;">← Back to Dashboard</a>
+        </div>
+      </div>
+      <div style="padding:24px; max-width:900px; margin:0 auto;">
+        <div class="wf-card" style="margin-bottom:20px; border-left:3px solid var(--wire-primary);">
+          <div style="font-size:12px; font-weight:700; color:var(--wire-primary); margin-bottom:8px;">📋 Executive Summary</div>
+          <div style="font-size:11px; color:var(--wire-text-light); line-height:1.7;">This month, Acme Corp achieved significant growth in organic search visibility. Keywords in the top 10 increased by 4, and organic traffic grew by 16.3% compared to April 2024.</div>
+          <div class="kpi-grid kpi-grid-4" style="margin-top:14px;">
+            <div class="kpi-card"><div class="kpi-label">Sessions</div><div class="kpi-value" style="font-size:18px;">8,420</div><div class="kpi-change up">↑ +16.3%</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 10 KW</div><div class="kpi-value" style="font-size:18px;">47</div><div class="kpi-change up">↑ +4</div></div>
+            <div class="kpi-card"><div class="kpi-label">Backlinks</div><div class="kpi-value" style="font-size:18px;">1,847</div><div class="kpi-change up">↑ +47</div></div>
+            <div class="kpi-card"><div class="kpi-label">Health</div><div class="kpi-value" style="font-size:18px;">76%</div><div class="kpi-change up">↑ +8pts</div></div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div class="wf-card"><div style="font-size:12px; font-weight:700; color:var(--wire-primary); margin-bottom:10px;">🔑 Keyword Rankings</div><div style="height:60px; background:var(--wire-fill); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--wire-text-muted);">[ Position Distribution Chart + Top Keywords Table ]</div></div>
+          <div class="wf-card"><div style="font-size:12px; font-weight:700; color:var(--wire-primary); margin-bottom:10px;">📈 Organic Traffic & GSC Data</div><div style="height:60px; background:var(--wire-fill); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--wire-text-muted);">[ Traffic Chart + GSC Query Table ]</div></div>
+          <div class="wf-card"><div style="font-size:12px; font-weight:700; color:var(--wire-primary); margin-bottom:10px;">🔗 Backlink Profile</div><div style="height:60px; background:var(--wire-fill); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--wire-text-muted);">[ New/Lost Chart + Referring Domains ]</div></div>
+          <div class="wf-card"><div style="font-size:12px; font-weight:700; color:var(--wire-primary); margin-bottom:10px;">💡 Recommendations</div><div style="font-size:11px; line-height:1.8; color:var(--wire-text-light);">1. Fix 3 critical broken links<br>2. Add meta descriptions to 8 blog posts<br>3. Target keyword gap: 'ecommerce seo uk'</div></div>
+        </div>
+        <div style="margin-top:24px; text-align:center; font-size:10px; color:var(--wire-text-muted);">Prepared by Digital Horizons Agency · Confidential</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Same report component as agency view — no edit controls shown</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Agency branding applied (colors, logo, footer)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>PDF download available to client</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 24: PUBLIC SHAREABLE REPORT -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-23">
+  <div class="screen-label">Screen 24</div>
+  <div class="screen-title">Public Shareable Report (/r/[slug])</div>
+  <div class="screen-desc">No-login shareable report link. Optional password protection. Agency branded.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">reports.digitalhorizons.com/r/x8kPq2mNvL</div></div>
+    <div class="wf-body" style="background:var(--wire-fill);">
+      <!-- Password gate (shown first) -->
+      <div style="min-height:300px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px;">
+        <div style="background:var(--wire-surface); border:1px solid var(--wire-border); border-radius:12px; padding:32px; max-width:380px; width:100%; text-align:center;">
+          <div class="img-placeholder" style="width:100px; height:36px; margin:0 auto 16px;">AGENCY LOGO</div>
+          <div style="font-size:16px; font-weight:800; color:var(--wire-text); margin-bottom:6px;">🔒 Protected Report</div>
+          <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:20px;">This SEO report is password protected. Enter the password below to view.</div>
+          <div class="form-group"><label class="form-label" style="text-align:left;">Password</label><div class="form-input">••••••••</div></div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; margin-top:4px;">View Report</div>
+          <div style="font-size:10px; color:var(--wire-text-muted); margin-top:12px;">Report prepared by Digital Horizons Agency for Acme Corp · May 2024</div>
+        </div>
+      </div>
+      <!-- After password: show report (abbreviated) -->
+      <div style="max-width:900px; margin:0 auto; padding:0 24px;">
+        <div style="background:var(--wire-primary); color:#fff; padding:16px 24px; border-radius:8px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center;">
+          <div><div style="font-size:14px; font-weight:800;">Monthly SEO Report — Acme Corp</div><div style="font-size:10px; opacity:0.7;">May 2024 · Prepared by Digital Horizons Agency</div></div>
+          <div style="display:flex; gap:8px;"><div style="background:rgba(255,255,255,0.2); padding:6px 12px; border-radius:6px; font-size:10px;">📥 Download PDF</div></div>
+        </div>
+        <div style="text-align:center; padding:16px; font-size:11px; color:var(--wire-text-muted); background:var(--wire-surface); border-radius:8px; border:1px solid var(--wire-border);">← Full report content displays here after password entry (same as authenticated view)</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>URL: /r/{shareSlug} — 12-char random slug stored in reports.shareSlug</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Password hashed (bcrypt) in reports.sharePassword</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Supports share expiry date (reports.shareExpiresAt)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Custom domain: reports.agencyname.com/r/[slug]</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Vercel Edge Cache: 7 days (invalidated on report update)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 25: SUPER ADMIN DASHBOARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-24">
+  <div class="screen-label">Screen 25</div>
+  <div class="screen-title">Super Admin Dashboard</div>
+  <div class="screen-desc">Platform-wide oversight. Manage agencies, monitor usage, handle billing. Internal use only.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">app.rankflow.app/admin</div></div>
+    <div class="wf-layout" style="min-height:600px;">
+      <div class="wf-sidebar" style="background:#1e2030;">
+        <div class="wf-sidebar-logo" style="border-color:#2a2d40;"><div class="logo-box" style="background:#4a5270;">RF</div><div><div class="logo-text" style="color:#e0e4f0;">RankFlow</div><div class="logo-sub" style="color:#606478;">Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item active" style="color:#e0e4f0; background:#2a2d40;"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item" style="color:#8890a8;"><div class="nav-icon"></div> Agencies <span class="nav-badge">12</span></div>
+          <div class="nav-item" style="color:#8890a8;"><div class="nav-icon"></div> Users</div>
+          <div class="nav-item" style="color:#8890a8;"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-item" style="color:#8890a8;"><div class="nav-icon"></div> Billing</div>
+          <div class="nav-item" style="color:#8890a8;"><div class="nav-icon"></div> System Health</div>
+        </div>
+        <div class="wf-sidebar-footer" style="border-color:#2a2d40;"><div class="user-chip" style="background:#2a2d40;"><div class="avatar" style="background:#4a5270; border-color:#8890a8;">SA</div><div class="user-info"><div class="user-name" style="color:#e0e4f0;">Super Admin</div><div class="user-role">Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Platform Overview</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">+ Create Agency</div></div></div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Total Agencies</div><div class="kpi-value">12</div><div class="kpi-change up">↑ +2 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Clients</div><div class="kpi-value">284</div><div class="kpi-change up">↑ +31 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Reports Generated</div><div class="kpi-value">1,240</div><div class="kpi-change up">↑ +18% vs last month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Monthly Revenue</div><div class="kpi-value">$4,800</div><div class="kpi-change up">↑ +$600 MoM</div></div>
+          </div>
+          <div class="two-col" style="margin-top:4px;">
+            <div class="wf-table-wrap" style="margin-bottom:0;">
+              <div class="wf-table-header"><div class="wf-table-title">Agencies</div><div class="wf-btn wf-btn-ghost wf-btn-sm">View All</div></div>
+              <table>
+                <tr><th>Agency</th><th>Plan</th><th>Clients</th><th>Reports</th><th>Status</th></tr>
+                <tr><td><strong>Digital Horizons</strong></td><td><span class="badge badge-primary">Pro</span></td><td>24</td><td>38</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr><td><strong>SEO Masters UK</strong></td><td><span class="badge badge-primary">Pro</span></td><td>18</td><td>29</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr><td><strong>Rank Boost Co</strong></td><td><span class="badge badge-neutral">Starter</span></td><td>6</td><td>8</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr><td><strong>GrowthLab Ltd</strong></td><td><span class="badge badge-neutral">Starter</span></td><td>4</td><td>3</td><td><span class="badge badge-warn">Trial</span></td></tr>
+              </table>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Reports Generated — 6 Month Trend</div>
+              <div class="chart-placeholder" style="height:120px; gap:8px;">
+                <div class="chart-bar" style="height:45%;"></div><div class="chart-bar" style="height:55%;"></div><div class="chart-bar" style="height:62%;"></div><div class="chart-bar" style="height:74%;"></div><div class="chart-bar" style="height:88%;"></div><div class="chart-bar" style="height:100%; background:var(--wire-primary);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-top:16px;">
+            <div class="wf-table-title" style="margin-bottom:12px;">System Health</div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; font-size:11px; text-align:center;">
+              <div style="background:var(--wire-fill); border-radius:6px; padding:10px;"><div style="font-size:14px; font-weight:700; color:var(--wire-success);">✅</div><div>API Sync</div><div style="font-size:9px; color:var(--wire-text-muted);">Last: 2h ago</div></div>
+              <div style="background:var(--wire-fill); border-radius:6px; padding:10px;"><div style="font-size:14px; font-weight:700; color:var(--wire-success);">✅</div><div>Email Queue</div><div style="font-size:9px; color:var(--wire-text-muted);">0 pending</div></div>
+              <div style="background:var(--wire-fill); border-radius:6px; padding:10px;"><div style="font-size:14px; font-weight:700; color:var(--wire-success);">✅</div><div>PDF Engine</div><div style="font-size:9px; color:var(--wire-text-muted);">Healthy</div></div>
+              <div style="background:var(--wire-fill); border-radius:6px; padding:10px;"><div style="font-size:14px; font-weight:700; color:var(--wire-success);">✅</div><div>Database</div><div style="font-size:9px; color:var(--wire-text-muted);">99.9% uptime</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Accessible at app.rankflow.app (separate subdomain)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Super Admin role enforced in middleware (not just UI)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>System health checks Inngest queue, Supabase, PDF service</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Revenue from Stripe billing integration (Phase 2)</div>
+  </div>
+</div>
+
+</div><!-- wireframe-wrapper -->
+</div><!-- screen-area -->
+
+<script>
+  let currentScreen = 0;
+  const totalScreens = 25;
+
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + n).classList.add('active');
+    document.getElementById('screenSelect').value = n;
+    document.getElementById('screenCounter').textContent = (n + 1) + ' / ' + totalScreens;
+    currentScreen = n;
+    window.scrollTo(0, 0);
+  }
+
+  function nextScreen() {
+    if (currentScreen < totalScreens - 1) showScreen(currentScreen + 1);
+  }
+
+  function prevScreen() {
+    if (currentScreen > 0) showScreen(currentScreen - 1);
+  }
+
+  function gotoScreen(val) {
+    showScreen(parseInt(val));
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextScreen();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevScreen();
+  });
+</script>
+</body>
+</html>
