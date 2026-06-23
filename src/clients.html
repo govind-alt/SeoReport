@@ -84,8 +84,8 @@
       <!-- Bulk Action Bar (hidden until rows selected) -->
       <div class="bulk-action-bar" id="bulkActionBar">
         <span class="bulk-count">0 clients selected</span>
-        <button class="btn btn-primary btn-sm" onclick="Toast.success('Generating reports for selected clients...')">📄 Generate Reports</button>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening email composer...')">📧 Send Email</button>
+        <button class="btn btn-primary btn-sm" onclick="bulkGenerate()">📄 Generate Reports</button>
+        <button class="btn btn-secondary btn-sm" onclick="bulkEmail()">📧 Send Email</button>
         <button class="btn btn-danger btn-sm" onclick="archiveSelected()">🗃 Archive</button>
         <span class="bulk-clear" onclick="clearSelection()">✕</span>
       </div>
@@ -475,14 +475,73 @@ function clearSelection() {
   document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
   document.getElementById('masterCheckbox').checked = false;
   document.getElementById('bulkActionBar').style.display = 'none';
+  if (window.BulkSelect) {
+    const master = document.querySelector('#clientsTable thead input[type="checkbox"]');
+    if (master) master.indeterminate = false;
+  }
 }
 
 function archiveSelected() {
-  const count = document.querySelectorAll('.row-checkbox:checked').length;
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  const count = checkboxes.length;
+  if (count === 0) return;
   if (confirm(`Archive ${count} selected client${count > 1 ? 's' : ''}?`)) {
+    checkboxes.forEach(cb => {
+      const tr = cb.closest('tr');
+      if (tr) tr.remove();
+    });
     Toast.success(`${count} client${count > 1 ? 's' : ''} archived`);
     clearSelection();
+    updateTableCount();
   }
+}
+
+function updateTableCount() {
+  const visible = document.querySelectorAll('#clientsTable tbody tr:not([style*="display: none"])').length;
+  const countEl = document.getElementById('tableCount');
+  if (countEl) countEl.textContent = `Showing ${visible} of 24 clients`;
+}
+
+function bulkGenerate() {
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  const count = checkboxes.length;
+  if (count === 0) return;
+  
+  const t = Toast.loading(`Generating reports for ${count} client${count > 1 ? 's' : ''}...`);
+  
+  checkboxes.forEach(cb => {
+    const tr = cb.closest('tr');
+    if (tr) {
+      const badge = tr.querySelector('td:nth-child(7) .badge');
+      if (badge) {
+        badge.className = 'badge badge-warning';
+        badge.innerHTML = '<span class="spinner" style="font-size:10px;">⟳</span> Generating...';
+      }
+    }
+  });
+
+  setTimeout(() => {
+    t.dismiss();
+    Toast.success(`Successfully generated ${count} report${count > 1 ? 's' : ''}!`);
+    checkboxes.forEach(cb => {
+      const tr = cb.closest('tr');
+      if (tr) {
+        const badge = tr.querySelector('td:nth-child(7) .badge');
+        if (badge) {
+          badge.className = 'badge badge-success';
+          badge.innerHTML = 'Active';
+        }
+      }
+    });
+    clearSelection();
+  }, 2000);
+}
+
+function bulkEmail() {
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  if (checkboxes.length === 0) return;
+  Toast.info(`Opening email composer for ${checkboxes.length} client${checkboxes.length > 1 ? 's' : ''}...`);
+  clearSelection();
 }
 
 function filterStatus(val) {
