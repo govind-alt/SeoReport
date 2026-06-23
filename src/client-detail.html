@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RankFlow — Acme Corp</title>
-<meta name="description" content="Detailed SEO analytics for Acme Corp — keywords, backlinks, audit, analytics, competitors and reports."/>
+<title>RankFlow â€” Acme Corp</title>
+<meta name="description" content="Detailed SEO analytics for Acme Corp â€” keywords, backlinks, audit, analytics, competitors and reports."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
@@ -34,38 +34,62 @@
   <aside class="sidebar">
     <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
     <nav class="sidebar-nav">
-      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
-      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
-      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ“Š</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">ðŸ‘¥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ“„</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
       <div class="sidebar-section-label">Configuration</div>
-      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
-      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help</span></a>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">âš™ï¸</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">â“</span><span class="sidebar-item-label">Help</span></a>
     </nav>
-    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-avatar">JD</div><div><div class="sidebar-user-name">John Doe</div><div class="sidebar-user-role">Agency Admin</div></div></div></div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-wrap">
+        <!-- User menu popup -->
+        <div id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">John Doe</div>
+            <div class="user-menu-email">john@digitalhorizons.com</div>
+          </div>
+          <button class="user-menu-item" onclick="window.location.href='settings.html'">⚙️ Account Settings</button>
+          <button class="user-menu-item" onclick="Toast.info('Opening billing...');window.location.href='settings.html'">💳 Billing &amp; Plan</button>
+          <button class="user-menu-item" onclick="Toast.info('Opening help...')">❓ Help &amp; Support</button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item danger" onclick="Logout.confirm()">🚪 Sign Out</button>
+        </div>
+        <!-- Clickable chip -->
+        <div id="sidebarUserChip">
+          <div class="sidebar-avatar">JD</div>
+          <div>
+            <div class="sidebar-user-name">John Doe</div>
+            <div class="sidebar-user-role">Agency Admin</div>
+          </div>
+          <span class="chevron">▲</span>
+        </div>
+      </div>
+    </div>
   </aside>
 
   <div class="main-content">
     <!-- Topbar -->
     <header class="topbar">
       <div style="flex:1;">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;"><a href="clients.html" style="color:var(--text-muted);">Clients</a> › <strong style="color:var(--text-primary);">Acme Corp</strong></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;"><a href="clients.html" style="color:var(--text-muted);">Clients</a> â€º <strong style="color:var(--text-primary);">Acme Corp</strong></div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div style="font-size:16px;font-weight:800;">Acme Corp</div>
           <span style="font-size:12px;color:var(--text-muted);">acmecorp.com</span>
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="date-range-btn" onclick="Toast.info('Date picker opened')">📅 Jun 2026 vs May 2026 ▾</button>
-        <span class="gsc-badge connected">✅ GSC Connected</span>
-        <button class="btn btn-secondary btn-sm" onclick="Modal.open('editClientModal')">⚙ Edit</button>
+        <button class="date-range-btn" onclick="Toast.info('Date picker opened')">ðŸ“… Jun 2026 vs May 2026 â–¾</button>
+        <span class="gsc-badge connected">âœ… GSC Connected</span>
+        <button class="btn btn-secondary btn-sm" onclick="Modal.open('editClientModal')">âš™ Edit</button>
         <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">+ Report</button>
         <div class="notif-bell-wrap" style="position:relative;">
-          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">🔔</button>
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">ðŸ””</button>
           <div style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
           <div class="notif-dropdown" id="notifDropdown">
             <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications</div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
             <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">You have 5 unread notifications</div>
-            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);">View all →</a></div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);">View all â†’</a></div>
           </div>
         </div>
       </div>
@@ -82,56 +106,56 @@
       <div class="ctab" onclick="switchTab('reports',this)">Reports</div>
     </div>
 
-    <!-- ═══ TAB: OVERVIEW ═══ -->
+    <!-- â•â•â• TAB: OVERVIEW â•â•â• -->
     <div class="tab-panel active" id="tab-overview">
       <div class="kpi-grid kpi-grid-5" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
-        <div class="kpi-card success"><div class="kpi-label">Sessions</div><div class="kpi-value" style="font-size:24px;">8,420</div><div class="kpi-trend trend-up">↑ +16.3%</div></div>
-        <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value" style="font-size:24px;">47</div><div class="kpi-trend trend-up">↑ +4 kws</div></div>
-        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value" style="font-size:24px;">42</div><div class="kpi-trend trend-up">↑ +2 pts</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="font-size:24px;">76%</div><div class="kpi-trend trend-up">↑ +8 pts</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Sessions</div><div class="kpi-value" style="font-size:24px;">8,420</div><div class="kpi-trend trend-up">â†‘ +16.3%</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value" style="font-size:24px;">47</div><div class="kpi-trend trend-up">â†‘ +4 kws</div></div>
+        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value" style="font-size:24px;">42</div><div class="kpi-trend trend-up">â†‘ +2 pts</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="font-size:24px;">76%</div><div class="kpi-trend trend-up">â†‘ +8 pts</div></div>
         <div class="kpi-card"><div class="kpi-label">AI Visibility</div><div class="kpi-value" style="font-size:24px;">14</div><div class="kpi-trend trend-flat">ChatGPT mentions</div></div>
       </div>
       <div class="grid-2" style="margin-bottom:20px;">
         <div class="chart-card" style="margin-bottom:0;">
-          <div class="chart-header"><div><div class="chart-title">Keyword Position Trend</div><div class="chart-subtitle">Top 10 count — 6 months</div></div></div>
+          <div class="chart-header"><div><div class="chart-title">Keyword Position Trend</div><div class="chart-subtitle">Top 10 count â€” 6 months</div></div></div>
           <div style="height:180px;"><canvas id="kwTrendChart"></canvas></div>
         </div>
         <div class="chart-card" style="margin-bottom:0;">
-          <div class="chart-header"><div><div class="chart-title">Organic Traffic Trend</div><div class="chart-subtitle">Sessions — 6 months</div></div></div>
+          <div class="chart-header"><div><div class="chart-title">Organic Traffic Trend</div><div class="chart-subtitle">Sessions â€” 6 months</div></div></div>
           <div style="height:180px;"><canvas id="trafficChart"></canvas></div>
         </div>
       </div>
       <div style="display:flex;gap:10px;">
         <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">+ Generate Report</button>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Syncing data...')">🔄 Sync Now</button>
-        <button class="btn btn-secondary btn-sm" onclick="switchTab('reports',null)">📄 View Reports</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Syncing data...')">ðŸ”„ Sync Now</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('reports',null)">ðŸ“„ View Reports</button>
       </div>
     </div>
 
-    <!-- ═══ TAB: KEYWORDS ═══ -->
+    <!-- â•â•â• TAB: KEYWORDS â•â•â• -->
     <div class="tab-panel" id="tab-keywords">
       <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:16px;">
-        <div class="kpi-card"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:22px;">12</div><div class="kpi-trend trend-up">↑+2</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:22px;">47</div><div class="kpi-trend trend-up">↑+4</div></div>
-        <div class="kpi-card"><div class="kpi-label">Top 30</div><div class="kpi-value" style="font-size:22px;">89</div><div class="kpi-trend trend-up">↑+7</div></div>
-        <div class="kpi-card"><div class="kpi-label">Top 100</div><div class="kpi-value" style="font-size:22px;">124</div><div class="kpi-trend trend-flat">→0</div></div>
-        <div class="kpi-card"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:22px;">18.4</div><div class="kpi-trend trend-up">↑ Improved</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 3</div><div class="kpi-value" style="font-size:22px;">12</div><div class="kpi-trend trend-up">â†‘+2</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Top 10</div><div class="kpi-value" style="font-size:22px;">47</div><div class="kpi-trend trend-up">â†‘+4</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 30</div><div class="kpi-value" style="font-size:22px;">89</div><div class="kpi-trend trend-up">â†‘+7</div></div>
+        <div class="kpi-card"><div class="kpi-label">Top 100</div><div class="kpi-value" style="font-size:22px;">124</div><div class="kpi-trend trend-flat">â†’0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Avg Position</div><div class="kpi-value" style="font-size:22px;">18.4</div><div class="kpi-trend trend-up">â†‘ Improved</div></div>
       </div>
       <!-- Pill Filters -->
       <div class="pill-filters">
         <div class="pill active" data-filter="all" data-filter-group="kw" data-filter-target="kwTable">All Keywords (124)</div>
-        <div class="pill" data-filter="new" data-filter-group="kw" data-filter-target="kwTable">🟢 New this month (8)</div>
-        <div class="pill" data-filter="lost" data-filter-group="kw" data-filter-target="kwTable">🔴 Lost this month (3)</div>
-        <div class="pill" data-filter="gainer" data-filter-group="kw" data-filter-target="kwTable">⬆ Top Gainers (20)</div>
-        <div class="pill" data-filter="loser" data-filter-group="kw" data-filter-target="kwTable">⬇ Top Losers (12)</div>
-        <div class="pill" data-filter="top3" data-filter-group="kw" data-filter-target="kwTable">📍 Top 3 (12)</div>
-        <div class="pill" data-filter="featured" data-filter-group="kw" data-filter-target="kwTable">📌 Featured Snippet (4)</div>
+        <div class="pill" data-filter="new" data-filter-group="kw" data-filter-target="kwTable">ðŸŸ¢ New this month (8)</div>
+        <div class="pill" data-filter="lost" data-filter-group="kw" data-filter-target="kwTable">ðŸ”´ Lost this month (3)</div>
+        <div class="pill" data-filter="gainer" data-filter-group="kw" data-filter-target="kwTable">â¬† Top Gainers (20)</div>
+        <div class="pill" data-filter="loser" data-filter-group="kw" data-filter-target="kwTable">â¬‡ Top Losers (12)</div>
+        <div class="pill" data-filter="top3" data-filter-group="kw" data-filter-target="kwTable">ðŸ“ Top 3 (12)</div>
+        <div class="pill" data-filter="featured" data-filter-group="kw" data-filter-target="kwTable">ðŸ“Œ Featured Snippet (4)</div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-        <div class="search-input-wrap" style="flex:1;min-width:200px;"><span class="search-icon">🔍</span><input type="text" class="form-input" id="kwSearch" placeholder="Search keyword..." style="padding-left:34px;"/></div>
-        <select class="form-input" style="width:150px;"><option>Position: All</option><option>Top 3</option><option>Top 10</option><option>Top 30</option><option>11–50</option></select>
+        <div class="search-input-wrap" style="flex:1;min-width:200px;"><span class="search-icon">ðŸ”</span><input type="text" class="form-input" id="kwSearch" placeholder="Search keyword..." style="padding-left:34px;"/></div>
+        <select class="form-input" style="width:150px;"><option>Position: All</option><option>Top 3</option><option>Top 10</option><option>Top 30</option><option>11â€“50</option></select>
         <select class="form-input" style="width:150px;"><option>Intent: All</option><option>Informational</option><option>Commercial</option><option>Transactional</option></select>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting CSV...')">⬇ CSV</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting CSV...')">â¬‡ CSV</button>
       </div>
       <div class="table-wrapper">
         <table id="kwTable">
@@ -139,34 +163,34 @@
           <tbody>
             <tr data-filter="featured gainer top3"><td style="color:var(--text-muted);">1</td><td><strong>seo agency london</strong></td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:6px;"></div><div class="kw-spark-bar" style="height:8px;"></div><div class="kw-spark-bar" style="height:10px;"></div><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar up" style="height:18px;"></div></div></td>
-              <td><span class="badge badge-success">4</span></td><td style="color:var(--success);font-weight:600;">▲+3</td><td>1,600</td><td>68</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td><span class="badge badge-primary" style="font-size:10px;">Featured</span></td></tr>
+              <td><span class="badge badge-success">4</span></td><td style="color:var(--success);font-weight:600;">â–²+3</td><td>1,600</td><td>68</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td><span class="badge badge-primary" style="font-size:10px;">Featured</span></td></tr>
             <tr data-filter="gainer top3"><td style="color:var(--text-muted);">2</td><td><strong>local seo london</strong></td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:4px;"></div><div class="kw-spark-bar" style="height:6px;"></div><div class="kw-spark-bar" style="height:9px;"></div><div class="kw-spark-bar up" style="height:13px;"></div><div class="kw-spark-bar up" style="height:19px;"></div></div></td>
-              <td><span class="badge badge-success">2</span></td><td style="color:var(--success);font-weight:600;">▲+8</td><td>880</td><td>54</td><td style="font-size:11px;color:var(--text-muted);">/local-seo</td><td><span class="badge badge-primary" style="font-size:10px;">Local Pack</span></td></tr>
+              <td><span class="badge badge-success">2</span></td><td style="color:var(--success);font-weight:600;">â–²+8</td><td>880</td><td>54</td><td style="font-size:11px;color:var(--text-muted);">/local-seo</td><td><span class="badge badge-primary" style="font-size:10px;">Local Pack</span></td></tr>
             <tr data-filter="loser"><td style="color:var(--text-muted);">3</td><td>digital marketing uk</td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar" style="height:12px;"></div><div class="kw-spark-bar" style="height:9px;"></div><div class="kw-spark-bar down" style="height:7px;"></div><div class="kw-spark-bar down" style="height:5px;"></div></div></td>
-              <td><span class="badge badge-warning">7</span></td><td style="color:var(--danger);font-weight:600;">▼-1</td><td>2,400</td><td>72</td><td style="font-size:11px;color:var(--text-muted);">/digital-mktg</td><td>—</td></tr>
+              <td><span class="badge badge-warning">7</span></td><td style="color:var(--danger);font-weight:600;">â–¼-1</td><td>2,400</td><td>72</td><td style="font-size:11px;color:var(--text-muted);">/digital-mktg</td><td>â€”</td></tr>
             <tr data-filter="gainer"><td style="color:var(--text-muted);">4</td><td>seo company london</td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:5px;"></div><div class="kw-spark-bar" style="height:7px;"></div><div class="kw-spark-bar up" style="height:10px;"></div><div class="kw-spark-bar up" style="height:14px;"></div><div class="kw-spark-bar up" style="height:17px;"></div></div></td>
-              <td><span class="badge badge-warning">9</span></td><td style="color:var(--success);font-weight:600;">▲+5</td><td>1,200</td><td>71</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td>—</td></tr>
+              <td><span class="badge badge-warning">9</span></td><td style="color:var(--success);font-weight:600;">â–²+5</td><td>1,200</td><td>71</td><td style="font-size:11px;color:var(--text-muted);">/seo-services</td><td>â€”</td></tr>
             <tr class="kw-row-new" data-filter="new gainer"><td style="color:var(--text-muted);">5</td><td><strong>seo audit tool uk</strong> <span class="badge badge-success" style="font-size:9px;">NEW</span></td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar" style="height:1px;"></div><div class="kw-spark-bar up" style="height:14px;"></div></div></td>
-              <td><span class="badge badge-success">28</span></td><td style="color:var(--success);font-weight:600;">NEW</td><td>390</td><td>58</td><td style="font-size:11px;color:var(--text-muted);">/audit</td><td>—</td></tr>
+              <td><span class="badge badge-success">28</span></td><td style="color:var(--success);font-weight:600;">NEW</td><td>390</td><td>58</td><td style="font-size:11px;color:var(--text-muted);">/audit</td><td>â€”</td></tr>
             <tr class="kw-row-lost" data-filter="lost"><td style="color:var(--text-muted);">6</td><td><span style="text-decoration:line-through;color:var(--text-muted);">seo tools free</span> <span class="badge badge-danger" style="font-size:9px;">LOST</span></td>
               <td><div class="kw-sparkline"><div class="kw-spark-bar up" style="height:16px;"></div><div class="kw-spark-bar" style="height:10px;"></div><div class="kw-spark-bar down" style="height:6px;"></div><div class="kw-spark-bar down" style="height:2px;"></div><div class="kw-spark-bar" style="height:1px;"></div></div></td>
-              <td><span class="badge badge-neutral">101+</span></td><td style="color:var(--danger);font-weight:600;">LOST</td><td>5,400</td><td>82</td><td style="font-size:11px;color:var(--text-muted);">/tools</td><td>—</td></tr>
+              <td><span class="badge badge-neutral">101+</span></td><td style="color:var(--danger);font-weight:600;">LOST</td><td>5,400</td><td>82</td><td style="font-size:11px;color:var(--text-muted);">/tools</td><td>â€”</td></tr>
           </tbody>
         </table>
-        <div class="table-footer"><span>Showing 6 of 124 keywords · Sparklines show 30-day position trend</span><span style="font-size:11px;">Last updated: Today 02:14 AM</span></div>
+        <div class="table-footer"><span>Showing 6 of 124 keywords Â· Sparklines show 30-day position trend</span><span style="font-size:11px;">Last updated: Today 02:14 AM</span></div>
       </div>
     </div>
 
-    <!-- ═══ TAB: BACKLINKS ═══ -->
+    <!-- â•â•â• TAB: BACKLINKS â•â•â• -->
     <div class="tab-panel" id="tab-backlinks">
       <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
-        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-trend trend-up">↑+2 pts</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Total Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-trend trend-up">↑+47 new</div></div>
-        <div class="kpi-card"><div class="kpi-label">Referring Domains</div><div class="kpi-value">312</div><div class="kpi-trend trend-up">↑+18</div></div>
+        <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-trend trend-up">â†‘+2 pts</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Total Backlinks</div><div class="kpi-value">1,847</div><div class="kpi-trend trend-up">â†‘+47 new</div></div>
+        <div class="kpi-card"><div class="kpi-label">Referring Domains</div><div class="kpi-value">312</div><div class="kpi-trend trend-up">â†‘+18</div></div>
         <div class="kpi-card"><div class="kpi-label">Dofollow Links</div><div class="kpi-value">1,243</div><div class="kpi-trend trend-flat">67% of total</div></div>
       </div>
       <div class="grid-2" style="margin-bottom:20px;">
@@ -183,7 +207,7 @@
             <div style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
               <div><span style="display:inline-block;width:10px;height:10px;background:#4F46E5;border-radius:2px;margin-right:5px;"></span>Dofollow: 1,243 (67%)</div>
               <div><span style="display:inline-block;width:10px;height:10px;background:#E2E8F0;border-radius:2px;margin-right:5px;"></span>Nofollow: 604 (33%)</div>
-              <div style="font-size:11px;color:var(--text-muted);">Gov: 3 · Edu: 8</div>
+              <div style="font-size:11px;color:var(--text-muted);">Gov: 3 Â· Edu: 8</div>
             </div>
           </div>
           <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Top Anchors</div>
@@ -197,9 +221,9 @@
       <div class="table-wrapper">
         <div class="table-header"><div class="table-title">Referring Domains</div>
           <div class="table-actions">
-            <select class="form-input" style="width:120px;font-size:12px;"><option>Trust: Any</option><option>70+</option><option>50–70</option><option>Below 50</option></select>
+            <select class="form-input" style="width:120px;font-size:12px;"><option>Trust: Any</option><option>70+</option><option>50â€“70</option><option>Below 50</option></select>
             <select class="form-input" style="width:130px;font-size:12px;"><option>Type: Any</option><option>Dofollow</option><option>Nofollow</option></select>
-            <input type="text" class="form-input" id="blSearch" placeholder="🔍 Search domain..." style="width:180px;font-size:12px;"/>
+            <input type="text" class="form-input" id="blSearch" placeholder="ðŸ” Search domain..." style="width:180px;font-size:12px;"/>
           </div>
         </div>
         <table id="blTable">
@@ -212,21 +236,21 @@
             <tr><td><strong>ahrefs.com</strong></td><td><span style="font-weight:700;color:var(--success);">91</span></td><td>2</td><td><span class="badge badge-success">Dofollow</span></td><td>May 2026</td><td>Jun 2026</td></tr>
           </tbody>
         </table>
-        <div class="table-footer"><span>Showing 5 of 312 domains</span><span style="font-size:11px;color:var(--text-muted);">Sorted by: Trust Score ↓</span></div>
+        <div class="table-footer"><span>Showing 5 of 312 domains</span><span style="font-size:11px;color:var(--text-muted);">Sorted by: Trust Score â†“</span></div>
       </div>
     </div>
 
-    <!-- ═══ TAB: AUDIT ═══ -->
+    <!-- â•â•â• TAB: AUDIT â•â•â• -->
     <div class="tab-panel" id="tab-audit">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <span style="font-size:12px;color:var(--text-muted);">Last audit: June 1, 2026 · Previous: May 1, 2026</span>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Running new audit...')">🔄 Run New Audit</button>
+        <span style="font-size:12px;color:var(--text-muted);">Last audit: June 1, 2026 Â· Previous: May 1, 2026</span>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Running new audit...')">ðŸ”„ Run New Audit</button>
       </div>
       <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
         <div class="kpi-card"><div class="kpi-label">Pages Crawled</div><div class="kpi-value">342</div><div class="kpi-trend trend-flat">Full crawl</div></div>
         <div class="kpi-card"><div class="kpi-label">Indexable Pages</div><div class="kpi-value">287</div><div class="kpi-trend trend-flat">84% of total</div></div>
         <div class="kpi-card warning"><div class="kpi-label">Non-Indexable</div><div class="kpi-value">55</div><div class="kpi-trend trend-flat">noindex / blocked</div></div>
-        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="color:var(--success);">76%</div><div class="kpi-trend trend-up">↑ +8 pts vs May</div></div>
+        <div class="kpi-card success"><div class="kpi-label">Site Health</div><div class="kpi-value" style="color:var(--success);">76%</div><div class="kpi-trend trend-up">â†‘ +8 pts vs May</div></div>
       </div>
       <div class="grid-2" style="margin-bottom:20px;">
         <div class="card">
@@ -253,9 +277,9 @@
           <div class="card-body">
             <div style="font-size:13px;font-weight:700;margin-bottom:14px;">Issue Summary</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--danger);"></div><span style="font-size:13px;flex:1;">Critical</span><strong style="color:var(--danger);">3</strong><span style="font-size:11px;color:var(--success);">↓ from 11</span></div><div class="progress-bar"><div class="progress-fill danger" style="width:3%;"></div></div></div>
-              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--warning);"></div><span style="font-size:13px;flex:1;">Warnings</span><strong style="color:var(--warning);">18</strong><span style="font-size:11px;color:var(--success);">↓ from 23</span></div><div class="progress-bar"><div class="progress-fill warning" style="width:18%;"></div></div></div>
-              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#7090C0;"></div><span style="font-size:13px;flex:1;">Notices</span><strong style="color:#7090C0;">42</strong><span style="font-size:11px;color:var(--danger);">↑ from 39</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:#7090C0;"></div></div></div>
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--danger);"></div><span style="font-size:13px;flex:1;">Critical</span><strong style="color:var(--danger);">3</strong><span style="font-size:11px;color:var(--success);">â†“ from 11</span></div><div class="progress-bar"><div class="progress-fill danger" style="width:3%;"></div></div></div>
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--warning);"></div><span style="font-size:13px;flex:1;">Warnings</span><strong style="color:var(--warning);">18</strong><span style="font-size:11px;color:var(--success);">â†“ from 23</span></div><div class="progress-bar"><div class="progress-fill warning" style="width:18%;"></div></div></div>
+              <div><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><div style="width:10px;height:10px;border-radius:50%;background:#7090C0;"></div><span style="font-size:13px;flex:1;">Notices</span><strong style="color:#7090C0;">42</strong><span style="font-size:11px;color:var(--danger);">â†‘ from 39</span></div><div class="progress-bar"><div class="progress-fill" style="width:42%;background:#7090C0;"></div></div></div>
             </div>
           </div>
         </div>
@@ -271,29 +295,29 @@
               <td><span class="badge badge-danger">Critical</span></td>
               <td>3</td>
               <td style="font-size:12px;color:var(--text-muted);">/blog/post-14, /resources/guide-3</td>
-              <td><button class="audit-expand-btn" onclick="toggleExpand('expand1',this)">▶ View URLs</button></td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand1',this)">â–¶ View URLs</button></td>
             </tr>
             <tr class="expand-row" id="expand1" style="display:none;">
               <td colspan="5" style="padding:0;">
                 <div class="expand-panel">
                   <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:8px;">3 broken links found:</div>
-                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/post-14</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
-                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/resources/guide-3</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
-                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/old-services</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/post-14</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/resources/guide-3</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/old-services</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div>
                 </div>
               </td>
             </tr>
             <tr>
               <td>Missing meta descriptions</td><td><span class="badge badge-warning">Warning</span></td><td>8</td>
               <td style="font-size:12px;color:var(--text-muted);">/blog/* (8 pages)</td>
-              <td><button class="audit-expand-btn" onclick="toggleExpand('expand2',this)">▶ View URLs</button></td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand2',this)">â–¶ View URLs</button></td>
             </tr>
             <tr class="expand-row" id="expand2" style="display:none;">
               <td colspan="5" style="padding:0;">
                 <div class="expand-panel">
                   <div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">8 pages missing meta description:</div>
-                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/seo-tips-2026</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
-                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/link-building</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/seo-tips-2026</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div>
+                  <div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/link-building</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div>
                   <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">+6 more pages</div>
                 </div>
               </td>
@@ -301,42 +325,42 @@
             <tr>
               <td>Slow pages (&gt;3s load time)</td><td><span class="badge badge-warning">Warning</span></td><td>11</td>
               <td style="font-size:12px;color:var(--text-muted);">Various</td>
-              <td><button class="audit-expand-btn" onclick="toggleExpand('expand3',this)">▶ View URLs</button></td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand3',this)">â–¶ View URLs</button></td>
             </tr>
             <tr class="expand-row" id="expand3" style="display:none;">
-              <td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">11 slow pages detected (avg 4.2s):</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/case-studies (5.1s)</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div></div></td>
+              <td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">11 slow pages detected (avg 4.2s):</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/case-studies (5.1s)</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div></div></td>
             </tr>
             <tr>
               <td>Missing H1 tags</td><td><span class="badge badge-warning">Warning</span></td><td>4</td>
               <td style="font-size:12px;color:var(--text-muted);">4 pages</td>
-              <td><button class="audit-expand-btn" onclick="toggleExpand('expand4',this)">▶ View URLs</button></td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand4',this)">â–¶ View URLs</button></td>
             </tr>
-            <tr class="expand-row" id="expand4" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">4 pages without H1:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/services/ppc</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL →</button></div></div></td></tr>
+            <tr class="expand-row" id="expand4" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;color:var(--warning);margin-bottom:8px;">4 pages without H1:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/services/ppc</span><button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="Toast.info('Opening URL...')">Open URL â†’</button></div></div></td></tr>
             <tr>
               <td>Duplicate title tags</td><td><span class="badge badge-neutral">Notice</span></td><td>7</td>
               <td style="font-size:12px;color:var(--text-muted);">7 pages</td>
-              <td><button class="audit-expand-btn" onclick="toggleExpand('expand5',this)">▶ View URLs</button></td>
+              <td><button class="audit-expand-btn" onclick="toggleExpand('expand5',this)">â–¶ View URLs</button></td>
             </tr>
-            <tr class="expand-row" id="expand5" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;margin-bottom:8px;">7 pages with duplicate titles:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/category/seo</span><button class="btn btn-ghost btn-sm" style="font-size:11px;">Open URL →</button></div></div></td></tr>
+            <tr class="expand-row" id="expand5" style="display:none;"><td colspan="5" style="padding:0;"><div class="expand-panel"><div style="font-size:12px;font-weight:700;margin-bottom:8px;">7 pages with duplicate titles:</div><div class="expand-url-item"><span style="font-family:monospace;font-size:12px;">/blog/category/seo</span><button class="btn btn-ghost btn-sm" style="font-size:11px;">Open URL â†’</button></div></div></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ═══ TAB: ANALYTICS ═══ -->
+    <!-- â•â•â• TAB: ANALYTICS â•â•â• -->
     <div class="tab-panel" id="tab-analytics">
       <div id="gscConnectedState">
         <div class="kpi-grid kpi-grid-2" style="grid-template-columns:1fr 1fr;margin-bottom:16px;">
-          <div class="kpi-card success"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-trend trend-up">↑ +16.3%</div></div>
-          <div class="kpi-card"><div class="kpi-label">Total Clicks (GSC)</div><div class="kpi-value">9,840</div><div class="kpi-trend trend-up">↑ +18.3%</div></div>
+          <div class="kpi-card success"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-trend trend-up">â†‘ +16.3%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Clicks (GSC)</div><div class="kpi-value">9,840</div><div class="kpi-trend trend-up">â†‘ +18.3%</div></div>
         </div>
         <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
-          <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">142K</div><div class="kpi-trend trend-up">↑ +10.9%</div></div>
-          <div class="kpi-card"><div class="kpi-label">Avg CTR</div><div class="kpi-value">6.93%</div><div class="kpi-trend trend-up">↑ +0.43%</div></div>
-          <div class="kpi-card success"><div class="kpi-label">Avg Position</div><div class="kpi-value">14.2</div><div class="kpi-trend trend-up">↑ Improved</div></div>
+          <div class="kpi-card"><div class="kpi-label">Impressions</div><div class="kpi-value">142K</div><div class="kpi-trend trend-up">â†‘ +10.9%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Avg CTR</div><div class="kpi-value">6.93%</div><div class="kpi-trend trend-up">â†‘ +0.43%</div></div>
+          <div class="kpi-card success"><div class="kpi-label">Avg Position</div><div class="kpi-value">14.2</div><div class="kpi-trend trend-up">â†‘ Improved</div></div>
         </div>
         <div class="chart-card">
-          <div class="chart-header"><div><div class="chart-title">Traffic Trend — 6 Months</div><div class="chart-subtitle">Organic sessions from GSC</div></div></div>
+          <div class="chart-header"><div><div class="chart-title">Traffic Trend â€” 6 Months</div><div class="chart-subtitle">Organic sessions from GSC</div></div></div>
           <div style="height:200px;"><canvas id="analyticsChart"></canvas></div>
         </div>
         <div class="table-wrapper">
@@ -354,7 +378,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAB: COMPETITORS ═══ -->
+    <!-- â•â•â• TAB: COMPETITORS â•â•â• -->
     <div class="tab-panel" id="tab-competitors">
       <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
         <button class="btn btn-primary btn-sm" data-modal-open="addCompetitorModal">+ Add Competitor</button>
@@ -364,15 +388,15 @@
         <table>
           <thead><tr><th>Domain</th><th>Trust Score</th><th>Top 10 KWs</th><th>Common KWs</th><th>Visibility</th><th>Status</th><th></th></tr></thead>
           <tbody>
-            <tr class="comp-us"><td><strong>acmecorp.com</strong> <span class="badge badge-primary" style="font-size:10px;">Us</span></td><td>42</td><td>47</td><td>—</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill" style="width:68%;"></div></div>68.4</div></td><td>—</td><td></td></tr>
-            <tr><td>rival-seo.co.uk</td><td><span style="color:var(--danger);font-weight:700;">58</span></td><td>67</td><td>43</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill danger" style="width:82%;"></div></div>82.1</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('rival-seo.co.uk')">🗑</button></td></tr>
-            <tr><td>seolondon.co.uk</td><td><span style="color:var(--warning);font-weight:700;">51</span></td><td>54</td><td>38</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill warning" style="width:75%;"></div></div>74.7</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('seolondon.co.uk')">🗑</button></td></tr>
-            <tr><td>digitalfirst.uk</td><td><span style="color:var(--success);font-weight:700;">47</span></td><td>49</td><td>31</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill success" style="width:71%;"></div></div>71.2</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('digitalfirst.uk')">🗑</button></td></tr>
+            <tr class="comp-us"><td><strong>acmecorp.com</strong> <span class="badge badge-primary" style="font-size:10px;">Us</span></td><td>42</td><td>47</td><td>â€”</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill" style="width:68%;"></div></div>68.4</div></td><td>â€”</td><td></td></tr>
+            <tr><td>rival-seo.co.uk</td><td><span style="color:var(--danger);font-weight:700;">58</span></td><td>67</td><td>43</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill danger" style="width:82%;"></div></div>82.1</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('rival-seo.co.uk')">ðŸ—‘</button></td></tr>
+            <tr><td>seolondon.co.uk</td><td><span style="color:var(--warning);font-weight:700;">51</span></td><td>54</td><td>38</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill warning" style="width:75%;"></div></div>74.7</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('seolondon.co.uk')">ðŸ—‘</button></td></tr>
+            <tr><td>digitalfirst.uk</td><td><span style="color:var(--success);font-weight:700;">47</span></td><td>49</td><td>31</td><td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:80px;margin:0;"><div class="progress-fill success" style="width:71%;"></div></div>71.2</div></td><td><span class="badge badge-warning">Ahead</span></td><td><button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeCompetitor('digitalfirst.uk')">ðŸ—‘</button></td></tr>
           </tbody>
         </table>
       </div>
       <div class="table-wrapper">
-        <div class="table-header"><div class="table-title">Keyword Gap — Top Opportunities</div><button class="btn btn-ghost btn-sm" onclick="Toast.info('Loading all 34...')">View all 34 →</button></div>
+        <div class="table-header"><div class="table-title">Keyword Gap â€” Top Opportunities</div><button class="btn btn-ghost btn-sm" onclick="Toast.info('Loading all 34...')">View all 34 â†’</button></div>
         <table>
           <thead><tr><th>Keyword</th><th>Best Competitor Position</th><th>Our Position</th><th>Volume</th><th>Difficulty</th></tr></thead>
           <tbody>
@@ -386,7 +410,7 @@
       </div>
     </div>
 
-    <!-- ═══ TAB: REPORTS ═══ -->
+    <!-- â•â•â• TAB: REPORTS â•â•â• -->
     <div class="tab-panel" id="tab-reports">
       <!-- Auto-Schedule Config -->
       <div class="card" style="margin-bottom:16px;">
@@ -396,7 +420,7 @@
         </div>
         <div class="card-body">
           <div class="schedule-row">
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Day of Month</label><input class="form-input" type="number" value="1" min="1" max="28" style="width:80px;"/><div class="form-hint">1–28 only (avoids Feb issues)</div></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Day of Month</label><input class="form-input" type="number" value="1" min="1" max="28" style="width:80px;"/><div class="form-hint">1â€“28 only (avoids Feb issues)</div></div>
             <div class="form-group" style="margin-bottom:0;"><label class="form-label">Time</label><input class="form-input" type="time" value="09:00" style="width:120px;"/><div class="form-hint">Agency timezone (IST)</div></div>
             <div class="form-group" style="flex:1;margin-bottom:0;"><label class="form-label">Send to</label><input class="form-input" value="sarah@acmecorp.com, team@digitalhorizons.com"/></div>
             <div style="padding-top:24px;"><button class="btn btn-secondary btn-sm" onclick="Toast.success('Schedule saved!')">Save</button></div>
@@ -412,45 +436,45 @@
             <tr>
               <td><strong>May 2026</strong></td>
               <td><span class="badge badge-neutral">Monthly</span></td>
-              <td><span class="badge badge-success">✅ Done</span></td>
+              <td><span class="badge badge-success">âœ… Done</span></td>
               <td style="font-size:11px;color:var(--text-muted);">v1</td>
               <td style="font-size:12px;">Jun 1, 09:12</td>
-              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">🔗 Share</button><button class="btn btn-ghost btn-sm" onclick="Toast.info('Regenerating...')">🔄 Regen</button></div></td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">ðŸ‘ View</button><button class="btn btn-secondary btn-sm" onclick="downloadReport()">ðŸ“¥ PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">ðŸ”— Share</button><button class="btn btn-ghost btn-sm" onclick="Toast.info('Regenerating...')">ðŸ”„ Regen</button></div></td>
             </tr>
             <tr style="background:var(--gray-50);">
               <td>May 2026 <span class="badge badge-neutral" style="font-size:10px;">regenerated</span></td>
               <td><span class="badge badge-neutral">Monthly</span></td>
-              <td><span class="badge badge-success">✅ Done</span></td>
+              <td><span class="badge badge-success">âœ… Done</span></td>
               <td style="font-size:11px;color:var(--primary);font-weight:700;">v2 (latest)</td>
               <td style="font-size:12px;">Jun 3, 14:20</td>
-              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">🔗 Share</button></div></td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">ðŸ‘ View</button><button class="btn btn-secondary btn-sm" onclick="downloadReport()">ðŸ“¥ PDF</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Share link copied!')">ðŸ”— Share</button></div></td>
             </tr>
             <tr>
               <td><strong>April 2026</strong></td>
               <td><span class="badge badge-neutral">Monthly</span></td>
-              <td><span class="badge badge-success">✅ Done</span></td>
+              <td><span class="badge badge-success">âœ… Done</span></td>
               <td style="font-size:11px;color:var(--text-muted);">v1</td>
               <td style="font-size:12px;">May 1, 09:08</td>
-              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">👁 View</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Downloading PDF...')">📥 PDF</button></div></td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening preview...')">ðŸ‘ View</button><button class="btn btn-secondary btn-sm" onclick="downloadReport()">ðŸ“¥ PDF</button></div></td>
             </tr>
             <tr>
               <td><strong>March 2026</strong></td>
               <td><span class="badge badge-neutral">Monthly</span></td>
-              <td><span class="badge badge-danger">❌ Failed</span></td>
-              <td style="font-size:11px;color:var(--text-muted);">—</td>
+              <td><span class="badge badge-danger">âŒ Failed</span></td>
+              <td style="font-size:11px;color:var(--text-muted);">â€”</td>
               <td style="font-size:12px;color:var(--danger);">Failed Apr 1, 09:05</td>
-              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Retrying...')">🔄 Retry</button><button class="btn btn-ghost btn-sm" onclick="toggleErrorLog()">⚠ Error Log</button></div></td>
+              <td><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Retrying...')">ðŸ”„ Retry</button><button class="btn btn-ghost btn-sm" onclick="toggleErrorLog()">âš  Error Log</button></div></td>
             </tr>
           </tbody>
         </table>
       </div>
       <!-- Error log (hidden by default) -->
       <div id="errorLogPanel" style="display:none;margin-top:12px;" class="error-log">
-        <div class="error-log-title">⚠ Error Details — March 2026 Report</div>
+        <div class="error-log-title">âš  Error Details â€” March 2026 Report</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;"><strong>Failed at:</strong> April 1, 2026 09:05:32 UTC</div>
-        <div class="error-pre">SERankingAPIError: Request failed with status 429 (Too Many Requests)<br>at fetchKeywordPositions (/lib/seranking/client.ts:84)<br>Endpoint: GET /sites/12345/positions<br>Retry count: 3/3 — all failed</div>
+        <div class="error-pre">SERankingAPIError: Request failed with status 429 (Too Many Requests)<br>at fetchKeywordPositions (/lib/seranking/client.ts:84)<br>Endpoint: GET /sites/12345/positions<br>Retry count: 3/3 â€” all failed</div>
         <div class="error-log-desc"><strong>Cause:</strong> SERanking API rate limit exceeded. The data sync job and report generation ran simultaneously.<br><strong>Fix:</strong> Reports now scheduled 2 hours after data sync to prevent collision.</div>
-        <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="Toast.success('Retry queued!')">🔄 Retry Report Generation</button>
+        <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="Toast.success('Retry queued!')">ðŸ”„ Retry Report Generation</button>
       </div>
     </div>
 
@@ -459,34 +483,34 @@
 
 <!-- Generate Report Modal -->
 <div class="modal-overlay" id="generateReportModal">
-  <div class="modal"><div class="modal-header"><div class="modal-title">Generate Report — Acme Corp</div><button class="modal-close" data-modal-close="generateReportModal">✕</button></div>
+  <div class="modal"><div class="modal-header"><div class="modal-title">Generate Report â€” Acme Corp</div><button class="modal-close" data-modal-close="generateReportModal">âœ•</button></div>
   <div class="modal-body">
     <div class="form-group"><label class="form-label">Report Period</label><select class="form-input"><option>June 2026 (current month)</option><option>May 2026</option><option>April 2026</option><option>Custom range</option></select></div>
-    <div class="form-group"><label class="form-label">Send to Client</label><select class="form-input"><option>Yes — Email + Client Portal</option><option>No — Generate draft only</option></select></div>
+    <div class="form-group"><label class="form-label">Send to Client</label><select class="form-input"><option>Yes â€” Email + Client Portal</option><option>No â€” Generate draft only</option></select></div>
   </div>
-  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button><button class="btn btn-primary" onclick="Modal.close('generateReportModal');Toast.success('Report generation queued!')">🚀 Generate</button></div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button><button class="btn btn-primary" onclick="Modal.close('generateReportModal');Toast.success('Report generation queued!')">ðŸš€ Generate</button></div>
   </div>
 </div>
 
 <!-- Add Competitor Modal -->
 <div class="modal-overlay" id="addCompetitorModal">
-  <div class="modal modal-sm"><div class="modal-header"><div><div class="modal-title">Add Competitor</div><div class="modal-subtitle">Track and compare against Acme Corp</div></div><button class="modal-close" data-modal-close="addCompetitorModal">✕</button></div>
+  <div class="modal modal-sm"><div class="modal-header"><div><div class="modal-title">Add Competitor</div><div class="modal-subtitle">Track and compare against Acme Corp</div></div><button class="modal-close" data-modal-close="addCompetitorModal">âœ•</button></div>
   <div class="modal-body">
     <div class="form-group"><label class="form-label">Competitor Domain <span class="required">*</span></label><input class="form-input" id="compDomain" placeholder="competitorsite.com" style="font-family:monospace;"/><div class="form-hint">Enter the root domain without https:// or www.</div></div>
     <div class="form-group"><label class="form-label">Display Name (optional)</label><input class="form-input" placeholder="Competitor Agency Name"/></div>
-    <div id="compValidation" style="display:none;" class="alert alert-success" style="margin-bottom:0;">✅ Found! Domain Trust: 54 · 61 tracked keywords found</div>
+    <div id="compValidation" style="display:none;" class="alert alert-success" style="margin-bottom:0;">âœ… Found! Domain Trust: 54 Â· 61 tracked keywords found</div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-modal-close="addCompetitorModal">Cancel</button>
     <button class="btn btn-secondary btn-sm" onclick="validateCompetitor()">Validate Domain</button>
-    <button class="btn btn-primary" onclick="addCompetitor()">Add Competitor →</button>
+    <button class="btn btn-primary" onclick="addCompetitor()">Add Competitor â†’</button>
   </div>
   </div>
 </div>
 
 <!-- Edit Client Modal -->
 <div class="modal-overlay" id="editClientModal">
-  <div class="modal"><div class="modal-header"><div class="modal-title">Edit Client — Acme Corp</div><button class="modal-close" data-modal-close="editClientModal">✕</button></div>
+  <div class="modal"><div class="modal-header"><div class="modal-title">Edit Client â€” Acme Corp</div><button class="modal-close" data-modal-close="editClientModal">âœ•</button></div>
   <div class="modal-body">
     <div class="form-row"><div class="form-group"><label class="form-label">Company Name</label><input class="form-input" value="Acme Corporation"/></div><div class="form-group"><label class="form-label">Industry</label><select class="form-input"><option selected>B2B SaaS</option><option>E-commerce</option></select></div></div>
     <div class="form-row"><div class="form-group"><label class="form-label">Website URL</label><input class="form-input" value="https://acmecorp.com"/></div><div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" value="sarah@acmecorp.com"/></div></div>
@@ -548,7 +572,7 @@ function toggleExpand(id, btn) {
   if (!row) return;
   const isOpen = row.style.display !== 'none';
   row.style.display = isOpen ? 'none' : 'table-row';
-  btn.textContent = isOpen ? '▶ View URLs' : '▼ Collapse';
+  btn.textContent = isOpen ? 'â–¶ View URLs' : 'â–¼ Collapse';
 }
 
 function toggleErrorLog() {

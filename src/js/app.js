@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════
-   RankFlow — App.js v3.0 GODMODE
-   All interactions fixed and bulletproof
+   RankFlow — App.js v3.1 GODMODE
+   Logout + PDF Download + All interactions
    ═══════════════════════════════════════════ */
 
 'use strict';
@@ -486,6 +486,22 @@ function disconnectGSC() {
   Toast.warning('GSC disconnected.');
 }
 
+/* ─── Report Download (opens printable report-pdf.html) ─── */
+function downloadReport(opts = {}) {
+  const client = opts.client || 'Acme Corp';
+  const period = opts.period || 'June 2026';
+  const health = opts.health || '76';
+  const sessions = opts.sessions || '8,420';
+  const keywords = opts.keywords || '47';
+  // Build URL to the printable report
+  const base = location.pathname.includes('/src/') ? '' : 'src/';
+  const params = new URLSearchParams({ client, period, health, sessions, keywords });
+  const url = `report-pdf.html?${params.toString()}`;
+  const win = window.open(url, '_blank');
+  if (!win) Toast.warning('Pop-up blocked — please allow pop-ups for this site.');
+  else Toast.info('Opening report PDF viewer...');
+}
+
 /* ─── Report Sharing ─── */
 function copyShareLink() {
   const link = `${location.origin}/reports/share/rf-${Math.random().toString(36).slice(2,8)}`;
@@ -511,6 +527,54 @@ function confirmDeleteAgency() {
   setTimeout(() => { window.location.href = 'login.html'; }, 3000);
 }
 
+/* ─── Logout ─── */
+const Logout = {
+  _menuId: 'userMenu',
+
+  init() {
+    // User chip click → toggle menu
+    const chip = document.getElementById('sidebarUserChip');
+    if (chip) {
+      chip.addEventListener('click', e => {
+        e.stopPropagation();
+        this.toggleMenu();
+      });
+    }
+    // Close on outside click
+    document.addEventListener('click', () => this.closeMenu());
+  },
+
+  toggleMenu() {
+    const menu = document.getElementById(this._menuId);
+    if (!menu) return;
+    const open = menu.classList.toggle('open');
+    // Close other dropdowns
+    if (open) {
+      document.querySelectorAll('.notif-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.dropdown-menu:not(#userMenu).open').forEach(d => d.classList.remove('open'));
+    }
+  },
+
+  closeMenu() {
+    const menu = document.getElementById(this._menuId);
+    if (menu) menu.classList.remove('open');
+  },
+
+  confirm() {
+    this.closeMenu();
+    Modal.open('logoutModal');
+  },
+
+  execute() {
+    Modal.close('logoutModal');
+    const t = Toast.info('Signing out...');
+    setTimeout(() => {
+      t.remove();
+      window.location.href = 'login.html';
+    }, 1200);
+  }
+};
+
 /* ─── Page Init ─── */
 document.addEventListener('DOMContentLoaded', () => {
   // Chart defaults
@@ -524,6 +588,37 @@ document.addEventListener('DOMContentLoaded', () => {
   AuditExpand.init();
   ClientTabs.init();
   SettingsNav.init();
+  Logout.init();
+
+  // Inject logout modal if not present
+  if (!document.getElementById('logoutModal')) {
+    document.body.insertAdjacentHTML('beforeend', `
+    <div class="modal-overlay" id="logoutModal">
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Sign Out</div>
+            <div class="modal-subtitle">You'll need to sign back in to access your dashboard</div>
+          </div>
+          <button class="modal-close" data-modal-close="logoutModal">✕</button>
+        </div>
+        <div class="modal-body" style="text-align:center;padding:28px 24px;">
+          <div style="font-size:40px;margin-bottom:14px;">👋</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px;">Sign out of RankFlow?</div>
+          <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">
+            You're signed in as <strong>John Doe</strong><br/>
+            <span style="font-size:12px;">john@digitalhorizons.com</span>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content:center;gap:12px;">
+          <button class="btn btn-secondary" data-modal-close="logoutModal" style="min-width:110px;">Stay Signed In</button>
+          <button class="btn btn-danger" onclick="Logout.execute()" style="min-width:110px;">Sign Out →</button>
+        </div>
+      </div>
+    </div>`);
+    // Re-init modals so new one is wired
+    Modal.init();
+  }
 
   // Bulk select
   if (document.getElementById('clientsTable')) {
@@ -543,10 +638,5 @@ document.addEventListener('DOMContentLoaded', () => {
     PasswordStrength.init('passwordInput', 'strengthBars');
   }
 
-  // Notif badge hide on hover
-  document.querySelectorAll('.notif-count').forEach(badge => {
-    setTimeout(() => { if (badge.textContent === '0') badge.style.display = 'none'; }, 0);
-  });
-
-  console.log('🚀 RankFlow v3.0 — GODMODE active');
+  console.log('🚀 RankFlow v3.1 — GODMODE + Logout + PDF active');
 });
