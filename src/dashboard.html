@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RankFlow â€” Dashboard</title>
-<meta name="description" content="Agency SEO command center â€” monitor all clients, track KPIs and generate reports."/>
+<title>RankFlow — Dashboard</title>
+<meta name="description" content="Agency SEO command center — monitor all clients, track KPIs and generate reports."/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -55,14 +55,14 @@
       <div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div>
     </div>
     <nav class="sidebar-nav">
-      <a href="dashboard.html" class="sidebar-item active"><span class="sidebar-item-icon">ðŸ“Š</span><span class="sidebar-item-label">Dashboard</span></a>
-      <a href="clients.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ‘¥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
-      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ“„</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <a href="dashboard.html" class="sidebar-item active"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
       <div class="sidebar-section-label">Configuration</div>
-      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">âš™ï¸</span><span class="sidebar-item-label">Settings</span></a>
-      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">â“</span><span class="sidebar-item-label">Help &amp; Support</span></a>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help &amp; Support</span></a>
     </nav>
-    <div class="sidebar-footer">
+        <div class="sidebar-footer">
       <div class="sidebar-user-wrap">
         <!-- User menu popup -->
         <div id="userMenu">
@@ -97,12 +97,12 @@
       </div>
       <div class="topbar-actions">
         <button class="date-range-btn" onclick="Toast.info('Date picker opened')">
-          ðŸ“… Jun 2026 vs May 2026 â–¾
+          📅 Jun 2026 vs May 2026 ▾
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Syncing all clients...')">ðŸ”„ Sync All</button>
-        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">ï¼‹ Generate Report</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Syncing all clients...')">🔄 Sync All</button>
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">＋ Generate Report</button>
         <div class="relative">
-          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">ðŸ””
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">🔔
             <span class="notif-dot"></span>
           </button>
           <div class="notif-dropdown" id="notifDropdown">
@@ -111,30 +111,30 @@
               <button class="btn btn-ghost btn-sm" data-mark-read>Mark all read</button>
             </div>
             <div class="notif-item unread">
-              <div class="notif-avatar">âœ…</div>
+              <div class="notif-avatar">✅</div>
               <div style="flex:1;"><div class="notif-text"><strong>Acme Corp</strong> report generated successfully</div><div class="notif-time">2 min ago</div></div>
               <div class="notif-unread-dot"></div>
             </div>
             <div class="notif-item unread">
-              <div class="notif-avatar">ðŸ“ˆ</div>
-              <div style="flex:1;"><div class="notif-text"><strong>TechStart.io</strong> â€” 3 new keywords entered Top 10</div><div class="notif-time">45 min ago</div></div>
+              <div class="notif-avatar">📈</div>
+              <div style="flex:1;"><div class="notif-text"><strong>TechStart.io</strong> — 3 new keywords entered Top 10</div><div class="notif-time">45 min ago</div></div>
               <div class="notif-unread-dot"></div>
             </div>
             <div class="notif-item unread">
-              <div class="notif-avatar">âŒ</div>
-              <div style="flex:1;"><div class="notif-text"><strong>BlueSky Marketing</strong> â€” Report failed (API 429)</div><div class="notif-time">1 hour ago</div></div>
+              <div class="notif-avatar">❌</div>
+              <div style="flex:1;"><div class="notif-text"><strong>BlueSky Marketing</strong> — Report failed (API 429)</div><div class="notif-time">1 hour ago</div></div>
               <div class="notif-unread-dot"></div>
             </div>
             <div class="notif-item">
-              <div class="notif-avatar">ðŸ”„</div>
-              <div style="flex:1;"><div class="notif-text"><strong>Daily sync complete</strong> â€” 24 clients updated</div><div class="notif-time">3 hours ago</div></div>
+              <div class="notif-avatar">🔄</div>
+              <div style="flex:1;"><div class="notif-text"><strong>Daily sync complete</strong> — 24 clients updated</div><div class="notif-time">3 hours ago</div></div>
             </div>
             <div class="notif-item">
-              <div class="notif-avatar">âš ï¸</div>
+              <div class="notif-avatar">⚠️</div>
               <div style="flex:1;"><div class="notif-text"><strong>SERanking API key</strong> expires in 14 days</div><div class="notif-time">Yesterday</div></div>
             </div>
             <div style="padding:10px 16px;text-align:center;border-top:1px solid var(--border);">
-              <a href="#" style="font-size:12px;font-weight:600;">View all notifications â†’</a>
+              <a href="#" style="font-size:12px;font-weight:600;">View all notifications →</a>
             </div>
           </div>
         </div>
@@ -143,10 +143,10 @@
 
     <!-- Sync status bar -->
     <div class="sync-bar">
-      <span>âœ… Data sync complete Â· Jun 23, 2026 at 02:14 AM Â· All 24 clients updated</span>
+      <span>✅ Data sync complete · Jun 23, 2026 at 02:14 AM · All 24 clients updated</span>
       <div style="display:flex;gap:8px;">
         <span style="font-size:11px;color:#065F46;">Next sync: Jun 24 at 02:00 AM</span>
-        <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:#059669;border:1px solid rgba(16,185,129,0.3);font-size:11px;" onclick="Toast.info('Manual sync queued...')">ðŸ”„ Force Sync</button>
+        <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:#059669;border:1px solid rgba(16,185,129,0.3);font-size:11px;" onclick="Toast.info('Manual sync queued...')">🔄 Force Sync</button>
       </div>
     </div>
 
@@ -155,14 +155,14 @@
       <!-- GSC setup banner (shown when not connected) -->
       <div class="gsc-setup-banner" id="gscSetupBanner">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:24px;">âš ï¸</span>
+          <span style="font-size:24px;">⚠️</span>
           <div>
             <div style="font-size:13px;font-weight:700;color:#92400E;">Connect Google Search Console to unlock Analytics data</div>
             <div style="font-size:12px;color:#B45309;margin-top:2px;">Traffic, clicks, CTR and impressions are unavailable until GSC is connected.</div>
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0;">
-          <button class="btn btn-warning btn-sm" style="background:#F59E0B;color:white;border:none;" onclick="window.location.href='settings.html'">ðŸ”‘ Connect Now â†’</button>
+          <button class="btn btn-warning btn-sm" style="background:#F59E0B;color:white;border:none;" onclick="window.location.href='settings.html'">🔑 Connect Now →</button>
           <button class="btn btn-ghost btn-sm" onclick="this.closest('.gsc-setup-banner').style.display='none'">Dismiss</button>
         </div>
       </div>
@@ -171,14 +171,14 @@
       <div class="hero-banner">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">
           <div>
-            <div class="hero-title">Good morning, John ðŸ‘‹</div>
-            <div class="hero-sub">Digital Horizons Agency Â· June 2026 â€” Your agency is performing exceptionally well.</div>
+            <div class="hero-title">Good morning, John 👋</div>
+            <div class="hero-sub">Digital Horizons Agency · June 2026 — Your agency is performing exceptionally well.</div>
             <div class="hero-stats">
               <div><div class="hero-stat-val">24</div><div class="hero-stat-lbl">ACTIVE CLIENTS</div></div>
               <div style="width:1px;height:36px;background:rgba(255,255,255,0.2);"></div>
               <div><div class="hero-stat-val">38</div><div class="hero-stat-lbl">REPORTS SENT</div></div>
               <div style="width:1px;height:36px;background:rgba(255,255,255,0.2);"></div>
-              <div><div class="hero-stat-val" style="color:#A7F3D0;">â†‘ 89%</div><div class="hero-stat-lbl">AVG HEALTH SCORE</div></div>
+              <div><div class="hero-stat-val" style="color:#A7F3D0;">↑ 89%</div><div class="hero-stat-lbl">AVG HEALTH SCORE</div></div>
             </div>
           </div>
           <div style="flex-shrink:0;">
@@ -187,40 +187,40 @@
               <span style="width:8px;height:8px;background:#34D399;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px rgba(52,211,153,0.3);"></span>
               <div>
                 <div style="font-size:12px;font-weight:700;">8,400 credits left</div>
-                <div style="font-size:10px;opacity:0.7;">âš  Key expires in 14 days</div>
+                <div style="font-size:10px;opacity:0.7;">⚠ Key expires in 14 days</div>
               </div>
             </div>
           </div>
         </div>
         <div class="hero-actions">
-          <button class="hero-btn hero-btn-solid" onclick="Modal.open('generateReportModal')">ðŸ“„ Generate Report</button>
-          <button class="hero-btn hero-btn-white" onclick="window.location.href='clients.html'">ðŸ‘¥ View All Clients</button>
-          <button class="hero-btn hero-btn-white" onclick="window.location.href='settings.html'">ðŸ”‘ Manage API Keys</button>
+          <button class="hero-btn hero-btn-solid" onclick="Modal.open('generateReportModal')">📄 Generate Report</button>
+          <button class="hero-btn hero-btn-white" onclick="window.location.href='clients.html'">👥 View All Clients</button>
+          <button class="hero-btn hero-btn-white" onclick="window.location.href='settings.html'">🔑 Manage API Keys</button>
         </div>
       </div>
 
       <!-- KPI Grid -->
       <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
         <div class="kpi-card success">
-          <div class="kpi-icon">ðŸ“Š</div>
+          <div class="kpi-icon">📊</div>
           <div class="kpi-label">Total Organic Sessions</div>
           <div class="kpi-value">84.2K</div>
-          <div class="kpi-trend trend-up">â†‘ +14.3% vs May</div>
+          <div class="kpi-trend trend-up">↑ +14.3% vs May</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon">ðŸ”‘</div>
+          <div class="kpi-icon">🔑</div>
           <div class="kpi-label">Keywords in Top 10</div>
           <div class="kpi-value">623</div>
-          <div class="kpi-trend trend-up">â†‘ +34 this month</div>
+          <div class="kpi-trend trend-up">↑ +34 this month</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon">ðŸ”—</div>
+          <div class="kpi-icon">🔗</div>
           <div class="kpi-label">New Backlinks</div>
           <div class="kpi-value">1,284</div>
-          <div class="kpi-trend trend-up">â†‘ +182 acquired</div>
+          <div class="kpi-trend trend-up">↑ +182 acquired</div>
         </div>
         <div class="kpi-card warning">
-          <div class="kpi-icon">âš ï¸</div>
+          <div class="kpi-icon">⚠️</div>
           <div class="kpi-label">Critical Issues</div>
           <div class="kpi-value" style="color:var(--warning);">18</div>
           <div class="kpi-trend" style="color:var(--warning);">Across 7 clients</div>
@@ -233,7 +233,7 @@
           <div class="chart-header">
             <div>
               <div class="chart-title">Agency Traffic Trend</div>
-              <div class="chart-subtitle">Total organic sessions across all clients Â· 6 months</div>
+              <div class="chart-subtitle">Total organic sessions across all clients · 6 months</div>
             </div>
             <select class="form-input" style="width:110px;font-size:11px;padding:5px 8px;height:auto;">
               <option>All Clients</option>
@@ -251,7 +251,7 @@
           <div class="chart-header">
             <div>
               <div class="chart-title">Keyword Growth</div>
-              <div class="chart-subtitle">Top 10 keywords across all clients Â· 6 months</div>
+              <div class="chart-subtitle">Top 10 keywords across all clients · 6 months</div>
             </div>
           </div>
           <div style="height:200px;"><canvas id="kwGrowthChart"></canvas></div>
@@ -268,8 +268,8 @@
         <!-- Reports Status -->
         <div class="chart-card" style="margin-bottom:0;">
           <div class="chart-header">
-            <div><div class="chart-title">Reports This Month</div><div class="chart-subtitle">18 generated Â· 6 pending</div></div>
-            <a href="reports.html" class="btn btn-ghost btn-sm">View all â†’</a>
+            <div><div class="chart-title">Reports This Month</div><div class="chart-subtitle">18 generated · 6 pending</div></div>
+            <a href="reports.html" class="btn btn-ghost btn-sm">View all →</a>
           </div>
           <div style="display:flex;align-items:center;gap:24px;margin-bottom:16px;">
             <div style="width:100px;height:100px;flex-shrink:0;position:relative;">
@@ -296,7 +296,7 @@
           </div>
           <!-- Overdue clients -->
           <div style="background:var(--warning-light);border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:6px;">âš  Overdue Reports (need action)</div>
+            <div style="font-size:11px;font-weight:700;color:#92400E;margin-bottom:6px;">⚠ Overdue Reports (need action)</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;">
                 <span style="color:#92400E;">GreenLeaf Organics</span>
@@ -317,7 +317,7 @@
           </div>
           <div>
             <div class="activity-item">
-              <div class="activity-icon" style="background:#ECFDF5;">âœ…</div>
+              <div class="activity-icon" style="background:#ECFDF5;">✅</div>
               <div style="flex:1;">
                 <div style="font-size:13px;"><strong>Acme Corp</strong> report generated</div>
                 <div style="font-size:11px;color:var(--text-muted);">Monthly SEO report sent to sarah@acmecorp.com</div>
@@ -325,34 +325,34 @@
               <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;">2 min</div>
             </div>
             <div class="activity-item">
-              <div class="activity-icon" style="background:#EEF2FF;">ðŸ“ˆ</div>
+              <div class="activity-icon" style="background:#EEF2FF;">📈</div>
               <div style="flex:1;">
-                <div style="font-size:13px;"><strong>TechStart.io</strong> â€” 3 keywords entered Top 10</div>
+                <div style="font-size:13px;"><strong>TechStart.io</strong> — 3 keywords entered Top 10</div>
                 <div style="font-size:11px;color:var(--text-muted);">"saas startup tools", "mvp software", "tech agency uk"</div>
               </div>
               <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;">45 min</div>
             </div>
             <div class="activity-item">
-              <div class="activity-icon" style="background:#FEF2F2;">âŒ</div>
+              <div class="activity-icon" style="background:#FEF2F2;">❌</div>
               <div style="flex:1;">
                 <div style="font-size:13px;"><strong>BlueSky Marketing</strong> report failed</div>
-                <div style="font-size:11px;color:var(--danger);">SERanking API 429 â€” <a href="reports.html" style="color:var(--danger);">View error â†’</a></div>
+                <div style="font-size:11px;color:var(--danger);">SERanking API 429 — <a href="reports.html" style="color:var(--danger);">View error →</a></div>
               </div>
               <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;">1 hr</div>
             </div>
             <div class="activity-item">
-              <div class="activity-icon" style="background:#EEF2FF;">ðŸ”„</div>
+              <div class="activity-icon" style="background:#EEF2FF;">🔄</div>
               <div style="flex:1;">
-                <div style="font-size:13px;"><strong>Daily sync complete</strong> â€” All 24 clients</div>
+                <div style="font-size:13px;"><strong>Daily sync complete</strong> — All 24 clients</div>
                 <div style="font-size:11px;color:var(--text-muted);">Positions, backlinks, and health scores updated</div>
               </div>
               <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;">3 hr</div>
             </div>
             <div class="activity-item">
-              <div class="activity-icon" style="background:#ECFDF5;">ðŸ‘¤</div>
+              <div class="activity-icon" style="background:#ECFDF5;">👤</div>
               <div style="flex:1;">
-                <div style="font-size:13px;"><strong>New client added</strong> â€” RetailPro Ltd</div>
-                <div style="font-size:11px;color:var(--text-muted);">retailpro.co.uk Â· Added by sarah@digitalhorizons.com</div>
+                <div style="font-size:13px;"><strong>New client added</strong> — RetailPro Ltd</div>
+                <div style="font-size:11px;color:var(--text-muted);">retailpro.co.uk · Added by sarah@digitalhorizons.com</div>
               </div>
               <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;">Yesterday</div>
             </div>
@@ -363,9 +363,9 @@
       <!-- Top Clients Health Table -->
       <div class="table-wrapper">
         <div class="table-header">
-          <div><div class="table-title">Top Clients â€” Health Overview</div><div style="font-size:12px;color:var(--text-muted);">Sorted by health score</div></div>
+          <div><div class="table-title">Top Clients — Health Overview</div><div style="font-size:12px;color:var(--text-muted);">Sorted by health score</div></div>
           <div class="table-actions">
-            <button class="btn btn-secondary btn-sm" onclick="window.location.href='clients.html'">View All 24 â†’</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.location.href='clients.html'">View All 24 →</button>
           </div>
         </div>
         <table>
@@ -394,11 +394,11 @@
                   <strong style="color:var(--success);">76</strong>
                 </div>
               </td>
-              <td><strong>47</strong> <span style="font-size:11px;color:var(--success);">â†‘+4</span></td>
-              <td>8,420 <span style="font-size:11px;color:var(--success);">â†‘+16%</span></td>
+              <td><strong>47</strong> <span style="font-size:11px;color:var(--success);">↑+4</span></td>
+              <td>8,420 <span style="font-size:11px;color:var(--success);">↑+16%</span></td>
               <td>1,847</td>
-              <td><span class="badge badge-success">âœ… Done</span></td>
-              <td><a href="client-detail.html" class="btn btn-ghost btn-sm">View â†’</a></td>
+              <td><span class="badge badge-success">✅ Done</span></td>
+              <td><a href="client-detail.html" class="btn btn-ghost btn-sm">View →</a></td>
             </tr>
             <tr>
               <td>
@@ -413,11 +413,11 @@
                   <strong style="color:var(--success);">89</strong>
                 </div>
               </td>
-              <td><strong>87</strong> <span style="font-size:11px;color:var(--success);">â†‘+11</span></td>
-              <td>12,340 <span style="font-size:11px;color:var(--success);">â†‘+21%</span></td>
+              <td><strong>87</strong> <span style="font-size:11px;color:var(--success);">↑+11</span></td>
+              <td>12,340 <span style="font-size:11px;color:var(--success);">↑+21%</span></td>
               <td>3,241</td>
-              <td><span class="badge badge-success">âœ… Done</span></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening TechStart...')">View â†’</button></td>
+              <td><span class="badge badge-success">✅ Done</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening TechStart...')">View →</button></td>
             </tr>
             <tr>
               <td>
@@ -432,11 +432,11 @@
                   <strong style="color:var(--warning);">64</strong>
                 </div>
               </td>
-              <td><strong>31</strong> <span style="font-size:11px;color:var(--danger);">â†“-2</span></td>
-              <td>4,120 <span style="font-size:11px;color:var(--danger);">â†“-3%</span></td>
+              <td><strong>31</strong> <span style="font-size:11px;color:var(--danger);">↓-2</span></td>
+              <td>4,120 <span style="font-size:11px;color:var(--danger);">↓-3%</span></td>
               <td>842</td>
-              <td><span class="badge badge-warning">â³ Pending</span></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening GreenLeaf...')">View â†’</button></td>
+              <td><span class="badge badge-warning">⏳ Pending</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening GreenLeaf...')">View →</button></td>
             </tr>
             <tr>
               <td>
@@ -451,17 +451,17 @@
                   <strong style="color:var(--danger);">48</strong>
                 </div>
               </td>
-              <td><strong>22</strong> <span style="font-size:11px;color:var(--danger);">â†“-4</span></td>
-              <td>3,280 <span style="font-size:11px;color:var(--danger);">â†“-8%</span></td>
+              <td><strong>22</strong> <span style="font-size:11px;color:var(--danger);">↓-4</span></td>
+              <td>3,280 <span style="font-size:11px;color:var(--danger);">↓-8%</span></td>
               <td>541</td>
-              <td><span class="badge badge-danger">âŒ Failed</span></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening BlueSky...')">View â†’</button></td>
+              <td><span class="badge badge-danger">❌ Failed</span></td>
+              <td><button class="btn btn-ghost btn-sm" onclick="Toast.info('Opening BlueSky...')">View →</button></td>
             </tr>
           </tbody>
         </table>
         <div class="table-footer">
           <span>Showing top 4 of 24 clients by health score</span>
-          <a href="clients.html" style="font-size:12px;font-weight:600;">View all clients â†’</a>
+          <a href="clients.html" style="font-size:12px;font-weight:600;">View all clients →</a>
         </div>
       </div>
 
@@ -474,7 +474,7 @@
   <div class="modal">
     <div class="modal-header">
       <div><div class="modal-title">Generate Report</div><div class="modal-subtitle">Create a branded SEO report for a client</div></div>
-      <button class="modal-close" data-modal-close="generateReportModal">âœ•</button>
+      <button class="modal-close" data-modal-close="generateReportModal">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -498,7 +498,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button>
-      <button class="btn btn-primary" onclick="dashGenReport()">ðŸš€ Generate</button>
+      <button class="btn btn-primary" onclick="dashGenReport()">🚀 Generate</button>
     </div>
   </div>
 </div>
@@ -547,7 +547,7 @@ function dashGenReport() {
   if (!client) { Toast.error('Please select a client'); return; }
   Modal.close('generateReportModal');
   const t = Toast.loading(`Generating ${client} report...`);
-  setTimeout(() => { t.dismiss(); Toast.success(`${client} â€” Report generated!`); }, 2000);
+  setTimeout(() => { t.dismiss(); Toast.success(`${client} — Report generated!`); }, 2000);
 }
 </script>
 </body>

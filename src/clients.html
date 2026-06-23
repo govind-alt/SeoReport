@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RankFlow â€” Clients</title>
-<meta name="description" content="Manage all your SEO clients â€” view health scores, reports, and take bulk actions."/>
+<title>RankFlow — Clients</title>
+<meta name="description" content="Manage all your SEO clients — view health scores, reports, and take bulk actions."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
@@ -26,14 +26,14 @@
   <aside class="sidebar">
     <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
     <nav class="sidebar-nav">
-      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ“Š</span><span class="sidebar-item-label">Dashboard</span></a>
-      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">ðŸ‘¥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
-      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">ðŸ“„</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
       <div class="sidebar-section-label">Configuration</div>
-      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">âš™ï¸</span><span class="sidebar-item-label">Settings</span></a>
-      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">â“</span><span class="sidebar-item-label">Help &amp; Support</span></a>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="#" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help &amp; Support</span></a>
     </nav>
-    <div class="sidebar-footer">
+        <div class="sidebar-footer">
       <div class="sidebar-user-wrap">
         <!-- User menu popup -->
         <div id="userMenu">
@@ -65,15 +65,15 @@
     <header class="topbar">
       <div class="topbar-title">Clients</div>
       <div class="topbar-actions">
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening CSV import...')">â¬‡ Import CSV</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening CSV import...')">⬇ Import CSV</button>
         <button class="btn btn-primary btn-sm" data-modal-open="addClientModal">+ Add Client</button>
         <div class="notif-bell-wrap" style="position:relative;">
-          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown" title="Notifications">ðŸ””</button>
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown" title="Notifications">🔔</button>
           <div class="notif-count" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
           <div class="notif-dropdown" id="notifDropdown">
             <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications <span class="badge badge-danger">5 new</span></div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
-            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">3 unread notifications â€” open dashboard for details</div>
-            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);font-weight:500;">View all notifications â†’</a></div>
+            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">3 unread notifications — open dashboard for details</div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);font-weight:500;">View all notifications →</a></div>
           </div>
         </div>
       </div>
@@ -84,16 +84,16 @@
       <!-- Bulk Action Bar (hidden until rows selected) -->
       <div class="bulk-action-bar" id="bulkActionBar">
         <span class="bulk-count">0 clients selected</span>
-        <button class="btn btn-primary btn-sm" onclick="Toast.success('Generating reports for selected clients...')">ðŸ“„ Generate Reports</button>
-        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening email composer...')">ðŸ“§ Send Email</button>
-        <button class="btn btn-danger btn-sm" onclick="archiveSelected()">ðŸ—ƒ Archive</button>
-        <span class="bulk-clear" onclick="clearSelection()">âœ•</span>
+        <button class="btn btn-primary btn-sm" onclick="Toast.success('Generating reports for selected clients...')">📄 Generate Reports</button>
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening email composer...')">📧 Send Email</button>
+        <button class="btn btn-danger btn-sm" onclick="archiveSelected()">🗃 Archive</button>
+        <span class="bulk-clear" onclick="clearSelection()">✕</span>
       </div>
 
       <!-- Filters & View Toggle -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
         <div class="search-input-wrap" style="flex:1;min-width:200px;">
-          <span class="search-icon">ðŸ”</span>
+          <span class="search-icon">🔍</span>
           <input type="text" class="form-input" id="clientSearch" placeholder="Search clients..." style="padding-left:34px;"/>
         </div>
         <select class="form-input" style="width:140px;" onchange="filterStatus(this.value)">
@@ -110,14 +110,14 @@
           <option>Real Estate</option>
         </select>
         <select class="form-input" style="width:150px;">
-          <option>Sort: Name Aâ€“Z</option>
-          <option>Health: Highâ€“Low</option>
-          <option>Traffic: Highâ€“Low</option>
+          <option>Sort: Name A–Z</option>
+          <option>Health: High–Low</option>
+          <option>Traffic: High–Low</option>
           <option>Last Report</option>
         </select>
         <div style="display:flex;">
-          <button class="view-toggle-btn active" data-view-toggle="table" data-group="clients" id="tableToggleBtn" onclick="switchView('table')">â‰¡ Table</button>
-          <button class="view-toggle-btn" data-view-toggle="grid" data-group="clients" id="gridToggleBtn" onclick="switchView('grid')">âŠž Cards</button>
+          <button class="view-toggle-btn active" data-view-toggle="table" data-group="clients" id="tableToggleBtn" onclick="switchView('table')">≡ Table</button>
+          <button class="view-toggle-btn" data-view-toggle="grid" data-group="clients" id="gridToggleBtn" onclick="switchView('grid')">⊞ Cards</button>
         </div>
       </div>
 
@@ -150,14 +150,14 @@
                   <div style="display:flex;gap:4px;align-items:center;">
                     <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
                     <div class="dropdown" style="position:relative;">
-                      <button class="row-menu-btn" data-dropdown="rowMenu1" title="More actions">â‹¯</button>
+                      <button class="row-menu-btn" data-dropdown="rowMenu1" title="More actions">⋯</button>
                       <div class="dropdown-menu" id="rowMenu1">
-                        <a href="client-detail.html" class="dropdown-item">ðŸ‘ View Detail</a>
-                        <a href="client-detail.html" class="dropdown-item">âœï¸ Edit Client</a>
-                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">ðŸ“„ Generate Report</a>
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a href="client-detail.html" class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">ðŸ—ƒ Archive</a>
-                        <a class="dropdown-item danger" onclick="confirmDeleteClient('Acme Corp')">ðŸ—‘ Delete</a>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('Acme Corp')">🗑 Delete</a>
                       </div>
                     </div>
                   </div>
@@ -175,14 +175,14 @@
                   <div style="display:flex;gap:4px;align-items:center;">
                     <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
                     <div class="dropdown" style="position:relative;">
-                      <button class="row-menu-btn" data-dropdown="rowMenu2" title="More actions">â‹¯</button>
+                      <button class="row-menu-btn" data-dropdown="rowMenu2" title="More actions">⋯</button>
                       <div class="dropdown-menu" id="rowMenu2">
-                        <a href="client-detail.html" class="dropdown-item">ðŸ‘ View Detail</a>
-                        <a class="dropdown-item">âœï¸ Edit Client</a>
-                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">ðŸ“„ Generate Report</a>
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">ðŸ—ƒ Archive</a>
-                        <a class="dropdown-item danger" onclick="confirmDeleteClient('TechStart.io')">ðŸ—‘ Delete</a>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('TechStart.io')">🗑 Delete</a>
                       </div>
                     </div>
                   </div>
@@ -194,20 +194,20 @@
                 <td style="font-size:12px;color:var(--text-muted);">greenleaf.com</td>
                 <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:60px;margin:0;"><div class="progress-fill warning" style="width:62%;"></div></div><span style="font-size:12px;font-weight:600;color:var(--warning);">62%</span></div></td>
                 <td><span class="badge badge-warning">May 1</span></td>
-                <td style="font-size:12px;color:var(--danger);font-weight:600;">Jun 1 âš </td>
-                <td><span class="badge badge-warning">âš  Needs Report</span></td>
+                <td style="font-size:12px;color:var(--danger);font-weight:600;">Jun 1 ⚠</td>
+                <td><span class="badge badge-warning">⚠ Needs Report</span></td>
                 <td>
                   <div style="display:flex;gap:4px;align-items:center;">
                     <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
                     <div class="dropdown" style="position:relative;">
-                      <button class="row-menu-btn" data-dropdown="rowMenu3">â‹¯</button>
+                      <button class="row-menu-btn" data-dropdown="rowMenu3">⋯</button>
                       <div class="dropdown-menu" id="rowMenu3">
-                        <a href="client-detail.html" class="dropdown-item">ðŸ‘ View Detail</a>
-                        <a class="dropdown-item">âœï¸ Edit Client</a>
-                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">ðŸ“„ Generate Report</a>
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">ðŸ—ƒ Archive</a>
-                        <a class="dropdown-item danger" onclick="confirmDeleteClient('GreenLeaf')">ðŸ—‘ Delete</a>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('GreenLeaf')">🗑 Delete</a>
                       </div>
                     </div>
                   </div>
@@ -225,14 +225,14 @@
                   <div style="display:flex;gap:4px;align-items:center;">
                     <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
                     <div class="dropdown" style="position:relative;">
-                      <button class="row-menu-btn" data-dropdown="rowMenu4">â‹¯</button>
+                      <button class="row-menu-btn" data-dropdown="rowMenu4">⋯</button>
                       <div class="dropdown-menu" id="rowMenu4">
-                        <a href="client-detail.html" class="dropdown-item">ðŸ‘ View Detail</a>
-                        <a class="dropdown-item">âœï¸ Edit Client</a>
-                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">ðŸ“„ Generate Report</a>
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">ðŸ—ƒ Archive</a>
-                        <a class="dropdown-item danger" onclick="confirmDeleteClient('BlueSky')">ðŸ—‘ Delete</a>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('BlueSky')">🗑 Delete</a>
                       </div>
                     </div>
                   </div>
@@ -244,18 +244,18 @@
                 <td style="font-size:12px;color:var(--text-muted);">retailpro.co.uk</td>
                 <td><span class="badge badge-neutral">No data</span></td>
                 <td><span class="badge badge-neutral">Never</span></td>
-                <td style="font-size:12px;color:var(--text-muted);">â€”</td>
+                <td style="font-size:12px;color:var(--text-muted);">—</td>
                 <td><span class="badge badge-neutral">Inactive</span></td>
                 <td>
                   <div style="display:flex;gap:4px;align-items:center;">
                     <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
                     <div class="dropdown" style="position:relative;">
-                      <button class="row-menu-btn" data-dropdown="rowMenu5">â‹¯</button>
+                      <button class="row-menu-btn" data-dropdown="rowMenu5">⋯</button>
                       <div class="dropdown-menu" id="rowMenu5">
-                        <a href="client-detail.html" class="dropdown-item">ðŸ‘ View Detail</a>
-                        <a class="dropdown-item">âœï¸ Edit Client</a>
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item danger" onclick="confirmDeleteClient('RetailPro')">ðŸ—‘ Delete</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('RetailPro')">🗑 Delete</a>
                       </div>
                     </div>
                   </div>
@@ -266,11 +266,11 @@
           <div class="table-footer">
             <span id="tableCount">Showing 5 of 24 clients</span>
             <div style="display:flex;gap:4px;">
-              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Previous page')">â† Prev</button>
+              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Previous page')">← Prev</button>
               <button class="btn btn-primary btn-sm">1</button>
               <button class="btn btn-secondary btn-sm">2</button>
               <button class="btn btn-secondary btn-sm">3</button>
-              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Next page')">Next â†’</button>
+              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Next page')">Next →</button>
             </div>
           </div>
         </div>
@@ -295,7 +295,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
               <span>Last report: <strong>Jun 1</strong></span>
-              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View â†’</a>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
             </div>
           </div>
           <div class="client-card" onclick="window.location='client-detail.html'">
@@ -314,7 +314,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
               <span>Last report: <strong>Jun 1</strong></span>
-              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View â†’</a>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
             </div>
           </div>
           <div class="client-card" onclick="window.location='client-detail.html'" style="border-color:var(--warning);">
@@ -332,8 +332,8 @@
               <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">3.2k</div><div style="color:var(--text-muted);">Traffic</div></div>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;">
-              <span style="color:var(--danger);font-weight:600;">âš  Overdue since Jun 1</span>
-              <a href="client-detail.html" class="btn btn-primary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">Report â†’</a>
+              <span style="color:var(--danger);font-weight:600;">⚠ Overdue since Jun 1</span>
+              <a href="client-detail.html" class="btn btn-primary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">Report →</a>
             </div>
           </div>
           <div class="client-card" onclick="window.location='client-detail.html'">
@@ -352,7 +352,7 @@
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
               <span>Last report: <strong>Jun 1</strong></span>
-              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View â†’</a>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
             </div>
           </div>
         </div>
@@ -367,7 +367,7 @@
   <div class="modal modal-lg">
     <div class="modal-header">
       <div><div class="modal-title">Add New Client</div><div class="modal-subtitle">Fill in the client details to get started</div></div>
-      <button class="modal-close" data-modal-close="addClientModal">âœ•</button>
+      <button class="modal-close" data-modal-close="addClientModal">✕</button>
     </div>
     <div class="modal-body">
       <!-- Client Info -->
@@ -383,7 +383,7 @@
       <div class="form-row">
         <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" placeholder="Sarah Miller"/></div>
         <div class="form-group"><label class="form-label">Logo (optional)</label>
-          <div style="border:2px dashed var(--border-strong);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--text-muted);" onclick="Toast.info('File picker opened...')">ðŸ“Ž Upload logo (PNG/SVG/JPG)</div>
+          <div style="border:2px dashed var(--border-strong);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--text-muted);" onclick="Toast.info('File picker opened...')">📎 Upload logo (PNG/SVG/JPG)</div>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Internal Notes</label><textarea class="form-input" rows="2" placeholder="E.g. UK-focused, e-commerce, targeting organic traffic growth..."></textarea></div>
@@ -393,16 +393,16 @@
       <div class="form-group"><label class="form-label">SERanking Project <span class="required">*</span></label>
         <select class="form-input">
           <option value="">Select SERanking project...</option>
-          <option>Acme Corp (acmecorp.com) â€” site_12345</option>
-          <option>TechStart (techstart.io) â€” site_23456</option>
-          <option>GreenLeaf (greenleaf.com) â€” site_34567</option>
-          <option>BlueSky (bluesky.co.uk) â€” site_45678</option>
+          <option>Acme Corp (acmecorp.com) — site_12345</option>
+          <option>TechStart (techstart.io) — site_23456</option>
+          <option>GreenLeaf (greenleaf.com) — site_34567</option>
+          <option>BlueSky (bluesky.co.uk) — site_45678</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Track Competitors (optional)</label>
         <div id="competitorTags" class="tag-input-wrap" data-tag-input>
-          <span class="tag">rival-seo.co.uk<span class="tag-remove" onclick="this.parentElement.remove()">Ã—</span></span>
+          <span class="tag">rival-seo.co.uk<span class="tag-remove" onclick="this.parentElement.remove()">×</span></span>
           <input type="text" placeholder="Add competitor domain, press Enter..." style="border:none;outline:none;font-size:12px;flex:1;min-width:150px;font-family:inherit;"/>
         </div>
         <div class="form-hint">Competitors fetched from SERanking and tracked for comparison</div>
@@ -411,10 +411,10 @@
       <!-- GSC -->
       <div style="font-size:13px;font-weight:700;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Google Search Console</div>
       <div style="border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:20px;text-align:center;">
-        <div style="font-size:28px;margin-bottom:8px;">ðŸ“Š</div>
+        <div style="font-size:28px;margin-bottom:8px;">📊</div>
         <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Connect Google Search Console</div>
         <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Required for organic traffic, clicks, impressions, CTR, and avg position data</div>
-        <button class="btn btn-primary btn-sm" onclick="Toast.info('Redirecting to Google OAuth...')">ðŸ”— Connect with Google OAuth</button>
+        <button class="btn btn-primary btn-sm" onclick="Toast.info('Redirecting to Google OAuth...')">🔗 Connect with Google OAuth</button>
         <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">You'll authorize RankFlow to read data for this client's GSC property</div>
       </div>
 
@@ -431,7 +431,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-modal-close="addClientModal">Cancel</button>
-      <button class="btn btn-primary" onclick="saveClient()">Save Client â†’</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client →</button>
     </div>
   </div>
 </div>

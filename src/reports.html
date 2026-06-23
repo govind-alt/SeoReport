@@ -1,15 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>RankFlow â€” Reports</title>
+<title>RankFlow — Reports</title>
 <meta name="description" content="Generate, manage and share SEO reports for all your clients."/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/styles.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-/* â”€â”€ Page-specific â”€â”€ */
+/* ── Page-specific ── */
 .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .reports-grid{display:grid;grid-template-columns:1fr 400px;gap:24px;align-items:start;}
 .preview-container{position:sticky;top:76px;}
@@ -75,7 +75,7 @@ tr.overdue-row{border-left:3px solid var(--warning);}
 <body>
 <div class="app-layout">
 
-  <!-- â•â•â•â•â•â•â•â•â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ══════════ SIDEBAR ══════════ -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">RF</div>
@@ -86,30 +86,30 @@ tr.overdue-row{border-left:3px solid var(--warning);}
     </div>
     <nav class="sidebar-nav">
       <a href="dashboard.html" class="sidebar-item">
-        <span class="sidebar-item-icon">ðŸ“Š</span>
+        <span class="sidebar-item-icon">📊</span>
         <span class="sidebar-item-label">Dashboard</span>
       </a>
       <a href="clients.html" class="sidebar-item">
-        <span class="sidebar-item-icon">ðŸ‘¥</span>
+        <span class="sidebar-item-icon">👥</span>
         <span class="sidebar-item-label">Clients</span>
         <span class="sidebar-badge">24</span>
       </a>
       <a href="reports.html" class="sidebar-item active">
-        <span class="sidebar-item-icon">ðŸ“„</span>
+        <span class="sidebar-item-icon">📄</span>
         <span class="sidebar-item-label">Reports</span>
         <span class="sidebar-badge">38</span>
       </a>
       <div class="sidebar-section-label">Configuration</div>
       <a href="settings.html" class="sidebar-item">
-        <span class="sidebar-item-icon">âš™ï¸</span>
+        <span class="sidebar-item-icon">⚙️</span>
         <span class="sidebar-item-label">Settings</span>
       </a>
       <a href="#" class="sidebar-item">
-        <span class="sidebar-item-icon">â“</span>
+        <span class="sidebar-item-icon">❓</span>
         <span class="sidebar-item-label">Help &amp; Support</span>
       </a>
     </nav>
-    <div class="sidebar-footer">
+        <div class="sidebar-footer">
       <div class="sidebar-user-wrap">
         <!-- User menu popup -->
         <div id="userMenu">
@@ -136,19 +136,19 @@ tr.overdue-row{border-left:3px solid var(--warning);}
     </div>
   </aside>
 
-  <!-- â•â•â•â•â•â•â•â•â•â• MAIN â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ══════════ MAIN ══════════ -->
   <div class="main-content">
 
     <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-title">Reports
-        <span class="topbar-subtitle">38 total Â· 6 pending</span>
+        <span class="topbar-subtitle">38 total · 6 pending</span>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-secondary btn-sm" onclick="Modal.open('bulkGenerateModal')">âš¡ Bulk Generate</button>
-        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">ï¼‹ Generate Report</button>
+        <button class="btn btn-secondary btn-sm" onclick="Modal.open('bulkGenerateModal')">⚡ Bulk Generate</button>
+        <button class="btn btn-primary btn-sm" onclick="Modal.open('generateReportModal')">＋ Generate Report</button>
         <div class="relative">
-          <button class="topbar-icon-btn" id="notifBell" data-notif-toggle="notifDropdown">ðŸ””
+          <button class="topbar-icon-btn" id="notifBell" data-notif-toggle="notifDropdown">🔔
             <span class="notif-dot"></span>
           </button>
           <div class="notif-dropdown" id="notifDropdown">
@@ -157,30 +157,30 @@ tr.overdue-row{border-left:3px solid var(--warning);}
               <button class="btn btn-ghost btn-sm" data-mark-read>Mark all read</button>
             </div>
             <div class="notif-item unread">
-              <div class="notif-avatar">ðŸ“„</div>
+              <div class="notif-avatar">📄</div>
               <div style="flex:1;">
-                <div class="notif-text"><strong>Acme Corp</strong> â€” May report generated successfully</div>
+                <div class="notif-text"><strong>Acme Corp</strong> — May report generated successfully</div>
                 <div class="notif-time">2 min ago</div>
               </div>
               <div class="notif-unread-dot"></div>
             </div>
             <div class="notif-item unread">
-              <div class="notif-avatar">âŒ</div>
+              <div class="notif-avatar">❌</div>
               <div style="flex:1;">
-                <div class="notif-text"><strong>BlueSky Marketing</strong> â€” Report failed (API 429)</div>
+                <div class="notif-text"><strong>BlueSky Marketing</strong> — Report failed (API 429)</div>
                 <div class="notif-time">1 hour ago</div>
               </div>
               <div class="notif-unread-dot"></div>
             </div>
             <div class="notif-item">
-              <div class="notif-avatar">âœ…</div>
+              <div class="notif-avatar">✅</div>
               <div style="flex:1;">
-                <div class="notif-text"><strong>Data sync complete</strong> â€” All 24 clients updated</div>
+                <div class="notif-text"><strong>Data sync complete</strong> — All 24 clients updated</div>
                 <div class="notif-time">3 hours ago</div>
               </div>
             </div>
             <div style="padding:10px 16px;text-align:center;border-top:1px solid var(--border);">
-              <a href="dashboard.html" style="font-size:12px;font-weight:600;">View all notifications â†’</a>
+              <a href="dashboard.html" style="font-size:12px;font-weight:600;">View all notifications →</a>
             </div>
           </div>
         </div>
@@ -189,8 +189,8 @@ tr.overdue-row{border-left:3px solid var(--warning);}
 
     <!-- Sync bar -->
     <div class="sync-bar">
-      <span>âœ… Last sync: Today at 02:14 AM Â· Next: Tomorrow 02:00 AM Â· All 24 clients up to date</span>
-      <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:#059669;border:1px solid rgba(16,185,129,0.3);font-size:11px;" onclick="Toast.info('Sync queued...')">ðŸ”„ Sync Now</button>
+      <span>✅ Last sync: Today at 02:14 AM · Next: Tomorrow 02:00 AM · All 24 clients up to date</span>
+      <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:#059669;border:1px solid rgba(16,185,129,0.3);font-size:11px;" onclick="Toast.info('Sync queued...')">🔄 Sync Now</button>
     </div>
 
     <div class="page-content">
@@ -198,40 +198,40 @@ tr.overdue-row{border-left:3px solid var(--warning);}
       <!-- KPI Row -->
       <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
         <div class="kpi-card success">
-          <div class="kpi-icon">ðŸ“„</div>
+          <div class="kpi-icon">📄</div>
           <div class="kpi-label">Reports This Month</div>
           <div class="kpi-value">18</div>
-          <div class="kpi-trend trend-up">â†‘ +3 vs last month</div>
+          <div class="kpi-trend trend-up">↑ +3 vs last month</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon">ðŸ—‚</div>
+          <div class="kpi-icon">🗂</div>
           <div class="kpi-label">Total Reports</div>
           <div class="kpi-value">38</div>
-          <div class="kpi-trend trend-flat">â†’ Across 24 clients</div>
+          <div class="kpi-trend trend-flat">→ Across 24 clients</div>
         </div>
         <div class="kpi-card warning">
-          <div class="kpi-icon">â³</div>
+          <div class="kpi-icon">⏳</div>
           <div class="kpi-label">Pending / Overdue</div>
           <div class="kpi-value" style="color:var(--warning);">6</div>
-          <div class="kpi-trend" style="color:var(--warning);">âš  Action needed</div>
+          <div class="kpi-trend" style="color:var(--warning);">⚠ Action needed</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-icon">âš¡</div>
+          <div class="kpi-icon">⚡</div>
           <div class="kpi-label">Avg Gen Time</div>
           <div class="kpi-value">2.4m</div>
-          <div class="kpi-trend trend-up">â†‘ 0.3m faster</div>
+          <div class="kpi-trend trend-up">↑ 0.3m faster</div>
         </div>
       </div>
 
       <!-- Main grid: Table + Preview -->
       <div class="reports-grid">
 
-        <!-- â”€â”€ Reports Table â”€â”€ -->
+        <!-- ── Reports Table ── -->
         <div>
           <!-- Filters -->
           <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
             <div class="search-input-wrap">
-              <span class="search-icon">ðŸ”</span>
+              <span class="search-icon">🔍</span>
               <input type="text" id="reportSearch" class="form-input" placeholder="Search client or period..." style="padding-left:34px;width:220px;font-size:12px;" oninput="filterTable(this.value)"/>
             </div>
             <select class="form-input" style="width:150px;font-size:12px;" onchange="filterByClient(this.value)">
@@ -243,9 +243,9 @@ tr.overdue-row{border-left:3px solid var(--warning);}
             </select>
             <select class="form-input" style="width:130px;font-size:12px;" onchange="filterByStatus(this.value)">
               <option value="">Status: All</option>
-              <option value="done">âœ… Completed</option>
-              <option value="pending">â³ Pending</option>
-              <option value="failed">âŒ Failed</option>
+              <option value="done">✅ Completed</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="failed">❌ Failed</option>
             </select>
             <select class="form-input" style="width:130px;font-size:12px;">
               <option>Period: All</option>
@@ -253,7 +253,7 @@ tr.overdue-row{border-left:3px solid var(--warning);}
               <option>May 2026</option>
               <option>Apr 2026</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting CSV...')">â¬‡ Export</button>
+            <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting CSV...')">⬇ Export</button>
           </div>
 
           <!-- Table -->
@@ -270,7 +270,7 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                 </tr>
               </thead>
               <tbody id="reportsTbody">
-                <!-- Acme Corp â€” June v2 -->
+                <!-- Acme Corp — June v2 -->
                 <tr data-status="done" data-client="Acme Corp" data-period="Jun 2026"
                     class="selected-row" id="rowAcmeJun"
                     style="cursor:pointer;" onclick="selectRow(this,'acme-jun')">
@@ -286,18 +286,18 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                   <td><strong>Jun 2026</strong> <span class="badge badge-primary" style="font-size:10px;margin-left:3px;">v2</span></td>
                   <td><span class="badge badge-success"><span class="badge-dot"></span>Done</span></td>
                   <td style="font-size:12px;color:var(--text-secondary);">Jun 3, 14:20</td>
-                  <td><span class="badge badge-success">ðŸ‘ Viewed Ã— 2</span></td>
+                  <td><span class="badge badge-success">👁 Viewed × 2</span></td>
                   <td>
                     <div style="display:flex;gap:4px;justify-content:flex-end;">
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(document.getElementById('rowAcmeJun'),'acme-jun')">ðŸ‘ View</button>
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">ðŸ“¥</button>
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">ðŸ”—</button>
-                      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();Toast.info('Regenerating...')">ðŸ”„</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(document.getElementById('rowAcmeJun'),'acme-jun')">👁 View</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">📥</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">🔗</button>
+                      <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();Toast.info('Regenerating...')">🔄</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- TechStart.io â€” June v1 -->
+                <!-- TechStart.io — June v1 -->
                 <tr data-status="done" data-client="TechStart.io" data-period="Jun 2026"
                     style="cursor:pointer;" onclick="selectRow(this,'techstart-jun')">
                   <td>
@@ -315,14 +315,14 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                   <td><span class="badge badge-neutral">Not opened yet</span></td>
                   <td>
                     <div style="display:flex;gap:4px;justify-content:flex-end;">
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(this.closest('tr'),'techstart-jun')">ðŸ‘ View</button>
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">ðŸ“¥</button>
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">ðŸ”—</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(this.closest('tr'),'techstart-jun')">👁 View</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">📥</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();copyShareLink()">🔗</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- GreenLeaf â€” Pending -->
+                <!-- GreenLeaf — Pending -->
                 <tr data-status="pending" data-client="GreenLeaf Organics" data-period="Jun 2026"
                     class="overdue-row" style="cursor:default;">
                   <td>
@@ -336,16 +336,16 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                   </td>
                   <td><strong>Jun 2026</strong></td>
                   <td><span class="badge badge-warning"><span class="badge-dot"></span>Pending</span></td>
-                  <td><span class="schedule-chip">ðŸ“… Scheduled Jul 1</span></td>
-                  <td style="font-size:12px;color:var(--text-muted);">â€”</td>
+                  <td><span class="schedule-chip">📅 Scheduled Jul 1</span></td>
+                  <td style="font-size:12px;color:var(--text-muted);">—</td>
                   <td>
                     <div style="display:flex;gap:4px;justify-content:flex-end;">
-                      <button class="btn btn-primary btn-sm" onclick="generateNow(this,'GreenLeaf Organics')">âš¡ Generate Now</button>
+                      <button class="btn btn-primary btn-sm" onclick="generateNow(this,'GreenLeaf Organics')">⚡ Generate Now</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- BlueSky â€” Failed -->
+                <!-- BlueSky — Failed -->
                 <tr data-status="failed" data-client="BlueSky Marketing" data-period="May 2026"
                     style="cursor:default;">
                   <td>
@@ -360,16 +360,16 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                   <td><strong>May 2026</strong></td>
                   <td><span class="badge badge-danger"><span class="badge-dot"></span>Failed</span></td>
                   <td style="font-size:12px;color:var(--danger);">Failed Jun 1, 09:05</td>
-                  <td style="font-size:12px;color:var(--text-muted);">â€”</td>
+                  <td style="font-size:12px;color:var(--text-muted);">—</td>
                   <td>
                     <div style="display:flex;gap:4px;justify-content:flex-end;">
-                      <button class="btn btn-secondary btn-sm" onclick="Toast.success('Retry queued!')">ðŸ”„ Retry</button>
-                      <button class="btn btn-ghost btn-sm" onclick="toggleErrorLog()">âš  Error Log</button>
+                      <button class="btn btn-secondary btn-sm" onclick="Toast.success('Retry queued!')">🔄 Retry</button>
+                      <button class="btn btn-ghost btn-sm" onclick="toggleErrorLog()">⚠ Error Log</button>
                     </div>
                   </td>
                 </tr>
 
-                <!-- Acme Corp â€” May v1 -->
+                <!-- Acme Corp — May v1 -->
                 <tr data-status="done" data-client="Acme Corp" data-period="May 2026"
                     style="cursor:pointer;" onclick="selectRow(this,'acme-may')">
                   <td>
@@ -384,11 +384,11 @@ tr.overdue-row{border-left:3px solid var(--warning);}
                   <td><strong>May 2026</strong> <span class="badge badge-neutral" style="font-size:10px;margin-left:3px;">v1</span></td>
                   <td><span class="badge badge-success"><span class="badge-dot"></span>Done</span></td>
                   <td style="font-size:12px;color:var(--text-secondary);">May 1, 09:12</td>
-                  <td><span class="badge badge-success">ðŸ‘ Viewed Ã— 3</span></td>
+                  <td><span class="badge badge-success">👁 Viewed × 3</span></td>
                   <td>
                     <div style="display:flex;gap:4px;justify-content:flex-end;">
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(this.closest('tr'),'acme-may')">ðŸ‘ View</button>
-                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">ðŸ“¥</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();selectRow(this.closest('tr'),'acme-may')">👁 View</button>
+                      <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();downloadReport()">📥</button>
                     </div>
                   </td>
                 </tr>
@@ -397,8 +397,8 @@ tr.overdue-row{border-left:3px solid var(--warning);}
 
             <!-- Error Log (inline) -->
             <div id="errorLogRow" style="display:none;background:var(--danger-light);border-top:1px solid #FECACA;padding:16px 20px;">
-              <div class="error-log-title">âš  Error Details â€” BlueSky Marketing Â· May 2026</div>
-              <div style="font-size:12px;color:#991B1B;margin-bottom:8px;"><strong>Failed at:</strong> Jun 1, 2026 09:05:32 UTC Â· Retry count: 3/3</div>
+              <div class="error-log-title">⚠ Error Details — BlueSky Marketing · May 2026</div>
+              <div style="font-size:12px;color:#991B1B;margin-bottom:8px;"><strong>Failed at:</strong> Jun 1, 2026 09:05:32 UTC · Retry count: 3/3</div>
               <div class="error-log-code">SERankingAPIError: 429 Too Many Requests
 at fetchKeywordPositions (/lib/seranking/client.ts:84)
 Endpoint: GET /sites/47291/positions?range=30&page=1
@@ -408,29 +408,29 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
                 <strong>Root cause:</strong> Data sync job and report generation ran simultaneously, hitting the 100 req/min rate limit.<br/>
                 <strong>Fix applied:</strong> Reports now queue 2 hours after daily sync to prevent collision.
               </div>
-              <button class="btn btn-danger btn-sm" onclick="Toast.success('Retry queued!');document.getElementById('errorLogRow').style.display='none';">ðŸ”„ Retry Now</button>
+              <button class="btn btn-danger btn-sm" onclick="Toast.success('Retry queued!');document.getElementById('errorLogRow').style.display='none';">🔄 Retry Now</button>
               <button class="btn btn-ghost btn-sm" onclick="document.getElementById('errorLogRow').style.display='none';" style="margin-left:6px;">Close</button>
             </div>
 
             <div class="table-footer">
               <span id="reportCountText">Showing 5 of 38 reports</span>
               <div style="display:flex;gap:4px;">
-                <button class="btn btn-secondary btn-sm">â† Prev</button>
+                <button class="btn btn-secondary btn-sm">← Prev</button>
                 <button class="btn btn-primary btn-sm">1</button>
                 <button class="btn btn-secondary btn-sm">2</button>
-                <button class="btn btn-secondary btn-sm" style="padding:6px 10px;">Â·Â·Â·</button>
+                <button class="btn btn-secondary btn-sm" style="padding:6px 10px;">···</button>
                 <button class="btn btn-secondary btn-sm">8</button>
-                <button class="btn btn-secondary btn-sm">Next â†’</button>
+                <button class="btn btn-secondary btn-sm">Next →</button>
               </div>
             </div>
           </div><!-- /table-wrapper -->
         </div>
 
-        <!-- â”€â”€ Report Preview Panel â”€â”€ -->
+        <!-- ── Report Preview Panel ── -->
         <div class="preview-container">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-            <div style="font-size:14px;font-weight:800;color:var(--text-primary);">ðŸ“„ Report Preview</div>
-            <span id="previewClientLabel" class="badge badge-primary">Acme Corp Â· Jun 2026</span>
+            <div style="font-size:14px;font-weight:800;color:var(--text-primary);">📄 Report Preview</div>
+            <span id="previewClientLabel" class="badge badge-primary">Acme Corp · Jun 2026</span>
           </div>
 
           <!-- Preview: Acme Jun -->
@@ -438,14 +438,14 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
             <div class="report-cover">
               <div class="report-cover-agency">Digital Horizons Agency</div>
               <div class="report-cover-title">Monthly SEO Report</div>
-              <div class="report-cover-period">Acme Corp Â· June 2026</div>
+              <div class="report-cover-period">Acme Corp · June 2026</div>
               <div class="report-cover-score">
                 <div class="report-cover-score-value">76</div>
                 <div class="report-cover-score-label">HEALTH SCORE</div>
               </div>
               <div style="margin-top:12px;display:flex;justify-content:center;gap:16px;font-size:11px;opacity:0.75;">
-                <span>â†‘ 8 pts MoM</span>
-                <span>Â·</span>
+                <span>↑ 8 pts MoM</span>
+                <span>·</span>
                 <span>3 issues resolved</span>
               </div>
             </div>
@@ -470,15 +470,15 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
             </div>
 
             <div class="report-section">
-              <div class="report-section-title">ðŸ¤– AI Recommendations</div>
-              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--danger);"></div><div class="ai-rec-text"><strong>Fix 3 broken internal links</strong> â€” /blog/post-14 and /resources/guide-3 affecting crawlability.</div></div>
-              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--warning);"></div><div class="ai-rec-text"><strong>Add meta descriptions to 8 blog pages</strong> â€” CTR improvement potential: +15%.</div></div>
-              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--primary);"></div><div class="ai-rec-text"><strong>Target "seo audit london"</strong> â€” Competitor ranks #3 Â· 480 monthly searches Â· Your position: unranked.</div></div>
+              <div class="report-section-title">🤖 AI Recommendations</div>
+              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--danger);"></div><div class="ai-rec-text"><strong>Fix 3 broken internal links</strong> — /blog/post-14 and /resources/guide-3 affecting crawlability.</div></div>
+              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--warning);"></div><div class="ai-rec-text"><strong>Add meta descriptions to 8 blog pages</strong> — CTR improvement potential: +15%.</div></div>
+              <div class="ai-rec"><div class="ai-rec-dot" style="background:var(--primary);"></div><div class="ai-rec-text"><strong>Target "seo audit london"</strong> — Competitor ranks #3 · 480 monthly searches · Your position: unranked.</div></div>
             </div>
 
             <div class="report-section" style="background:var(--gray-50);">
               <div style="font-size:10px;color:var(--text-muted);text-align:center;letter-spacing:0.3px;">
-                Prepared exclusively by Digital Horizons Agency Â· Confidential
+                Prepared exclusively by Digital Horizons Agency · Confidential
               </div>
             </div>
           </div>
@@ -488,7 +488,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
             <div class="report-cover" style="background:linear-gradient(135deg,#10B981 0%,#059669 55%,#0D9488 100%);">
               <div class="report-cover-agency">Digital Horizons Agency</div>
               <div class="report-cover-title">Monthly SEO Report</div>
-              <div class="report-cover-period">TechStart.io Â· June 2026</div>
+              <div class="report-cover-period">TechStart.io · June 2026</div>
               <div class="report-cover-score">
                 <div class="report-cover-score-value">89</div>
                 <div class="report-cover-score-label">HEALTH SCORE</div>
@@ -506,7 +506,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
                 <div class="report-metric"><div class="report-metric-val" style="color:var(--success);">89%</div><div class="report-metric-label">Health</div></div>
               </div>
             </div>
-            <div class="report-section" style="background:var(--gray-50);"><div style="font-size:10px;color:var(--text-muted);text-align:center;">Prepared exclusively by Digital Horizons Agency Â· Confidential</div></div>
+            <div class="report-section" style="background:var(--gray-50);"><div style="font-size:10px;color:var(--text-muted);text-align:center;">Prepared exclusively by Digital Horizons Agency · Confidential</div></div>
           </div>
 
           <!-- Preview: Acme May -->
@@ -514,7 +514,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
             <div class="report-cover" style="background:linear-gradient(135deg,#4F46E5 0%,#6366F1 55%,#8B5CF6 100%);">
               <div class="report-cover-agency">Digital Horizons Agency</div>
               <div class="report-cover-title">Monthly SEO Report</div>
-              <div class="report-cover-period">Acme Corp Â· May 2026</div>
+              <div class="report-cover-period">Acme Corp · May 2026</div>
               <div class="report-cover-score">
                 <div class="report-cover-score-value">68</div>
                 <div class="report-cover-score-label">HEALTH SCORE</div>
@@ -522,7 +522,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
             </div>
             <div class="report-section">
               <div class="report-section-title">Executive Summary</div>
-              <div style="font-size:12px;color:var(--text-secondary);line-height:1.65;">Solid growth month â€” Top 10 keywords up 3, traffic improved 14%. 11 critical issues identified. Health score at 68, with clear improvements planned.</div>
+              <div style="font-size:12px;color:var(--text-secondary);line-height:1.65;">Solid growth month — Top 10 keywords up 3, traffic improved 14%. 11 critical issues identified. Health score at 68, with clear improvements planned.</div>
             </div>
             <div class="report-section">
               <div class="report-section-title">Key Metrics</div>
@@ -532,13 +532,13 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
                 <div class="report-metric"><div class="report-metric-val" style="color:var(--warning);">68%</div><div class="report-metric-label">Health</div></div>
               </div>
             </div>
-            <div class="report-section" style="background:var(--gray-50);"><div style="font-size:10px;color:var(--text-muted);text-align:center;">Prepared exclusively by Digital Horizons Agency Â· Confidential</div></div>
+            <div class="report-section" style="background:var(--gray-50);"><div style="font-size:10px;color:var(--text-muted);text-align:center;">Prepared exclusively by Digital Horizons Agency · Confidential</div></div>
           </div>
 
           <!-- No preview selected -->
           <div class="report-preview report-preview-block" id="preview-empty" style="display:none;">
             <div class="empty-state" style="padding:40px;">
-              <div class="empty-state-icon">ðŸ“„</div>
+              <div class="empty-state-icon">📄</div>
               <div class="empty-state-title">Select a report to preview</div>
               <div class="empty-state-desc">Click any completed report row to see its preview here</div>
             </div>
@@ -546,9 +546,9 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
 
           <!-- Actions -->
           <div style="display:flex;gap:8px;margin-top:12px;">
-            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="downloadReport()">ðŸ“¥ Download PDF</button>
-            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="copyShareLink()">ðŸ”— Share Link</button>
-            <button class="btn btn-ghost btn-sm btn-icon" onclick="Toast.info('Sending to client email...')">ðŸ“§</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="downloadReport()">📥 Download PDF</button>
+            <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="copyShareLink()">🔗 Share Link</button>
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="Toast.info('Sending to client email...')">📧</button>
           </div>
         </div><!-- /preview -->
 
@@ -557,7 +557,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
   </div><!-- /main-content -->
 </div><!-- /app-layout -->
 
-<!-- â•â• Generate Modal â•â• -->
+<!-- ══ Generate Modal ══ -->
 <div class="modal-overlay" id="generateReportModal">
   <div class="modal">
     <div class="modal-header">
@@ -565,7 +565,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
         <div class="modal-title">Generate New Report</div>
         <div class="modal-subtitle">Create a branded SEO report for a client</div>
       </div>
-      <button class="modal-close" data-modal-close="generateReportModal">âœ•</button>
+      <button class="modal-close" data-modal-close="generateReportModal">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -605,26 +605,26 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);width:15px;height:15px;"/> Organic Traffic (GSC)</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);width:15px;height:15px;"/> Backlink Profile</label>
           <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);width:15px;height:15px;"/> Technical Audit</label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);width:15px;height:15px;"/> ðŸ¤– AI Recommendations</label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;"><input type="checkbox" checked style="accent-color:var(--primary);width:15px;height:15px;"/> 🤖 AI Recommendations</label>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-modal-close="generateReportModal">Cancel</button>
-      <button class="btn btn-primary" onclick="generateReport()">ðŸš€ Generate Report</button>
+      <button class="btn btn-primary" onclick="generateReport()">🚀 Generate Report</button>
     </div>
   </div>
 </div>
 
-<!-- â•â• Bulk Generate Modal â•â• -->
+<!-- ══ Bulk Generate Modal ══ -->
 <div class="modal-overlay" id="bulkGenerateModal">
   <div class="modal modal-sm">
     <div class="modal-header">
       <div>
-        <div class="modal-title">âš¡ Bulk Generate Reports</div>
+        <div class="modal-title">⚡ Bulk Generate Reports</div>
         <div class="modal-subtitle">Generate June 2026 reports for multiple clients</div>
       </div>
-      <button class="modal-close" data-modal-close="bulkGenerateModal">âœ•</button>
+      <button class="modal-close" data-modal-close="bulkGenerateModal">✕</button>
     </div>
     <div class="modal-body">
       <div class="alert alert-info">Reports will be generated and emailed automatically per each client's schedule config.</div>
@@ -633,25 +633,25 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
           <input type="checkbox" checked style="accent-color:var(--primary);width:16px;height:16px;"/>
           <div style="width:30px;height:30px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">AC</div>
           <div style="flex:1;"><div style="font-weight:600;">Acme Corp</div><div style="font-size:11px;color:var(--text-muted);">Last: Jun 3</div></div>
-          <span class="badge badge-success">âœ… Done</span>
+          <span class="badge badge-success">✅ Done</span>
         </label>
         <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:13px;transition:var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
           <input type="checkbox" checked style="accent-color:var(--primary);width:16px;height:16px;"/>
           <div style="width:30px;height:30px;background:linear-gradient(135deg,#10B981,#059669);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">TS</div>
           <div style="flex:1;"><div style="font-weight:600;">TechStart.io</div><div style="font-size:11px;color:var(--text-muted);">Last: Jun 1</div></div>
-          <span class="badge badge-success">âœ… Done</span>
+          <span class="badge badge-success">✅ Done</span>
         </label>
         <label style="display:flex;align-items:center;gap:10px;padding:12px;border:2px solid var(--warning);border-radius:10px;cursor:pointer;font-size:13px;background:var(--warning-light);">
           <input type="checkbox" checked style="accent-color:var(--primary);width:16px;height:16px;"/>
           <div style="width:30px;height:30px;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">GL</div>
           <div style="flex:1;"><div style="font-weight:600;">GreenLeaf Organics</div><div style="font-size:11px;color:var(--text-muted);">Not generated this month</div></div>
-          <span class="badge badge-warning">âš  Overdue</span>
+          <span class="badge badge-warning">⚠ Overdue</span>
         </label>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" data-modal-close="bulkGenerateModal">Cancel</button>
-      <button class="btn btn-primary" onclick="bulkGenerate()">ðŸš€ Generate 3 Reports</button>
+      <button class="btn btn-primary" onclick="bulkGenerate()">🚀 Generate 3 Reports</button>
     </div>
   </div>
 </div>
@@ -659,7 +659,7 @@ X-RateLimit-Reset: 1717232400 (in ~43 min)</div>
 <div class="toast-container" id="toastContainer"></div>
 <script src="js/app.js"></script>
 <script>
-// â”€â”€ Table filter â”€â”€
+// ── Table filter ──
 function filterTable(q) {
   q = q.toLowerCase();
   document.querySelectorAll('#reportsTbody tr[data-client]').forEach(row => {
@@ -680,7 +680,7 @@ function filterByStatus(val) {
   });
 }
 
-// â”€â”€ Row selection & preview â”€â”€
+// ── Row selection & preview ──
 function selectRow(rowEl, previewId) {
   // Clear all row highlights
   document.querySelectorAll('#reportsTbody tr').forEach(r => r.classList.remove('selected-row'));
@@ -700,11 +700,11 @@ function selectRow(rowEl, previewId) {
   if (label) {
     const client = rowEl.dataset.client || '';
     const period = rowEl.dataset.period || '';
-    label.textContent = `${client} Â· ${period}`;
+    label.textContent = `${client} · ${period}`;
   }
 }
 
-// â”€â”€ Error log toggle â”€â”€
+// ── Error log toggle ──
 function toggleErrorLog() {
   const el = document.getElementById('errorLogRow');
   if (!el) return;
@@ -712,22 +712,22 @@ function toggleErrorLog() {
   if (el.style.display === 'block') el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// â”€â”€ Generate now (from table row) â”€â”€
+// ── Generate now (from table row) ──
 function generateNow(btn, client) {
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner">âŸ³</span> Generating...';
+  btn.innerHTML = '<span class="spinner">⟳</span> Generating...';
   btn.style.background = 'var(--gray-100)';
   btn.style.color = 'var(--text-muted)';
   Toast.info(`Generating report for ${client}...`);
   setTimeout(() => {
-    btn.innerHTML = 'âœ… Done!';
+    btn.innerHTML = '✅ Done!';
     btn.className = 'btn btn-success btn-sm';
     btn.disabled = true;
-    Toast.success(`${client} â€” Report generated and sent!`);
+    Toast.success(`${client} — Report generated and sent!`);
   }, 2500);
 }
 
-// â”€â”€ Generate modal submit â”€â”€
+// ── Generate modal submit ──
 function generateReport() {
   const client = document.getElementById('genClient').value;
   if (!client) { Toast.error('Please select a client first'); return; }
@@ -735,11 +735,11 @@ function generateReport() {
   const loader = Toast.loading(`Generating report for ${client}...`);
   setTimeout(() => {
     loader.dismiss();
-    Toast.success(`${client} â€” Report generated and sent to client!`);
+    Toast.success(`${client} — Report generated and sent to client!`);
   }, 2000);
 }
 
-// â”€â”€ Bulk generate â”€â”€
+// ── Bulk generate ──
 function bulkGenerate() {
   Modal.close('bulkGenerateModal');
   Toast.loading('Queuing bulk generation...');
@@ -747,12 +747,12 @@ function bulkGenerate() {
   const clients = ['Acme Corp', 'TechStart.io', 'GreenLeaf Organics'];
   clients.forEach((c, i) => setTimeout(() => {
     count++;
-    Toast.success(`${c} â€” Report done!`);
-    if (count === clients.length) setTimeout(() => Toast.success('âœ… All 3 reports generated!'), 600);
+    Toast.success(`${c} — Report done!`);
+    if (count === clients.length) setTimeout(() => Toast.success('✅ All 3 reports generated!'), 600);
   }, 700 * (i + 1)));
 }
 
-// â”€â”€ Init â”€â”€
+// ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
   // Click first row to show preview by default
   const firstRow = document.querySelector('#reportsTbody tr[data-status="done"]');
