@@ -184,6 +184,24 @@ a:hover { color: var(--primary-hover); }
 .auth-panel { display: none; }
 .auth-panel.active { display: block; }
 
+/* Role Selector */
+.role-selector {
+  display: flex; gap: 8px; margin-bottom: 24px;
+  background: var(--gray-50); padding: 6px;
+  border-radius: var(--radius-md); border: 1px solid var(--border);
+}
+.role-option {
+  flex: 1; text-align: center; padding: 10px 8px;
+  font-size: 13px; font-weight: 600; color: var(--text-muted);
+  border-radius: var(--radius); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.role-option:hover { color: var(--text-secondary); background: rgba(0,0,0,0.02); }
+.role-option.active {
+  background: var(--surface); color: var(--primary);
+  box-shadow: var(--shadow-sm); border: 1px solid var(--border-strong);
+}
+
 /* Form elements */
 .form-group { margin-bottom: 18px; }
 .form-label {
@@ -467,6 +485,14 @@ a:hover { color: var(--primary-hover); }
       </div>
 
       <form id="loginForm" onsubmit="handleLogin(event)">
+        <!-- Role Selector -->
+        <div class="role-selector" id="loginRoleSelector">
+          <div class="role-option active" data-role="agency" onclick="selectRole('agency')">🏢 Agency</div>
+          <div class="role-option" data-role="client" onclick="selectRole('client')">👤 Client</div>
+          <div class="role-option" data-role="admin" onclick="selectRole('admin')">🛡️ Admin</div>
+        </div>
+        <input type="hidden" id="selectedRole" value="agency" />
+
         <div class="form-group">
           <label class="form-label" for="loginEmail">Email Address</label>
           <input class="form-input" id="loginEmail" type="email" placeholder="john@agency.com" autocomplete="email" required/>
@@ -491,15 +517,13 @@ a:hover { color: var(--primary-hover); }
       </form>
 
       <div class="divider">or continue with</div>
-      <a href="dashboard.html" class="btn btn-google">
+      <a href="#" onclick="event.preventDefault(); routeToRoleDashboard()" class="btn btn-google">
         <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
         Continue with Google
       </a>
 
       <div class="form-footer">
         No account? <span class="link" onclick="switchTab('register')">Sign up free</span>
-        &nbsp;·&nbsp; Client? <a href="client-portal-dashboard.html" class="link" style="font-weight:500;">Client portal →</a>
-        &nbsp;·&nbsp; Admin? <a href="superadmin-dashboard.html" class="link" style="font-weight:500;">Superadmin →</a>
       </div>
     </div>
 
@@ -621,7 +645,7 @@ a:hover { color: var(--primary-hover); }
           <label class="form-label">Confirm New Password</label>
           <input class="form-input" id="confirmNewPwd" type="password" placeholder="••••••••••"/>
         </div>
-        <a href="dashboard.html" class="btn btn-primary">Update Password & Sign In</a>
+        <button onclick="routeToRoleDashboard()" class="btn btn-primary" style="width:100%">Update Password & Sign In</button>
       </div>
     </div>
 
@@ -674,13 +698,26 @@ a:hover { color: var(--primary-hover); }
   function showForgot() { switchTab('forgot'); document.getElementById('forgotRequest').classList.add('active'); }
   function showSignin() { switchTab('signin'); }
 
-  // ─── Login ───
+  // ─── Login & Roles ───
+  function selectRole(role) {
+    document.getElementById('selectedRole').value = role;
+    document.querySelectorAll('#loginRoleSelector .role-option').forEach(el => el.classList.remove('active'));
+    document.querySelector(`#loginRoleSelector .role-option[data-role="${role}"]`).classList.add('active');
+  }
+
+  function routeToRoleDashboard() {
+    const role = document.getElementById('selectedRole').value || 'agency';
+    if (role === 'client') window.location.href = 'client-portal-dashboard.html';
+    else if (role === 'admin') window.location.href = 'superadmin-dashboard.html';
+    else window.location.href = 'dashboard.html';
+  }
+
   function handleLogin(e) {
     e.preventDefault();
     const btn = document.getElementById('loginBtn');
     const txt = document.getElementById('loginBtnText');
     btn.disabled = true; txt.textContent = 'Signing in...';
-    setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+    setTimeout(routeToRoleDashboard, 900);
   }
 
   // ─── Register ───
