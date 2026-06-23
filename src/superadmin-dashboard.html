@@ -182,7 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
   
   Charts.line('mrrChart', 
     ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    [8500, 9200, 10500, 11800, 12700, 14250]
+    [{
+      label: 'MRR',
+      data: [8500, 9200, 10500, 11800, 12700, 14250],
+      borderColor: '#8b5cf6',
+      backgroundColor: 'rgba(139,92,246,0.1)',
+      fill: true
+    }]
   );
   
   Charts.doughnut('planChart',
