@@ -197,8 +197,8 @@ ENCRYPTION_SECRET=...                 # 32-char string for AES-256 API key encry
 
 | Phase | Focus | Week | Status |
 |---|---|---|---|
-| 0 | Foundation & Setup | 1 | ⬜ Not started |
-| 1 | Auth & Multi-Tenancy | 2–3 | ⬜ Not started |
+| 0 | Foundation & Setup | 1 | ✅ Completed |
+| 1 | Auth & Multi-Tenancy | 2–3 | ✅ Completed |
 | 2 | SERanking Integration | 4–5 | ⬜ Not started |
 | 3 | Dashboard & Clients | 6–7 | ⬜ Not started |
 | 4 | Report Engine | 8–10 | ⬜ Not started |
@@ -235,6 +235,14 @@ ENCRYPTION_SECRET=...                 # 32-char string for AES-256 API key encry
              AI can now be onboarded on any device by reading this file alone.
              README.md reviewed. No source code yet. Phase 0 not started.
              Next step: Scaffold Next.js 14 project (Phase 0).
+
+[2026-07-03] Phase 0 completed. Scaffolded Next.js 15 app router.
+             Configured Prisma, Tailwind CSS 4, and ported `index.html` and `dashboard.html`.
+
+[2026-07-03] Phase 1 completed. NextAuth installed and configured.
+             Subdomain multi-tenancy middleware created.
+             `login.html` converted to a functional React client component.
+             Next step: Phase 2 (SERanking API Integration).
 ```
 
 > **Add entries here as you make progress.** Format: `[YYYY-MM-DD] What was done. What is next.`

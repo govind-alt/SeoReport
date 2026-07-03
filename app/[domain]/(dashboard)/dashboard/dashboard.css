@@ -1,0 +1,35 @@
+
+.hero-banner{
+  background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 50%,#EC4899 100%);
+  border-radius:var(--radius-lg);padding:24px 28px;color:white;margin-bottom:24px;
+  position:relative;overflow:hidden;
+}
+.hero-banner::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='40' cy='40' r='8'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.hero-title{font-size:22px;font-weight:800;letter-spacing:-0.4px;margin-bottom:4px;}
+.hero-sub{font-size:13px;opacity:0.75;}
+.hero-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
+.hero-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:var(--transition-fast);}
+.hero-btn-white{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.35);}
+.hero-btn-white:hover{background:rgba(255,255,255,0.3);}
+.hero-btn-solid{background:white;color:#4F46E5;border:none;}
+.hero-btn-solid:hover{background:#F5F3FF;}
+.hero-stats{display:flex;gap:24px;margin-top:16px;flex-wrap:wrap;}
+.hero-stat-val{font-size:24px;font-weight:800;line-height:1;}
+.hero-stat-lbl{font-size:10px;opacity:0.65;margin-top:2px;}
+
+.client-health-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.client-health-row:last-child{border-bottom:none;}
+.client-avatar-sm{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;}
+.activity-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.gsc-setup-banner{
+  background:linear-gradient(135deg,var(--warning-light),#FFFBEB);
+  border:1.5px solid #FDE68A;border-radius:var(--radius-md);
+  padding:14px 18px;margin-bottom:20px;display:flex;
+  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
