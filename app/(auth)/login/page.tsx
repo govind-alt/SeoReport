@@ -32,11 +32,11 @@ export default function Login() {
       } else {
         // Successful login, route based on selected role
         if (selectedRole === 'client') {
-          window.location.href = '/dashboard?role=client'; // For client portal
+          window.location.href = '/?role=client'; // For client portal
         } else if (selectedRole === 'admin') {
-          window.location.href = '/dashboard?role=admin'; // For superadmin
+          window.location.href = '/?role=admin'; // For superadmin
         } else {
-          window.location.href = '/dashboard'; // For agency
+          window.location.href = '/'; // For agency
         }
       }
     } catch (error) {
@@ -47,7 +47,7 @@ export default function Login() {
 
   const handleGoogle = (e: React.MouseEvent) => {
     e.preventDefault();
-    signIn('google', { callbackUrl: '/dashboard' });
+    signIn('google', { callbackUrl: '/' });
   };
 
   return (

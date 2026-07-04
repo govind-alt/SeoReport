@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
 const trendData = [
   { name: 'Jan', count: 32 },
@@ -134,8 +135,8 @@ export default function ClientDetailPage({ params }: { params: { clientId: strin
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn btn-primary btn-sm" onClick={() => alert('Generate report')}>+ Generate Report</button>
-            <button className="btn btn-secondary btn-sm" onClick={() => alert('Syncing data...')}>🔄 Sync Now</button>
+            <button className="btn btn-primary btn-sm" onClick={() => toast.success('Report generation started')}>+ Generate Report</button>
+            <button className="btn btn-secondary btn-sm" onClick={() => toast.loading('Syncing data...', { duration: 2000 })}>🔄 Sync Now</button>
             <button className="btn btn-secondary btn-sm" onClick={() => setActiveTab('reports')}>📄 View Reports</button>
           </div>
         </div>
