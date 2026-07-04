@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 export function Sidebar() {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -38,16 +41,30 @@ export function Sidebar() {
         </Link>
       </nav>
       <div className="sidebar-footer">
-        <div className="sidebar-user-wrap">
-          {/* User menu popup would go here */}
+        <div className="sidebar-user-wrap" style={{ position: 'relative' }}>
+          {/* User menu popup */}
+          {isUserMenuOpen && (
+            <div id="userMenu" style={{ display: 'block' }}>
+              <div className="user-menu-header">
+                <div className="user-menu-name">John Doe</div>
+                <div className="user-menu-email">john@digitalhorizons.com</div>
+              </div>
+              <button className="user-menu-item" onClick={() => alert('Opening Settings...')}>⚙️ Account Settings</button>
+              <button className="user-menu-item" onClick={() => alert('Opening Billing...')}>💳 Billing &amp; Plan</button>
+              <button className="user-menu-item" onClick={() => alert('Opening Help...')}>❓ Help &amp; Support</button>
+              <div className="user-menu-divider"></div>
+              <Link href="/login" className="user-menu-item danger" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>🚪 Sign Out</Link>
+            </div>
+          )}
+          
           {/* Clickable chip */}
-          <div id="sidebarUserChip">
+          <div id="sidebarUserChip" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} style={{ cursor: 'pointer' }}>
             <div className="sidebar-avatar">JD</div>
             <div>
               <div className="sidebar-user-name">John Doe</div>
               <div className="sidebar-user-role">Agency Admin</div>
             </div>
-            <span className="chevron">▲</span>
+            <span className="chevron" style={{ transform: isUserMenuOpen ? 'rotate(180deg)' : 'rotate(0)', transition: '0.2s' }}>▲</span>
           </div>
         </div>
       </div>
