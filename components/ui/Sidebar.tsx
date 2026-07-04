@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 export function Sidebar() {
@@ -11,7 +13,7 @@ export function Sidebar() {
         </div>
       </div>
       <nav className="sidebar-nav">
-        <Link href="/dashboard" className="sidebar-item active">
+        <Link href="/" className="sidebar-item active">
           <span className="sidebar-item-icon">📊</span>
           <span className="sidebar-item-label">Dashboard</span>
         </Link>
@@ -20,17 +22,17 @@ export function Sidebar() {
           <span className="sidebar-item-label">Clients</span>
           <span className="sidebar-badge">24</span>
         </Link>
-        <Link href="/reports" className="sidebar-item">
+        <Link href="#" className="sidebar-item" onClick={(e) => { e.preventDefault(); alert('Reports page will be built in Phase 4'); }}>
           <span className="sidebar-item-icon">📄</span>
           <span className="sidebar-item-label">Reports</span>
           <span className="sidebar-badge">38</span>
         </Link>
         <div className="sidebar-section-label">Configuration</div>
-        <Link href="/settings" className="sidebar-item">
+        <Link href="#" className="sidebar-item" onClick={(e) => { e.preventDefault(); alert('Settings page coming soon'); }}>
           <span className="sidebar-item-icon">⚙️</span>
           <span className="sidebar-item-label">Settings</span>
         </Link>
-        <Link href="/help" className="sidebar-item">
+        <Link href="#" className="sidebar-item" onClick={(e) => { e.preventDefault(); alert('Help page coming soon'); }}>
           <span className="sidebar-item-icon">❓</span>
           <span className="sidebar-item-label">Help &amp; Support</span>
         </Link>
