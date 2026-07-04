@@ -21,7 +21,7 @@ export default function Home() {
 
       <section className="hero">
         <div className="container">
-          <h1>Automate your agency's<br /><span>SEO reporting</span></h1>
+          <h1>Automate your agency&apos;s<br /><span>SEO reporting</span></h1>
           <p>Connect your SERanking account once. Generate beautiful, 100% white-labeled PDF and web reports for all your clients automatically on the 1st of every month.</p>
           <div className="hero-buttons">
             <Link href="/onboarding" className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '16px' }}>Start 14-Day Free Trial</Link>
@@ -68,7 +68,7 @@ export default function Home() {
             <div className="feature-card">
               <div className="feature-icon" style={{ color: '#3b82f6' }}>🤖</div>
               <div className="feature-title">AI Recommendations</div>
-              <div className="feature-desc">Our AI analyzes ranking drops and site audit issues to automatically write a custom "Next Steps" action plan for every single report.</div>
+              <div className="feature-desc">Our AI analyzes ranking drops and site audit issues to automatically write a custom &quot;Next Steps&quot; action plan for every single report.</div>
             </div>
             <div className="feature-card">
               <div className="feature-icon" style={{ color: '#f59e0b' }}>📄</div>

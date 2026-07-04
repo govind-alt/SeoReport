@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     const rankings = await client.getRankings(siteId);
 
     return NextResponse.json(rankings);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[SERANKING_RANKINGS_GET]', error);
     return new NextResponse('Internal Error', { status: 500 });
   }

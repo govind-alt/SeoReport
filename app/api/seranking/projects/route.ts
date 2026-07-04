@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     const sites = await client.getSites();
 
     return NextResponse.json(sites);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[SERANKING_PROJECTS_GET]', error);
     return new NextResponse('Internal Error', { status: 500 });
   }

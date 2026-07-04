@@ -1,7 +1,6 @@
 "use client";
 
 import './login.css';
-import Link from 'next/link';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 
@@ -68,7 +67,7 @@ export default function Login() {
             <p className="brand-hero-desc">RankFlow pulls data from SERanking and generates beautiful, branded monthly SEO reports — automatically. Save hours every month.</p>
 
             <div className="brand-testimonial" style={{marginTop: '32px'}}>
-              <blockquote>"RankFlow cut our reporting time from 8 hours to 20 minutes per client. Our clients love the reports, and we love the extra time."</blockquote>
+              <blockquote>&quot;RankFlow cut our reporting time from 8 hours to 20 minutes per client. Our clients love the reports, and we love the extra time.&quot;</blockquote>
               <div className="testimonial-author">
                 <div className="testimonial-avatar">SR</div>
                 <div>
@@ -231,7 +230,7 @@ export default function Login() {
               <div style={{fontSize: '36px', marginBottom: '12px'}}>🔑</div>
               <div className="form-header">
                 <div className="form-header-title">Forgot password?</div>
-                <div className="form-header-desc">Enter your email and we'll send a reset link</div>
+                <div className="form-header-desc">Enter your email and we&apos;ll send a reset link</div>
               </div>
 
               <div className="forgot-state active" id="forgotRequest">
@@ -250,8 +249,8 @@ export default function Login() {
               <div className="success-panel">
                 <div className="success-icon">📧</div>
                 <div className="success-title">Check your inbox</div>
-                <div className="success-desc">We've sent a verification link. Click the link to activate your account.</div>
-                <div className="alert alert-success mb-4">✅ Verification email sent! Check your spam folder if you don't see it.</div>
+                <div className="success-desc">We&apos;ve sent a verification link. Click the link to activate your account.</div>
+                <div className="alert alert-success mb-4">✅ Verification email sent! Check your spam folder if you don&apos;t see it.</div>
                 <button className="btn btn-primary mb-3" onClick={() => window.open('https://mail.google.com', '_blank')}>Open Gmail →</button>
               </div>
 
