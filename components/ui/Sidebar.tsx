@@ -32,11 +32,11 @@ export function Sidebar() {
           <span className="sidebar-badge">38</span>
         </Link>
         <div className="sidebar-section-label">Configuration</div>
-        <Link href="#" className="sidebar-item" onClick={(e) => { e.preventDefault(); toast.info('Settings page coming soon'); }}>
+        <Link href="/settings" className="sidebar-item">
           <span className="sidebar-item-icon">⚙️</span>
           <span className="sidebar-item-label">Settings</span>
         </Link>
-        <Link href="#" className="sidebar-item" onClick={(e) => { e.preventDefault(); toast.info('Help page coming soon'); }}>
+        <Link href="/help" className="sidebar-item">
           <span className="sidebar-item-icon">❓</span>
           <span className="sidebar-item-label">Help &amp; Support</span>
         </Link>
@@ -50,9 +50,9 @@ export function Sidebar() {
                 <div className="user-menu-name">John Doe</div>
                 <div className="user-menu-email">john@digitalhorizons.com</div>
               </div>
-              <button className="user-menu-item" onClick={() => toast.info('Opening Settings...')}>⚙️ Account Settings</button>
-              <button className="user-menu-item" onClick={() => toast.info('Opening Billing...')}>💳 Billing &amp; Plan</button>
-              <button className="user-menu-item" onClick={() => toast.info('Opening Help...')}>❓ Help &amp; Support</button>
+              <Link href="/settings" className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>⚙️ Account Settings</Link>
+              <Link href="/settings" className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>💳 Billing &amp; Plan</Link>
+              <Link href="/help" className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>❓ Help &amp; Support</Link>
               <div className="user-menu-divider"></div>
               <Link href="/login" className="user-menu-item danger" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>🚪 Sign Out</Link>
             </div>
