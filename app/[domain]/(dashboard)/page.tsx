@@ -1,27 +1,75 @@
 'use client';
 
 
+import { useState, use } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const trafficData = [
-  { name: 'Jan', sessions: 65000 },
-  { name: 'Feb', sessions: 68000 },
-  { name: 'Mar', sessions: 72000 },
-  { name: 'Apr', sessions: 71000 },
-  { name: 'May', sessions: 76000 },
-  { name: 'Jun', sessions: 84200 },
-];
+const dataAllClients = {
+  traffic: [
+    { name: 'Jan', sessions: 65000 },
+    { name: 'Feb', sessions: 68000 },
+    { name: 'Mar', sessions: 72000 },
+    { name: 'Apr', sessions: 71000 },
+    { name: 'May', sessions: 76000 },
+    { name: 'Jun', sessions: 84200 },
+  ],
+  keywords: [
+    { name: 'Jan', keywords: 450 },
+    { name: 'Feb', keywords: 480 },
+    { name: 'Mar', keywords: 510 },
+    { name: 'Apr', keywords: 550 },
+    { name: 'May', keywords: 589 },
+    { name: 'Jun', keywords: 623 },
+  ]
+};
 
-const keywordData = [
-  { name: 'Jan', keywords: 450 },
-  { name: 'Feb', keywords: 480 },
-  { name: 'Mar', keywords: 510 },
-  { name: 'Apr', keywords: 550 },
-  { name: 'May', keywords: 589 },
-  { name: 'Jun', keywords: 623 },
-];
+const dataAcmeCorp = {
+  traffic: [
+    { name: 'Jan', sessions: 12000 },
+    { name: 'Feb', sessions: 13500 },
+    { name: 'Mar', sessions: 15000 },
+    { name: 'Apr', sessions: 14800 },
+    { name: 'May', sessions: 16200 },
+    { name: 'Jun', sessions: 19400 },
+  ],
+  keywords: [
+    { name: 'Jan', keywords: 80 },
+    { name: 'Feb', keywords: 95 },
+    { name: 'Mar', keywords: 110 },
+    { name: 'Apr', keywords: 115 },
+    { name: 'May', keywords: 132 },
+    { name: 'Jun', keywords: 148 },
+  ]
+};
 
-export default function DashboardPage() {
+const dataTechStart = {
+  traffic: [
+    { name: 'Jan', sessions: 35000 },
+    { name: 'Feb', sessions: 36200 },
+    { name: 'Mar', sessions: 39100 },
+    { name: 'Apr', sessions: 42000 },
+    { name: 'May', sessions: 48500 },
+    { name: 'Jun', sessions: 52100 },
+  ],
+  keywords: [
+    { name: 'Jan', keywords: 210 },
+    { name: 'Feb', keywords: 225 },
+    { name: 'Mar', keywords: 240 },
+    { name: 'Apr', keywords: 265 },
+    { name: 'May', keywords: 290 },
+    { name: 'Jun', keywords: 312 },
+  ]
+};
+
+export default function DashboardPage({ params }: { params: Promise<{ domain: string }> }) {
+  const [selectedClient, setSelectedClient] = useState('All Clients');
+  const resolvedParams = use(params);
+  const domain = resolvedParams.domain || 'localhost';
+  
+  const currentData = selectedClient === 'Acme Corp' ? dataAcmeCorp : 
+                      selectedClient === 'TechStart.io' ? dataTechStart : 
+                      dataAllClients;
+                      
   return (
     <>
       {/* Sync status bar */}
@@ -43,7 +91,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div style={{display: 'flex', gap: '8px', flexShrink: '0'}}>
-          <button className="btn btn-warning btn-sm" style={{background: '#F59E0B', color: 'white', border: 'none'}} onClick={() => window.location.href='/settings'}>🔑 Connect Now →</button>
+          <button className="btn btn-warning btn-sm" style={{background: '#F59E0B', color: 'white', border: 'none'}} onClick={() => window.location.href=`/${domain}/settings`}>🔑 Connect Now →</button>
           <button className="btn btn-ghost btn-sm" onClick={(e) => (e.currentTarget.closest('.gsc-setup-banner') as HTMLElement).style.display='none'}>Dismiss</button>
         </div>
       </div>
@@ -74,9 +122,9 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="hero-actions">
-          <button className="hero-btn hero-btn-solid" onClick={() => alert('Generate Report modal')}>📄 Generate Report</button>
-          <button className="hero-btn hero-btn-white" onClick={() => window.location.href='/clients'}>👥 View All Clients</button>
-          <button className="hero-btn hero-btn-white" onClick={() => window.location.href='/settings'}>🔑 Manage API Keys</button>
+          <button className="hero-btn hero-btn-solid" onClick={() => window.location.href=`/${domain}/reports`}>📄 Generate Report</button>
+          <button className="hero-btn hero-btn-white" onClick={() => window.location.href=`/${domain}/clients`}>👥 View All Clients</button>
+          <button className="hero-btn hero-btn-white" onClick={() => window.location.href=`/${domain}/settings`}>🔑 Manage API Keys</button>
         </div>
       </div>
 
@@ -116,7 +164,12 @@ export default function DashboardPage() {
               <div className="chart-title">Agency Traffic Trend</div>
               <div className="chart-subtitle">Total organic sessions across all clients · 6 months</div>
             </div>
-            <select className="form-input" style={{width: '110px', fontSize: '11px', padding: '5px 8px', height: 'auto'}}>
+            <select 
+              className="form-input" 
+              style={{width: '110px', fontSize: '11px', padding: '5px 8px', height: 'auto'}}
+              value={selectedClient}
+              onChange={(e) => setSelectedClient(e.target.value)}
+            >
               <option>All Clients</option>
               <option>Acme Corp</option>
               <option>TechStart.io</option>
@@ -124,11 +177,14 @@ export default function DashboardPage() {
           </div>
           <div style={{height: '200px', marginTop: '16px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trafficData}>
+              <LineChart data={currentData.traffic}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#6B7280'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#6B7280'}} tickFormatter={(value) => `${value / 1000}k`} />
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  formatter={(value: any) => [new Intl.NumberFormat('en-US').format(value), 'Sessions']}
+                />
                 <Line type="monotone" dataKey="sessions" stroke="#2563EB" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
               </LineChart>
             </ResponsiveContainer>
@@ -147,11 +203,14 @@ export default function DashboardPage() {
           </div>
           <div style={{height: '200px', marginTop: '16px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={keywordData}>
+              <LineChart data={currentData.keywords}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#6B7280'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 11, fill: '#6B7280'}} />
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  formatter={(value: any) => [value, 'Keywords']}
+                />
                 <Line type="monotone" dataKey="keywords" stroke="#059669" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
               </LineChart>
             </ResponsiveContainer>

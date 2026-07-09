@@ -23,7 +23,7 @@ const trafficData = [
   { name: 'Jun', count: 8420 },
 ];
 
-export default function ClientDetailPage({ params }: { params: { clientId: string } }) {
+export default function ClientDetailPage({ params }: { params: Promise<{ clientId: string }> }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (

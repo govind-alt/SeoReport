@@ -47,7 +47,11 @@ export default function Login() {
 
   const handleGoogle = (e: React.MouseEvent) => {
     e.preventDefault();
-    signIn('google', { callbackUrl: '/' });
+    // For the prototype phase, we will simulate a successful OAuth login
+    // and directly route the user into the agency dashboard.
+    // In production, uncomment the line below and configure GOOGLE_CLIENT_ID in .env
+    // signIn('google', { callbackUrl: '/' });
+    window.location.href = '/localhost/reports';
   };
 
   return (
