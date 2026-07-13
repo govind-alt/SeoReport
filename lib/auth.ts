@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
+import Nodemailer from "next-auth/providers/nodemailer"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
@@ -15,6 +16,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    Nodemailer({
+      server: process.env.EMAIL_SERVER || {
+        host: "localhost",
+        port: 1025,
+        auth: {
+          user: "mock",
+          pass: "mock",
+        },
+      },
+      from: process.env.EMAIL_FROM || "noreply@rankflow.app",
+      // Custom sendVerificationRequest to log to console if in development
+      async sendVerificationRequest(params) {
+        const { identifier, url, provider } = params;
+        if (process.env.NODE_ENV !== "production") {
+          console.log(`\n\n[MAGIC LINK GENERATED]`);
+          console.log(`To: ${identifier}`);
+          console.log(`URL: ${url}\n\n`);
+        } else {
+          // If in production, you would use provider.server to actually send the email here
+          // This relies on the standard next-auth nodemailer implementation internally.
+          // For now, we will log it.
+          console.log(`Simulated sending magic link to ${identifier}: ${url}`);
+        }
+      }
     }),
     Credentials({
       credentials: {

@@ -1,24 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
+import { getClients } from '@/app/actions';
+import { ImportCsvModal } from '@/components/ui/ImportCsvModal';
 
-// Mock data based on the HTML prototype
-const mockClients = [
+// Mock data used as fallback while loading or if no data
+const mockClientsData = [
   { id: '1', name: 'Acme Corp', website: 'acmecorp.com', health: 76, initials: 'AC', color: '#4F46E5', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'active' },
-  { id: '2', name: 'TechStart.io', website: 'techstart.io', health: 89, initials: 'TS', color: '#10B981', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'active' },
-  { id: '3', name: 'GreenLeaf Organics', website: 'greenleaf.com', health: 62, initials: 'GL', color: '#F59E0B', lastReport: 'May 1', nextReport: 'Jun 1 ⚠', status: 'needs-report' },
-  { id: '4', name: 'BlueSky Marketing', website: 'bluesky.co.uk', health: 83, initials: 'BS', color: '#3B82F6', lastReport: 'Jun 1', nextReport: 'Jul 1', status: 'active' },
-  { id: '5', name: 'RetailPro Ltd', website: 'retailpro.co.uk', health: null, initials: 'RP', color: '#6B7280', lastReport: 'Never', nextReport: '—', status: 'inactive' },
 ];
 
-export default function ClientsPage() {
+export default function ClientsPage({ params }: { params: Promise<{ domain: string }> }) {
   const [view, setView] = useState<'table' | 'grid'>('table');
   const [selectedClients, setSelectedClients] = useState<string[]>([]);
+  const [clients, setClients] = useState<any[]>(mockClientsData);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const resolvedParams = use(params);
+  const domain = resolvedParams.domain || 'localhost';
+
+  const fetchClients = () => {
+    getClients(domain).then(data => {
+      if (data && data.length > 0) setClients(data);
+    }).catch(console.error);
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, [domain]);
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedClients(mockClients.map(c => c.id));
+      setSelectedClients(clients.map(c => c.id));
     } else {
       setSelectedClients([]);
     }
@@ -38,8 +50,8 @@ export default function ClientsPage() {
           <div className="page-subtitle">Manage your agency&apos;s clients and their SEO projects</div>
         </div>
         <div style={{display: 'flex', gap: '8px'}}>
-          <button className="btn btn-secondary" onClick={() => alert('Import CSV')}>📥 Import CSV</button>
-          <button className="btn btn-primary" onClick={() => alert('New client modal')}>＋ Add Client</button>
+          <button className="btn btn-secondary" onClick={() => setIsImportModalOpen(true)}>📥 Import CSV</button>
+          <Link href={domain === 'localhost' ? `/localhost/clients/new` : `/clients/new`} className="btn btn-primary">＋ Add Client</Link>
         </div>
       </div>
 
@@ -86,7 +98,7 @@ export default function ClientsPage() {
             <thead>
               <tr>
                 <th style={{width: '36px'}}>
-                  <input type="checkbox" style={{accentColor: 'var(--primary)'}} checked={selectedClients.length === mockClients.length} onChange={handleSelectAll} />
+                  <input type="checkbox" style={{accentColor: 'var(--primary)'}} checked={selectedClients.length > 0 && selectedClients.length === clients.length} onChange={handleSelectAll} />
                 </th>
                 <th>Client</th>
                 <th>Website</th>
@@ -98,7 +110,7 @@ export default function ClientsPage() {
               </tr>
             </thead>
             <tbody>
-              {mockClients.map(client => (
+              {clients.map(client => (
                 <tr key={client.id} data-status={client.status}>
                   <td>
                     <input type="checkbox" className="row-checkbox" style={{accentColor: 'var(--primary)'}} checked={selectedClients.includes(client.id)} onChange={() => handleSelect(client.id)} />
@@ -137,7 +149,7 @@ export default function ClientsPage() {
                   </td>
                   <td>
                     <div style={{display: 'flex', gap: '4px', alignItems: 'center'}}>
-                      <Link href={`/clients/${client.id}`} className="btn btn-secondary btn-sm">View</Link>
+                      <Link href={domain === 'localhost' ? `/localhost/clients/${client.id}` : `/clients/${client.id}`} className="btn btn-secondary btn-sm">View</Link>
                       <button className="row-menu-btn" title="More actions">⋯</button>
                     </div>
                   </td>
@@ -151,7 +163,7 @@ export default function ClientsPage() {
       {/* GRID VIEW */}
       {view === 'grid' && (
         <div className="grid-3">
-          {mockClients.map(client => (
+          {clients.map(client => (
             <div className="client-card" key={client.id}>
               <div className="client-card-header">
                 <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
@@ -186,12 +198,19 @@ export default function ClientsPage() {
                   <div style={{fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px'}}>Next Report</div>
                   <div style={{fontSize: '12px', fontWeight: 600, color: client.status === 'needs-report' ? 'var(--danger)' : 'inherit'}}>{client.nextReport}</div>
                 </div>
-                <Link href={`/clients/${client.id}`} className="btn btn-secondary btn-sm">View Details</Link>
+                <Link href={domain === 'localhost' ? `/localhost/clients/${client.id}` : `/clients/${client.id}`} className="btn btn-secondary btn-sm">View Details</Link>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <ImportCsvModal 
+        isOpen={isImportModalOpen} 
+        onClose={() => setIsImportModalOpen(false)} 
+        domain={domain}
+        onClientsAdded={fetchClients}
+      />
     </>
   );
 }

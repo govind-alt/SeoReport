@@ -1,24 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import './reports.css';
 
-export default function ReportsPage() {
+export default function ReportsPage({ params }: { params: Promise<{ domain: string }> }) {
+  const resolvedParams = use(params);
+  const domain = resolvedParams.domain || 'localhost';
+  
   const [selectedReport, setSelectedReport] = useState('acme-jun');
-  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isErrorLogOpen, setIsErrorLogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
-
-  const generateReport = (client: string) => {
-    setIsGenerateModalOpen(false);
-    const id = toast.loading(`Generating report for ${client}...`);
-    setTimeout(() => {
-      toast.dismiss(id);
-      toast.success(`${client} — Report generated and sent to client!`);
-    }, 2000);
-  };
 
   const downloadPdf = (reportId: string) => {
     toast.info('Generating PDF... This may take a few seconds.');
@@ -51,7 +46,7 @@ export default function ReportsPage() {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn btn-secondary btn-sm" onClick={() => setIsBulkModalOpen(true)}>⚡ Bulk Generate</button>
-          <button className="btn btn-primary btn-sm" onClick={() => setIsGenerateModalOpen(true)}>＋ Generate Report</button>
+          <Link href={domain === 'localhost' ? '/localhost/reports/new' : '/reports/new'} className="btn btn-primary btn-sm">＋ Generate Report</Link>
         </div>
       </div>
 
@@ -70,7 +65,7 @@ export default function ReportsPage() {
             <div className="kpi-trend trend-up">↑ +3 vs last month</div>
           </div>
           <div className="kpi-card">
-            <div className="kpi-icon">🗂</div>
+            <div className="kpi-icon">📁</div>
             <div className="kpi-label">Total Reports</div>
             <div className="kpi-value">38</div>
             <div className="kpi-trend trend-flat">→ Across 24 clients</div>

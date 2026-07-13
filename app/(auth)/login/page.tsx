@@ -3,16 +3,38 @@
 import './login.css';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import { registerAgency } from '../../actions';
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState<'signin' | 'register' | 'forgot' | 'verify'>('signin');
   const [selectedRole, setSelectedRole] = useState('agency');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
+  
+  // Login State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Register State
+  const [regFirstName, setRegFirstName] = useState('');
+  const [regLastName, setRegLastName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regAgency, setRegAgency] = useState('');
+  const [regSubdomain, setRegSubdomain] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirm, setRegConfirm] = useState('');
+  const [regError, setRegError] = useState('');
+
+  const getSubdomainUrl = (subdomain: string) => {
+    const isLocal = window.location.hostname.includes('localhost');
+    const port = window.location.port ? `:${window.location.port}` : '';
+    if (isLocal) {
+      return `http://${subdomain}.localhost${port}`;
+    }
+    return `https://${subdomain}.rankflow.app`; // Production domain
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,13 +52,14 @@ export default function Login() {
         setLoginError(true);
         setLoading(false);
       } else {
-        // Successful login, route based on selected role
-        if (selectedRole === 'client') {
-          window.location.href = '/?role=client'; // For client portal
-        } else if (selectedRole === 'admin') {
-          window.location.href = '/?role=admin'; // For superadmin
+        // If login successful, we would ideally know their subdomain. 
+        // For prototype, we'll just go to root and let middleware handle it if they are already on a subdomain,
+        // or go to 'demo.localhost:3000' if they login from root.
+        const isLocal = window.location.hostname === 'localhost';
+        if (isLocal) {
+          window.location.href = '/localhost'; // Hack for local dev root login
         } else {
-          window.location.href = '/'; // For agency
+          window.location.href = '/'; 
         }
       }
     } catch (error) {
@@ -45,13 +68,52 @@ export default function Login() {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegError('');
+    
+    if (regPassword !== regConfirm) {
+      setRegError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+
+    const res = await registerAgency({
+      firstName: regFirstName,
+      lastName: regLastName,
+      email: regEmail,
+      agencyName: regAgency,
+      subdomain: regSubdomain.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+      password: regPassword
+    });
+
+    if (res.error) {
+      setRegError(res.error);
+      setLoading(false);
+      return;
+    }
+
+    // Success! Log them in automatically
+    const loginRes = await signIn('credentials', {
+      email: regEmail,
+      password: regPassword,
+      redirect: false
+    });
+
+    if (!loginRes?.error) {
+      // Redirect to their new subdomain
+      window.location.href = getSubdomainUrl(regSubdomain);
+    } else {
+      setActiveTab('signin');
+      setLoading(false);
+    }
+  };
+
   const handleGoogle = (e: React.MouseEvent) => {
     e.preventDefault();
-    // For the prototype phase, we will simulate a successful OAuth login
-    // and directly route the user into the agency dashboard.
-    // In production, uncomment the line below and configure GOOGLE_CLIENT_ID in .env
-    // signIn('google', { callbackUrl: '/' });
-    window.location.href = '/localhost/reports';
+    setLoading(true);
+    signIn('google', { callbackUrl: '/localhost' });
   };
 
   return (
@@ -175,44 +237,55 @@ export default function Login() {
                 <div className="form-header-desc">14-day trial, no credit card required</div>
               </div>
 
-              <form id="registerForm" onSubmit={(e) => { e.preventDefault(); setActiveTab('verify'); }}>
+              {regError && (
+                <div className="alert alert-danger" style={{marginBottom: '16px'}}>
+                  ❌ {regError}
+                </div>
+              )}
+
+              <form id="registerForm" onSubmit={handleRegister}>
                 <div className="form-row mb-4">
                   <div className="form-group" style={{marginBottom: '0'}}>
                     <label className="form-label" htmlFor="firstName">First Name <span className="req">*</span></label>
-                    <input className="form-input" id="firstName" type="text" placeholder="John" required/>
+                    <input className="form-input" id="firstName" type="text" placeholder="John" required value={regFirstName} onChange={e => setRegFirstName(e.target.value)}/>
                   </div>
                   <div className="form-group" style={{marginBottom: '0'}}>
                     <label className="form-label" htmlFor="lastName">Last Name <span className="req">*</span></label>
-                    <input className="form-input" id="lastName" type="text" placeholder="Doe" required/>
+                    <input className="form-input" id="lastName" type="text" placeholder="Doe" required value={regLastName} onChange={e => setRegLastName(e.target.value)}/>
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="workEmail">Work Email <span className="req">*</span></label>
-                  <input className="form-input" id="workEmail" type="email" placeholder="john@youragency.com" required/>
+                  <input className="form-input" id="workEmail" type="email" placeholder="john@youragency.com" required value={regEmail} onChange={e => setRegEmail(e.target.value)}/>
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="agencyName">Agency Name <span className="req">*</span></label>
-                  <input className="form-input" id="agencyName" type="text" placeholder="Digital Horizons Agency" required/>
+                  <input className="form-input" id="agencyName" type="text" placeholder="Digital Horizons Agency" required value={regAgency} onChange={e => {
+                    setRegAgency(e.target.value);
+                    if (!regSubdomain) {
+                      setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+                    }
+                  }}/>
                   <div className="form-hint">Shown on all client reports</div>
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="subdomain">Agency Subdomain <span className="req">*</span></label>
                   <div className="subdomain-group">
-                    <input className="form-input success" id="subdomain" type="text" placeholder="digital-horizons" />
+                    <input className="form-input success" id="subdomain" type="text" placeholder="digital-horizons" value={regSubdomain} onChange={e => setRegSubdomain(e.target.value)} required/>
                     <div className="subdomain-suffix">.rankflow.app</div>
                   </div>
-                  <div className="form-hint" style={{color: 'var(--success)'}}>✓ Available! Your dashboard: digital-horizons.rankflow.app</div>
+                  {regSubdomain && <div className="form-hint" style={{color: 'var(--success)'}}>✓ Dashboard will be: {regSubdomain.toLowerCase().replace(/[^a-z0-9-]/g, '')}.rankflow.app</div>}
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="regPassword">Password <span className="req">*</span></label>
                   <div className="input-with-icon">
-                    <input className="form-input" id="regPassword" type={showRegPassword ? "text" : "password"} placeholder="Min. 8 characters" required/>
+                    <input className="form-input" id="regPassword" type={showRegPassword ? "text" : "password"} placeholder="Min. 8 characters" required value={regPassword} onChange={e => setRegPassword(e.target.value)}/>
                     <button type="button" className="input-icon-btn" onClick={() => setShowRegPassword(!showRegPassword)}>{showRegPassword ? "🙈" : "👁"}</button>
                   </div>
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="confirmPwd">Confirm Password <span className="req">*</span></label>
-                  <input className="form-input" id="confirmPwd" type="password" placeholder="••••••••••" required/>
+                  <input className="form-input" id="confirmPwd" type="password" placeholder="••••••••••" required value={regConfirm} onChange={e => setRegConfirm(e.target.value)}/>
                 </div>
                 <div className="form-group">
                   <div className="checkbox-row mb-3">
@@ -220,7 +293,9 @@ export default function Login() {
                     <label htmlFor="agreeTerms">I agree to the <a href="#" className="link">Terms of Service</a> and <a href="#" className="link">Privacy Policy</a></label>
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary">Create Agency Account →</button>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? 'Creating Account...' : 'Create Agency Account →'}
+                </button>
               </form>
 
               <div className="form-footer">

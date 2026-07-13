@@ -5,11 +5,11 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
 }
 
 model Agency {
@@ -17,11 +17,15 @@ model Agency {
   name      String
   slug      String   @unique
   subdomain String?  @unique
-  plan      String   @default("starter")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users     User[]
-  clients   Client[]
+  plan            String   @default("starter")
+  serankingApiKey String?  // Encrypted AES-256
+  brandingLogo    String?
+  brandingColor   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  users           User[]
+  clients         Client[]
+  invitations     Invitation[]
 }
 
 model User {
@@ -46,12 +50,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String? 
+  access_token      String? 
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String? 
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -78,9 +82,117 @@ model VerificationToken {
 model Client {
   id        String   @id @default(cuid())
   name      String
-  domain    String
-  agencyId  String
-  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  domain             String
+  serankingProjectId Int?
+  agencyId           String
+  
+  industry           String?
+  contactEmail       String?
+  contactName        String?
+  logo               String?
+  internalNotes      String?
+  competitors        String?   // JSON array of domains
+  gscConnected       Boolean   @default(false)
+  clientPortalEnabled Boolean  @default(false)
+
+  agency             Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  keywordSnapshots   KeywordSnapshot[]
+  analyticsSnapshots AnalyticsSnapshot[]
+  backlinkSnapshots  BacklinkSnapshot[]
+  auditSnapshots     AuditSnapshot[]
+  reports            Report[]
+  reportSchedules    ReportSchedule[]
+  invitations        Invitation[]
 }
+
+model KeywordSnapshot {
+  id            String   @id @default(cuid())
+  clientId      String
+  date          DateTime @default(now())
+  totalKeywords Int      @default(0)
+  top3          Int      @default(0)
+  top10         Int      @default(0)
+  top100        Int      @default(0)
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, date])
+}
+
+model AnalyticsSnapshot {
+  id        String   @id @default(cuid())
+  clientId  String
+  date      DateTime @default(now())
+  sessions  Int      @default(0)
+  users     Int      @default(0)
+  pageviews Int      @default(0)
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, date])
+}
+
+model BacklinkSnapshot {
+  id               String   @id @default(cuid())
+  clientId         String
+  date             DateTime @default(now())
+  totalBacklinks   Int      @default(0)
+  referringDomains Int      @default(0)
+  newBacklinks     Int      @default(0)
+  lostBacklinks    Int      @default(0)
+  domainTrust      Int      @default(0)
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, date])
+}
+
+model AuditSnapshot {
+  id             String   @id @default(cuid())
+  clientId       String
+  date           DateTime @default(now())
+  healthScore    Int      @default(0)
+  criticalIssues Int      @default(0)
+  warnings       Int      @default(0)
+  notices        Int      @default(0)
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId, date])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  clientId    String
+  title       String
+  date        DateTime @default(now())
+  status      String   @default("draft") // draft, generated, failed
+  pdfUrl      String?
+  sections    String?   // JSON string
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ReportSchedule {
+  id         String   @id @default(cuid())
+  clientId   String   @unique
+  frequency  String   @default("monthly")
+  dayOfMonth Int      @default(1)
+  isActive   Boolean  @default(true)
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  agencyId  String
+  clientId  String?
+  role      String   @default("client")
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  client    Client?  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+

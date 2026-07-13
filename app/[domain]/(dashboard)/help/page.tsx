@@ -46,28 +46,28 @@ export default function HelpPage({ params }: { params: Promise<{ domain: string 
           <div>
             {/* KB Categories */}
             <div className="kb-grid">
-              <Link href={`/${domain}/help/guide/getting-started`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href={`/help/guide/getting-started`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="kb-card" style={{ height: '100%' }}>
                   <div className="kb-icon" style={{ background: '#EEF2FF', color: '#4F46E5' }}>🚀</div>
                   <div className="kb-title">Getting Started</div>
                   <div className="kb-desc">Learn how to connect your first client and configure the SERanking API.</div>
                 </div>
               </Link>
-              <Link href={`/${domain}/help/guide/customization`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href={`/help/guide/customization`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="kb-card" style={{ height: '100%' }}>
                   <div className="kb-icon" style={{ background: '#F5F3FF', color: '#8B5CF6' }}>🎨</div>
                   <div className="kb-title">Report Customization</div>
                   <div className="kb-desc">Customize colors, logos, and metric layouts for your agency&apos;s brand.</div>
                 </div>
               </Link>
-              <Link href={`/${domain}/help/guide/billing`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href={`/help/guide/billing`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="kb-card" style={{ height: '100%' }}>
                   <div className="kb-icon" style={{ background: '#ECFDF5', color: '#10B981' }}>💳</div>
                   <div className="kb-title">Billing & Subscription</div>
                   <div className="kb-desc">Manage your subscription, invoices, and payment methods.</div>
                 </div>
               </Link>
-              <Link href={`/${domain}/help/guide/troubleshooting`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href={`/help/guide/troubleshooting`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="kb-card" style={{ height: '100%' }}>
                   <div className="kb-icon" style={{ background: '#FEF2F2', color: '#EF4444' }}>🔧</div>
                   <div className="kb-title">Troubleshooting</div>

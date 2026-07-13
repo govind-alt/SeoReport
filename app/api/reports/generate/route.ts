@@ -51,6 +51,28 @@ export async function GET(request: NextRequest) {
     // Go to the render page and wait for network to be idle
     await page.goto(reportUrl, { waitUntil: 'networkidle0' });
 
+    // Inject styles for print to ensure the PDF looks professional
+    await page.addStyleTag({
+      content: `
+        @media print {
+          /* Hide UI elements that shouldn't be in the PDF */
+          .btn, button, nav, .sidebar { display: none !important; }
+          
+          /* Prevent page breaks inside cards/charts */
+          .card, .recharts-wrapper { page-break-inside: avoid; }
+          
+          /* Add some breathing room */
+          body { padding: 20px; }
+          
+          /* Fix background colors for printing */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+        }
+      `
+    });
+
     // Generate PDF
     const pdfBuffer = await page.pdf({
       format: 'A4',
@@ -61,7 +83,7 @@ export async function GET(request: NextRequest) {
     await browser.close();
 
     // Return the PDF buffer
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

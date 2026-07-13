@@ -8,11 +8,12 @@ import { toast } from 'sonner';
 export function Sidebar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const pathname = usePathname() || '';
-  
-  // Extract domain from pathname (e.g. /localhost/reports -> localhost)
-  // If no domain (like at /), default to 'localhost' for development
-  const pathParts = pathname.split('/').filter(Boolean);
-  const domain = pathParts.length > 0 ? pathParts[0] : 'localhost';
+
+  let basePath = '';
+  const firstSegment = pathname.split('/')[1];
+  if (firstSegment && !['clients', 'reports', 'settings', 'help', ''].includes(firstSegment)) {
+    basePath = `/${firstSegment}`;
+  }
 
   return (
     <aside className="sidebar">
@@ -24,26 +25,26 @@ export function Sidebar() {
         </div>
       </div>
       <nav className="sidebar-nav">
-        <Link href={`/${domain}`} className={`sidebar-item ${pathname === `/${domain}` ? 'active' : ''}`}>
-          <span className="sidebar-item-icon">📊</span>
+        <Link href={`${basePath}/`} className={`sidebar-item ${pathname === `${basePath}/` || pathname === basePath || pathname === '/' ? 'active' : ''}`}>
+          <span className="sidebar-item-icon">📈</span>
           <span className="sidebar-item-label">Dashboard</span>
         </Link>
-        <Link href={`/${domain}/clients`} className={`sidebar-item ${pathname.includes('/clients') ? 'active' : ''}`}>
+        <Link href={`${basePath}/clients`} className={`sidebar-item ${pathname.includes('/clients') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">👥</span>
           <span className="sidebar-item-label">Clients</span>
           <span className="sidebar-badge">24</span>
         </Link>
-        <Link href={`/${domain}/reports`} className={`sidebar-item ${pathname.includes('/reports') ? 'active' : ''}`}>
+        <Link href={`${basePath}/reports`} className={`sidebar-item ${pathname.includes('/reports') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">📄</span>
           <span className="sidebar-item-label">Reports</span>
           <span className="sidebar-badge">38</span>
         </Link>
         <div className="sidebar-section-label">Configuration</div>
-        <Link href={`/${domain}/settings`} className={`sidebar-item ${pathname.includes('/settings') ? 'active' : ''}`}>
+        <Link href={`${basePath}/settings`} className={`sidebar-item ${pathname.includes('/settings') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">⚙️</span>
           <span className="sidebar-item-label">Settings</span>
         </Link>
-        <Link href={`/${domain}/help`} className={`sidebar-item ${pathname.includes('/help') ? 'active' : ''}`}>
+        <Link href={`${basePath}/help`} className={`sidebar-item ${pathname.includes('/help') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">❓</span>
           <span className="sidebar-item-label">Help &amp; Support</span>
         </Link>
@@ -57,9 +58,9 @@ export function Sidebar() {
                 <div className="user-menu-name">John Doe</div>
                 <div className="user-menu-email">john@digitalhorizons.com</div>
               </div>
-              <Link href={`/${domain}/settings`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>⚙️ Account Settings</Link>
-              <Link href={`/${domain}/settings`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>💳 Billing &amp; Plan</Link>
-              <Link href={`/${domain}/help`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>❓ Help &amp; Support</Link>
+              <Link href={`${basePath}/settings`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>⚙️ Account Settings</Link>
+              <Link href={`${basePath}/settings`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>💳 Billing &amp; Plan</Link>
+              <Link href={`${basePath}/help`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>❓ Help &amp; Support</Link>
               <div className="user-menu-divider"></div>
               <Link href="/login" className="user-menu-item danger" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>🚪 Sign Out</Link>
             </div>

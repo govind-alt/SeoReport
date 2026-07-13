@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
+import { getClientDetails, syncClientData } from '@/app/actions';
 
 const trendData = [
   { name: 'Jan', count: 32 },
@@ -23,27 +24,76 @@ const trafficData = [
   { name: 'Jun', count: 8420 },
 ];
 
-export default function ClientDetailPage({ params }: { params: Promise<{ clientId: string }> }) {
+export default function ClientDetailPage({ params }: { params: Promise<{ clientId: string; domain: string }> }) {
   const [activeTab, setActiveTab] = useState('overview');
+  const [client, setClient] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const resolvedParams = use(params);
+  const clientId = resolvedParams.clientId;
+  const domain = resolvedParams.domain;
+
+  useEffect(() => {
+    setLoading(true);
+    getClientDetails(clientId).then(data => {
+      setClient(data);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, [clientId]);
+
+  const handleSync = async () => {
+    setIsSyncing(true);
+    toast.loading('Syncing data...', { id: 'sync' });
+    try {
+      await syncClientData(clientId, domain);
+      toast.success('Sync complete', { id: 'sync' });
+      // Refresh local data
+      const updatedData = await getClientDetails(clientId);
+      if (updatedData) setClient(updatedData);
+    } catch (e: any) {
+      toast.error(e.message || 'Sync failed', { id: 'sync' });
+    }
+    setIsSyncing(false);
+  };
+
+  if (loading) return <div style={{padding: '40px'}}>Loading...</div>;
+  if (!client) return (
+    <div style={{padding: '40px', textAlign: 'center'}}>
+      <h2>Client not found</h2>
+      <p style={{color: 'var(--text-muted)', marginBottom: '20px'}}>The client you are looking for does not exist.</p>
+      <Link href="/clients" className="btn btn-primary">Back to Clients</Link>
+    </div>
+  );
 
   return (
     <>
-      {/* Header section */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <div className="client-avatar" style={{ background: '#4F46E5', width: '56px', height: '56px', fontSize: '20px' }}>AC</div>
-        <div style={{ flex: '1' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>Acme Corp</h1>
-            <span className="badge badge-success">Active</span>
-            <span className="badge badge-primary">B2B SaaS</span>
-          </div>
-          <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
-            <a href="https://acmecorp.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>acmecorp.com</a> · Client since Jan 2025
-          </div>
+      {/* Breadcrumb */}
+      <div style={{fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px'}}>
+        <Link href={`/${domain}/clients`} style={{color: 'inherit', textDecoration: 'none'}}>Clients</Link> › <span style={{color: 'var(--text)', fontWeight: 500}}>{client.name}</span> › <span style={{textTransform: 'capitalize'}}>{activeTab}</span>
+      </div>
+      
+      {/* Topbar */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text-primary)' }}>{client.name}</div>
+          <a href={`https://${client.domain}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'none' }}>{client.domain}</a>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-secondary" onClick={() => alert('Editing settings')}>⚙️ Settings</button>
-          <button className="btn btn-primary" onClick={() => alert('Generating report...')}>📄 Generate Report</button>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div onClick={() => toast.info('Date range filtering coming soon')} style={{display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', background: 'var(--bg)', padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border)', cursor: 'pointer', fontWeight: 500}}>
+            📅 May 2024 vs Apr 2024 ▾
+          </div>
+          
+          <div onClick={() => toast.info(client.gscConnected ? 'Google Search Console is active' : 'You can connect GSC in client settings')} style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: 500, padding: '6px 10px', borderRadius: '6px', background: client.gscConnected ? '#f0fdf4' : '#fff1f2', border: `1px solid ${client.gscConnected ? '#c0e8c8' : '#fecdd3'}`, color: client.gscConnected ? '#15803d' : '#e11d48', cursor: 'pointer'}}>
+            {client.gscConnected ? '✅ GSC Connected' : '❌ GSC Disconnected'}
+          </div>
+
+          <button className="btn btn-secondary btn-sm" onClick={() => { toast.info('Client settings editing coming soon'); window.location.href = `/${domain}/settings`; }}>⚙ Edit</button>
+          <button className="btn btn-primary btn-sm" onClick={() => window.location.href = `/${domain}/reports`}>+ Report</button>
+          <div style={{fontSize: '18px', cursor: 'pointer', padding: '4px'}} onClick={() => toast('No new notifications', { icon: '🔔' })}>🔔</div>
         </div>
       </div>
 
@@ -67,23 +117,23 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
           <div className="kpi-grid kpi-grid-5" style={{ gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', marginBottom: '20px' }}>
             <div className="kpi-card success">
               <div className="kpi-label">Sessions</div>
-              <div className="kpi-value" style={{ fontSize: '24px' }}>8,420</div>
-              <div className="kpi-trend trend-up">↑ +16.3%</div>
+              <div className="kpi-value" style={{ fontSize: '24px' }}>{client.snapshots?.analytics?.[0]?.sessions || '--'}</div>
+              <div className="kpi-trend trend-up">↑</div>
             </div>
             <div className="kpi-card">
               <div className="kpi-label">Top 10 Keywords</div>
-              <div className="kpi-value" style={{ fontSize: '24px' }}>47</div>
-              <div className="kpi-trend trend-up">↑ +4 kws</div>
+              <div className="kpi-value" style={{ fontSize: '24px' }}>{client.snapshots?.keywords?.[0]?.top10 || '--'}</div>
+              <div className="kpi-trend trend-up">↑</div>
             </div>
             <div className="kpi-card">
               <div className="kpi-label">Domain Trust</div>
-              <div className="kpi-value" style={{ fontSize: '24px' }}>42</div>
-              <div className="kpi-trend trend-up">↑ +2 pts</div>
+              <div className="kpi-value" style={{ fontSize: '24px' }}>{client.snapshots?.backlinks?.domainTrust || '--'}</div>
+              <div className="kpi-trend trend-up">↑</div>
             </div>
             <div className="kpi-card success">
               <div className="kpi-label">Site Health</div>
-              <div className="kpi-value" style={{ fontSize: '24px' }}>76%</div>
-              <div className="kpi-trend trend-up">↑ +8 pts</div>
+              <div className="kpi-value" style={{ fontSize: '24px' }}>{client.snapshots?.audit?.healthScore || '--'}%</div>
+              <div className="kpi-trend trend-up">↑</div>
             </div>
             <div className="kpi-card">
               <div className="kpi-label">AI Visibility</div>
@@ -136,7 +186,9 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <button className="btn btn-primary btn-sm" onClick={() => toast.success('Report generation started')}>+ Generate Report</button>
-            <button className="btn btn-secondary btn-sm" onClick={() => toast.loading('Syncing data...', { duration: 2000 })}>🔄 Sync Now</button>
+            <button className="btn btn-secondary btn-sm" onClick={handleSync} disabled={isSyncing}>
+              {isSyncing ? '🔄 Syncing...' : '🔄 Sync Now'}
+            </button>
             <button className="btn btn-secondary btn-sm" onClick={() => setActiveTab('reports')}>📄 View Reports</button>
           </div>
         </div>

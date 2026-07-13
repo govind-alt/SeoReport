@@ -70,7 +70,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
         <div>
           <div className="page-title">{guide.title}</div>
           <div style={{ marginTop: '8px' }}>
-            <Link href={`/${domain}/help`} style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>
+            <Link href={`/help`} style={{ color: 'var(--primary)', textDecoration: 'none', fontSize: '14px', fontWeight: 500 }}>
               &larr; Back to Help Center
             </Link>
           </div>
