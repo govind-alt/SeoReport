@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RankFlow — Help & Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+/* ── Page-specific styles ── */
+.help-hero {
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.help-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.help-hero-title { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 12px; }
+.help-hero-sub { font-size: 15px; opacity: 0.8; max-width: 500px; margin: 0 auto 24px; }
+.search-wrapper { position: relative; max-width: 540px; margin: 0 auto; }
+.search-input {
+  width: 100%; padding: 16px 20px 16px 48px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1);
+  color: white; font-size: 15px; font-family: inherit; transition: var(--transition-fast);
+}
+.search-input::placeholder { color: rgba(255,255,255,0.6); }
+.search-input:focus { outline: none; background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+.search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.7; }
+
+.help-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+
+.kb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; }
+.kb-card {
+  background: white; border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; cursor: pointer; transition: var(--transition-fast);
+}
+.kb-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--primary-light); }
+.kb-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+.kb-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.kb-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* FAQ Accordion */
+.faq-item { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; background: white; }
+.faq-summary {
+  padding: 16px 20px; font-size: 14px; font-weight: 600; color: var(--text-primary);
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; list-style: none;
+}
+.faq-summary::-webkit-details-marker { display: none; }
+.faq-summary:hover { background: var(--gray-50); }
+.faq-content { padding: 0 20px 20px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.faq-icon { transition: transform 0.2s; font-size: 12px; color: var(--text-muted); }
+details[open] .faq-icon { transform: rotate(180deg); }
+details[open] .faq-summary { border-bottom: 1px solid var(--gray-50); margin-bottom: 12px; }
+
+/* Contact Support Card */
+.support-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.support-header { padding: 20px; border-bottom: 1px solid var(--border); background: var(--gray-50); }
+.support-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+.support-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.support-body { padding: 20px; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">RF</div>
+      <div>
+        <div class="sidebar-logo-text">RankFlow</div>
+        <div class="sidebar-logo-sub">Digital Horizons</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-item">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-label">Dashboard</span>
+      </a>
+      <a href="clients.html" class="sidebar-item">
+        <span class="sidebar-item-icon">👥</span>
+        <span class="sidebar-item-label">Clients</span>
+        <span class="sidebar-badge">24</span>
+      </a>
+      <a href="reports.html" class="sidebar-item">
+        <span class="sidebar-item-icon">📄</span>
+        <span class="sidebar-item-label">Reports</span>
+        <span class="sidebar-badge">38</span>
+      </a>
+      <div class="sidebar-section-label">Configuration</div>
+      <a href="settings.html" class="sidebar-item">
+        <span class="sidebar-item-icon">⚙️</span>
+        <span class="sidebar-item-label">Settings</span>
+      </a>
+      <a href="help.html" class="sidebar-item active">
+        <span class="sidebar-item-icon">❓</span>
+        <span class="sidebar-item-label">Help &amp; Support</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-wrap">
+        <div id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">John Doe</div>
+            <div class="user-menu-email">john@digitalhorizons.com</div>
+          </div>
+          <button class="user-menu-item" onclick="window.location.href='settings.html'">⚙️ Account Settings</button>
+          <button class="user-menu-item" onclick="Toast.info('Opening billing...');window.location.href='settings.html'">💳 Billing &amp; Plan</button>
+          <button class="user-menu-item" onclick="window.location.href='help.html'">❓ Help &amp; Support</button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item danger" onclick="Logout.confirm()">🚪 Sign Out</button>
+        </div>
+        <div id="sidebarUserChip">
+          <div class="sidebar-avatar">JD</div>
+          <div>
+            <div class="sidebar-user-name">John Doe</div>
+            <div class="sidebar-user-role">Agency Admin</div>
+          </div>
+          <span class="chevron">▲</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div style="flex:1;"><div class="topbar-title">Help & Support</div></div>
+    </header>
+
+    <div class="page-content">
+      
+      <!-- Hero -->
+      <div class="help-hero">
+        <div class="help-hero-title">How can we help you today?</div>
+        <div class="help-hero-sub">Search our knowledge base or get in touch with our support team.</div>
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" placeholder="Search for guides, API issues, billing..."/>
+        </div>
+      </div>
+
+      <div class="help-grid">
+        <!-- Left Col -->
+        <div>
+          <!-- KB Categories -->
+          <div class="kb-grid">
+            <div class="kb-card" onclick="Toast.info('Opening Getting Started guide...')">
+              <div class="kb-icon" style="background:#EEF2FF;color:#4F46E5;">🚀</div>
+              <div class="kb-title">Getting Started</div>
+              <div class="kb-desc">Learn how to connect your first client and configure the SERanking API.</div>
+            </div>
+            <div class="kb-card" onclick="Toast.info('Opening Report Customization guide...')">
+              <div class="kb-icon" style="background:#F5F3FF;color:#8B5CF6;">🎨</div>
+              <div class="kb-title">Report Customization</div>
+              <div class="kb-desc">Customize colors, logos, and metric layouts for your agency's brand.</div>
+            </div>
+            <div class="kb-card" onclick="Toast.info('Opening Billing guide...')">
+              <div class="kb-icon" style="background:#ECFDF5;color:#10B981;">💳</div>
+              <div class="kb-title">Billing & Subscription</div>
+              <div class="kb-desc">Manage your subscription, invoices, and payment methods.</div>
+            </div>
+            <div class="kb-card" onclick="Toast.info('Opening Troubleshooting guide...')">
+              <div class="kb-icon" style="background:#FEF2F2;color:#EF4444;">🔧</div>
+              <div class="kb-title">Troubleshooting</div>
+              <div class="kb-desc">Fix common issues like API timeouts, missing keywords, and PDF generation.</div>
+            </div>
+          </div>
+
+          <!-- FAQs -->
+          <h2 style="font-size:16px;font-weight:700;margin-bottom:16px;">Frequently Asked Questions</h2>
+          <details class="faq-item">
+            <summary class="faq-summary">Why are my SERanking API limits showing as 429? <span class="faq-icon">▼</span></summary>
+            <div class="faq-content">
+              A 429 status code means you have hit your SERanking API rate limit. If you have "Auto-Sync" enabled for many clients, they may all try to pull data simultaneously. Try spacing out your sync schedules in the Settings panel, or contact SERanking to increase your API quota.
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-summary">How do I add a custom agency domain for report links? <span class="faq-icon">▼</span></summary>
+            <div class="faq-content">
+              You can set up a custom domain (e.g., <code>reports.youragency.com</code>) by going to <strong>Settings &rarr; Agency Branding</strong>. You will need to add a CNAME record to your DNS provider pointing to <code>cname.rankflow.app</code>. SSL certificates are provisioned automatically within 24 hours.
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-summary">Can clients view the dashboard? <span class="faq-icon">▼</span></summary>
+            <div class="faq-content">
+              Currently, RankFlow is designed as an internal agency tool. Clients cannot log in directly to view the dashboard. However, you can share a live "Preview Link" with them via the Reports page, which gives them a read-only, white-labeled view of their current report.
+            </div>
+          </details>
+          <details class="faq-item">
+            <summary class="faq-summary">Are PDF reports fully white-labeled? <span class="faq-icon">▼</span></summary>
+            <div class="faq-content">
+              Yes! As long as you have uploaded your agency logo and configured your brand colors in Settings, all generated PDF reports will be 100% white-labeled with no mention of RankFlow.
+            </div>
+          </details>
+        </div>
+
+        <!-- Right Col (Contact) -->
+        <div>
+          <div class="support-card">
+            <div class="support-header">
+              <div class="support-title">Contact Support</div>
+              <div class="support-subtitle">We usually reply within 2 hours.</div>
+            </div>
+            <div class="support-body">
+              <form onsubmit="event.preventDefault();submitSupport();">
+                <div class="form-group">
+                  <label class="form-label">Issue Type</label>
+                  <select class="form-input">
+                    <option>Technical Support</option>
+                    <option>Billing & Plan</option>
+                    <option>Feature Request</option>
+                    <option>API Issues</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Subject</label>
+                  <input type="text" class="form-input" placeholder="e.g. Can't connect GSC" required/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Message</label>
+                  <textarea class="form-input" rows="5" placeholder="Describe the issue in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Send Message</button>
+              </form>
+
+              <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+                <div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:10px;">Direct Contact</div>
+                <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);margin-bottom:8px;">
+                  <span style="background:var(--gray-50);padding:4px;border-radius:4px;">📧</span> support@rankflow.app
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-muted);">
+                  <span style="background:var(--gray-50);padding:4px;border-radius:4px;">📞</span> 1-800-555-RANK
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+function submitSupport() {
+  const btn = document.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner">⟳</span> Sending...';
+  
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = 'Send Message';
+    document.querySelector('form').reset();
+    Toast.success('Support ticket created! We will email you shortly.');
+  }, 1200);
+}
+</script>
+</body>
+</html>

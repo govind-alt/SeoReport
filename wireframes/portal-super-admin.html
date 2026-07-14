@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankFlow — Super Admin Portal Wireframes</title>
+  <style>
+    :root {
+      --wire-bg: #f4f5f7;
+      --wire-surface: #ffffff;
+      --wire-border: #c8ccd4;
+      --wire-border-dark: #8c94a4;
+      --wire-text: #1e2030;
+      --wire-text-light: #5c6478;
+      --wire-text-muted: #9aa0b4;
+      --wire-fill: #dde1e8;
+      --wire-fill-dark: #b8bfcc;
+      --wire-fill-accent: #c4c8d6;
+      --wire-primary: #4a3080;
+      --wire-success: #5a7a60;
+      --wire-danger: #8a4a4a;
+      --wire-warn: #8a7040;
+      --sidebar-w: 224px;
+      --role-color: #4a3080;
+      --role-bg: #ede8f8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1d2e; color: var(--wire-text); min-height: 100vh; }
+
+    /* TOP NAV */
+    .top-nav { background: #12141f; border-bottom: 1px solid #2a2d40; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .top-nav .brand { display: flex; align-items: center; gap: 10px; color: #e0e4f0; font-weight: 700; font-size: 15px; }
+    .brand-icon { width: 28px; height: 28px; background: var(--role-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff; }
+    .role-badge { background: var(--role-bg); color: var(--role-color); font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; border: 1px solid #c8b8f0; }
+    .screen-selector { display: flex; align-items: center; gap: 8px; }
+    .screen-selector select { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+    .nav-btns { display: flex; gap: 8px; }
+    .nav-btn { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+    .nav-btn:hover { background: #3a3d54; color: #fff; }
+    .screen-counter { color: #606478; font-size: 12px; }
+
+    /* SCREEN AREA */
+    .screen-area { display: flex; justify-content: center; align-items: flex-start; padding: 28px 24px; min-height: calc(100vh - 52px); }
+    .wireframe-wrapper { width: 100%; max-width: 1100px; }
+    .screen-label { color: #8890a8; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
+    .screen-title { color: #e0e4f0; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .screen-desc { color: #606478; font-size: 13px; margin-bottom: 20px; }
+
+    /* WIREFRAME CHROME */
+    .wf-chrome { background: var(--wire-bg); border-radius: 12px; overflow: hidden; border: 2px solid #2a2d40; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .wf-chrome-bar { background: #e0e3ea; height: 32px; display: flex; align-items: center; padding: 0 14px; gap: 7px; border-bottom: 1px solid var(--wire-border); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #e07070; } .dot-y { background: #e0c070; } .dot-g { background: #70c070; }
+    .wf-url { flex: 1; background: #fff; border: 1px solid var(--wire-border); border-radius: 12px; height: 20px; margin: 0 10px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; color: var(--wire-text-muted); }
+
+    /* LAYOUT */
+    .wf-layout { display: flex; min-height: 620px; }
+    .wf-sidebar { width: var(--sidebar-w); background: var(--wire-surface); border-right: 1px solid var(--wire-border); flex-shrink: 0; display: flex; flex-direction: column; }
+    .wf-sidebar-logo { padding: 16px 16px 12px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; gap: 10px; }
+    .logo-box { width: 32px; height: 32px; background: var(--role-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 700; }
+    .logo-text { font-size: 12px; font-weight: 700; color: var(--wire-primary); }
+    .logo-sub { font-size: 9px; color: var(--wire-text-muted); }
+    .logo-role-pill { font-size: 9px; font-weight: 700; background: var(--role-bg); color: var(--role-color); padding: 1px 6px; border-radius: 8px; margin-top: 2px; display: inline-block; }
+    .wf-sidebar-nav { padding: 8px; flex: 1; }
+    .nav-section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--wire-text-muted); padding: 8px 8px 4px; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 8px; border-radius: 6px; font-size: 12px; color: var(--wire-text-light); cursor: pointer; margin-bottom: 1px; }
+    .nav-item:hover, .nav-item.active { background: var(--role-bg); color: var(--role-color); font-weight: 600; }
+    .nav-icon { width: 14px; height: 14px; background: var(--wire-fill-dark); border-radius: 3px; flex-shrink: 0; }
+    .nav-icon.super { background: #c8b8f0; }
+    .nav-badge { margin-left: auto; background: var(--wire-fill-dark); color: var(--wire-text-light); font-size: 9px; padding: 1px 6px; border-radius: 10px; }
+    .wf-sidebar-footer { padding: 12px; border-top: 1px solid var(--wire-border); }
+    .user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: var(--role-bg); border-radius: 8px; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--role-color); border: 1px solid #c8b8f0; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 11px; font-weight: 600; color: var(--wire-text); }
+    .user-role { font-size: 9px; color: var(--role-color); font-weight: 700; }
+    .wf-content { flex: 1; overflow: hidden; }
+
+    /* TOPBAR */
+    .wf-topbar { height: 52px; background: var(--wire-surface); border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--wire-text); flex: 1; }
+    .topbar-actions { display: flex; gap: 8px; }
+
+    /* BUTTONS */
+    .wf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .wf-btn-primary { background: var(--wire-primary); color: #fff; border-color: var(--wire-primary); }
+    .wf-btn-secondary { background: var(--wire-surface); color: var(--wire-text-light); border-color: var(--wire-border); }
+    .wf-btn-danger { background: #f8ecec; color: var(--wire-danger); border-color: #e0c4c4; }
+    .wf-btn-warn { background: #fdf8e8; color: var(--wire-warn); border-color: #e8d888; }
+    .wf-btn-sm { padding: 4px 10px; font-size: 10px; }
+    .wf-btn-ghost { background: transparent; color: var(--wire-text-muted); border-color: var(--wire-border); }
+
+    /* MAIN CONTENT */
+    .wf-main { padding: 24px; }
+    .kpi-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .kpi-label { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--wire-text); line-height: 1; }
+    .kpi-change { font-size: 10px; margin-top: 4px; }
+    .kpi-change.up { color: var(--wire-success); } .kpi-change.down { color: var(--wire-danger); } .kpi-change.neutral { color: var(--wire-text-muted); }
+
+    /* TABLE */
+    .wf-table-wrap { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-table-header { padding: 14px 16px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; justify-content: space-between; }
+    .wf-table-title { font-size: 13px; font-weight: 700; color: var(--wire-text); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--wire-fill); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--wire-text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--wire-border); }
+    td { padding: 9px 12px; font-size: 11px; color: var(--wire-text); border-bottom: 1px solid var(--wire-fill); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--wire-fill); }
+
+    /* CHARTS */
+    .chart-box { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .chart-title { font-size: 12px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 12px; }
+    .chart-placeholder { background: var(--wire-fill); border-radius: 6px; display: flex; align-items: flex-end; justify-content: space-around; padding: 16px 12px 0; gap: 4px; }
+    .chart-bar { background: var(--wire-fill-dark); border-radius: 3px 3px 0 0; flex: 1; min-width: 20px; }
+
+    /* MISC */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .wf-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .badge-success { background: #e6f0e8; color: var(--wire-success); }
+    .badge-danger { background: #f0e6e6; color: var(--wire-danger); }
+    .badge-warn { background: #f0ece0; color: var(--wire-warn); }
+    .badge-neutral { background: var(--wire-fill); color: var(--wire-text-muted); }
+    .badge-primary { background: var(--role-bg); color: var(--role-color); }
+    .progress-bar { height: 6px; background: var(--wire-fill); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; background: var(--wire-primary); border-radius: 3px; }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .wf-input { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 6px; padding: 7px 12px; font-size: 11px; color: var(--wire-text-light); flex: 1; min-width: 160px; }
+    .wf-select { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 6px; padding: 7px 12px; font-size: 11px; color: var(--wire-text-light); }
+    .alert { padding: 10px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .alert-info { background: #f0f4fd; border: 1px solid #c0ccf0; color: #283878; }
+    .alert-warn { background: #fdf8e8; border: 1px solid #e8d888; color: #705820; }
+    .alert-danger { background: #fdf0f0; border: 1px solid #e8c0c0; color: #7a2828; }
+    .alert-success { background: #f0fdf4; border: 1px solid #c0e8c8; color: #286048; }
+    .divider { border: none; border-top: 1px solid var(--wire-border); margin: 16px 0; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--wire-text); margin-bottom: 5px; }
+    .form-input { display: block; width: 100%; padding: 9px 12px; border: 1px solid var(--wire-border); border-radius: 6px; font-size: 12px; color: var(--wire-text-light); background: var(--wire-fill); }
+    .form-input-hint { font-size: 9px; color: var(--wire-text-muted); margin-top: 3px; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .page-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .page-h1 { font-size: 18px; font-weight: 800; color: var(--wire-text); }
+    .page-sub { font-size: 11px; color: var(--wire-text-muted); margin-top: 3px; }
+    .icon-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--wire-text); margin-bottom: 3px; }
+    .section-desc { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 16px; }
+    .wf-switch { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .switch-track { width: 32px; height: 18px; border-radius: 9px; background: var(--wire-fill-dark); position: relative; flex-shrink: 0; }
+    .switch-track.on { background: var(--wire-primary); }
+    .switch-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; }
+    .switch-track.on .switch-thumb { left: 16px; }
+    .switch-label { font-size: 11px; color: var(--wire-text); }
+    .switch-sub { font-size: 10px; color: var(--wire-text-muted); }
+    .auth-wrapper { min-height: 600px; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; padding: 32px; }
+    .auth-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 12px; padding: 32px; width: 380px; }
+    .auth-logo { text-align: center; margin-bottom: 24px; }
+    .auth-title { font-size: 18px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .auth-subtitle { font-size: 11px; color: var(--wire-text-muted); }
+
+    /* SCREEN DISPLAY */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ANNOTATIONS */
+    .annotations-panel { background: #12141f; border-top: 1px solid #2a2d40; padding: 12px 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .ann-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #8890a8; }
+    .ann-bullet { width: 8px; height: 8px; border-radius: 2px; background: var(--role-color); flex-shrink: 0; }
+    .permission-only { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; color: var(--role-color); background: var(--role-bg); border: 1px solid #c8b8f0; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+    .up-arrow { color: var(--wire-success); }
+    .down-arrow { color: var(--wire-danger); }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAVIGATION -->
+<div class="top-nav">
+  <div class="brand">
+    <div class="brand-icon">SA</div>
+    RankFlow — Wireframes
+    <div class="role-badge">⚡ Super Admin Portal</div>
+  </div>
+  <div class="screen-selector">
+    <select id="screenSelect" onchange="gotoScreen(this.value)">
+      <option value="0">01 — Super Admin Login</option>
+      <option value="1">02 — Platform Overview Dashboard</option>
+      <option value="2">03 — Agencies List</option>
+      <option value="3">04 — Agency Detail</option>
+      <option value="4">05 — Add / Edit Agency</option>
+      <option value="5">06 — Platform Billing & Usage</option>
+      <option value="6">07 — Platform Settings</option>
+      <option value="7">08 — Audit Log</option>
+    </select>
+    <span class="screen-counter" id="screenCounter">1 / 8</span>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="prevScreen()">← Prev</button>
+    <button class="nav-btn" onclick="nextScreen()">Next →</button>
+  </div>
+</div>
+
+<div class="screen-area">
+<div class="wireframe-wrapper">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 01: SUPER ADMIN LOGIN -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-0">
+  <div class="screen-label">Screen 01 · SUPER_ADMIN</div>
+  <div class="screen-title">Super Admin Login</div>
+  <div class="screen-desc">Platform-level login. Only RankFlow platform owners access this. Separate from agency-facing login.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/login</div></div>
+    <div class="auth-wrapper" style="background:#f0ecfc;">
+      <div style="max-width:400px; width:100%;">
+        <div class="auth-logo">
+          <div style="width:48px; height:48px; background:var(--role-color); border-radius:12px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; font-weight:900;">RF</div>
+          <div style="font-size:20px; font-weight:800; color:var(--role-color);">RankFlow Platform</div>
+          <div style="font-size:11px; color:var(--wire-text-muted); margin-top:4px;">Super Admin Access Only</div>
+        </div>
+        <div class="auth-card" style="border: 2px solid #c8b8f0;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px; background:var(--role-bg); padding:10px 12px; border-radius:8px;">
+            <span style="font-size:16px;">⚡</span>
+            <span style="font-size:11px; color:var(--role-color); font-weight:600;">Platform Administration Console</span>
+          </div>
+          <div class="auth-title">Admin Sign In</div>
+          <div class="auth-subtitle" style="margin-bottom:20px;">Manage all agencies, tenants, billing & platform config</div>
+          <div class="form-group">
+            <label class="form-label">Platform Email</label>
+            <div class="form-input">admin@rankflow.app</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="form-input">••••••••••••</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Two-Factor Code <span style="color:var(--wire-danger); font-size:10px;">Required</span></label>
+            <div class="form-input" style="font-family:monospace; letter-spacing:4px;">_ _ _ _ _ _</div>
+          </div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; padding:10px; background:var(--role-color);">Sign In to Admin Console</div>
+          <div style="text-align:center; margin-top:16px; font-size:10px; color:var(--wire-text-muted);">Unauthorized access is prohibited and monitored.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Separate login URL from agency-facing login</div>
+    <div class="ann-item"><div class="ann-bullet"></div>2FA mandatory (TOTP via Authenticator app)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>All logins logged to audit table with IP + timestamp</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Cannot access agency dashboards directly (must impersonate)</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 02: PLATFORM DASHBOARD -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-1">
+  <div class="screen-label">Screen 02 · SUPER_ADMIN</div>
+  <div class="screen-title">Platform Overview Dashboard</div>
+  <div class="screen-desc">Bird's-eye view of the entire RankFlow platform: all agencies, usage stats, revenue, and system health.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/dashboard</div></div>
+    <div class="wf-layout">
+      <!-- Sidebar -->
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo">
+          <div class="logo-box">RF</div>
+          <div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div>
+        </div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item active"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Agencies <span class="nav-badge">47</span></div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Platform Settings</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Feature Flags</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <!-- Content -->
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">Platform Overview <span style="font-size:11px; font-weight:400; color:var(--wire-text-muted);">June 2026</span></div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Export Report</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm" style="background:var(--role-color);">+ Add Agency</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Total Agencies</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +3 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Clients</div><div class="kpi-value">1,284</div><div class="kpi-change up">↑ +112 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Reports Generated</div><div class="kpi-value">3,847</div><div class="kpi-change up">↑ +24% vs last month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Platform Revenue</div><div class="kpi-value">$18.4K</div><div class="kpi-change up">↑ +8% MoM</div></div>
+          </div>
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">API Credits Used</div><div class="kpi-value">284K</div><div class="kpi-change neutral">of 500K allocated</div></div>
+            <div class="kpi-card"><div class="kpi-label">Active Team Members</div><div class="kpi-value">193</div><div class="kpi-change up">↑ +17 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">Suspended Agencies</div><div class="kpi-value">2</div><div class="kpi-change down">↑ +1 this month</div></div>
+            <div class="kpi-card"><div class="kpi-label">System Uptime</div><div class="kpi-value">99.8%</div><div class="kpi-change up">↑ Last 30 days</div></div>
+          </div>
+          <div class="two-col">
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">New Agencies per Month</div>
+              <div class="chart-subtitle">Last 6 months</div>
+              <div class="chart-placeholder" style="height:90px;">
+                <div class="chart-bar" style="height:40%;"></div>
+                <div class="chart-bar" style="height:55%;"></div>
+                <div class="chart-bar" style="height:48%;"></div>
+                <div class="chart-bar" style="height:70%;"></div>
+                <div class="chart-bar" style="height:60%;"></div>
+                <div class="chart-bar" style="height:90%; background:var(--role-color);"></div>
+              </div>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Reports Generated (Platform-wide)</div>
+              <div class="chart-subtitle">Last 6 months</div>
+              <div class="chart-placeholder" style="height:90px;">
+                <div class="chart-bar" style="height:30%;"></div>
+                <div class="chart-bar" style="height:45%;"></div>
+                <div class="chart-bar" style="height:62%;"></div>
+                <div class="chart-bar" style="height:74%;"></div>
+                <div class="chart-bar" style="height:80%;"></div>
+                <div class="chart-bar" style="height:100%; background:var(--role-color);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header">
+              <div class="wf-table-title">Top Agencies by Usage</div>
+              <div class="wf-btn wf-btn-ghost wf-btn-sm">View All →</div>
+            </div>
+            <table>
+              <tr><th>Agency</th><th>Plan</th><th>Clients</th><th>Reports/mo</th><th>API Credits</th><th>Status</th><th>Actions</th></tr>
+              <tr><td><strong>Digital Horizons</strong></td><td><span class="badge badge-primary">Agency Pro</span></td><td>24</td><td>18</td><td>42,000</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impersonate</div></div></td></tr>
+              <tr><td><strong>SEO Masters Ltd</strong></td><td><span class="badge badge-primary">Enterprise</span></td><td>68</td><td>52</td><td>120,000</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impersonate</div></div></td></tr>
+              <tr><td><strong>RankBoost Agency</strong></td><td><span class="badge badge-warn">Starter</span></td><td>8</td><td>4</td><td>8,200</td><td><span class="badge badge-danger">Suspended</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-warn wf-btn-sm">Unsuspend</div></div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>All KPIs aggregated across all tenants — not visible to any other role</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Revenue data from billing system (Stripe), not SERanking</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Impersonate: lets super admin view an agency's dashboard as that admin</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Suspend agency: blocks login for all users under that tenant</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 03: AGENCIES LIST -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+  <div class="screen-label">Screen 03 · SUPER_ADMIN</div>
+  <div class="screen-title">Agencies List</div>
+  <div class="screen-desc">Full paginated list of all agency tenants with search, filter by plan/status, and bulk actions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/agencies</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Agencies <span class="nav-badge">47</span></div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Platform Settings</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Feature Flags</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">All Agencies</div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Export CSV</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm" style="background:var(--role-color);">+ New Agency</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input">🔍  Search agencies...</div>
+            <div class="wf-select">Plan: All ▾</div>
+            <div class="wf-select">Status: All ▾</div>
+            <div class="wf-select">Sort: Newest ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th><input type="checkbox" /></th><th>Agency Name</th><th>Subdomain</th><th>Plan</th><th>Clients</th><th>Admin Email</th><th>Created</th><th>Status</th><th>Actions</th></tr>
+              <tr><td><input type="checkbox" /></td><td><strong>Digital Horizons</strong></td><td style="font-size:10px; color:var(--wire-text-muted);">digital-horizons.rankflow.app</td><td><span class="badge badge-primary">Agency Pro</span></td><td>24</td><td style="font-size:10px;">john@dh.com</td><td>Jan 2026</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impers.</div><div class="wf-btn wf-btn-danger wf-btn-sm">Suspend</div></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><strong>SEO Masters Ltd</strong></td><td style="font-size:10px; color:var(--wire-text-muted);">seo-masters.rankflow.app</td><td><span class="badge badge-primary">Enterprise</span></td><td>68</td><td style="font-size:10px;">ceo@seomasters.com</td><td>Sep 2025</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impers.</div><div class="wf-btn wf-btn-danger wf-btn-sm">Suspend</div></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><strong>RankBoost Agency</strong></td><td style="font-size:10px; color:var(--wire-text-muted);">rankboost.rankflow.app</td><td><span class="badge badge-warn">Starter</span></td><td>8</td><td style="font-size:10px;">info@rankboost.io</td><td>Mar 2026</td><td><span class="badge badge-danger">Suspended</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impers.</div><div class="wf-btn wf-btn-warn wf-btn-sm">Restore</div></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><strong>Growth Hackers Co</strong></td><td style="font-size:10px; color:var(--wire-text-muted);">growth-hackers.rankflow.app</td><td><span class="badge badge-primary">Agency Pro</span></td><td>15</td><td style="font-size:10px;">admin@gh.co</td><td>Apr 2026</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impers.</div><div class="wf-btn wf-btn-danger wf-btn-sm">Suspend</div></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><strong>SearchPros Agency</strong></td><td style="font-size:10px; color:var(--wire-text-muted);">searchpros.rankflow.app</td><td><span class="badge badge-neutral">Trial</span></td><td>3</td><td style="font-size:10px;">hello@searchpros.com</td><td>Jun 2026</td><td><span class="badge badge-warn">Trial (12d left)</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Impers.</div><div class="wf-btn wf-btn-danger wf-btn-sm">Suspend</div></div></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border); display:flex; justify-content:space-between; align-items:center;">
+              <span>Showing 5 of 47 agencies</span>
+              <div style="display:flex; gap:6px;"><div class="wf-btn wf-btn-ghost wf-btn-sm">← Prev</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Next →</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>SUPER_ADMIN exclusive — no other role sees this list</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Bulk select + actions: Suspend selected, Export selected</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Impersonate: opens agency dashboard in a new tab with a banner "Viewing as [agency]"</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Suspend: sets agency.status = 'SUSPENDED', all logins blocked</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 04: AGENCY DETAIL -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+  <div class="screen-label">Screen 04 · SUPER_ADMIN</div>
+  <div class="screen-title">Agency Detail</div>
+  <div class="screen-desc">Deep-dive into a single agency tenant: users, API key status, usage graph, billing tier, and admin actions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/agencies/digital-horizons</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Agencies</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div style="flex:1;"><div style="font-size:10px; color:var(--wire-text-muted);">Agencies / <span style="color:var(--role-color);">Digital Horizons</span></div><div class="topbar-title" style="font-size:14px;">Digital Horizons Agency</div></div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-ghost wf-btn-sm">👁 Impersonate</div>
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">✏ Edit</div>
+            <div class="wf-btn wf-btn-danger wf-btn-sm">⛔ Suspend</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="three-col" style="margin-bottom:16px;">
+            <div class="wf-card"><div class="kpi-label">Plan</div><div class="kpi-value" style="font-size:18px;">Agency Pro</div><div class="kpi-change neutral">$149/mo</div></div>
+            <div class="wf-card"><div class="kpi-label">Clients</div><div class="kpi-value">24</div><div class="kpi-change up">↑ +3 this month</div></div>
+            <div class="wf-card"><div class="kpi-label">API Credits Used</div><div class="kpi-value" style="font-size:20px;">42,184</div><div class="kpi-change neutral">of 50,000/mo</div></div>
+          </div>
+          <div class="alert alert-info">🔗 Subdomain: <strong>digital-horizons.rankflow.app</strong> · SERanking API Key: <strong>se_key_••••••••••</strong> (Valid ✓)</div>
+          <div class="two-col">
+            <div class="wf-card">
+              <div class="wf-table-title" style="margin-bottom:12px;">Users & Roles</div>
+              <table>
+                <tr><th>Name</th><th>Role</th><th>Last Login</th><th>Status</th></tr>
+                <tr><td>John Doe</td><td><span class="badge badge-primary">Agency Admin</span></td><td>Today</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr><td>Sarah Lee</td><td><span class="badge badge-neutral">Team Member</span></td><td>2d ago</td><td><span class="badge badge-success">Active</span></td></tr>
+                <tr><td>Mike Ray</td><td><span class="badge badge-neutral">Team Member</span></td><td>5d ago</td><td><span class="badge badge-success">Active</span></td></tr>
+              </table>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">API Credit Usage (6 months)</div>
+              <div class="chart-placeholder" style="height:90px;">
+                <div class="chart-bar" style="height:40%;"></div>
+                <div class="chart-bar" style="height:52%;"></div>
+                <div class="chart-bar" style="height:65%;"></div>
+                <div class="chart-bar" style="height:78%;"></div>
+                <div class="chart-bar" style="height:72%;"></div>
+                <div class="chart-bar" style="height:84%; background:var(--role-color);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-top:0;">
+            <div class="wf-table-title" style="margin-bottom:12px;">Billing History</div>
+            <table>
+              <tr><th>Period</th><th>Plan</th><th>Amount</th><th>Status</th><th>Invoice</th></tr>
+              <tr><td>Jun 2026</td><td>Agency Pro</td><td>$149.00</td><td><span class="badge badge-success">Paid</span></td><td><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></td></tr>
+              <tr><td>May 2026</td><td>Agency Pro</td><td>$149.00</td><td><span class="badge badge-success">Paid</span></td><td><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>API key shown masked — super admin can trigger re-validation</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Impersonate opens agency's /dashboard with "Admin View" banner</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Billing history from Stripe webhook data stored in billing_events table</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 05: ADD / EDIT AGENCY -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+  <div class="screen-label">Screen 05 · SUPER_ADMIN</div>
+  <div class="screen-title">Add / Edit Agency</div>
+  <div class="screen-desc">Form to create a new agency tenant or edit an existing one. Assigns subdomain, plan tier, and admin user.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/agencies/new</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Agencies</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">← Agencies / <span style="color:var(--role-color);">Add New Agency</span></div></div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="section-title">Agency Details</div>
+            <div class="section-desc">Basic information for the new tenant.</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Agency Name *</label><div class="form-input">Digital Horizons Agency</div></div>
+              <div class="form-group"><label class="form-label">Subdomain *</label>
+                <div style="display:flex; gap:4px; align-items:center;"><div class="form-input" style="flex:1;">digital-horizons</div><span style="font-size:11px; color:var(--wire-text-muted);">.rankflow.app</span></div>
+                <div class="form-input-hint" style="color:var(--wire-success);">✓ Available</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Custom Domain (optional)</label><div class="form-input">reports.digitalhorizons.com</div><div class="form-input-hint">Agency can use their own domain</div></div>
+              <div class="form-group"><label class="form-label">Plan Tier *</label><div class="form-input">▾ Agency Pro — $149/mo (50K credits)</div></div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="section-title">Admin User</div>
+            <div class="section-desc">Creates the Agency Admin account for this tenant.</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Admin First Name</label><div class="form-input">John</div></div>
+              <div class="form-group"><label class="form-label">Admin Last Name</label><div class="form-input">Doe</div></div>
+            </div>
+            <div class="form-group"><label class="form-label">Admin Email *</label><div class="form-input">john@digitalhorizons.com</div><div class="form-input-hint">Invite email will be sent to this address</div></div>
+          </div>
+          <div class="wf-card" style="margin-bottom:12px;">
+            <div class="section-title">Feature Flags</div>
+            <div class="section-desc">Override platform defaults for this agency.</div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">White-label: Remove "Powered by RankFlow"</div><div class="switch-sub">Enterprise plan required</div></div></div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Custom domain support</div><div class="switch-sub">SSL auto-provisioned via Let's Encrypt</div></div></div>
+            <div class="wf-switch"><div class="switch-track"><div class="switch-thumb"></div></div><div><div class="switch-label">AI Recommendations (beta)</div><div class="switch-sub">GPT-4 powered next steps</div></div></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <div class="wf-btn wf-btn-secondary">Cancel</div>
+            <div class="wf-btn wf-btn-primary" style="background:var(--role-color);">Create Agency & Send Invite</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Creates agency record + admin user in a single DB transaction</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Sends admin invite email via Resend with temp password reset link</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Feature flags stored per-agency in agency_features JSONB column</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 06: PLATFORM BILLING & USAGE -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-5">
+  <div class="screen-label">Screen 06 · SUPER_ADMIN</div>
+  <div class="screen-title">Platform Billing & Usage</div>
+  <div class="screen-desc">Global API credit consumption across all agencies, revenue breakdown by plan tier, and per-agency usage table.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/billing</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Agencies</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Platform Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Billing & Usage</div><div class="topbar-actions"><div class="wf-select" style="font-size:11px;">June 2026 ▾</div><div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Export</div></div></div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">MRR (Monthly Recurring)</div><div class="kpi-value">$18,453</div><div class="kpi-change up">↑ +8% vs May</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total API Credits Used</div><div class="kpi-value">284K</div><div class="kpi-change neutral">of 500K pool</div></div>
+            <div class="kpi-card"><div class="kpi-label">Starter Plans</div><div class="kpi-value">12</div><div class="kpi-change neutral">$49/mo each</div></div>
+            <div class="kpi-card"><div class="kpi-label">Enterprise Plans</div><div class="kpi-value">8</div><div class="kpi-change up">↑ +2 this month</div></div>
+          </div>
+          <div class="two-col">
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Revenue by Plan Tier</div>
+              <div style="padding:12px; background:var(--wire-fill); border-radius:6px; display:flex; flex-direction:column; gap:8px;">
+                <div><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Enterprise ($499/mo × 8)</span><span>$3,992</span></div><div class="progress-bar"><div class="progress-fill" style="width:22%;"></div></div></div>
+                <div><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Agency Pro ($149/mo × 27)</span><span>$4,023</span></div><div class="progress-bar"><div class="progress-fill" style="width:55%;"></div></div></div>
+                <div><div style="display:flex; justify-content:space-between; font-size:11px;"><span>Starter ($49/mo × 12)</span><span>$588</span></div><div class="progress-bar"><div class="progress-fill" style="width:10%;"></div></div></div>
+              </div>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">API Credits Used (Platform-wide, 6mo)</div>
+              <div class="chart-placeholder" style="height:100px;">
+                <div class="chart-bar" style="height:40%;"></div>
+                <div class="chart-bar" style="height:48%;"></div>
+                <div class="chart-bar" style="height:56%;"></div>
+                <div class="chart-bar" style="height:62%;"></div>
+                <div class="chart-bar" style="height:68%;"></div>
+                <div class="chart-bar" style="height:76%; background:var(--role-color);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header"><div class="wf-table-title">Per-Agency Usage This Month</div></div>
+            <table>
+              <tr><th>Agency</th><th>Plan</th><th>Credits Used</th><th>Credits Limit</th><th>Utilization</th><th>Reports</th></tr>
+              <tr><td><strong>SEO Masters Ltd</strong></td><td>Enterprise</td><td>120,400</td><td>200,000</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:60%;"></div></div><span>60%</span></div></td><td>52</td></tr>
+              <tr><td><strong>Digital Horizons</strong></td><td>Agency Pro</td><td>42,184</td><td>50,000</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:84%; background:var(--wire-warn);"></div></div><span style="color:var(--wire-warn);">84%</span></div></td><td>18</td></tr>
+              <tr><td><strong>Growth Hackers Co</strong></td><td>Agency Pro</td><td>18,200</td><td>50,000</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:36%;"></div></div><span>36%</span></div></td><td>11</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Revenue data synced from Stripe via webhooks</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Credit utilization >80% triggers warning email to agency admin</div>
+    <div class="ann-item"><div class="ann-bullet"></div>SUPER_ADMIN exclusive — agency admins only see their own usage</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 07: PLATFORM SETTINGS -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-6">
+  <div class="screen-label">Screen 07 · SUPER_ADMIN</div>
+  <div class="screen-title">Platform Settings</div>
+  <div class="screen-desc">Global platform configuration: plan definitions, white-label toggles, SMTP settings, and feature flags defaults.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/settings</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Agencies</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Audit Log</div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Platform Settings</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Feature Flags</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Platform Settings</div><div class="topbar-actions"><div class="wf-btn wf-btn-primary wf-btn-sm" style="background:var(--role-color);">Save Changes</div></div></div>
+        <div class="wf-main" style="max-width:720px;">
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">White-Label Controls</div>
+            <div class="section-desc">Control "Powered by RankFlow" visibility per plan tier.</div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Show "Powered by RankFlow" on Starter plan</div></div></div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Show "Powered by RankFlow" on Agency Pro plan</div></div></div>
+            <div class="wf-switch"><div class="switch-track"><div class="switch-thumb"></div></div><div><div class="switch-label">Show "Powered by RankFlow" on Enterprise plan</div><div class="switch-sub">Disabled — Enterprise agencies get full white-label</div></div></div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Platform Email (SMTP)</div>
+            <div class="section-desc">Outbound email config used for invites, reports, and alerts.</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">SMTP Host</label><div class="form-input">smtp.resend.com</div></div>
+              <div class="form-group"><label class="form-label">Port</label><div class="form-input">587</div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">From Name</label><div class="form-input">RankFlow Platform</div></div>
+              <div class="form-group"><label class="form-label">From Email</label><div class="form-input">noreply@rankflow.app</div></div>
+            </div>
+            <div class="alert alert-success">✓ Email delivery test passed 2h ago</div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Default Feature Flags</div>
+            <div class="section-desc">Applied to all new agencies unless overridden per-agency.</div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">AI Recommendations enabled by default</div></div></div>
+            <div class="wf-switch"><div class="switch-track"><div class="switch-thumb"></div></div><div><div class="switch-label">Competitor Analysis (beta)</div></div></div>
+            <div class="wf-switch"><div class="switch-track on"><div class="switch-thumb"></div></div><div><div class="switch-label">Public shareable report links</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Settings stored in platform_config table (single row, keyed by config_key)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Feature flags use JSONB for flexibility — no migration needed for new flags</div>
+    <div class="ann-item"><div class="ann-bullet"></div>SUPER_ADMIN only — no agency can alter platform-level SMTP or white-label rules</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- SCREEN 08: AUDIT LOG -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-7">
+  <div class="screen-label">Screen 08 · SUPER_ADMIN</div>
+  <div class="screen-title">Platform Audit Log</div>
+  <div class="screen-desc">Chronological log of all significant actions across all tenants — report generations, logins, API key changes, suspensions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">rankflow.app/admin/audit-log</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">RF</div><div><div class="logo-text">RankFlow</div><div class="logo-role-pill">⚡ Super Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon super"></div> Dashboard</div>
+          <div class="nav-section-label">Platform Management</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Agencies</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Billing & Usage</div>
+          <div class="nav-item active"><div class="nav-icon super"></div> Audit Log</div>
+          <div class="nav-section-label">Config</div>
+          <div class="nav-item"><div class="nav-icon super"></div> Platform Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">SA</div><div class="user-info"><div class="user-name">Super Admin</div><div class="user-role">⚡ Platform Owner</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Platform Audit Log</div><div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Export CSV</div></div></div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input">🔍  Search by user, action, agency...</div>
+            <div class="wf-select">Action: All ▾</div>
+            <div class="wf-select">Agency: All ▾</div>
+            <div class="wf-select">Date: Last 30 days ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>Timestamp</th><th>Agency</th><th>User</th><th>Role</th><th>Action</th><th>Details</th><th>IP</th></tr>
+              <tr><td style="font-size:10px; color:var(--wire-text-muted);">2026-06-24 16:12</td><td>Digital Horizons</td><td>John Doe</td><td><span class="badge badge-primary">Agency Admin</span></td><td><span class="badge badge-success">Report Generated</span></td><td style="font-size:10px;">Acme Corp — June 2026</td><td style="font-size:10px; color:var(--wire-text-muted);">203.0.113.42</td></tr>
+              <tr><td style="font-size:10px; color:var(--wire-text-muted);">2026-06-24 14:48</td><td>SEO Masters</td><td>Alice K.</td><td><span class="badge badge-neutral">Team Member</span></td><td><span class="badge badge-neutral">Client Created</span></td><td style="font-size:10px;">New client: TechBoost Ltd</td><td style="font-size:10px; color:var(--wire-text-muted);">198.51.100.18</td></tr>
+              <tr><td style="font-size:10px; color:var(--wire-text-muted);">2026-06-24 11:22</td><td>RankBoost</td><td>info@rb.io</td><td><span class="badge badge-primary">Agency Admin</span></td><td><span class="badge badge-warn">API Key Changed</span></td><td style="font-size:10px;">SERanking API key updated</td><td style="font-size:10px; color:var(--wire-text-muted);">192.0.2.77</td></tr>
+              <tr><td style="font-size:10px; color:var(--wire-text-muted);">2026-06-24 09:05</td><td>—</td><td>Super Admin</td><td><span class="badge badge-primary">Super Admin</span></td><td><span class="badge badge-danger">Agency Suspended</span></td><td style="font-size:10px;">RankBoost suspended (payment failed)</td><td style="font-size:10px; color:var(--wire-text-muted);">10.0.0.1</td></tr>
+              <tr><td style="font-size:10px; color:var(--wire-text-muted);">2026-06-24 08:30</td><td>Growth Hackers</td><td>Sarah L.</td><td><span class="badge badge-neutral">Client</span></td><td><span class="badge badge-neutral">Report Viewed</span></td><td style="font-size:10px;">BlueSky Corp — May 2026</td><td style="font-size:10px; color:var(--wire-text-muted);">172.16.0.55</td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border); display:flex; justify-content:space-between; align-items:center;">
+              <span>Showing 5 of 4,128 events · Last 30 days</span>
+              <div style="display:flex; gap:6px;"><div class="wf-btn wf-btn-ghost wf-btn-sm">← Prev</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Next →</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Audit events written via DB trigger on key tables (reports, clients, users, settings)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>IP address logged from request headers (with proxy awareness)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Retention: 90 days online, archived to cold storage after</div>
+    <div class="ann-item"><div class="ann-bullet"></div>SUPER_ADMIN exclusive — no tenant can view cross-agency audit data</div>
+  </div>
+</div>
+
+</div><!-- /wireframe-wrapper -->
+</div><!-- /screen-area -->
+
+<script>
+  const total = 8;
+  let current = 0;
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i === n));
+    document.getElementById('screenSelect').value = n;
+    document.getElementById('screenCounter').textContent = (n+1) + ' / ' + total;
+    current = n;
+    window.scrollTo(0,0);
+  }
+  function gotoScreen(v) { showScreen(parseInt(v)); }
+  function nextScreen() { showScreen(Math.min(current + 1, total - 1)); }
+  function prevScreen() { showScreen(Math.max(current - 1, 0)); }
+</script>
+</body>
+</html>

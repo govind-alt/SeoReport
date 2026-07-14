@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RankFlow — Report PDF</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+/* ── Print-ready report template ── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1E293B;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+/* Screen wrapper */
+.screen-controls{background:#F1F5F9;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #E2E8F0;}
+.screen-controls h2{font-size:15px;font-weight:700;color:#1E293B;}
+.screen-controls p{font-size:12px;color:#64748B;margin-top:2px;}
+.btn-print{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:white;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;}
+.btn-close{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-left:8px;}
+
+/* Report wrapper */
+.report{max-width:780px;margin:0 auto;background:#fff;}
+
+/* Cover */
+.cover{
+  background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 50%,#EC4899 100%);
+  padding:56px 48px;color:white;text-align:center;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  position:relative;overflow:hidden;
+}
+.cover::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 25% 10%,rgba(255,255,255,0.18) 0%,transparent 55%);
+  pointer-events:none;
+}
+.cover-agency{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:0.65;margin-bottom:8px;}
+.cover-title{font-size:32px;font-weight:900;letter-spacing:-0.8px;margin-bottom:6px;}
+.cover-client{font-size:15px;opacity:0.75;margin-bottom:28px;}
+.cover-score-wrap{display:inline-flex;gap:32px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.25);border-radius:14px;padding:18px 32px;margin-bottom:24px;}
+.cover-score-item{text-align:center;}
+.cover-score-value{font-size:32px;font-weight:900;line-height:1;}
+.cover-score-label{font-size:10px;opacity:0.65;margin-top:4px;letter-spacing:0.6px;text-transform:uppercase;}
+.cover-date{font-size:12px;opacity:0.55;margin-top:8px;}
+
+/* Section styles */
+.section{padding:28px 40px;border-bottom:2px solid #F1F5F9;page-break-inside:avoid;}
+.section:last-child{border-bottom:none;}
+.section-label{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#94A3B8;margin-bottom:14px;}
+.section-label::after{content:'';flex:1;height:1px;background:#F1F5F9;}
+.section-title{font-size:17px;font-weight:800;color:#1E293B;margin-bottom:6px;letter-spacing:-0.3px;}
+
+/* Executive summary */
+.exec-intro{font-size:13px;color:#475569;line-height:1.75;margin-bottom:16px;}
+.exec-highlight{background:linear-gradient(90deg,#EEF2FF,#F5F3FF);border-left:4px solid #6366F1;border-radius:0 8px 8px 0;padding:12px 16px;font-size:13px;color:#3730A3;font-weight:500;margin-bottom:12px;}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.kpi-card{border:1px solid #E2E8F0;border-radius:10px;padding:16px;text-align:center;}
+.kpi-value{font-size:26px;font-weight:800;color:#1E293B;line-height:1;}
+.kpi-label{font-size:10px;color:#94A3B8;margin-top:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.kpi-change{font-size:11px;font-weight:600;margin-top:4px;}
+.up{color:#10B981;}.dn{color:#EF4444;}.flat{color:#94A3B8;}
+
+/* Traffic progress */
+.metric-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #F8FAFC;}
+.metric-row:last-child{border-bottom:none;}
+.metric-label{font-size:12px;color:#475569;width:180px;flex-shrink:0;}
+.metric-bar{flex:1;height:7px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
+.metric-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#6366F1,#8B5CF6);}
+.metric-val{font-size:12px;font-weight:700;color:#1E293B;width:60px;text-align:right;}
+
+/* Keywords table */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;}
+.data-table thead th{background:#F8FAFC;padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94A3B8;border-bottom:2px solid #E2E8F0;}
+.data-table tbody td{padding:10px 12px;border-bottom:1px solid #F8FAFC;color:#1E293B;}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:nth-child(even){background:#FAFBFC;}
+.pos-badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.pos-1-3{background:#DCFCE7;color:#166534;}
+.pos-4-10{background:#DBEAFE;color:#1E40AF;}
+.pos-11{background:#F1F5F9;color:#64748B;}
+.chg-up{color:#10B981;font-weight:700;}
+.chg-dn{color:#EF4444;font-weight:700;}
+
+/* AI Recommendations */
+.rec-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #F8FAFC;}
+.rec-item:last-child{border-bottom:none;}
+.rec-priority{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.rec-priority.critical{background:#FEF2F2;}
+.rec-priority.warning{background:#FFFBEB;}
+.rec-priority.opportunity{background:#EEF2FF;}
+.rec-title{font-size:13px;font-weight:700;color:#1E293B;margin-bottom:3px;}
+.rec-desc{font-size:12px;color:#64748B;line-height:1.55;}
+.rec-impact{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.impact-high{background:#FEF2F2;color:#DC2626;}
+.impact-med{background:#FFFBEB;color:#B45309;}
+.impact-low{background:#EEF2FF;color:#4338CA;}
+
+/* Audit section */
+.audit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.audit-stat{border-radius:8px;padding:12px;text-align:center;}
+.audit-stat-critical{background:#FEF2F2;border:1px solid #FECACA;}
+.audit-stat-warning{background:#FFFBEB;border:1px solid #FDE68A;}
+.audit-stat-notice{background:#EFF6FF;border:1px solid #BFDBFE;}
+.audit-stat-ok{background:#ECFDF5;border:1px solid #A7F3D0;}
+.audit-stat-value{font-size:22px;font-weight:800;}
+.audit-stat-label{font-size:10px;margin-top:3px;font-weight:600;}
+
+/* Footer */
+.report-footer{padding:24px 40px;background:#F8FAFC;border-top:2px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center;}
+.footer-agency{font-size:13px;font-weight:700;color:#1E293B;}
+.footer-note{font-size:11px;color:#94A3B8;}
+.footer-page{font-size:11px;color:#94A3B8;}
+
+/* Chart placeholder for print */
+.chart-placeholder{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:16px;margin-bottom:12px;display:flex;align-items:flex-end;gap:6px;height:120px;}
+.chart-bar{flex:1;border-radius:4px 4px 0 0;}
+
+/* Print overrides */
+@media print {
+  .screen-controls{display:none !important;}
+  body{background:#fff;}
+  .section{page-break-inside:avoid;}
+  .cover{page-break-after:always;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Screen controls (hidden when printing) ── -->
+<div class="screen-controls" id="screenControls">
+  <div>
+    <h2>📄 Report Preview — <span id="reportTitleDisplay">Acme Corp · June 2026</span></h2>
+    <p>This is how the report will look when downloaded as PDF. Use your browser's "Save as PDF" option.</p>
+  </div>
+  <div style="display:flex;align-items:center;">
+    <button class="btn-print" onclick="window.print()">🖨 Download / Print PDF</button>
+    <button class="btn-close" onclick="window.close()">✕ Close</button>
+  </div>
+</div>
+
+<!-- ── The actual printable report ── -->
+<div class="report" id="reportContent">
+
+  <!-- Cover Page -->
+  <div class="cover">
+    <div class="cover-agency">Digital Horizons Agency · Confidential</div>
+    <div class="cover-title" id="coverTitle">Monthly SEO Report</div>
+    <div class="cover-client" id="coverClient">Acme Corp · June 2026</div>
+    <div class="cover-score-wrap">
+      <div class="cover-score-item">
+        <div class="cover-score-value" id="coverHealth">76</div>
+        <div class="cover-score-label">Health Score</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.2);"></div>
+      <div class="cover-score-item">
+        <div class="cover-score-value" id="coverSessions">8,420</div>
+        <div class="cover-score-label">Sessions</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,0.2);"></div>
+      <div class="cover-score-item">
+        <div class="cover-score-value" id="coverKeywords">47</div>
+        <div class="cover-score-label">Top 10 KWs</div>
+      </div>
+    </div>
+    <div class="cover-date" id="coverDate">Generated: June 23, 2026 · Prepared by Digital Horizons Agency</div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="section">
+    <div class="section-label">01 Executive Summary</div>
+    <div class="exec-highlight" id="execHighlight">
+      ↑ Strong month: Top 10 keywords grew by 4 · Organic traffic up +16.3% · Site health improved 8 points to 76%
+    </div>
+    <div class="exec-intro" id="execBody">
+      June 2026 was a strong performance month for <strong>Acme Corp</strong>. The site achieved significant gains across all key SEO metrics compared to May 2026. Organic sessions reached <strong>8,420</strong> (+16.3% MoM), the number of keywords ranking in the Top 10 grew to <strong>47</strong> (+4 new entries), and the site health score improved by 8 points to reach <strong>76/100</strong>. Three previously identified critical issues were resolved this month, contributing directly to the health score improvement.
+      <br/><br/>
+      The primary driver of traffic growth was the strong performance of the "seo agency london" and "local seo london" keyword clusters, which together account for an estimated 38% of total organic sessions. Backlink acquisition remained healthy with 80 new referring domains added.
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="section">
+    <div class="section-label">02 Key Performance Metrics</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value" style="color:#10B981;" id="mSessions">8,420</div>
+        <div class="kpi-label">Organic Sessions</div>
+        <div class="kpi-change up" id="mSessionsChg">↑ +16.3% vs May</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="mKeywords">47</div>
+        <div class="kpi-label">Top 10 Keywords</div>
+        <div class="kpi-change up" id="mKeywordsChg">↑ +4 new entries</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" style="color:#10B981;" id="mHealth">76%</div>
+        <div class="kpi-label">Site Health Score</div>
+        <div class="kpi-change up" id="mHealthChg">↑ +8 pts from 68%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="mClicks">9,840</div>
+        <div class="kpi-label">Total Clicks (GSC)</div>
+        <div class="kpi-change up" id="mClicksChg">↑ +18.3% vs May</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="mImpressions">142K</div>
+        <div class="kpi-label">Impressions</div>
+        <div class="kpi-change up" id="mImpChg">↑ +10.9% vs May</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value" id="mCTR">6.93%</div>
+        <div class="kpi-label">Avg. CTR</div>
+        <div class="kpi-change up" id="mCTRChg">↑ +0.43% vs May</div>
+      </div>
+    </div>
+
+    <!-- Traffic bar chart (visual) -->
+    <div style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Traffic — 6 Month Trend</div>
+    <div class="chart-placeholder">
+      <div style="display:flex;align-items:flex-end;gap:5px;width:100%;height:100%;">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:#E2E8F0;height:62%;"></div></div>
+          <div style="font-size:9px;color:#94A3B8;">Jan<br/><strong style="color:#1E293B;">5.8K</strong></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:#C7D2FE;height:69%;"></div></div>
+          <div style="font-size:9px;color:#94A3B8;">Feb<br/><strong style="color:#1E293B;">6.4K</strong></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:#A5B4FC;height:76%;"></div></div>
+          <div style="font-size:9px;color:#94A3B8;">Mar<br/><strong style="color:#1E293B;">7.1K</strong></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:#818CF8;height:84%;"></div></div>
+          <div style="font-size:9px;color:#94A3B8;">Apr<br/><strong style="color:#1E293B;">7.8K</strong></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:#6366F1;height:86%;"></div></div>
+          <div style="font-size:9px;color:#94A3B8;">May<br/><strong style="color:#1E293B;">7.8K</strong></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;">
+          <div style="flex:1;display:flex;align-items:flex-end;width:100%;"><div class="chart-bar" style="background:linear-gradient(180deg,#6366F1,#8B5CF6);height:100%;box-shadow:0 0 12px rgba(99,102,241,0.3);"></div></div>
+          <div style="font-size:9px;color:#4F46E5;font-weight:700;">Jun<br/><strong>8.4K</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyword Rankings -->
+  <div class="section">
+    <div class="section-label">03 Keyword Rankings</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+      <div class="kpi-card"><div class="kpi-value">12</div><div class="kpi-label">Top 3</div><div class="kpi-change up">↑+2</div></div>
+      <div class="kpi-card"><div class="kpi-value">47</div><div class="kpi-label">Top 10</div><div class="kpi-change up">↑+4</div></div>
+      <div class="kpi-card"><div class="kpi-value">89</div><div class="kpi-label">Top 30</div><div class="kpi-change up">↑+7</div></div>
+      <div class="kpi-card"><div class="kpi-value">18.4</div><div class="kpi-label">Avg Position</div><div class="kpi-change up">↑ Improved</div></div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>#</th><th>Keyword</th><th>Position</th><th>Change</th><th>Monthly Volume</th><th>Difficulty</th><th>URL</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:#94A3B8;font-size:11px;">1</td><td><strong>seo agency london</strong></td><td><span class="pos-badge pos-1-3">4</span></td><td class="chg-up">▲+3</td><td>1,600</td><td>68</td><td style="font-size:10px;color:#94A3B8;">/seo-services</td></tr>
+        <tr><td style="color:#94A3B8;font-size:11px;">2</td><td><strong>local seo london</strong></td><td><span class="pos-badge pos-1-3">2</span></td><td class="chg-up">▲+8</td><td>880</td><td>54</td><td style="font-size:10px;color:#94A3B8;">/local-seo</td></tr>
+        <tr><td style="color:#94A3B8;font-size:11px;">3</td><td>digital marketing uk</td><td><span class="pos-badge pos-4-10">7</span></td><td class="chg-dn">▼-1</td><td>2,400</td><td>72</td><td style="font-size:10px;color:#94A3B8;">/digital-mktg</td></tr>
+        <tr><td style="color:#94A3B8;font-size:11px;">4</td><td>seo company london</td><td><span class="pos-badge pos-4-10">9</span></td><td class="chg-up">▲+5</td><td>1,200</td><td>71</td><td style="font-size:10px;color:#94A3B8;">/seo-services</td></tr>
+        <tr><td style="color:#94A3B8;font-size:11px;">5</td><td>seo audit tool uk <em style="color:#10B981;font-size:10px;">(NEW)</em></td><td><span class="pos-badge pos-11">28</span></td><td class="chg-up">NEW</td><td>390</td><td>58</td><td style="font-size:10px;color:#94A3B8;">/audit</td></tr>
+        <tr><td style="color:#94A3B8;font-size:11px;">6</td><td>seo consultant london</td><td><span class="pos-badge pos-4-10">6</span></td><td class="chg-up">▲+2</td><td>590</td><td>55</td><td style="font-size:10px;color:#94A3B8;">/about</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:#94A3B8;margin-top:8px;">Showing top 6 of 124 tracked keywords · Data from SERanking</div>
+  </div>
+
+  <!-- Backlinks -->
+  <div class="section">
+    <div class="section-label">04 Backlink Profile</div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-value">42</div><div class="kpi-label">Domain Trust</div><div class="kpi-change up">↑+2 pts</div></div>
+      <div class="kpi-card"><div class="kpi-value">1,847</div><div class="kpi-label">Total Backlinks</div><div class="kpi-change up">↑+47 new</div></div>
+      <div class="kpi-card"><div class="kpi-value">312</div><div class="kpi-label">Referring Domains</div><div class="kpi-change up">↑+18 new</div></div>
+    </div>
+    <div style="margin-top:4px;">
+      <div class="metric-row"><div class="metric-label">Dofollow Links (67%)</div><div class="metric-bar"><div class="metric-fill" style="width:67%;"></div></div><div class="metric-val">1,243</div></div>
+      <div class="metric-row"><div class="metric-label">Nofollow Links (33%)</div><div class="metric-bar"><div class="metric-fill" style="width:33%;background:linear-gradient(90deg,#94A3B8,#CBD5E1);"></div></div><div class="metric-val">604</div></div>
+      <div class="metric-row"><div class="metric-label">Trust Score 70+ domains</div><div class="metric-bar"><div class="metric-fill" style="width:42%;background:linear-gradient(90deg,#10B981,#059669);"></div></div><div class="metric-val">47</div></div>
+    </div>
+  </div>
+
+  <!-- Technical Audit -->
+  <div class="section">
+    <div class="section-label">05 Technical Audit</div>
+    <div class="audit-grid">
+      <div class="audit-stat audit-stat-critical"><div class="audit-stat-value" style="color:#DC2626;">3</div><div class="audit-stat-label" style="color:#DC2626;">Critical</div></div>
+      <div class="audit-stat audit-stat-warning"><div class="audit-stat-value" style="color:#B45309;">18</div><div class="audit-stat-label" style="color:#B45309;">Warnings</div></div>
+      <div class="audit-stat audit-stat-notice"><div class="audit-stat-value" style="color:#1D4ED8;">42</div><div class="audit-stat-label" style="color:#1D4ED8;">Notices</div></div>
+      <div class="audit-stat audit-stat-ok"><div class="audit-stat-value" style="color:#059669;">279</div><div class="audit-stat-label" style="color:#059669;">Healthy Pages</div></div>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Issue</th><th>Severity</th><th>Count</th><th>Status vs May</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Broken internal links</strong></td><td style="color:#DC2626;font-weight:700;">Critical</td><td>3</td><td style="color:#10B981;">↓ from 11 (resolved 8)</td></tr>
+        <tr><td>Missing meta descriptions</td><td style="color:#B45309;font-weight:700;">Warning</td><td>8</td><td style="color:#10B981;">↓ from 12</td></tr>
+        <tr><td>Slow pages (&gt;3s load time)</td><td style="color:#B45309;font-weight:700;">Warning</td><td>11</td><td style="color:#10B981;">↓ from 14</td></tr>
+        <tr><td>Missing H1 tags</td><td style="color:#B45309;font-weight:700;">Warning</td><td>4</td><td style="color:#94A3B8;">→ No change</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- AI Recommendations -->
+  <div class="section">
+    <div class="section-label">06 🤖 AI-Powered Recommendations</div>
+    <div>
+      <div class="rec-item">
+        <div class="rec-priority critical">🚨</div>
+        <div>
+          <div class="rec-title">Fix 3 remaining broken internal links immediately</div>
+          <div class="rec-desc">Pages <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px;">/blog/post-14</code>, <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px;">/resources/guide-3</code> and <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px;">/old-services</code> have broken internal links. These pages are linked from high-traffic pages and are impacting crawlability and user experience.</div>
+          <span class="rec-impact impact-high">High Impact</span>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-priority warning">⚠️</div>
+        <div>
+          <div class="rec-title">Add meta descriptions to 8 blog pages</div>
+          <div class="rec-desc">8 pages under <code style="background:#F1F5F9;padding:1px 5px;border-radius:3px;">/blog/*</code> are missing meta descriptions. Adding unique, compelling descriptions is estimated to improve CTR by 15–25% for these pages.</div>
+          <span class="rec-impact impact-med">Medium Impact</span>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-priority opportunity">🎯</div>
+        <div>
+          <div class="rec-title">Target "seo audit london" — major gap opportunity</div>
+          <div class="rec-desc">Your top competitor (rival-seo.co.uk) ranks #3 for this keyword with 480 monthly searches. You currently have no ranking. Creating a dedicated landing page targeting this keyword with existing audit tool content could yield Top 10 position within 60–90 days.</div>
+          <span class="rec-impact impact-low">Growth Opportunity</span>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-priority warning">🐢</div>
+        <div>
+          <div class="rec-title">Optimize page speed for 11 slow pages</div>
+          <div class="rec-desc">11 pages have load times exceeding 3 seconds (avg 4.2s). Key recommendations: compress images on /case-studies, defer non-critical JS on /services pages, enable browser caching. Expected improvement: 40–60% faster load times.</div>
+          <span class="rec-impact impact-med">Medium Impact</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="report-footer">
+    <div>
+      <div class="footer-agency">Digital Horizons Agency</div>
+      <div class="footer-note">Prepared exclusively for Acme Corp · June 2026 · Confidential</div>
+    </div>
+    <div class="footer-page">Powered by RankFlow · rankflow.app</div>
+  </div>
+
+</div><!-- /report -->
+
+<script>
+// Read URL params to customise the report data
+const params = new URLSearchParams(location.search);
+const client = params.get('client') || 'Acme Corp';
+const period = params.get('period') || 'June 2026';
+const health = params.get('health') || '76';
+const sessions = params.get('sessions') || '8,420';
+const keywords = params.get('keywords') || '47';
+
+// Apply to DOM
+document.getElementById('reportTitleDisplay').textContent = `${client} · ${period}`;
+document.getElementById('coverClient').textContent = `${client} · ${period}`;
+document.getElementById('coverHealth').textContent = health;
+document.getElementById('coverSessions').textContent = sessions;
+document.getElementById('coverKeywords').textContent = keywords;
+
+// Auto-print if ?print=1
+if (params.get('print') === '1') {
+  window.addEventListener('load', () => setTimeout(() => window.print(), 600));
+}
+</script>
+</body>
+</html>

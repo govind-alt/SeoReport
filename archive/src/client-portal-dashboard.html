@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Client Portal — Overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- SIDEBAR (Simplified for Client Portal) -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">AC</div>
+      <div>
+        <div class="sidebar-logo-text">Acme Corp</div>
+        <div class="sidebar-logo-sub">Client Portal</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" style="margin-top:20px;">
+      <a href="client-portal-dashboard.html" class="sidebar-item active">
+        <span class="sidebar-item-icon">📊</span>
+        <span class="sidebar-item-label">Overview</span>
+      </a>
+      <a href="client-portal-reports.html" class="sidebar-item">
+        <span class="sidebar-item-icon">📄</span>
+        <span class="sidebar-item-label">Reports</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px;">Managed by <strong style="color:var(--text-secondary);">Digital Horizons</strong></div>
+      <button class="btn btn-secondary btn-sm" style="width:100%;" onclick="Logout.confirm()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Performance Overview</div>
+    </header>
+
+    <div class="page-content">
+      
+      <!-- Welcome Banner -->
+      <div style="background:linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 100%);border:1px solid rgba(99,102,241,0.2);border-radius:var(--radius-lg);padding:32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:24px;font-weight:800;color:var(--text-primary);margin-bottom:8px;letter-spacing:-0.5px;">Welcome back, Sarah! 👋</div>
+          <div style="font-size:14px;color:var(--text-secondary);max-width:500px;line-height:1.5;">Here is a snapshot of your website's organic performance this month. Your next detailed SEO report will be ready on <strong>July 1st</strong>.</div>
+        </div>
+        <div style="display:flex;gap:12px;">
+          <button class="btn btn-primary" onclick="window.location.href='client-portal-reports.html'">View Latest Report</button>
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:24px;">
+        <div class="kpi-card success">
+          <div class="kpi-icon">🎯</div>
+          <div class="kpi-label">SEO Health Score</div>
+          <div class="kpi-value">76%</div>
+          <div class="kpi-trend trend-up">↑ +4% vs last month</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-label">Top 10 Keywords</div>
+          <div class="kpi-value">47</div>
+          <div class="kpi-trend trend-up">↑ +5 vs last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-label">Organic Traffic</div>
+          <div class="kpi-value">8,420</div>
+          <div class="kpi-trend trend-up">↑ +12.3% MoM</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🔗</div>
+          <div class="kpi-label">Domain Trust</div>
+          <div class="kpi-value">42</div>
+          <div class="kpi-trend trend-flat">→ No change</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:24px;">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Organic Traffic Trend (Last 6 Months)</div>
+          </div>
+          <div class="chart-body" style="height:300px;">
+            <canvas id="trafficChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Keyword Distribution</div>
+          </div>
+          <div class="chart-body" style="height:300px;display:flex;align-items:center;justify-content:center;">
+            <canvas id="keywordChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  Charts.line('trafficChart', 
+    ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    [6500, 6800, 7100, 7000, 7500, 8420]
+  );
+  
+  Charts.doughnut('keywordChart',
+    ['Top 3', 'Top 10', 'Top 50', 'Unranked'],
+    [12, 35, 120, 45],
+    ['#10B981', '#3B82F6', '#8B5CF6', '#E2E8F0']
+  );
+});
+</script>
+</body>
+</html>

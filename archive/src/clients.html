@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Clients</title>
+<meta name="description" content="Manage all your SEO clients — view health scores, reports, and take bulk actions."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+.client-avatar{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;flex-shrink:0;}
+.client-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;transition:var(--transition);cursor:pointer;}
+.client-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);border-color:var(--primary);}
+.view-toggle-btn{padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--surface);color:var(--text-muted);transition:var(--transition-fast);}
+.view-toggle-btn:first-child{border-radius:var(--radius) 0 0 var(--radius);}
+.view-toggle-btn:last-child{border-radius:0 var(--radius) var(--radius) 0;border-left:none;}
+.view-toggle-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+#bulkActionBar{display:none;}
+</style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item active"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <div class="sidebar-section-label">Configuration</div>
+      <a href="settings.html" class="sidebar-item"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="help.html" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help &amp; Support</span></a>
+    </nav>
+        <div class="sidebar-footer">
+      <div class="sidebar-user-wrap">
+        <!-- User menu popup -->
+        <div id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">John Doe</div>
+            <div class="user-menu-email">john@digitalhorizons.com</div>
+          </div>
+          <button class="user-menu-item" onclick="window.location.href='settings.html'">⚙️ Account Settings</button>
+          <button class="user-menu-item" onclick="Toast.info('Opening billing...');window.location.href='settings.html'">💳 Billing &amp; Plan</button>
+          <button class="user-menu-item" onclick="window.location.href='help.html'">❓ Help &amp; Support</button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item danger" onclick="Logout.confirm()">🚪 Sign Out</button>
+        </div>
+        <!-- Clickable chip -->
+        <div id="sidebarUserChip">
+          <div class="sidebar-avatar">JD</div>
+          <div>
+            <div class="sidebar-user-name">John Doe</div>
+            <div class="sidebar-user-role">Agency Admin</div>
+          </div>
+          <span class="chevron">▲</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-title">Clients</div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="Toast.info('Opening CSV import...')">⬇ Import CSV</button>
+        <button class="btn btn-primary btn-sm" data-modal-open="addClientModal">+ Add Client</button>
+        <div class="notif-bell-wrap" style="position:relative;">
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown" title="Notifications">🔔</button>
+          <div class="notif-count" style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications <span class="badge badge-danger">5 new</span></div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
+            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">3 unread notifications — open dashboard for details</div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);font-weight:500;">View all notifications →</a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+
+      <!-- Bulk Action Bar (hidden until rows selected) -->
+      <div class="bulk-action-bar" id="bulkActionBar">
+        <span class="bulk-count">0 clients selected</span>
+        <button class="btn btn-primary btn-sm" onclick="bulkGenerate()">📄 Generate Reports</button>
+        <button class="btn btn-secondary btn-sm" onclick="bulkEmail()">📧 Send Email</button>
+        <button class="btn btn-danger btn-sm" onclick="archiveSelected()">🗃 Archive</button>
+        <span class="bulk-clear" onclick="clearSelection()">✕</span>
+      </div>
+
+      <!-- Filters & View Toggle -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <div class="search-input-wrap" style="flex:1;min-width:200px;">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-input" id="clientSearch" placeholder="Search clients..." style="padding-left:34px;"/>
+        </div>
+        <select class="form-input" style="width:140px;" onchange="filterStatus(this.value)">
+          <option value="all">Status: All</option>
+          <option value="active">Active</option>
+          <option value="needs-report">Needs Report</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select class="form-input" style="width:160px;">
+          <option>Industry: All</option>
+          <option>B2B SaaS</option>
+          <option>E-commerce</option>
+          <option>Healthcare</option>
+          <option>Real Estate</option>
+        </select>
+        <select class="form-input" style="width:150px;">
+          <option>Sort: Name A–Z</option>
+          <option>Health: High–Low</option>
+          <option>Traffic: High–Low</option>
+          <option>Last Report</option>
+        </select>
+        <div style="display:flex;">
+          <button class="view-toggle-btn active" data-view-toggle="table" data-group="clients" id="tableToggleBtn" onclick="switchView('table')">≡ Table</button>
+          <button class="view-toggle-btn" data-view-toggle="grid" data-group="clients" id="gridToggleBtn" onclick="switchView('grid')">⊞ Cards</button>
+        </div>
+      </div>
+
+      <!-- TABLE VIEW -->
+      <div id="tableView" data-view="table" data-view-group="clients">
+        <div class="table-wrapper">
+          <table id="clientsTable">
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" id="masterCheckbox" style="accent-color:var(--primary);" onchange="toggleAll(this)"/></th>
+                <th>Client</th>
+                <th>Website</th>
+                <th>Health Score</th>
+                <th>Last Report</th>
+                <th>Next Report</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-status="active">
+                <td><input type="checkbox" class="row-checkbox" style="accent-color:var(--primary);" onchange="updateBulkBar()"/></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="client-avatar" style="background:#4F46E5;">AC</div><div><div style="font-weight:700;">Acme Corp</div></div></div></td>
+                <td style="font-size:12px;color:var(--text-muted);">acmecorp.com</td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:60px;margin:0;"><div class="progress-fill success" style="width:76%;"></div></div><span style="font-size:12px;font-weight:600;color:var(--success);">76%</span></div></td>
+                <td><span class="badge badge-success">Jun 1</span></td>
+                <td style="font-size:12px;">Jul 1</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>
+                  <div style="display:flex;gap:4px;align-items:center;">
+                    <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
+                    <div class="dropdown" style="position:relative;">
+                      <button class="row-menu-btn" data-dropdown="rowMenu1" title="More actions">⋯</button>
+                      <div class="dropdown-menu" id="rowMenu1">
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a href="client-detail.html" class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('Acme Corp')">🗑 Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr data-status="active">
+                <td><input type="checkbox" class="row-checkbox" style="accent-color:var(--primary);" onchange="updateBulkBar()"/></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="client-avatar" style="background:#10B981;">TS</div><div><div style="font-weight:700;">TechStart.io</div></div></div></td>
+                <td style="font-size:12px;color:var(--text-muted);">techstart.io</td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:60px;margin:0;"><div class="progress-fill success" style="width:89%;"></div></div><span style="font-size:12px;font-weight:600;color:var(--success);">89%</span></div></td>
+                <td><span class="badge badge-success">Jun 1</span></td>
+                <td style="font-size:12px;">Jul 1</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>
+                  <div style="display:flex;gap:4px;align-items:center;">
+                    <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
+                    <div class="dropdown" style="position:relative;">
+                      <button class="row-menu-btn" data-dropdown="rowMenu2" title="More actions">⋯</button>
+                      <div class="dropdown-menu" id="rowMenu2">
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('TechStart.io')">🗑 Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr data-status="needs-report">
+                <td><input type="checkbox" class="row-checkbox" style="accent-color:var(--primary);" onchange="updateBulkBar()"/></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="client-avatar" style="background:#F59E0B;">GL</div><div><div style="font-weight:700;">GreenLeaf Organics</div></div></div></td>
+                <td style="font-size:12px;color:var(--text-muted);">greenleaf.com</td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:60px;margin:0;"><div class="progress-fill warning" style="width:62%;"></div></div><span style="font-size:12px;font-weight:600;color:var(--warning);">62%</span></div></td>
+                <td><span class="badge badge-warning">May 1</span></td>
+                <td style="font-size:12px;color:var(--danger);font-weight:600;">Jun 1 ⚠</td>
+                <td><span class="badge badge-warning">⚠ Needs Report</span></td>
+                <td>
+                  <div style="display:flex;gap:4px;align-items:center;">
+                    <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
+                    <div class="dropdown" style="position:relative;">
+                      <button class="row-menu-btn" data-dropdown="rowMenu3">⋯</button>
+                      <div class="dropdown-menu" id="rowMenu3">
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('GreenLeaf')">🗑 Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr data-status="active">
+                <td><input type="checkbox" class="row-checkbox" style="accent-color:var(--primary);" onchange="updateBulkBar()"/></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="client-avatar" style="background:#3B82F6;">BS</div><div><div style="font-weight:700;">BlueSky Marketing</div></div></div></td>
+                <td style="font-size:12px;color:var(--text-muted);">bluesky.co.uk</td>
+                <td><div style="display:flex;align-items:center;gap:6px;"><div class="progress-bar" style="width:60px;margin:0;"><div class="progress-fill success" style="width:83%;"></div></div><span style="font-size:12px;font-weight:600;color:var(--success);">83%</span></div></td>
+                <td><span class="badge badge-success">Jun 1</span></td>
+                <td style="font-size:12px;">Jul 1</td>
+                <td><span class="badge badge-success">Active</span></td>
+                <td>
+                  <div style="display:flex;gap:4px;align-items:center;">
+                    <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
+                    <div class="dropdown" style="position:relative;">
+                      <button class="row-menu-btn" data-dropdown="rowMenu4">⋯</button>
+                      <div class="dropdown-menu" id="rowMenu4">
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <a class="dropdown-item" onclick="Toast.success('Generating report...')">📄 Generate Report</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item danger" onclick="Toast.warning('Client archived')">🗃 Archive</a>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('BlueSky')">🗑 Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr data-status="inactive">
+                <td><input type="checkbox" class="row-checkbox" style="accent-color:var(--primary);" onchange="updateBulkBar()"/></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="client-avatar" style="background:#6B7280;">RP</div><div><div style="font-weight:700;">RetailPro Ltd</div></div></div></td>
+                <td style="font-size:12px;color:var(--text-muted);">retailpro.co.uk</td>
+                <td><span class="badge badge-neutral">No data</span></td>
+                <td><span class="badge badge-neutral">Never</span></td>
+                <td style="font-size:12px;color:var(--text-muted);">—</td>
+                <td><span class="badge badge-neutral">Inactive</span></td>
+                <td>
+                  <div style="display:flex;gap:4px;align-items:center;">
+                    <a href="client-detail.html" class="btn btn-secondary btn-sm">View</a>
+                    <div class="dropdown" style="position:relative;">
+                      <button class="row-menu-btn" data-dropdown="rowMenu5">⋯</button>
+                      <div class="dropdown-menu" id="rowMenu5">
+                        <a href="client-detail.html" class="dropdown-item">👁 View Detail</a>
+                        <a class="dropdown-item">✏️ Edit Client</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item danger" onclick="confirmDeleteClient('RetailPro')">🗑 Delete</a>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <span id="tableCount">Showing 5 of 24 clients</span>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Previous page')">← Prev</button>
+              <button class="btn btn-primary btn-sm">1</button>
+              <button class="btn btn-secondary btn-sm">2</button>
+              <button class="btn btn-secondary btn-sm">3</button>
+              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Next page')">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID/CARD VIEW (hidden by default) -->
+      <div id="gridView" data-view="grid" data-view-group="clients" style="display:none;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
+          <div class="client-card" onclick="window.location='client-detail.html'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <div class="client-avatar" style="background:#4F46E5;width:42px;height:42px;font-size:14px;">AC</div>
+              <div><div style="font-weight:700;font-size:14px;">Acme Corp</div><div style="font-size:12px;color:var(--text-muted);">acmecorp.com</div></div>
+              <span class="badge badge-success" style="margin-left:auto;">Active</span>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Health Score</span><span style="font-weight:700;color:var(--success);">76%</span></div>
+              <div class="progress-bar"><div class="progress-fill success" style="width:76%;"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px;">
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">47</div><div style="color:var(--text-muted);">Top 10</div></div>
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">8.4k</div><div style="color:var(--text-muted);">Traffic</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
+              <span>Last report: <strong>Jun 1</strong></span>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
+            </div>
+          </div>
+          <div class="client-card" onclick="window.location='client-detail.html'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <div class="client-avatar" style="background:#10B981;width:42px;height:42px;font-size:14px;">TS</div>
+              <div><div style="font-weight:700;font-size:14px;">TechStart.io</div><div style="font-size:12px;color:var(--text-muted);">techstart.io</div></div>
+              <span class="badge badge-success" style="margin-left:auto;">Active</span>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Health Score</span><span style="font-weight:700;color:var(--success);">89%</span></div>
+              <div class="progress-bar"><div class="progress-fill success" style="width:89%;"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px;">
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">87</div><div style="color:var(--text-muted);">Top 10</div></div>
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">12.3k</div><div style="color:var(--text-muted);">Traffic</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
+              <span>Last report: <strong>Jun 1</strong></span>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
+            </div>
+          </div>
+          <div class="client-card" onclick="window.location='client-detail.html'" style="border-color:var(--warning);">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <div class="client-avatar" style="background:#F59E0B;width:42px;height:42px;font-size:14px;">GL</div>
+              <div><div style="font-weight:700;font-size:14px;">GreenLeaf Organics</div><div style="font-size:12px;color:var(--text-muted);">greenleaf.com</div></div>
+              <span class="badge badge-warning" style="margin-left:auto;">Needs Report</span>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Health Score</span><span style="font-weight:700;color:var(--warning);">62%</span></div>
+              <div class="progress-bar"><div class="progress-fill warning" style="width:62%;"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px;">
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">23</div><div style="color:var(--text-muted);">Top 10</div></div>
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">3.2k</div><div style="color:var(--text-muted);">Traffic</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;">
+              <span style="color:var(--danger);font-weight:600;">⚠ Overdue since Jun 1</span>
+              <a href="client-detail.html" class="btn btn-primary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">Report →</a>
+            </div>
+          </div>
+          <div class="client-card" onclick="window.location='client-detail.html'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <div class="client-avatar" style="background:#3B82F6;width:42px;height:42px;font-size:14px;">BS</div>
+              <div><div style="font-weight:700;font-size:14px;">BlueSky Marketing</div><div style="font-size:12px;color:var(--text-muted);">bluesky.co.uk</div></div>
+              <span class="badge badge-success" style="margin-left:auto;">Active</span>
+            </div>
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span style="color:var(--text-muted);">Health Score</span><span style="font-weight:700;color:var(--success);">83%</span></div>
+              <div class="progress-bar"><div class="progress-fill success" style="width:83%;"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;margin-bottom:12px;">
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">64</div><div style="color:var(--text-muted);">Top 10</div></div>
+              <div style="background:var(--gray-50);border-radius:var(--radius);padding:8px;text-align:center;"><div style="font-weight:700;font-size:16px;">9.1k</div><div style="color:var(--text-muted);">Traffic</div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);">
+              <span>Last report: <strong>Jun 1</strong></span>
+              <a href="client-detail.html" class="btn btn-secondary btn-sm" style="font-size:11px;" onclick="event.stopPropagation()">View →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal-overlay" id="addClientModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div><div class="modal-title">Add New Client</div><div class="modal-subtitle">Fill in the client details to get started</div></div>
+      <button class="modal-close" data-modal-close="addClientModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Client Info -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Client Information</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Client / Company Name <span class="required">*</span></label><input class="form-input" id="clientName" placeholder="e.g. Acme Corporation"/></div>
+        <div class="form-group"><label class="form-label">Industry</label><select class="form-input"><option>B2B SaaS</option><option>E-commerce</option><option>Healthcare</option><option>Real Estate</option><option>Finance</option><option>Other</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Website URL <span class="required">*</span></label><input class="form-input" placeholder="https://example.com"/></div>
+        <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" placeholder="client@company.com"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" placeholder="Sarah Miller"/></div>
+        <div class="form-group"><label class="form-label">Logo (optional)</label>
+          <div style="border:2px dashed var(--border-strong);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:12px;color:var(--text-muted);" onclick="Toast.info('File picker opened...')">📎 Upload logo (PNG/SVG/JPG)</div>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Internal Notes</label><textarea class="form-input" rows="2" placeholder="E.g. UK-focused, e-commerce, targeting organic traffic growth..."></textarea></div>
+
+      <!-- SERanking -->
+      <div style="font-size:13px;font-weight:700;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">SERanking Project</div>
+      <div class="form-group"><label class="form-label">SERanking Project <span class="required">*</span></label>
+        <select class="form-input">
+          <option value="">Select SERanking project...</option>
+          <option>Acme Corp (acmecorp.com) — site_12345</option>
+          <option>TechStart (techstart.io) — site_23456</option>
+          <option>GreenLeaf (greenleaf.com) — site_34567</option>
+          <option>BlueSky (bluesky.co.uk) — site_45678</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Track Competitors (optional)</label>
+        <div id="competitorTags" class="tag-input-wrap" data-tag-input>
+          <span class="tag">rival-seo.co.uk<span class="tag-remove" onclick="this.parentElement.remove()">×</span></span>
+          <input type="text" placeholder="Add competitor domain, press Enter..." style="border:none;outline:none;font-size:12px;flex:1;min-width:150px;font-family:inherit;"/>
+        </div>
+        <div class="form-hint">Competitors fetched from SERanking and tracked for comparison</div>
+      </div>
+
+      <!-- GSC -->
+      <div style="font-size:13px;font-weight:700;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Google Search Console</div>
+      <div style="border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:20px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:8px;">📊</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Connect Google Search Console</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Required for organic traffic, clicks, impressions, CTR, and avg position data</div>
+        <button class="btn btn-primary btn-sm" onclick="Toast.info('Redirecting to Google OAuth...')">🔗 Connect with Google OAuth</button>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">You'll authorize RankFlow to read data for this client's GSC property</div>
+      </div>
+
+      <!-- Portal Access -->
+      <div style="font-size:13px;font-weight:700;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Client Portal Access</div>
+      <div class="switch-row">
+        <div class="switch-info"><div class="switch-label">Enable client portal login</div><div class="switch-desc">Client receives an email invite to view their reports</div></div>
+        <label class="switch"><input type="checkbox" checked id="portalToggle"/><span class="switch-slider"></span></label>
+      </div>
+      <div class="form-row" style="margin-top:10px;">
+        <div class="form-group"><label class="form-label">Portal Email</label><input class="form-input" placeholder="client@company.com"/></div>
+        <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" placeholder="Sarah Miller"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-modal-close="addClientModal">Cancel</button>
+      <button class="btn btn-primary" onclick="saveClient()">Save Client →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  TableFilter.init('clientSearch', 'clientsTable');
+});
+
+function switchView(view) {
+  document.getElementById('tableView').style.display = view === 'table' ? '' : 'none';
+  document.getElementById('gridView').style.display = view === 'grid' ? '' : 'none';
+  document.getElementById('tableToggleBtn').classList.toggle('active', view === 'table');
+  document.getElementById('gridToggleBtn').classList.toggle('active', view === 'grid');
+}
+
+function toggleAll(master) {
+  document.querySelectorAll('.row-checkbox').forEach(cb => { cb.checked = master.checked; });
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const checked = document.querySelectorAll('.row-checkbox:checked').length;
+  const bar = document.getElementById('bulkActionBar');
+  const count = bar.querySelector('.bulk-count');
+  if (checked > 0) {
+    bar.style.display = 'flex';
+    count.textContent = `${checked} client${checked > 1 ? 's' : ''} selected`;
+  } else {
+    bar.style.display = 'none';
+  }
+  const master = document.getElementById('masterCheckbox');
+  const all = document.querySelectorAll('.row-checkbox');
+  master.indeterminate = checked > 0 && checked < all.length;
+  master.checked = checked === all.length;
+}
+
+function clearSelection() {
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('masterCheckbox').checked = false;
+  document.getElementById('bulkActionBar').style.display = 'none';
+  if (window.BulkSelect) {
+    const master = document.querySelector('#clientsTable thead input[type="checkbox"]');
+    if (master) master.indeterminate = false;
+  }
+}
+
+function archiveSelected() {
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  const count = checkboxes.length;
+  if (count === 0) return;
+  if (confirm(`Archive ${count} selected client${count > 1 ? 's' : ''}?`)) {
+    checkboxes.forEach(cb => {
+      const tr = cb.closest('tr');
+      if (tr) tr.remove();
+    });
+    Toast.success(`${count} client${count > 1 ? 's' : ''} archived`);
+    clearSelection();
+    updateTableCount();
+  }
+}
+
+function updateTableCount() {
+  const visible = document.querySelectorAll('#clientsTable tbody tr:not([style*="display: none"])').length;
+  const countEl = document.getElementById('tableCount');
+  if (countEl) countEl.textContent = `Showing ${visible} of 24 clients`;
+}
+
+function bulkGenerate() {
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  const count = checkboxes.length;
+  if (count === 0) return;
+  
+  const t = Toast.loading(`Generating reports for ${count} client${count > 1 ? 's' : ''}...`);
+  
+  checkboxes.forEach(cb => {
+    const tr = cb.closest('tr');
+    if (tr) {
+      const badge = tr.querySelector('td:nth-child(7) .badge');
+      if (badge) {
+        badge.className = 'badge badge-warning';
+        badge.innerHTML = '<span class="spinner" style="font-size:10px;">⟳</span> Generating...';
+      }
+    }
+  });
+
+  setTimeout(() => {
+    t.dismiss();
+    Toast.success(`Successfully generated ${count} report${count > 1 ? 's' : ''}!`);
+    checkboxes.forEach(cb => {
+      const tr = cb.closest('tr');
+      if (tr) {
+        const badge = tr.querySelector('td:nth-child(7) .badge');
+        if (badge) {
+          badge.className = 'badge badge-success';
+          badge.innerHTML = 'Active';
+        }
+      }
+    });
+    clearSelection();
+  }, 2000);
+}
+
+function bulkEmail() {
+  const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+  if (checkboxes.length === 0) return;
+  Toast.info(`Opening email composer for ${checkboxes.length} client${checkboxes.length > 1 ? 's' : ''}...`);
+  clearSelection();
+}
+
+function filterStatus(val) {
+  document.querySelectorAll('#clientsTable tbody tr').forEach(row => {
+    row.style.display = (val === 'all' || row.dataset.status === val) ? '' : 'none';
+  });
+}
+
+function confirmDeleteClient(name) {
+  if (confirm(`Permanently delete ${name}? This cannot be undone.`)) Toast.error(`${name} deleted`);
+}
+
+function saveClient() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { Toast.error('Please enter a client name'); return; }
+  Modal.close('addClientModal');
+  Toast.success(`${name} added! Redirecting to client overview...`);
+  setTimeout(() => window.location.href = 'client-detail.html', 1500);
+}
+</script>
+</body>
+</html>

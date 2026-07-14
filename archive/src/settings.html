@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RankFlow — Settings</title>
+<meta name="description" content="Agency settings — manage branding, API keys, team, billing, scheduling and audit log."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/styles.css"/>
+<style>
+.settings-layout{display:grid;grid-template-columns:180px 1fr;gap:0;min-height:calc(100vh - 60px);}
+.settings-nav{border-right:1px solid var(--border);padding:16px 8px;}
+.settings-nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius);font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:var(--transition-fast);margin-bottom:2px;border:none;background:none;width:100%;text-align:left;}
+.settings-nav-item:hover{background:var(--gray-100);color:var(--text-primary);}
+.settings-nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:700;}
+.settings-panel{display:none;padding:24px;max-width:660px;}
+.settings-panel.active{display:block;}
+.settings-section{margin-bottom:24px;}
+.settings-section-title{font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.team-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100);}
+.team-row:last-child{border-bottom:none;}
+.audit-row{display:flex;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--gray-100);}
+.audit-row:last-child{border-bottom:none;}
+.api-key-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--gray-100);}
+.api-key-row:last-child{border-bottom:none;}
+.key-mask{font-family:monospace;font-size:13px;letter-spacing:1px;color:var(--text-muted);}
+.billing-plan-card{border:2px solid var(--primary);border-radius:var(--radius-md);padding:18px;background:var(--primary-light);margin-bottom:14px;}
+.schedule-client-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--gray-100);}
+.schedule-client-row:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">RF</div><div><div class="sidebar-logo-text">RankFlow</div><div class="sidebar-logo-sub">Digital Horizons</div></div></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-item"><span class="sidebar-item-icon">📊</span><span class="sidebar-item-label">Dashboard</span></a>
+      <a href="clients.html" class="sidebar-item"><span class="sidebar-item-icon">👥</span><span class="sidebar-item-label">Clients</span><span class="sidebar-badge">24</span></a>
+      <a href="reports.html" class="sidebar-item"><span class="sidebar-item-icon">📄</span><span class="sidebar-item-label">Reports</span><span class="sidebar-badge">38</span></a>
+      <div class="sidebar-section-label">Configuration</div>
+      <a href="settings.html" class="sidebar-item active"><span class="sidebar-item-icon">⚙️</span><span class="sidebar-item-label">Settings</span></a>
+      <a href="help.html" class="sidebar-item"><span class="sidebar-item-icon">❓</span><span class="sidebar-item-label">Help &amp; Support</span></a>
+    </nav>
+        <div class="sidebar-footer">
+      <div class="sidebar-user-wrap">
+        <!-- User menu popup -->
+        <div id="userMenu">
+          <div class="user-menu-header">
+            <div class="user-menu-name">John Doe</div>
+            <div class="user-menu-email">john@digitalhorizons.com</div>
+          </div>
+          <button class="user-menu-item" onclick="window.location.href='settings.html'">⚙️ Account Settings</button>
+          <button class="user-menu-item" onclick="Toast.info('Opening billing...');window.location.href='settings.html'">💳 Billing &amp; Plan</button>
+          <button class="user-menu-item" onclick="window.location.href='help.html'">❓ Help &amp; Support</button>
+          <div class="user-menu-divider"></div>
+          <button class="user-menu-item danger" onclick="Logout.confirm()">🚪 Sign Out</button>
+        </div>
+        <!-- Clickable chip -->
+        <div id="sidebarUserChip">
+          <div class="sidebar-avatar">JD</div>
+          <div>
+            <div class="sidebar-user-name">John Doe</div>
+            <div class="sidebar-user-role">Agency Admin</div>
+          </div>
+          <span class="chevron">▲</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-title">Settings</div>
+      <div class="topbar-actions">
+        <div class="notif-bell-wrap" style="position:relative;">
+          <button class="topbar-icon-btn" data-notif-toggle="notifDropdown">🔔</button>
+          <div style="position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;font-size:9px;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);">5</div>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-header"><div style="font-size:13px;font-weight:700;">Notifications</div><button class="btn btn-ghost btn-sm" style="font-size:11px;" data-mark-read>Mark all read</button></div>
+            <div style="padding:12px 16px;font-size:12px;color:var(--text-muted);">5 unread notifications</div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border);text-align:center;"><a href="dashboard.html" style="font-size:12px;color:var(--primary);">View all →</a></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="settings-layout">
+
+      <!-- ─── Settings Nav ─── -->
+      <div class="settings-nav">
+        <button class="settings-nav-item active" onclick="showSettings('general',this)">🏢 General</button>
+        <button class="settings-nav-item" onclick="showSettings('branding',this)">🎨 Branding</button>
+        <button class="settings-nav-item" onclick="showSettings('api-keys',this)">🔑 API Keys</button>
+        <button class="settings-nav-item" onclick="showSettings('team',this)">👥 Team</button>
+        <button class="settings-nav-item" onclick="showSettings('billing',this)">💳 Billing</button>
+        <button class="settings-nav-item" onclick="showSettings('scheduling',this)">📅 Scheduling</button>
+        <button class="settings-nav-item" onclick="showSettings('audit-log',this)">📋 Audit Log</button>
+      </div>
+
+      <!-- ─── GENERAL ─── -->
+      <div class="settings-panel active" id="panel-general">
+        <div class="settings-section">
+          <div class="settings-section-title">Agency Information</div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Agency Name</label><input class="form-input" value="Digital Horizons Agency"/></div><div class="form-group"><label class="form-label">Subdomain</label><div class="input-group"><input class="form-input" value="digital-horizons"/><div class="input-group-append">.rankflow.app</div></div></div></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" value="admin@digitalhorizons.com"/></div><div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="+44 20 1234 5678"/></div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Timezone <span class="required">*</span></label>
+              <select class="form-input">
+                <option selected>(GMT+05:30) Asia/Kolkata</option>
+                <option>(GMT+00:00) UTC</option>
+                <option>(GMT+01:00) Europe/London</option>
+                <option>(GMT-05:00) America/New_York</option>
+                <option>(GMT-08:00) America/Los_Angeles</option>
+              </select>
+              <div class="form-hint">Affects report scheduling and displayed times</div>
+            </div>
+            <div class="form-group"><label class="form-label">Agency Website</label><input class="form-input" value="https://digitalhorizons.com"/></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary btn-sm" onclick="Toast.success('Agency information saved!')">Save Changes</button></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Custom Domain</div>
+          <div class="form-group"><label class="form-label">Custom Domain</label><input class="form-input" value="reports.digitalhorizons.com"/><div class="form-hint">Point CNAME to: <code style="font-size:11px;background:var(--gray-100);padding:1px 5px;border-radius:3px;">cname.rankflow.app</code></div></div>
+          <div class="alert alert-success" style="margin-bottom:0;">✓ DNS verified and active — HTTPS auto-provisioned by Vercel</div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Audit Log (Recent)</div>
+          <div style="background:var(--gray-50);border-radius:var(--radius);padding:14px;margin-bottom:10px;">
+            <div class="audit-row"><span style="color:var(--text-muted);white-space:nowrap;width:100px;">Jun 1, 09:12</span><span style="color:var(--primary);white-space:nowrap;margin-right:8px;">john@agency.com</span><span style="color:var(--text-secondary);">Generated report for Acme Corp — May 2026</span></div>
+            <div class="audit-row"><span style="color:var(--text-muted);white-space:nowrap;width:100px;">Jun 1, 08:30</span><span style="color:var(--text-muted);white-space:nowrap;margin-right:8px;">system</span><span style="color:var(--text-secondary);">Daily data sync completed — 24 projects updated</span></div>
+            <div class="audit-row"><span style="color:var(--text-muted);white-space:nowrap;width:100px;">May 31, 14:20</span><span style="color:var(--primary);white-space:nowrap;margin-right:8px;">sarah@agency.com</span><span style="color:var(--text-secondary);">Updated client: GreenLeaf Studio</span></div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="showSettings('audit-log',document.querySelectorAll('.settings-nav-item')[6])">View Full Audit Log →</button>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title" style="color:var(--danger);">⚠ Danger Zone</div>
+          <div style="background:var(--danger-light);border:1px solid #FECACA;border-radius:var(--radius-md);padding:18px;">
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">Deleting your agency permanently removes all clients (24), reports (38), API keys, and branding. <strong>This cannot be undone.</strong></div>
+            <div class="form-group" style="margin-bottom:10px;">
+              <label class="form-label" style="color:var(--danger);">Type "DELETE" to confirm</label>
+              <input class="form-input" id="deleteConfirmInput" placeholder="Type DELETE here..." style="border-color:var(--danger);" oninput="checkDeleteConfirm(this.value)"/>
+            </div>
+            <button class="btn btn-danger btn-sm" id="deleteConfirmBtn" disabled style="opacity:0.5;" onclick="confirmDeleteAgency()">🗑 Permanently Delete Agency</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── BRANDING ─── -->
+      <div class="settings-panel" id="panel-branding">
+        <div class="settings-section">
+          <div class="settings-section-title">White-Label Branding</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Agency Logo</label>
+              <div style="border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:20px;text-align:center;cursor:pointer;transition:var(--transition-fast);" onclick="Toast.info('File picker opened...')" onmouseenter="this.style.borderColor='var(--primary)'" onmouseleave="this.style.borderColor='var(--border-strong)'">
+                <div style="font-size:28px;margin-bottom:6px;">🖼</div>
+                <div style="font-size:12px;color:var(--text-muted);">Click to upload logo<br><span style="font-size:11px;">PNG, SVG — max 2MB</span></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Brand Colors</label>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;align-items:center;gap:10px;"><input type="color" value="#4F46E5" style="width:36px;height:36px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;padding:2px;"/><span style="font-size:13px;">Primary Color</span></div>
+                <div style="display:flex;align-items:center;gap:10px;"><input type="color" value="#0F172A" style="width:36px;height:36px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;padding:2px;"/><span style="font-size:13px;">Background Color</span></div>
+                <div style="display:flex;align-items:center;gap:10px;"><input type="color" value="#FFFFFF" style="width:36px;height:36px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;padding:2px;"/><span style="font-size:13px;">Report Background</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Agency Name in Reports</label><input class="form-input" value="Digital Horizons Agency"/></div>
+            <div class="form-group"><label class="form-label">Report Footer Text</label><input class="form-input" value="Confidential · Digital Horizons 2026"/></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email Sender Name</label><input class="form-input" value="Digital Horizons SEO Reports"/></div>
+          <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary btn-sm" onclick="Toast.success('Branding saved!')">Save Branding</button></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Branding Preview</div>
+          <div style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">
+            <div style="background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:20px;text-align:center;color:white;">
+              <div style="font-size:22px;font-weight:800;margin-bottom:3px;">Monthly SEO Report</div>
+              <div style="font-size:13px;opacity:0.7;">Acme Corp · June 2026</div>
+              <div style="font-size:11px;opacity:0.5;margin-top:4px;">Prepared by Digital Horizons Agency</div>
+            </div>
+            <div style="padding:16px;font-size:12px;color:var(--text-muted);text-align:center;">Confidential · Digital Horizons 2026</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── API KEYS ─── -->
+      <div class="settings-panel" id="panel-api-keys">
+        <div class="settings-section">
+          <div class="settings-section-title">SERanking Integration</div>
+          <div class="api-key-row">
+            <div><div style="font-size:13px;font-weight:600;">SERanking API Key</div><div class="key-mask">sk-•••••••••••••••••••••••••••••••••xyz</div><div style="font-size:11px;color:var(--text-muted);">Last used: Today · 47 calls today</div></div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <span class="badge badge-success">✅ Active</span>
+              <button class="btn btn-secondary btn-sm" onclick="revealKey('seranking')">👁 Reveal</button>
+              <button class="btn btn-ghost btn-sm" onclick="Modal.open('updateKeyModal')">✏ Update</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Google Search Console</div>
+          <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:18px;">
+            <div id="gscNotConnected">
+              <div class="connect-box">
+                <div style="font-size:32px;margin-bottom:8px;">📊</div>
+                <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Connect Google Search Console</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">Required for organic traffic, clicks, impressions, CTR, and avg position data across all clients</div>
+                <button class="btn btn-primary btn-sm" onclick="connectGSC()">🔑 Sign in with Google</button>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">Authorized scopes:<br>• Read GSC performance data<br>• List GSC properties<br>No write access</div>
+              </div>
+              <div class="form-hint" style="margin-top:8px;">Connection is per-agency. Each client's GSC property is mapped separately after connecting.</div>
+            </div>
+            <div id="gscConnected" style="display:none;">
+              <div class="alert alert-success" style="margin-bottom:12px;">✅ Connected as john@digitalhorizons.com · 8 GSC properties found</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:10px;">Map GSC Properties to Clients:</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;gap:10px;"><code style="flex:1;font-size:12px;background:var(--gray-50);padding:5px 8px;border-radius:4px;border:1px solid var(--border);">sc-domain:acmecorp.com</code><select class="form-input" style="width:160px;font-size:12px;"><option>Acme Corp</option></select></div>
+                <div style="display:flex;align-items:center;gap:10px;"><code style="flex:1;font-size:12px;background:var(--gray-50);padding:5px 8px;border-radius:4px;border:1px solid var(--border);">sc-domain:techstart.io</code><select class="form-input" style="width:160px;font-size:12px;"><option>TechStart.io</option></select></div>
+                <div style="display:flex;align-items:center;gap:10px;"><code style="flex:1;font-size:12px;background:var(--gray-50);padding:5px 8px;border-radius:4px;border:1px solid var(--border);">sc-domain:greenleaf.com</code><select class="form-input" style="width:160px;font-size:12px;"><option value="">Select client...</option><option>GreenLeaf Organics</option></select></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-primary btn-sm" onclick="Toast.success('GSC mapping saved!')">Save Mapping</button>
+                <button class="btn btn-danger btn-sm" onclick="disconnectGSC()">Disconnect GSC</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Webhook</div>
+          <div class="form-group"><label class="form-label">Webhook URL</label><input class="form-input" placeholder="https://hooks.example.com/rankflow" style="font-family:monospace;"/><div class="form-hint">Receive POST events for report_ready, sync_complete, report_failed</div></div>
+          <div style="display:flex;gap:8px;"><button class="btn btn-secondary btn-sm" onclick="Toast.info('Test event sent!')">Test Webhook</button><button class="btn btn-primary btn-sm" onclick="Toast.success('Webhook saved!')">Save</button></div>
+        </div>
+      </div>
+
+      <!-- ─── TEAM ─── -->
+      <div class="settings-panel" id="panel-team">
+        <div class="settings-section">
+          <div class="settings-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            Team Members
+            <button class="btn btn-primary btn-sm" data-modal-open="inviteTeamModal">+ Invite Member</button>
+          </div>
+          <div>
+            <div class="team-row">
+              <div class="sidebar-avatar" style="width:38px;height:38px;font-size:13px;">JD</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:700;">John Doe</div><div style="font-size:12px;color:var(--text-muted);">john@digitalhorizons.com</div></div>
+              <span class="badge badge-primary">Admin</span>
+              <span style="font-size:12px;color:var(--text-muted);">You</span>
+            </div>
+            <div class="team-row">
+              <div class="sidebar-avatar" style="width:38px;height:38px;font-size:13px;background:linear-gradient(135deg,#10B981,#059669);">SM</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Sarah Miller</div><div style="font-size:12px;color:var(--text-muted);">sarah@digitalhorizons.com</div></div>
+              <select class="form-input" style="width:120px;font-size:12px;"><option>Manager</option><option>Admin</option><option>Viewer</option></select>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="Toast.warning('Member removed')">Remove</button>
+            </div>
+            <div class="team-row" style="opacity:0.6;">
+              <div class="sidebar-avatar" style="width:38px;height:38px;font-size:13px;background:linear-gradient(135deg,#F59E0B,#D97706);">MR</div>
+              <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Mike Roberts</div><div style="font-size:12px;color:var(--text-muted);">mike@digitalhorizons.com</div></div>
+              <span class="badge badge-warning">Pending Invite</span>
+              <button class="btn btn-ghost btn-sm" onclick="Toast.info('Invite resent!')">Resend</button>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Role Permissions</div>
+          <div class="table-wrapper">
+            <table><thead><tr><th>Permission</th><th>Admin</th><th>Manager</th><th>Viewer</th></tr></thead>
+            <tbody>
+              <tr><td>View client data</td><td>✅</td><td>✅</td><td>✅</td></tr>
+              <tr><td>Generate reports</td><td>✅</td><td>✅</td><td>❌</td></tr>
+              <tr><td>Add/edit clients</td><td>✅</td><td>✅</td><td>❌</td></tr>
+              <tr><td>Manage API keys</td><td>✅</td><td>❌</td><td>❌</td></tr>
+              <tr><td>Manage billing</td><td>✅</td><td>❌</td><td>❌</td></tr>
+              <tr><td>Delete clients</td><td>✅</td><td>❌</td><td>❌</td></tr>
+            </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── BILLING ─── -->
+      <div class="settings-panel" id="panel-billing">
+        <div class="settings-section">
+          <div class="settings-section-title">Current Plan</div>
+          <div class="billing-plan-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <div><div style="font-size:18px;font-weight:800;color:var(--primary);">Agency Pro</div><div style="font-size:13px;color:var(--text-secondary);">£149 / month · Renews July 1, 2026</div></div>
+              <span class="badge badge-success">✅ Active</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">
+              <div style="background:rgba(255,255,255,0.6);border-radius:var(--radius);padding:10px;text-align:center;"><div style="font-size:16px;font-weight:800;">50</div><div style="font-size:11px;color:var(--text-muted);">Max Sites</div><div style="font-size:12px;font-weight:600;">23 used</div></div>
+              <div style="background:rgba(255,255,255,0.6);border-radius:var(--radius);padding:10px;text-align:center;"><div style="font-size:16px;font-weight:800;">5,000</div><div style="font-size:11px;color:var(--text-muted);">Keywords</div><div style="font-size:12px;font-weight:600;">1,847 used</div></div>
+              <div style="background:rgba(255,255,255,0.6);border-radius:var(--radius);padding:10px;text-align:center;"><div style="font-size:16px;font-weight:800;">10K</div><div style="font-size:11px;color:var(--text-muted);">API Credits</div><div style="font-size:12px;font-weight:600;">8,400 left</div></div>
+            </div>
+            <div style="display:flex;gap:8px;"><button class="btn btn-primary btn-sm" onclick="Toast.info('Redirecting to upgrade...')">Upgrade Plan</button><button class="btn btn-secondary btn-sm" onclick="Toast.info('Redirecting to Stripe...')">Manage Billing</button></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Billing History</div>
+          <div class="table-wrapper">
+            <table><thead><tr><th>Date</th><th>Amount</th><th>Status</th><th>Invoice</th></tr></thead>
+            <tbody>
+              <tr><td>Jun 1, 2026</td><td>£149.00</td><td><span class="badge badge-success">Paid</span></td><td><a href="#" style="color:var(--primary);font-size:12px;" onclick="Toast.info('Downloading invoice...')">📄 Download</a></td></tr>
+              <tr><td>May 1, 2026</td><td>£149.00</td><td><span class="badge badge-success">Paid</span></td><td><a href="#" style="color:var(--primary);font-size:12px;" onclick="Toast.info('Downloading invoice...')">📄 Download</a></td></tr>
+              <tr><td>Apr 1, 2026</td><td>£149.00</td><td><span class="badge badge-success">Paid</span></td><td><a href="#" style="color:var(--primary);font-size:12px;" onclick="Toast.info('Downloading invoice...')">📄 Download</a></td></tr>
+            </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SCHEDULING ─── -->
+      <div class="settings-panel" id="panel-scheduling">
+        <div class="settings-section">
+          <div class="settings-section-title">Default Report Schedule</div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Default Day of Month</label><input class="form-input" type="number" value="1" min="1" max="28" style="width:100px;"/><div class="form-hint">1–28 only (avoids Feb 29 issues)</div></div>
+            <div class="form-group"><label class="form-label">Default Time</label><input class="form-input" type="time" value="09:00"/><div class="form-hint">Agency timezone: IST (GMT+5:30)</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">Default Recipients (comma-separated)</label><input class="form-input" value="team@digitalhorizons.com"/><div class="form-hint">Applied to new clients unless overridden in client settings</div></div>
+          <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary btn-sm" onclick="Toast.success('Default schedule saved!')">Save Defaults</button></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Per-Client Schedule Overrides</div>
+          <div>
+            <div class="schedule-client-row">
+              <div style="width:32px;height:32px;background:#4F46E5;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0;">AC</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">Acme Corp</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:var(--text-muted);">Day 1, 09:00</span>
+                <label class="switch"><input type="checkbox" checked/><span class="switch-slider"></span></label>
+              </div>
+            </div>
+            <div class="schedule-client-row">
+              <div style="width:32px;height:32px;background:#10B981;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0;">TS</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">TechStart.io</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:var(--text-muted);">Day 5, 08:00</span>
+                <label class="switch"><input type="checkbox" checked/><span class="switch-slider"></span></label>
+              </div>
+            </div>
+            <div class="schedule-client-row">
+              <div style="width:32px;height:32px;background:#F59E0B;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;flex-shrink:0;">GL</div>
+              <div style="flex:1;font-size:13px;font-weight:600;">GreenLeaf Organics</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:12px;color:var(--text-muted);">Day 1, 09:00 (default)</span>
+                <label class="switch"><input type="checkbox"/><span class="switch-slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Data Sync Schedule</div>
+          <div class="switch-row">
+            <div class="switch-info"><div class="switch-label">Daily sync enabled</div><div class="switch-desc">Sync SERanking data every day at 02:00 AM agency time</div></div>
+            <label class="switch"><input type="checkbox" checked/><span class="switch-slider"></span></label>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text-muted);">ℹ Reports are scheduled 2 hours after data sync to ensure fresh data.</div>
+        </div>
+      </div>
+
+      <!-- ─── AUDIT LOG ─── -->
+      <div class="settings-panel" id="panel-audit-log">
+        <div class="settings-section">
+          <div class="settings-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+            Audit Log
+            <div style="display:flex;gap:8px;">
+              <input type="text" class="form-input" id="auditSearch" placeholder="🔍 Search log..." style="width:200px;font-size:12px;" oninput="filterAuditLog(this.value)"/>
+              <button class="btn btn-secondary btn-sm" onclick="Toast.info('Exporting log as CSV...')">⬇ Export CSV</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table id="auditTable">
+              <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+              <tbody>
+                <tr><td style="white-space:nowrap;font-size:12px;">Jun 3, 14:20</td><td><span class="badge badge-primary" style="font-size:10px;">john@agency.com</span></td><td><span class="badge badge-success">REPORT_GEN</span></td><td style="font-size:12px;">Generated report for Acme Corp — May 2026 v2</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">Jun 1, 09:12</td><td><span class="badge badge-primary" style="font-size:10px;">john@agency.com</span></td><td><span class="badge badge-success">REPORT_GEN</span></td><td style="font-size:12px;">Generated report for Acme Corp — May 2026 v1</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">Jun 1, 08:30</td><td><span class="badge badge-neutral" style="font-size:10px;">system</span></td><td><span class="badge badge-primary">SYNC</span></td><td style="font-size:12px;">Daily data sync completed — 24 projects updated</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">May 31, 14:20</td><td><span class="badge badge-primary" style="font-size:10px;">sarah@agency.com</span></td><td><span class="badge badge-warning">CLIENT_UPDATE</span></td><td style="font-size:12px;">Updated client: GreenLeaf Studio — changed contact email</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">May 31, 11:05</td><td><span class="badge badge-primary" style="font-size:10px;">john@agency.com</span></td><td><span class="badge badge-danger">REPORT_FAIL</span></td><td style="font-size:12px;">Report generation failed: BlueSky Marketing — API 429</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">May 30, 09:00</td><td><span class="badge badge-neutral" style="font-size:10px;">system</span></td><td><span class="badge badge-primary">SYNC</span></td><td style="font-size:12px;">Daily data sync completed — 24 projects updated</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">May 29, 16:40</td><td><span class="badge badge-primary" style="font-size:10px;">john@agency.com</span></td><td><span class="badge badge-success">CLIENT_ADD</span></td><td style="font-size:12px;">Added new client: RetailPro Ltd (retailpro.co.uk)</td></tr>
+                <tr><td style="white-space:nowrap;font-size:12px;">May 28, 10:30</td><td><span class="badge badge-primary" style="font-size:10px;">sarah@agency.com</span></td><td><span class="badge badge-success">REPORT_GEN</span></td><td style="font-size:12px;">Generated report for TechStart.io — April 2026</td></tr>
+              </tbody>
+            </table>
+            <div class="table-footer"><span>Showing 8 of 147 log entries</span><div style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm">← Prev</button><button class="btn btn-primary btn-sm">1</button><button class="btn btn-secondary btn-sm">2</button><button class="btn btn-secondary btn-sm">Next →</button></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /settings-layout -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- Update Key Modal -->
+<div class="modal-overlay" id="updateKeyModal">
+  <div class="modal modal-sm"><div class="modal-header"><div class="modal-title">Update SERanking API Key</div><button class="modal-close" data-modal-close="updateKeyModal">✕</button></div>
+  <div class="modal-body">
+    <div class="alert alert-warning">⚠ Updating the API key will immediately invalidate the old key and restart all integrations.</div>
+    <div class="form-group"><label class="form-label">New API Key <span class="required">*</span></label><input class="form-input" type="password" id="newApiKeyInput" placeholder="Paste new SERanking API key..."/></div>
+    <div id="keyValidationResult" style="display:none;"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-modal-close="updateKeyModal">Cancel</button>
+    <button class="btn btn-secondary btn-sm" onclick="validateKey()">Validate Key</button>
+    <button class="btn btn-primary" onclick="saveKey()">Update Key →</button>
+  </div>
+  </div>
+</div>
+
+<!-- Invite Team Modal -->
+<div class="modal-overlay" id="inviteTeamModal">
+  <div class="modal modal-sm"><div class="modal-header"><div class="modal-title">Invite Team Member</div><button class="modal-close" data-modal-close="inviteTeamModal">✕</button></div>
+  <div class="modal-body">
+    <div class="form-group"><label class="form-label">Email Address <span class="required">*</span></label><input class="form-input" type="email" id="inviteEmail" placeholder="colleague@agency.com"/></div>
+    <div class="form-group"><label class="form-label">Role</label><select class="form-input"><option>Manager</option><option>Admin</option><option>Viewer</option></select></div>
+    <div class="form-group"><label class="form-label">Clients Access</label><select class="form-input"><option>All Clients</option><option>Select Clients...</option></select></div>
+  </div>
+  <div class="modal-footer"><button class="btn btn-secondary" data-modal-close="inviteTeamModal">Cancel</button><button class="btn btn-primary" onclick="sendInvite()">Send Invite 📧</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+function showSettings(section, el) {
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+  const panel = document.getElementById('panel-' + section);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function checkDeleteConfirm(val) {
+  const btn = document.getElementById('deleteConfirmBtn');
+  const enabled = val === 'DELETE';
+  btn.disabled = !enabled;
+  btn.style.opacity = enabled ? '1' : '0.5';
+}
+
+function confirmDeleteAgency() {
+  if (confirm('Are you absolutely sure? This will permanently delete your agency and ALL data.')) {
+    Toast.error('Agency deletion initiated. You will receive a final confirmation email.');
+    setTimeout(() => window.location.href = 'login.html', 3000);
+  }
+}
+
+function connectGSC() {
+  Toast.info('Redirecting to Google OAuth...');
+  setTimeout(() => {
+    document.getElementById('gscNotConnected').style.display = 'none';
+    document.getElementById('gscConnected').style.display = 'block';
+    Toast.success('Google Search Console connected! 8 properties found.');
+  }, 1500);
+}
+
+function disconnectGSC() {
+  if (confirm('Disconnect Google Search Console? Analytics data will no longer be available.')) {
+    document.getElementById('gscConnected').style.display = 'none';
+    document.getElementById('gscNotConnected').style.display = 'block';
+    Toast.warning('GSC disconnected.');
+  }
+}
+
+function revealKey(type) {
+  Toast.info('Key revealed — hidden again in 10 seconds for security');
+}
+
+function validateKey() {
+  const key = document.getElementById('newApiKeyInput').value.trim();
+  if (!key) { Toast.error('Enter an API key first'); return; }
+  Toast.info('Validating key...');
+  setTimeout(() => {
+    const res = document.getElementById('keyValidationResult');
+    res.style.display = 'block';
+    res.className = 'alert alert-success';
+    res.textContent = '✅ Valid — Agency Pro plan · 10,000 daily credits';
+    Toast.success('Key validated successfully!');
+  }, 1200);
+}
+
+function saveKey() {
+  const key = document.getElementById('newApiKeyInput').value.trim();
+  if (!key) { Toast.error('Enter a key first'); return; }
+  Modal.close('updateKeyModal');
+  Toast.success('API key updated! Restarting integrations...');
+}
+
+function sendInvite() {
+  const email = document.getElementById('inviteEmail').value.trim();
+  if (!email) { Toast.error('Enter an email'); return; }
+  Modal.close('inviteTeamModal');
+  Toast.success(`Invite sent to ${email}!`);
+}
+
+function filterAuditLog(q) {
+  document.querySelectorAll('#auditTable tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankFlow — Client Portal Wireframes</title>
+  <style>
+    :root {
+      --wire-bg: #f4f5f7; --wire-surface: #ffffff; --wire-border: #c8ccd4;
+      --wire-border-dark: #8c94a4; --wire-text: #1e2030; --wire-text-light: #5c6478;
+      --wire-text-muted: #9aa0b4; --wire-fill: #dde1e8; --wire-fill-dark: #b8bfcc;
+      --wire-primary: #c07a20; --wire-success: #5a7a60; --wire-danger: #8a4a4a;
+      --wire-warn: #8a7040; --sidebar-w: 220px;
+      --role-color: #b06010; --role-bg: #fdf3e6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1d2e; color: var(--wire-text); min-height: 100vh; }
+    .top-nav { background: #12141f; border-bottom: 1px solid #2a2d40; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .top-nav .brand { display: flex; align-items: center; gap: 10px; color: #e0e4f0; font-weight: 700; font-size: 15px; }
+    .brand-icon { width: 28px; height: 28px; background: var(--role-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; }
+    .role-badge { background: var(--role-bg); color: var(--role-color); font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; border: 1px solid #e8c888; }
+    .screen-selector { display: flex; align-items: center; gap: 8px; }
+    .screen-selector select { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+    .nav-btns { display: flex; gap: 8px; }
+    .nav-btn { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .nav-btn:hover { background: #3a3d54; color: #fff; }
+    .screen-counter { color: #606478; font-size: 12px; }
+    .screen-area { display: flex; justify-content: center; padding: 28px 24px; min-height: calc(100vh - 52px); }
+    .wireframe-wrapper { width: 100%; max-width: 1100px; }
+    .screen-label { color: #8890a8; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
+    .screen-title { color: #e0e4f0; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .screen-desc { color: #606478; font-size: 13px; margin-bottom: 20px; }
+    .wf-chrome { background: var(--wire-bg); border-radius: 12px; overflow: hidden; border: 2px solid #2a2d40; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .wf-chrome-bar { background: #e0e3ea; height: 32px; display: flex; align-items: center; padding: 0 14px; gap: 7px; border-bottom: 1px solid var(--wire-border); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #e07070; } .dot-y { background: #e0c070; } .dot-g { background: #70c070; }
+    .wf-url { flex: 1; background: #fff; border: 1px solid var(--wire-border); border-radius: 12px; height: 20px; margin: 0 10px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; color: var(--wire-text-muted); }
+
+    /* CLIENT PORTAL: simplified header (no sidebar) */
+    .client-header-bar { background: var(--wire-primary); color: #fff; padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+    .client-header-logo { width: 90px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,0.8); }
+    .client-header-title { font-size: 14px; font-weight: 700; }
+    .client-header-user { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+    .client-avatar { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+    .client-nav-tabs { background: rgba(0,0,0,0.15); display: flex; gap: 2px; padding: 0 32px; }
+    .client-nav-tab { padding: 10px 16px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; border-bottom: 2px solid transparent; }
+    .client-nav-tab.active { color: #fff; border-bottom-color: #fff; font-weight: 700; }
+
+    /* LAYOUT */
+    .wf-layout { display: flex; min-height: 580px; }
+    .wf-sidebar { width: var(--sidebar-w); background: var(--wire-surface); border-right: 1px solid var(--wire-border); flex-shrink: 0; display: flex; flex-direction: column; }
+    .wf-sidebar-logo { padding: 16px 16px 12px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; gap: 10px; }
+    .logo-box { width: 32px; height: 32px; background: var(--wire-fill-dark); border-radius: 6px; border: 1px dashed var(--wire-border-dark); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--wire-text-muted); }
+    .logo-text { font-size: 12px; font-weight: 700; color: var(--role-color); }
+    .logo-role-pill { font-size: 9px; font-weight: 700; background: var(--role-bg); color: var(--role-color); padding: 1px 6px; border-radius: 8px; margin-top: 2px; display: inline-block; }
+    .wf-sidebar-nav { padding: 8px; flex: 1; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 8px; border-radius: 6px; font-size: 12px; color: var(--wire-text-light); cursor: pointer; margin-bottom: 1px; }
+    .nav-item.active { background: var(--role-bg); color: var(--role-color); font-weight: 600; }
+    .nav-icon { width: 14px; height: 14px; background: var(--wire-fill-dark); border-radius: 3px; flex-shrink: 0; }
+    .wf-sidebar-footer { padding: 12px; border-top: 1px solid var(--wire-border); }
+    .user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: var(--role-bg); border-radius: 8px; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--role-color); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 11px; font-weight: 600; color: var(--wire-text); }
+    .user-role { font-size: 9px; color: var(--role-color); font-weight: 700; }
+    .wf-content { flex: 1; overflow: hidden; }
+
+    /* BUTTONS */
+    .wf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .wf-btn-primary { background: var(--role-color); color: #fff; }
+    .wf-btn-secondary { background: var(--wire-surface); color: var(--wire-text-light); border-color: var(--wire-border); }
+    .wf-btn-sm { padding: 4px 10px; font-size: 10px; }
+    .wf-btn-ghost { background: transparent; color: var(--wire-text-muted); border-color: var(--wire-border); }
+
+    /* CARDS & KPI */
+    .wf-main { padding: 24px; }
+    .kpi-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .kpi-label { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--wire-text); line-height: 1; }
+    .kpi-change { font-size: 10px; margin-top: 4px; }
+    .kpi-change.up { color: var(--wire-success); } .kpi-change.down { color: var(--wire-danger); } .kpi-change.neutral { color: var(--wire-text-muted); }
+    .wf-table-wrap { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-table-header { padding: 14px 16px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; justify-content: space-between; }
+    .wf-table-title { font-size: 13px; font-weight: 700; color: var(--wire-text); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--wire-fill); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--wire-text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--wire-border); }
+    td { padding: 9px 12px; font-size: 11px; color: var(--wire-text); border-bottom: 1px solid var(--wire-fill); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--wire-fill); }
+    .chart-box { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .chart-title { font-size: 12px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 12px; }
+    .chart-placeholder { background: var(--wire-fill); border-radius: 6px; display: flex; align-items: flex-end; justify-content: space-around; padding: 16px 12px 0; gap: 4px; }
+    .chart-bar { background: var(--wire-fill-dark); border-radius: 3px 3px 0 0; flex: 1; min-width: 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .wf-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .badge-success { background: #e6f0e8; color: var(--wire-success); }
+    .badge-danger { background: #f0e6e6; color: var(--wire-danger); }
+    .badge-warn { background: #f0ece0; color: var(--wire-warn); }
+    .badge-neutral { background: var(--wire-fill); color: var(--wire-text-muted); }
+    .badge-primary { background: var(--role-bg); color: var(--role-color); }
+    .progress-bar { height: 6px; background: var(--wire-fill); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; background: var(--role-color); border-radius: 3px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--wire-text); margin-bottom: 5px; }
+    .form-input { display: block; width: 100%; padding: 9px 12px; border: 1px solid var(--wire-border); border-radius: 6px; font-size: 12px; color: var(--wire-text-light); background: var(--wire-fill); }
+    .form-input-hint { font-size: 9px; color: var(--wire-text-muted); margin-top: 3px; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--wire-text); margin-bottom: 3px; }
+    .section-desc { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 16px; }
+    .auth-wrapper { min-height: 580px; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; padding: 32px; }
+    .alert { padding: 10px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .alert-info { background: #f0f4fd; border: 1px solid #c0ccf0; color: #283878; }
+    .up-arrow { color: var(--wire-success); } .down-arrow { color: var(--wire-danger); }
+
+    /* REPORT VIEW STYLES */
+    .report-header { background: var(--role-color); color: #fff; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .report-header-logo { width: 80px; height: 28px; background: rgba(255,255,255,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255,255,255,0.7); }
+    .report-header-info { text-align: right; }
+    .report-header-title { font-size: 16px; font-weight: 800; }
+    .report-header-meta { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+    .report-section { padding: 20px 32px; border-bottom: 1px solid var(--wire-border); }
+    .report-section-title { font-size: 12px; font-weight: 800; color: var(--role-color); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--wire-fill); }
+    .gauge-ring { width: 90px; height: 90px; border-radius: 50%; background: conic-gradient(var(--role-color) 0% 76%, var(--wire-fill) 76% 100%); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; }
+    .gauge-inner { width: 64px; height: 64px; border-radius: 50%; background: var(--wire-surface); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .gauge-value { font-size: 16px; font-weight: 800; color: var(--wire-text); }
+    .gauge-max { font-size: 8px; color: var(--wire-text-muted); }
+
+    /* Modal overlay */
+    .modal-overlay { background: rgba(0,0,0,0.15); position: relative; padding: 40px; min-height: 540px; display: flex; align-items: center; justify-content: center; }
+    .modal-box { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 12px; padding: 24px; width: 460px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .modal-sub { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 20px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--wire-border); }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .annotations-panel { background: #12141f; border-top: 1px solid #2a2d40; padding: 12px 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .ann-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #8890a8; }
+    .ann-bullet { width: 8px; height: 8px; border-radius: 2px; background: var(--role-color); flex-shrink: 0; }
+    .ann-bullet-red { width: 8px; height: 8px; border-radius: 2px; background: #8a4a4a; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="brand">
+    <div class="brand-icon">CL</div>
+    RankFlow — Wireframes
+    <div class="role-badge">🔶 Client Portal</div>
+  </div>
+  <div class="screen-selector">
+    <select id="screenSelect" onchange="gotoScreen(this.value)">
+      <option value="0">01 — Client Portal Login</option>
+      <option value="1">02 — Client Dashboard (Read-only)</option>
+      <option value="2">03 — Report View (Interactive)</option>
+      <option value="3">04 — Download PDF Confirmation</option>
+      <option value="4">05 — Profile / Change Password</option>
+    </select>
+    <span class="screen-counter" id="screenCounter">1 / 5</span>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="prevScreen()">← Prev</button>
+    <button class="nav-btn" onclick="nextScreen()">Next →</button>
+  </div>
+</div>
+
+<div class="screen-area">
+<div class="wireframe-wrapper">
+
+<!-- SCREEN 01: CLIENT PORTAL LOGIN -->
+<div class="screen active" id="screen-0">
+  <div class="screen-label">Screen 01 · CLIENT</div>
+  <div class="screen-title">Client Portal Login</div>
+  <div class="screen-desc">Branded with agency logo and colors. Clients log in here to view only their own reports. Read-only access.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/client/login</div></div>
+    <div class="auth-wrapper" style="background:#fdf6ee;">
+      <div style="max-width:420px; width:100%;">
+        <div style="text-align:center; margin-bottom:28px;">
+          <div style="width:60px; height:60px; background:var(--role-bg); border:2px solid #e8c888; border-radius:16px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--wire-text-muted);">LOGO</div>
+          <div style="font-size:22px; font-weight:800; color:var(--role-color);">Digital Horizons</div>
+          <div style="font-size:12px; color:var(--wire-text-muted); margin-top:4px;">Client Report Portal</div>
+        </div>
+        <div class="wf-card" style="border:2px solid #e8c888;">
+          <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-size:16px; font-weight:700; color:var(--wire-text);">Welcome back</div>
+            <div style="font-size:11px; color:var(--wire-text-muted);">Sign in to view your SEO reports</div>
+          </div>
+          <div class="form-group"><label class="form-label">Your Email</label><div class="form-input">sarah@acmecorp.com</div></div>
+          <div class="form-group"><label class="form-label">Password</label><div class="form-input">••••••••••</div><div style="text-align:right; margin-top:4px; font-size:10px; color:var(--role-color);">Forgot password?</div></div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; padding:10px; background:var(--role-color);">View My Reports</div>
+          <div style="text-align:center; margin-top:16px; font-size:10px; color:var(--wire-text-muted);">
+            Having trouble? Contact your account manager at<br>
+            <span style="color:var(--role-color);">reports@digitalhorizons.com</span>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:14px; font-size:10px; color:var(--wire-text-muted);">Powered by RankFlow</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Separate URL from agency staff login (/client/login vs /login)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Branded with agency logo and primary color (from branding config)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Client account created when Agency Admin enables portal access for them</div>
+    <div class="ann-item"><div class="ann-bulletin ann-bullet-red"></div>Client can ONLY see their own data — tenant + client-level row-level security enforced</div>
+  </div>
+</div>
+
+<!-- SCREEN 02: CLIENT DASHBOARD -->
+<div class="screen" id="screen-1">
+  <div class="screen-label">Screen 02 · CLIENT</div>
+  <div class="screen-title">Client Dashboard — Read-Only</div>
+  <div class="screen-desc">Clients see ONLY their own KPIs and reports. No other clients, no generate, no settings, no navigation beyond their own data.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/client/dashboard</div></div>
+    <!-- Branded header bar instead of sidebar -->
+    <div>
+      <div class="client-header-bar" style="background:var(--role-color);">
+        <div class="client-header-logo">Agency Logo</div>
+        <div class="client-header-title">Acme Corp — SEO Reports</div>
+        <div class="client-header-user"><div class="client-avatar">SC</div> Sarah Clarke <span style="opacity:0.7; font-size:10px; margin-left:4px;">▾</span></div>
+      </div>
+      <div class="client-nav-tabs" style="background:rgba(176,96,16,0.85);">
+        <div class="client-nav-tab active">📊 Dashboard</div>
+        <div class="client-nav-tab">📄 My Reports</div>
+        <div class="client-nav-tab">👤 Profile</div>
+      </div>
+      <div style="background:var(--wire-bg); min-height:480px;">
+        <div class="wf-main" style="max-width:960px; margin:0 auto;">
+          <div style="margin-bottom:20px;">
+            <div style="font-size:18px; font-weight:800; color:var(--wire-text);">Welcome back, Sarah 👋</div>
+            <div style="font-size:11px; color:var(--wire-text-muted); margin-top:3px;">Acme Corp · acmecorp.com · Latest data: May 2026</div>
+          </div>
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4 keywords</div></div>
+            <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-change up">↑ +2 pts</div></div>
+            <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+          </div>
+          <div class="two-col">
+            <div class="wf-card">
+              <div style="font-size:13px; font-weight:700; margin-bottom:12px;">📄 Latest Report</div>
+              <div style="background:var(--wire-fill); border-radius:8px; padding:16px; margin-bottom:14px;">
+                <div style="font-size:12px; font-weight:700; color:var(--wire-text);">SEO Report — May 2026</div>
+                <div style="font-size:10px; color:var(--wire-text-muted); margin-top:3px;">Generated: Jun 1, 2026 · 7 sections</div>
+                <div style="font-size:10px; color:var(--wire-success); margin-top:3px;">✓ 3 major wins this month</div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <div class="wf-btn wf-btn-primary" style="flex:1; justify-content:center; background:var(--role-color);">View Full Report</div>
+                <div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ PDF</div>
+              </div>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Traffic Trend (6 months)</div>
+              <div class="chart-subtitle">Your organic sessions over time</div>
+              <div class="chart-placeholder" style="height:90px;">
+                <div class="chart-bar" style="height:50%;"></div>
+                <div class="chart-bar" style="height:58%;"></div>
+                <div class="chart-bar" style="height:65%;"></div>
+                <div class="chart-bar" style="height:72%;"></div>
+                <div class="chart-bar" style="height:80%;"></div>
+                <div class="chart-bar" style="height:100%; background:var(--role-color);"></div>
+              </div>
+            </div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header">
+              <div class="wf-table-title">My Report History</div>
+            </div>
+            <table>
+              <tr><th>Period</th><th>Generated</th><th>Status</th><th>Actions</th></tr>
+              <tr><td><strong>May 2026</strong></td><td>Jun 1, 2026</td><td><span class="badge badge-success">Ready</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></div></td></tr>
+              <tr><td><strong>April 2026</strong></td><td>May 1, 2026</td><td><span class="badge badge-success">Ready</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></div></td></tr>
+              <tr><td><strong>March 2026</strong></td><td>Apr 1, 2026</td><td><span class="badge badge-success">Ready</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></div></td></tr>
+              <tr><td><strong>February 2026</strong></td><td>Mar 1, 2026</td><td><span class="badge badge-success">Ready</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div></div></td></tr>
+            </table>
+          </div>
+          <div style="font-size:10px; color:var(--wire-text-muted); background:var(--wire-fill); padding:8px 12px; border-radius:6px;">
+            🔒 This portal is read-only. To update account settings or contact your SEO manager, email reports@digitalhorizons.com
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Client sees ONLY their own company data — RLS enforced at DB level</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Header-based navigation (no sidebar) — minimal interface for clients</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Branded with agency logo and color — customized per agency in branding settings</div>
+    <div class="ann-item"><div class="ann-bullet ann-bullet-red"></div>NOT available: Generate report, client list, settings, API, team, branding, billing</div>
+  </div>
+</div>
+
+<!-- SCREEN 03: REPORT VIEW -->
+<div class="screen" id="screen-2">
+  <div class="screen-label">Screen 03 · CLIENT</div>
+  <div class="screen-title">Interactive Report View</div>
+  <div class="screen-desc">Client views their full SEO report as an interactive web page. All 7 sections visible. Download PDF and share available.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/client/reports/acme-corp-may-2026</div></div>
+    <div>
+      <!-- Report Header (branded) -->
+      <div class="report-header" style="background:var(--role-color);">
+        <div class="report-header-logo">Agency Logo</div>
+        <div style="font-size:13px; font-weight:700; text-align:center;">Monthly SEO Report</div>
+        <div class="report-header-info">
+          <div class="report-header-title">Acme Corp</div>
+          <div class="report-header-meta">acmecorp.com · May 2026</div>
+        </div>
+      </div>
+      <!-- Download bar -->
+      <div style="background:var(--wire-fill); padding:8px 32px; border-bottom:1px solid var(--wire-border); display:flex; align-items:center; justify-content:space-between;">
+        <div style="font-size:11px; color:var(--wire-text-muted);">← Back to Dashboard</div>
+        <div style="display:flex; gap:8px;">
+          <div class="wf-btn wf-btn-secondary wf-btn-sm">⬇ Download PDF</div>
+          <div class="wf-btn wf-btn-ghost wf-btn-sm">🔗 Share Link</div>
+        </div>
+      </div>
+      <!-- 1. Executive Summary -->
+      <div class="report-section">
+        <div class="report-section-title">1. Executive Summary</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px;">
+          <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3%</div></div>
+          <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4</div></div>
+          <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-change up">↑ +2</div></div>
+          <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+        </div>
+        <div style="background:var(--wire-fill); border-radius:8px; padding:14px; font-size:11px; color:var(--wire-text);">
+          <strong>🏆 This Month's Wins:</strong><br>
+          <div style="margin-top:8px; display:flex; flex-direction:column; gap:5px;">
+            <div>✅ "local seo london" climbed from position 10 → position 2 (+8 places)</div>
+            <div>✅ Organic traffic increased by 16.3% month-over-month</div>
+            <div>✅ 3 new high-authority backlinks acquired (Forbes, Moz, TechRadar)</div>
+          </div>
+        </div>
+      </div>
+      <!-- 2. Keyword Rankings (compact) -->
+      <div class="report-section">
+        <div class="report-section-title">2. Keyword Rankings</div>
+        <div style="display:grid; grid-template-columns:1fr 2fr; gap:16px; align-items:start;">
+          <div>
+            <div style="text-align:center; padding:16px;">
+              <div class="gauge-ring"><div class="gauge-inner"><div class="gauge-value">47</div><div class="gauge-max">Top 10</div></div></div>
+              <div style="font-size:11px; color:var(--wire-success); margin-top:4px;">↑ +4 vs last month</div>
+            </div>
+          </div>
+          <div class="wf-table-wrap" style="margin-bottom:0;">
+            <table>
+              <tr><th>Keyword</th><th>Position</th><th>Change</th><th>Volume</th></tr>
+              <tr><td>local seo london</td><td><span class="badge badge-success">2</span></td><td class="up-arrow">▲ +8</td><td>880</td></tr>
+              <tr><td>seo agency london</td><td><span class="badge badge-success">4</span></td><td class="up-arrow">▲ +3</td><td>1,600</td></tr>
+              <tr><td>digital marketing uk</td><td><span class="badge badge-warn">7</span></td><td class="down-arrow">▼ -1</td><td>2,400</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- 3. AI Recommendations (abbreviated) -->
+      <div class="report-section" style="background:#fdf9f4;">
+        <div class="report-section-title">7. AI-Powered Recommendations</div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:11px;">
+          <div style="background:#fff; border:1px solid var(--wire-border); border-radius:6px; padding:12px; border-left:3px solid var(--role-color);">
+            <strong>1. Fix broken internal links</strong> — 3 critical broken links found. Fix /blog/post-14 and /resources/guide-2 this week to recover crawl budget.
+          </div>
+          <div style="background:#fff; border:1px solid var(--wire-border); border-radius:6px; padding:12px; border-left:3px solid var(--wire-success);">
+            <strong>2. Target "ppc agency london" (Pos. 11)</strong> — 1 more position push would enter the top 10. Add 2–3 internal links from blog posts to /ppc page.
+          </div>
+          <div style="background:#fff; border:1px solid var(--wire-border); border-radius:6px; padding:12px; border-left:3px solid #7090c0;">
+            <strong>3. Write 8 missing meta descriptions</strong> — 8 blog pages lack meta descriptions, reducing click-through rate in search results.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Full interactive report — client scrolls through all 7 sections</div>
+    <div class="ann-item"><div class="ann-bullet"></div>View event logged to report_views table on page load</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Download PDF and Share link buttons are available to clients</div>
+    <div class="ann-item"><div class="ann-bullet ann-bullet-red"></div>Client CANNOT generate reports, edit data, or access other clients' reports</div>
+  </div>
+</div>
+
+<!-- SCREEN 04: DOWNLOAD PDF CONFIRMATION -->
+<div class="screen" id="screen-3">
+  <div class="screen-label">Screen 04 · CLIENT</div>
+  <div class="screen-title">Download PDF — Confirmation Modal</div>
+  <div class="screen-desc">Before downloading, a modal shows report details and confirms the action. Branded PDF generated server-side.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/client/reports/acme-corp-may-2026</div></div>
+    <div class="modal-overlay">
+      <!-- Background page visible behind -->
+      <div style="position:absolute; inset:0; background:rgba(0,0,0,0.1); pointer-events:none;"></div>
+      <div class="modal-box" style="border:2px solid #e8c888;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <div style="width:40px; height:40px; background:var(--role-bg); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📄</div>
+          <div>
+            <div class="modal-title">Download Report PDF</div>
+            <div class="modal-sub" style="margin-bottom:0;">Your branded SEO report will download as a PDF file</div>
+          </div>
+        </div>
+        <div style="background:var(--wire-fill); border-radius:8px; padding:14px; margin-bottom:16px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:11px;">
+            <div><div style="font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--wire-text-muted); margin-bottom:3px;">Client</div><strong>Acme Corp</strong></div>
+            <div><div style="font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--wire-text-muted); margin-bottom:3px;">Report Period</div><strong>May 2026</strong></div>
+            <div><div style="font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--wire-text-muted); margin-bottom:3px;">Sections</div><strong>7 sections</strong></div>
+            <div><div style="font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--wire-text-muted); margin-bottom:3px;">Estimated Size</div><strong>~4.2 MB</strong></div>
+          </div>
+        </div>
+        <div style="background:var(--role-bg); border:1px solid #e8c888; border-radius:6px; padding:10px 12px; font-size:10px; color:var(--role-color); margin-bottom:16px;">
+          ℹ️ This PDF is branded by <strong>Digital Horizons</strong>. Do not distribute externally without permission.
+        </div>
+        <div class="modal-footer">
+          <div class="wf-btn wf-btn-secondary">Cancel</div>
+          <div class="wf-btn wf-btn-primary" style="background:var(--role-color);">⬇ Download PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>PDF generated server-side using Puppeteer — includes agency branding</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Download event logged to report_downloads table for agency admin tracking</div>
+    <div class="ann-item"><div class="ann-bullet"></div>File named: {client-slug}-{period}-seo-report.pdf (e.g. acme-corp-may-2026-seo-report.pdf)</div>
+  </div>
+</div>
+
+<!-- SCREEN 05: PROFILE / CHANGE PASSWORD -->
+<div class="screen" id="screen-4">
+  <div class="screen-label">Screen 05 · CLIENT</div>
+  <div class="screen-title">Client Profile — Account Settings</div>
+  <div class="screen-desc">Minimal account settings: name, email display, password change, and notification preferences. No SEO settings.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/client/profile</div></div>
+    <div>
+      <div class="client-header-bar" style="background:var(--role-color);">
+        <div class="client-header-logo">Agency Logo</div>
+        <div class="client-header-title">Acme Corp — SEO Reports</div>
+        <div class="client-header-user"><div class="client-avatar">SC</div> Sarah Clarke <span style="opacity:0.7; font-size:10px; margin-left:4px;">▾</span></div>
+      </div>
+      <div class="client-nav-tabs" style="background:rgba(176,96,16,0.85);">
+        <div class="client-nav-tab">📊 Dashboard</div>
+        <div class="client-nav-tab">📄 My Reports</div>
+        <div class="client-nav-tab active">👤 Profile</div>
+      </div>
+      <div style="background:var(--wire-bg); min-height:460px; padding:24px;">
+        <div style="max-width:560px; margin:0 auto;">
+          <div style="font-size:18px; font-weight:800; color:var(--wire-text); margin-bottom:20px;">Account Settings</div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Profile Information</div>
+            <div class="section-desc">Your contact details as set by your account manager.</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">First Name</label><div class="form-input">Sarah</div></div>
+              <div class="form-group"><label class="form-label">Last Name</label><div class="form-input">Clarke</div></div>
+            </div>
+            <div class="form-group"><label class="form-label">Email Address</label><div class="form-input" style="background:#f0f0f0; color:var(--wire-text-muted);">sarah@acmecorp.com <span style="font-size:9px; float:right; margin-top:2px;">(Cannot be changed)</span></div><div class="form-input-hint">Contact your account manager to update email</div></div>
+            <div style="display:flex; justify-content:flex-end;"><div class="wf-btn wf-btn-primary wf-btn-sm" style="background:var(--role-color);">Update Name</div></div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Change Password</div>
+            <div class="section-desc">For security, use a unique password at least 8 characters long.</div>
+            <div class="form-group"><label class="form-label">Current Password</label><div class="form-input">••••••••••</div></div>
+            <div class="form-group"><label class="form-label">New Password</label><div class="form-input">••••••••••</div></div>
+            <div class="form-group"><label class="form-label">Confirm New Password</label><div class="form-input">••••••••••</div></div>
+            <div style="display:flex; justify-content:flex-end;"><div class="wf-btn wf-btn-primary wf-btn-sm" style="background:var(--role-color);">Update Password</div></div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Notification Preferences</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; font-size:11px;">
+              <div><div style="font-weight:600;">Email me when new report is ready</div><div style="font-size:10px; color:var(--wire-text-muted);">Monthly notification when report is generated</div></div>
+              <div style="width:32px; height:18px; border-radius:9px; background:var(--role-color); position:relative; flex-shrink:0;"><div style="width:14px; height:14px; border-radius:50%; background:#fff; position:absolute; top:2px; left:16px;"></div></div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:center; margin-top:24px;">
+            <div class="wf-btn wf-btn-ghost" style="color:var(--wire-danger); border-color:#e8c0c0;">Sign Out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Email is read-only — can only be changed by Agency Admin in client settings</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Password change uses current password verification</div>
+    <div class="ann-item"><div class="ann-bulletin ann-bullet-red"></div>NOT available: any SEO settings, client list, reports for other companies, or admin features</div>
+    <div class="ann-item"><div class="ann-bullet ann-bullet-red"></div>Client portal is completely isolated from agency admin interface (separate JWT scope)</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+  const total = 5;
+  let current = 0;
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i === n));
+    document.getElementById('screenSelect').value = n;
+    document.getElementById('screenCounter').textContent = (n+1) + ' / ' + total;
+    current = n;
+    window.scrollTo(0,0);
+  }
+  function gotoScreen(v) { showScreen(parseInt(v)); }
+  function nextScreen() { showScreen(Math.min(current + 1, total - 1)); }
+  function prevScreen() { showScreen(Math.max(current - 1, 0)); }
+</script>
+</body>
+</html>

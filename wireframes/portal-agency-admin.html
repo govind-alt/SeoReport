@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RankFlow — Agency Admin Portal Wireframes</title>
+  <style>
+    :root {
+      --wire-bg: #f4f5f7; --wire-surface: #ffffff; --wire-border: #c8ccd4;
+      --wire-border-dark: #8c94a4; --wire-text: #1e2030; --wire-text-light: #5c6478;
+      --wire-text-muted: #9aa0b4; --wire-fill: #dde1e8; --wire-fill-dark: #b8bfcc;
+      --wire-primary: #1a5c8a; --wire-success: #5a7a60; --wire-danger: #8a4a4a;
+      --wire-warn: #8a7040; --sidebar-w: 224px;
+      --role-color: #1a5c8a; --role-bg: #e6f2fa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1d2e; color: var(--wire-text); min-height: 100vh; }
+    .top-nav { background: #12141f; border-bottom: 1px solid #2a2d40; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .top-nav .brand { display: flex; align-items: center; gap: 10px; color: #e0e4f0; font-weight: 700; font-size: 15px; }
+    .brand-icon { width: 28px; height: 28px; background: var(--role-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; }
+    .role-badge { background: var(--role-bg); color: var(--role-color); font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; border: 1px solid #a0c8e8; }
+    .screen-selector { display: flex; align-items: center; gap: 8px; }
+    .screen-selector select { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+    .nav-btns { display: flex; gap: 8px; }
+    .nav-btn { background: #2a2d40; border: 1px solid #3a3d54; color: #c0c4d8; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .nav-btn:hover { background: #3a3d54; color: #fff; }
+    .screen-counter { color: #606478; font-size: 12px; }
+    .screen-area { display: flex; justify-content: center; padding: 28px 24px; min-height: calc(100vh - 52px); }
+    .wireframe-wrapper { width: 100%; max-width: 1100px; }
+    .screen-label { color: #8890a8; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
+    .screen-title { color: #e0e4f0; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .screen-desc { color: #606478; font-size: 13px; margin-bottom: 20px; }
+    .wf-chrome { background: var(--wire-bg); border-radius: 12px; overflow: hidden; border: 2px solid #2a2d40; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .wf-chrome-bar { background: #e0e3ea; height: 32px; display: flex; align-items: center; padding: 0 14px; gap: 7px; border-bottom: 1px solid var(--wire-border); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #e07070; } .dot-y { background: #e0c070; } .dot-g { background: #70c070; }
+    .wf-url { flex: 1; background: #fff; border: 1px solid var(--wire-border); border-radius: 12px; height: 20px; margin: 0 10px; display: flex; align-items: center; padding: 0 10px; font-size: 10px; color: var(--wire-text-muted); }
+    .wf-layout { display: flex; min-height: 620px; }
+    .wf-sidebar { width: var(--sidebar-w); background: var(--wire-surface); border-right: 1px solid var(--wire-border); flex-shrink: 0; display: flex; flex-direction: column; }
+    .wf-sidebar-logo { padding: 16px 16px 12px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; gap: 10px; }
+    .logo-box { width: 32px; height: 32px; background: var(--wire-fill-dark); border-radius: 6px; border: 1px dashed var(--wire-border-dark); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--wire-text-muted); }
+    .logo-text { font-size: 12px; font-weight: 700; color: var(--role-color); }
+    .logo-sub { font-size: 9px; color: var(--wire-text-muted); }
+    .logo-role-pill { font-size: 9px; font-weight: 700; background: var(--role-bg); color: var(--role-color); padding: 1px 6px; border-radius: 8px; margin-top: 2px; display: inline-block; }
+    .wf-sidebar-nav { padding: 8px; flex: 1; }
+    .nav-section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--wire-text-muted); padding: 8px 8px 4px; }
+    .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 8px; border-radius: 6px; font-size: 12px; color: var(--wire-text-light); cursor: pointer; margin-bottom: 1px; }
+    .nav-item.active { background: var(--role-bg); color: var(--role-color); font-weight: 600; }
+    .nav-icon { width: 14px; height: 14px; background: var(--wire-fill-dark); border-radius: 3px; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--wire-fill-dark); color: var(--wire-text-light); font-size: 9px; padding: 1px 6px; border-radius: 10px; }
+    .wf-sidebar-footer { padding: 12px; border-top: 1px solid var(--wire-border); }
+    .user-chip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: var(--role-bg); border-radius: 8px; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--role-color); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; flex-shrink: 0; }
+    .user-info { display: flex; flex-direction: column; }
+    .user-name { font-size: 11px; font-weight: 600; color: var(--wire-text); }
+    .user-role { font-size: 9px; color: var(--role-color); font-weight: 700; }
+    .wf-content { flex: 1; overflow: hidden; }
+    .wf-topbar { height: 52px; background: var(--wire-surface); border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--wire-text); flex: 1; }
+    .topbar-actions { display: flex; gap: 8px; }
+    .wf-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+    .wf-btn-primary { background: var(--role-color); color: #fff; }
+    .wf-btn-secondary { background: var(--wire-surface); color: var(--wire-text-light); border-color: var(--wire-border); }
+    .wf-btn-danger { background: #f8ecec; color: var(--wire-danger); border-color: #e0c4c4; }
+    .wf-btn-sm { padding: 4px 10px; font-size: 10px; }
+    .wf-btn-ghost { background: transparent; color: var(--wire-text-muted); border-color: var(--wire-border); }
+    .wf-main { padding: 24px; }
+    .kpi-grid { display: grid; gap: 12px; margin-bottom: 24px; }
+    .kpi-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .kpi-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .kpi-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .kpi-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .kpi-label { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--wire-text); line-height: 1; }
+    .kpi-change { font-size: 10px; margin-top: 4px; }
+    .kpi-change.up { color: var(--wire-success); } .kpi-change.down { color: var(--wire-danger); } .kpi-change.neutral { color: var(--wire-text-muted); }
+    .wf-table-wrap { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .wf-table-header { padding: 14px 16px; border-bottom: 1px solid var(--wire-border); display: flex; align-items: center; justify-content: space-between; }
+    .wf-table-title { font-size: 13px; font-weight: 700; color: var(--wire-text); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--wire-fill); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--wire-text-muted); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--wire-border); }
+    td { padding: 9px 12px; font-size: 11px; color: var(--wire-text); border-bottom: 1px solid var(--wire-fill); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--wire-fill); }
+    .chart-box { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .chart-title { font-size: 12px; font-weight: 700; color: var(--wire-text); margin-bottom: 4px; }
+    .chart-subtitle { font-size: 10px; color: var(--wire-text-muted); margin-bottom: 12px; }
+    .chart-placeholder { background: var(--wire-fill); border-radius: 6px; display: flex; align-items: flex-end; justify-content: space-around; padding: 16px 12px 0; gap: 4px; }
+    .chart-bar { background: var(--wire-fill-dark); border-radius: 3px 3px 0 0; flex: 1; min-width: 20px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .wf-card { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 8px; padding: 16px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .badge-success { background: #e6f0e8; color: var(--wire-success); }
+    .badge-danger { background: #f0e6e6; color: var(--wire-danger); }
+    .badge-warn { background: #f0ece0; color: var(--wire-warn); }
+    .badge-neutral { background: var(--wire-fill); color: var(--wire-text-muted); }
+    .badge-primary { background: var(--role-bg); color: var(--role-color); }
+    .progress-bar { height: 6px; background: var(--wire-fill); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+    .progress-fill { height: 100%; background: var(--role-color); border-radius: 3px; }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .wf-input { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 6px; padding: 7px 12px; font-size: 11px; color: var(--wire-text-light); flex: 1; min-width: 160px; }
+    .wf-select { background: var(--wire-surface); border: 1px solid var(--wire-border); border-radius: 6px; padding: 7px 12px; font-size: 11px; color: var(--wire-text-light); }
+    .alert { padding: 10px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .alert-info { background: #f0f4fd; border: 1px solid #c0ccf0; color: #283878; }
+    .alert-warn { background: #fdf8e8; border: 1px solid #e8d888; color: #705820; }
+    .alert-success { background: #f0fdf4; border: 1px solid #c0e8c8; color: #286048; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--wire-text); margin-bottom: 5px; }
+    .form-input { display: block; width: 100%; padding: 9px 12px; border: 1px solid var(--wire-border); border-radius: 6px; font-size: 12px; color: var(--wire-text-light); background: var(--wire-fill); }
+    .form-input-hint { font-size: 9px; color: var(--wire-text-muted); margin-top: 3px; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .section-title { font-size: 14px; font-weight: 700; color: var(--wire-text); margin-bottom: 3px; }
+    .section-desc { font-size: 11px; color: var(--wire-text-muted); margin-bottom: 16px; }
+    .wf-switch { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .switch-track { width: 32px; height: 18px; border-radius: 9px; background: var(--wire-fill-dark); position: relative; flex-shrink: 0; }
+    .switch-track.on { background: var(--role-color); }
+    .switch-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; }
+    .switch-track.on .switch-thumb { left: 16px; }
+    .switch-label { font-size: 11px; color: var(--wire-text); }
+    .switch-sub { font-size: 10px; color: var(--wire-text-muted); }
+    .wf-tabs { display: flex; border-bottom: 1px solid var(--wire-border); gap: 2px; }
+    .wf-tab { padding: 8px 16px; font-size: 11px; font-weight: 500; color: var(--wire-text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .wf-tab.active { color: var(--role-color); border-bottom-color: var(--role-color); font-weight: 700; }
+    .img-placeholder { background: var(--wire-fill); border: 1px dashed var(--wire-border-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--wire-text-muted); font-size: 10px; }
+    .color-swatch { width: 28px; height: 28px; border-radius: 5px; border: 1px solid var(--wire-border); }
+    .icon-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--wire-fill); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .wizard-steps { display: flex; align-items: center; margin-bottom: 28px; }
+    .wizard-step { display: flex; align-items: center; flex: 1; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--wire-border-dark); background: var(--wire-surface); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--wire-text-muted); flex-shrink: 0; }
+    .step-circle.active { background: var(--role-color); border-color: var(--role-color); color: #fff; }
+    .step-circle.done { background: var(--wire-success); border-color: var(--wire-success); color: #fff; }
+    .step-label { font-size: 10px; color: var(--wire-text-muted); margin-left: 6px; }
+    .step-label.active { color: var(--role-color); font-weight: 700; }
+    .step-connector { flex: 1; height: 1px; background: var(--wire-border); margin: 0 8px; }
+    .step-connector.done { background: var(--wire-success); }
+    .up-arrow { color: var(--wire-success); } .down-arrow { color: var(--wire-danger); }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .annotations-panel { background: #12141f; border-top: 1px solid #2a2d40; padding: 12px 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+    .ann-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #8890a8; }
+    .ann-bullet { width: 8px; height: 8px; border-radius: 2px; background: var(--role-color); flex-shrink: 0; }
+    .restricted { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; color: var(--wire-danger); background: #f8ecec; border: 1px solid #e0c4c4; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="top-nav">
+  <div class="brand">
+    <div class="brand-icon">AA</div>
+    RankFlow — Wireframes
+    <div class="role-badge">🏢 Agency Admin Portal</div>
+  </div>
+  <div class="screen-selector">
+    <select id="screenSelect" onchange="gotoScreen(this.value)">
+      <option value="0">01 — Agency Admin Login</option>
+      <option value="1">02 — Agency Dashboard</option>
+      <option value="2">03 — Clients List</option>
+      <option value="3">04 — Client Detail (Overview Tab)</option>
+      <option value="4">05 — Generate Report Wizard</option>
+      <option value="5">06 — Reports List</option>
+      <option value="6">07 — Settings: Branding</option>
+      <option value="7">08 — Settings: API Keys</option>
+      <option value="8">09 — Settings: Team Management</option>
+      <option value="9">10 — Settings: Billing & Scheduling</option>
+    </select>
+    <span class="screen-counter" id="screenCounter">1 / 10</span>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="prevScreen()">← Prev</button>
+    <button class="nav-btn" onclick="nextScreen()">Next →</button>
+  </div>
+</div>
+
+<div class="screen-area">
+<div class="wireframe-wrapper">
+
+<!-- SCREEN 01: AGENCY ADMIN LOGIN -->
+<div class="screen active" id="screen-0">
+  <div class="screen-label">Screen 01 · AGENCY_ADMIN</div>
+  <div class="screen-title">Agency Admin Login</div>
+  <div class="screen-desc">Agency-branded login page at the agency's subdomain. Used by Agency Admin and Team Members.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/login</div></div>
+    <div style="min-height:580px; background:var(--wire-fill); display:flex; align-items:center; justify-content:center; padding:32px;">
+      <div style="max-width:420px; width:100%;">
+        <div style="text-align:center; margin-bottom:24px;">
+          <div class="logo-box" style="width:50px; height:50px; margin:0 auto 12px; font-size:12px;">LOGO</div>
+          <div style="font-size:20px; font-weight:800; color:var(--role-color);">Digital Horizons</div>
+          <div style="font-size:11px; color:var(--wire-text-muted);">SEO Report Portal — Sign In</div>
+        </div>
+        <div class="wf-card" style="border:2px solid var(--wire-border);">
+          <div class="form-group"><label class="form-label">Work Email</label><div class="form-input">john@digitalhorizons.com</div></div>
+          <div class="form-group"><label class="form-label">Password</label><div class="form-input">••••••••••</div><div style="text-align:right; margin-top:4px; font-size:10px; color:var(--role-color);">Forgot password?</div></div>
+          <div class="wf-btn wf-btn-primary" style="width:100%; justify-content:center; padding:10px; margin-bottom:12px;">Sign In</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;"><div style="flex:1; height:1px; background:var(--wire-border);"></div><span style="font-size:10px; color:var(--wire-text-muted);">or</span><div style="flex:1; height:1px; background:var(--wire-border);"></div></div>
+          <div class="wf-btn wf-btn-secondary" style="width:100%; justify-content:center; padding:10px;">
+            <div style="width:14px; height:14px; background:var(--wire-fill-dark); border-radius:2px;"></div> Continue with Google
+          </div>
+          <div style="text-align:center; margin-top:14px; font-size:10px; color:var(--wire-text-muted);">Client? <span style="color:var(--role-color);">Access client portal →</span></div>
+        </div>
+        <div style="text-align:center; margin-top:12px; font-size:10px; color:var(--wire-text-muted);">Powered by RankFlow</div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Agency-branded login — logo and color from agency branding config</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Both Agency Admin and Team Members log in here; role detected from DB</div>
+    <div class="ann-item"><div class="ann-bullet"></div>After login → redirects to /dashboard (Agency Admin) or /clients (Team Member)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Client portal link goes to /client/login — separate screen</div>
+  </div>
+</div>
+
+<!-- SCREEN 02: AGENCY DASHBOARD -->
+<div class="screen" id="screen-1">
+  <div class="screen-label">Screen 02 · AGENCY_ADMIN</div>
+  <div class="screen-title">Agency Dashboard — Home</div>
+  <div class="screen-desc">Main landing page for Agency Admin. Agency-wide KPIs, client health overview, recent activity, and quick actions.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/dashboard</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item active"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients <span class="nav-badge">24</span></div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports <span class="nav-badge">18</span></div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings <span style="font-size:8px; color:var(--role-color);">▸ Branding · API · Team · Billing</span></div>
+          <div class="nav-item"><div class="nav-icon"></div> Help</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">Good morning, John 👋 <span style="font-size:11px; font-weight:400; color:var(--wire-text-muted);">June 2026</span></div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">🔄 Sync Data</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Active Clients</div><div class="kpi-value">24</div><div class="kpi-change neutral">↔ No change</div></div>
+            <div class="kpi-card"><div class="kpi-label">Reports This Month</div><div class="kpi-value">18</div><div class="kpi-change up">↑ +3 vs last month</div></div>
+            <div class="kpi-card"><div class="kpi-label">API Credits Used</div><div class="kpi-value">42,184</div><div class="kpi-change neutral">of 50,000/mo</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg Health Score</div><div class="kpi-value">79%</div><div class="kpi-change up">↑ +4 pts vs last month</div></div>
+          </div>
+          <div class="wf-table-wrap">
+            <div class="wf-table-header">
+              <div class="wf-table-title">Client Health Overview</div>
+              <div style="display:flex; gap:8px;"><div class="wf-input" style="max-width:160px; padding:5px 10px;">Search clients...</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Filter ▾</div></div>
+            </div>
+            <table>
+              <tr><th>Client</th><th>Website</th><th>Health</th><th>Top 10 KW</th><th>Traffic</th><th>Last Report</th><th>Actions</th></tr>
+              <tr><td><strong>Acme Corp</strong></td><td style="color:var(--wire-text-muted); font-size:10px;">acmecorp.com</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:76%;"></div></div><span>76%</span></div></td><td><span class="up-arrow">↑</span> 47</td><td>8,420</td><td><span class="badge badge-success">Jun 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><strong>TechStart Inc</strong></td><td style="color:var(--wire-text-muted); font-size:10px;">techstart.io</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:89%;"></div></div><span>89%</span></div></td><td><span class="up-arrow">↑</span> 87</td><td>12,340</td><td><span class="badge badge-success">Jun 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><strong>GreenLeaf Studio</strong></td><td style="color:var(--wire-text-muted); font-size:10px;">greenleaf.com</td><td><div style="display:flex; align-items:center; gap:6px;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:62%;"></div></div><span>62%</span></div></td><td><span class="down-arrow">↓</span> 23</td><td>3,210</td><td><span class="badge badge-warn">May 1</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">Showing 3 of 24 clients · <span style="color:var(--role-color);">View all →</span></div>
+          </div>
+          <div class="wf-card">
+            <div class="wf-table-title" style="margin-bottom:12px;">Recent Activity</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle">✅</div><span><strong>Report generated:</strong> Acme Corp — June 2026</span><span style="margin-left:auto; color:var(--wire-text-muted);">1h ago</span></div>
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle">👤</div><span><strong>Team Member invited:</strong> sara@dh.com</span><span style="margin-left:auto; color:var(--wire-text-muted);">3h ago</span></div>
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px;"><div class="icon-circle">🔄</div><span><strong>Data synced:</strong> All 24 projects updated</span><span style="margin-left:auto; color:var(--wire-text-muted);">6h ago</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>API Credits shown — Agency Admin can see billing/usage (Team Member cannot)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Settings nav item with sub-sections only visible to Agency Admin</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Team invite activity visible in feed</div>
+  </div>
+</div>
+
+<!-- SCREEN 03: CLIENTS LIST -->
+<div class="screen" id="screen-2">
+  <div class="screen-label">Screen 03 · AGENCY_ADMIN</div>
+  <div class="screen-title">Clients List</div>
+  <div class="screen-desc">Full client management: search, filter, add/edit/archive clients, and bulk CSV import.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients <span class="nav-badge">24</span></div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div class="topbar-title">Clients</div>
+          <div class="topbar-actions">
+            <div class="wf-btn wf-btn-secondary wf-btn-sm">⬆ Import CSV</div>
+            <div class="wf-btn wf-btn-primary wf-btn-sm">+ Add Client</div>
+          </div>
+        </div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input">🔍  Search clients...</div>
+            <div class="wf-select">Status: All ▾</div>
+            <div class="wf-select">Sort: Health Score ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>Client</th><th>Website</th><th>Health</th><th>Keywords</th><th>Last Report</th><th>Portal</th><th>Actions</th></tr>
+              <tr><td><div style="display:flex; align-items:center; gap:8px;"><div style="width:24px; height:24px; background:var(--wire-fill); border-radius:4px; border:1px dashed var(--wire-border-dark);"></div><strong>Acme Corp</strong></div></td><td style="font-size:10px; color:var(--wire-text-muted);">acmecorp.com</td><td><div style="display:flex; align-items:center; gap:4px;"><div class="progress-bar" style="width:50px;"><div class="progress-fill" style="width:76%;"></div></div>76%</div></td><td>124</td><td><span class="badge badge-success">Jun 2026</span></td><td><span class="badge badge-success">Enabled</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Edit</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><div style="display:flex; align-items:center; gap:8px;"><div style="width:24px; height:24px; background:var(--wire-fill); border-radius:4px; border:1px dashed var(--wire-border-dark);"></div><strong>TechStart Inc</strong></div></td><td style="font-size:10px; color:var(--wire-text-muted);">techstart.io</td><td><div style="display:flex; align-items:center; gap:4px;"><div class="progress-bar" style="width:50px;"><div class="progress-fill" style="width:89%;"></div></div>89%</div></td><td>213</td><td><span class="badge badge-success">Jun 2026</span></td><td><span class="badge badge-success">Enabled</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Edit</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+              <tr><td><div style="display:flex; align-items:center; gap:8px;"><div style="width:24px; height:24px; background:var(--wire-fill); border-radius:4px; border:1px dashed var(--wire-border-dark);"></div><strong>GreenLeaf Studio</strong></div></td><td style="font-size:10px; color:var(--wire-text-muted);">greenleaf.com</td><td><div style="display:flex; align-items:center; gap:4px;"><div class="progress-bar" style="width:50px;"><div class="progress-fill" style="width:62%;"></div></div>62%</div></td><td>87</td><td><span class="badge badge-warn">May 2026</span></td><td><span class="badge badge-neutral">Disabled</span></td><td><div style="display:flex; gap:3px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">Edit</div><div class="wf-btn wf-btn-primary wf-btn-sm">Report</div></div></td></tr>
+            </table>
+            <div style="padding:10px 16px; font-size:10px; color:var(--wire-text-muted); border-top:1px solid var(--wire-border);">Showing 3 of 24 clients</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Bulk CSV import via modal — maps columns to client fields</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Archive option hidden in row dropdown (not shown here for space)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Portal column shows if client has portal login enabled</div>
+  </div>
+</div>
+
+<!-- SCREEN 04: CLIENT DETAIL -->
+<div class="screen" id="screen-3">
+  <div class="screen-label">Screen 04 · AGENCY_ADMIN</div>
+  <div class="screen-title">Client Detail — Overview Tab</div>
+  <div class="screen-desc">SEO KPI snapshot with keyword trend, traffic chart, and quick-action buttons. Agency Admin has all 7 tabs.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/clients/acme-corp/overview</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar">
+          <div style="flex:1;"><div style="font-size:10px; color:var(--wire-text-muted);">Clients / <span style="color:var(--role-color);">Acme Corp</span></div><div style="font-size:14px; font-weight:700;">Acme Corp — acmecorp.com</div></div>
+          <div class="topbar-actions"><div class="wf-btn wf-btn-secondary wf-btn-sm">⚙ Edit Client</div><div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div></div>
+        </div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab active">Overview</div><div class="wf-tab">Keywords</div><div class="wf-tab">Backlinks</div><div class="wf-tab">Audit</div><div class="wf-tab">Analytics</div><div class="wf-tab">Competitors</div><div class="wf-tab">Reports</div>
+        </div>
+        <div class="wf-main">
+          <div style="font-size:11px; color:var(--wire-text-muted); margin-bottom:12px;">Showing data for: <strong>May 2026</strong> vs <strong>April 2026</strong></div>
+          <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card"><div class="kpi-label">Organic Sessions</div><div class="kpi-value">8,420</div><div class="kpi-change up">↑ +16.3% vs Apr</div></div>
+            <div class="kpi-card"><div class="kpi-label">Top 10 Keywords</div><div class="kpi-value">47</div><div class="kpi-change up">↑ +4 keywords</div></div>
+            <div class="kpi-card"><div class="kpi-label">Domain Trust</div><div class="kpi-value">42</div><div class="kpi-change up">↑ +2 pts</div></div>
+            <div class="kpi-card"><div class="kpi-label">Site Health</div><div class="kpi-value">76%</div><div class="kpi-change up">↑ +8 pts</div></div>
+          </div>
+          <div class="two-col">
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Keyword Position Trend</div>
+              <div class="chart-subtitle">Top 10 keywords — 6 months</div>
+              <div style="background:var(--wire-fill); border-radius:6px; padding:16px; height:90px; position:relative;">
+                <svg width="100%" height="60" viewBox="0 0 360 60"><polyline fill="none" stroke="#8c94a4" stroke-width="2" points="0,45 60,38 120,30 180,22 240,15 300,8"/></svg>
+              </div>
+            </div>
+            <div class="chart-box" style="margin-bottom:0;">
+              <div class="chart-title">Traffic Trend</div>
+              <div class="chart-subtitle">Organic sessions — 6 months</div>
+              <div class="chart-placeholder" style="height:90px;">
+                <div class="chart-bar" style="height:55%;"></div><div class="chart-bar" style="height:62%;"></div><div class="chart-bar" style="height:68%;"></div><div class="chart-bar" style="height:74%;"></div><div class="chart-bar" style="height:82%;"></div><div class="chart-bar" style="height:100%; background:var(--role-color);"></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <div class="wf-btn wf-btn-primary">+ Generate Report</div>
+            <div class="wf-btn wf-btn-secondary">🔄 Sync Data Now</div>
+            <div class="wf-btn wf-btn-secondary">📄 View Reports</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>All 7 tabs visible — Agency Admin has full read + write on all client data</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Edit Client and Generate Report both available (same as Team Member)</div>
+  </div>
+</div>
+
+<!-- SCREEN 05: GENERATE REPORT WIZARD -->
+<div class="screen" id="screen-4">
+  <div class="screen-label">Screen 05 · AGENCY_ADMIN</div>
+  <div class="screen-title">Generate Report Wizard</div>
+  <div class="screen-desc">Step-by-step wizard to generate a branded SEO report: select client, date range, sections, preview, then generate.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/reports/generate</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">← Reports / Generate New Report</div></div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="wizard-steps">
+            <div class="wizard-step"><div class="step-circle done">✓</div><div class="step-label">Select Client</div></div>
+            <div class="step-connector done"></div>
+            <div class="wizard-step"><div class="step-circle done">✓</div><div class="step-label">Date Range</div></div>
+            <div class="step-connector done"></div>
+            <div class="wizard-step"><div class="step-circle active">3</div><div class="step-label active">Sections</div></div>
+            <div class="step-connector"></div>
+            <div class="wizard-step"><div class="step-circle">4</div><div class="step-label">Preview & Generate</div></div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div style="font-size:13px; font-weight:700; margin-bottom:4px;">Acme Corp · May 2026 vs April 2026</div>
+            <div style="font-size:10px; color:var(--wire-text-muted);">Step 3 — Select report sections to include</div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Report Sections</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">Executive Summary</div><div style="font-size:10px; color:var(--wire-text-muted);">KPI scorecard, highlights, wins</div></div><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">Keyword Rankings</div><div style="font-size:10px; color:var(--wire-text-muted);">Position tracking, movers/losers</div></div><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">Organic Traffic</div><div style="font-size:10px; color:var(--wire-text-muted);">Sessions, clicks via GSC</div></div><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">Backlink Profile</div><div style="font-size:10px; color:var(--wire-text-muted);">DA, new/lost links</div></div><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">Technical SEO Audit</div><div style="font-size:10px; color:var(--wire-text-muted);">Issue counts, crawl errors, CWV</div></div><div class="switch-track"><div class="switch-thumb"></div></div></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--wire-fill); border-radius:6px;"><div><div style="font-size:12px; font-weight:600;">AI Recommendations</div><div style="font-size:10px; color:var(--wire-text-muted);">GPT-4 generated next steps</div></div><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div></div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <div class="wf-btn wf-btn-secondary">← Back</div>
+            <div class="wf-btn wf-btn-primary">Preview Report →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Step 1: Select client from dropdown; Step 2: Date range picker (month/custom)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Step 4: Preview renders live in an iframe before generating PDF</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Generate triggers async job — status shown via toast/notification</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Agency Admin and Team Member both have access to this wizard</div>
+  </div>
+</div>
+
+<!-- SCREEN 06: REPORTS LIST -->
+<div class="screen" id="screen-5">
+  <div class="screen-label">Screen 06 · AGENCY_ADMIN</div>
+  <div class="screen-title">All Reports</div>
+  <div class="screen-desc">Central list of all reports across all clients: status, download PDF, shareable public link with optional password.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/reports</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">All Reports</div><div class="topbar-actions"><div class="wf-btn wf-btn-primary wf-btn-sm">+ Generate Report</div></div></div>
+        <div class="wf-main">
+          <div class="filter-bar">
+            <div class="wf-input">🔍  Search by client or period...</div>
+            <div class="wf-select">Client: All ▾</div>
+            <div class="wf-select">Status: All ▾</div>
+            <div class="wf-select">Date: Last 3 months ▾</div>
+          </div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>Client</th><th>Period</th><th>Status</th><th>Generated</th><th>Opened By Client</th><th>Actions</th></tr>
+              <tr><td><strong>Acme Corp</strong></td><td>June 2026</td><td><span class="badge badge-success">Ready</span></td><td>Jun 1, 09:12</td><td><span class="badge badge-success">Viewed 3x</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div><div class="wf-btn wf-btn-ghost wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td><strong>TechStart Inc</strong></td><td>June 2026</td><td><span class="badge badge-success">Ready</span></td><td>Jun 1, 10:45</td><td><span class="badge badge-success">Viewed 1x</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div><div class="wf-btn wf-btn-ghost wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td><strong>GreenLeaf Studio</strong></td><td>May 2026</td><td><span class="badge badge-success">Ready</span></td><td>May 2, 08:30</td><td><span class="badge badge-neutral">Not viewed</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-secondary wf-btn-sm">👁 View</div><div class="wf-btn wf-btn-ghost wf-btn-sm">⬇ PDF</div><div class="wf-btn wf-btn-ghost wf-btn-sm">🔗 Share</div></div></td></tr>
+              <tr><td><strong>BlueSky Marketing</strong></td><td>June 2026</td><td><span class="badge badge-warn">Generating…</span></td><td>—</td><td>—</td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-ghost wf-btn-sm" style="opacity:0.4;">⬇ PDF</div></div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>"Opened By Client" tracks view events via report_views table</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Share link generates a public token; optional password protection in modal</div>
+    <div class="ann-item"><div class="ann-bullet"></div>PDF download is async for large reports — progress toast shown</div>
+  </div>
+</div>
+
+<!-- SCREEN 07: SETTINGS BRANDING -->
+<div class="screen" id="screen-6">
+  <div class="screen-label">Screen 07 · AGENCY_ADMIN only</div>
+  <div class="screen-title">Settings — Branding</div>
+  <div class="screen-desc">White-label branding: agency logo, primary color, font, and email "from" settings. Team Members cannot access this.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/branding</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings</div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab active">Branding</div><div class="wf-tab">API Keys</div><div class="wf-tab">Team</div><div class="wf-tab">Billing</div><div class="wf-tab">Scheduling</div>
+        </div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Agency Logo</div>
+            <div class="section-desc">Used in PDF reports, client portal header, and email headers.</div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <div class="img-placeholder" style="width:120px; height:48px;">Current Logo</div>
+              <div class="wf-btn wf-btn-secondary wf-btn-sm">⬆ Upload New Logo</div>
+              <div style="font-size:10px; color:var(--wire-text-muted);">PNG or SVG · max 2MB · recommended 300×80px</div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Brand Colors</div>
+            <div class="section-desc">Applied to PDF headers, client portal buttons, and report accents.</div>
+            <div style="display:flex; gap:20px;">
+              <div><div class="form-label">Primary Color</div><div style="display:flex; align-items:center; gap:8px;"><div class="color-swatch" style="background:#1a5c8a;"></div><div class="form-input" style="width:100px;">1a5c8a</div></div></div>
+              <div><div class="form-label">Secondary Color</div><div style="display:flex; align-items:center; gap:8px;"><div class="color-swatch" style="background:#f4a620;"></div><div class="form-input" style="width:100px;">f4a620</div></div></div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Report Email Settings</div>
+            <div class="section-desc">Outbound report delivery email settings.</div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">From Name</label><div class="form-input">Digital Horizons</div></div>
+              <div class="form-group"><label class="form-label">Reply-To Email</label><div class="form-input">reports@digitalhorizons.com</div></div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <div class="wf-btn wf-btn-secondary">Preview Report PDF</div>
+            <div class="wf-btn wf-btn-primary">Save Branding</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>AGENCY_ADMIN only — Team Members are redirected away from /settings/*</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Logo stored in Supabase Storage, URL cached in agency record</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Preview Report PDF generates a sample 1-page preview with current branding</div>
+  </div>
+</div>
+
+<!-- SCREEN 08: SETTINGS API KEYS -->
+<div class="screen" id="screen-7">
+  <div class="screen-label">Screen 08 · AGENCY_ADMIN only</div>
+  <div class="screen-title">Settings — API Keys</div>
+  <div class="screen-desc">Manage SERanking API key connection and Google Search Console OAuth. Team Members do not have access.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/api-keys</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings</div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab">Branding</div><div class="wf-tab active">API Keys</div><div class="wf-tab">Team</div><div class="wf-tab">Billing</div><div class="wf-tab">Scheduling</div>
+        </div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">SERanking API Key</div>
+            <div class="section-desc">Your SERanking API key is used to fetch keyword, traffic, and audit data. Stored encrypted with AES-256.</div>
+            <div class="alert alert-success">✓ API key valid · Plan: Agency · Sites: 24/50 · Credits: 7,816 remaining</div>
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <div style="display:flex; gap:8px;">
+                <div class="form-input" style="flex:1; font-family:monospace; font-size:11px;">se_key_••••••••••••••••••••••••••</div>
+                <div class="wf-btn wf-btn-secondary">👁 Reveal</div>
+                <div class="wf-btn wf-btn-danger wf-btn-sm">Revoke</div>
+              </div>
+              <div class="form-input-hint">Last validated: June 24, 2026 at 14:00</div>
+            </div>
+            <div class="wf-btn wf-btn-secondary">🔄 Replace API Key</div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Google Search Console</div>
+            <div class="section-desc">Connect GSC to pull organic traffic, impressions, and click data for client reports.</div>
+            <div class="alert alert-success">✓ Connected as: analytics@digitalhorizons.com · 24 properties accessible</div>
+            <div style="display:flex; gap:8px;">
+              <div class="wf-btn wf-btn-secondary">🔄 Reconnect GSC</div>
+              <div class="wf-btn wf-btn-danger wf-btn-sm">Disconnect</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>API key encrypted at rest (AES-256) — never stored in plaintext</div>
+    <div class="ann-item"><div class="ann-bullet"></div>GSC uses OAuth2 — access_token stored per agency, auto-refreshed</div>
+    <div class="ann-item"><div class="ann-bullet"></div>AGENCY_ADMIN only — Team Members cannot view or manage API keys</div>
+  </div>
+</div>
+
+<!-- SCREEN 09: SETTINGS TEAM -->
+<div class="screen" id="screen-8">
+  <div class="screen-label">Screen 09 · AGENCY_ADMIN only</div>
+  <div class="screen-title">Settings — Team Management</div>
+  <div class="screen-desc">Invite team members, manage their roles (Agency Admin / Team Member), and revoke access.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/team</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings</div><div class="topbar-actions"><div class="wf-btn wf-btn-primary wf-btn-sm">+ Invite Team Member</div></div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab">Branding</div><div class="wf-tab">API Keys</div><div class="wf-tab active">Team</div><div class="wf-tab">Billing</div><div class="wf-tab">Scheduling</div>
+        </div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="alert alert-info">ℹ️ Limit: 5 team members on Agency Pro plan. 3/5 used.</div>
+          <div class="wf-table-wrap">
+            <table>
+              <tr><th>Name</th><th>Email</th><th>Role</th><th>Last Login</th><th>Status</th><th>Actions</th></tr>
+              <tr><td><strong>John Doe</strong> <span style="font-size:9px; color:var(--role-color);">(You)</span></td><td style="font-size:10px;">john@dh.com</td><td><span class="badge badge-primary">Agency Admin</span></td><td>Today</td><td><span class="badge badge-success">Active</span></td><td>—</td></tr>
+              <tr><td><strong>Sarah Lee</strong></td><td style="font-size:10px;">sarah@dh.com</td><td><span class="badge badge-neutral">Team Member</span></td><td>2 days ago</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-ghost wf-btn-sm">Change Role</div><div class="wf-btn wf-btn-danger wf-btn-sm">Remove</div></div></td></tr>
+              <tr><td><strong>Mike Ray</strong></td><td style="font-size:10px;">mike@dh.com</td><td><span class="badge badge-neutral">Team Member</span></td><td>5 days ago</td><td><span class="badge badge-success">Active</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-ghost wf-btn-sm">Change Role</div><div class="wf-btn wf-btn-danger wf-btn-sm">Remove</div></div></td></tr>
+              <tr><td><strong>Pending Invite</strong></td><td style="font-size:10px;">new@dh.com</td><td><span class="badge badge-neutral">Team Member</span></td><td>—</td><td><span class="badge badge-warn">Invite Sent</span></td><td><div style="display:flex; gap:4px;"><div class="wf-btn wf-btn-ghost wf-btn-sm">Resend</div><div class="wf-btn wf-btn-danger wf-btn-sm">Cancel</div></div></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Invite sends email via Resend with magic link (expires 48h)</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Agency Admin cannot remove themselves; must transfer role first</div>
+    <div class="ann-item"><div class="ann-bullet"></div>AGENCY_ADMIN only — Team Members cannot see or manage other team members</div>
+  </div>
+</div>
+
+<!-- SCREEN 10: SETTINGS BILLING + SCHEDULING -->
+<div class="screen" id="screen-9">
+  <div class="screen-label">Screen 10 · AGENCY_ADMIN only</div>
+  <div class="screen-title">Settings — Billing & Scheduling</div>
+  <div class="screen-desc">Plan usage, API credit consumption, and automated report schedule config. Team Members cannot access billing.</div>
+  <div class="wf-chrome">
+    <div class="wf-chrome-bar"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div><div class="wf-url">digital-horizons.rankflow.app/settings/billing</div></div>
+    <div class="wf-layout">
+      <div class="wf-sidebar">
+        <div class="wf-sidebar-logo"><div class="logo-box">LOGO</div><div><div class="logo-text">Digital Horizons</div><div class="logo-role-pill">🏢 Agency Admin</div></div></div>
+        <div class="wf-sidebar-nav">
+          <div class="nav-item"><div class="nav-icon"></div> Dashboard</div>
+          <div class="nav-item"><div class="nav-icon"></div> Clients</div>
+          <div class="nav-item"><div class="nav-icon"></div> Reports</div>
+          <div class="nav-section-label">Admin Only</div>
+          <div class="nav-item active"><div class="nav-icon"></div> Settings</div>
+        </div>
+        <div class="wf-sidebar-footer"><div class="user-chip"><div class="avatar">JD</div><div class="user-info"><div class="user-name">John Doe</div><div class="user-role">🏢 Agency Admin</div></div></div></div>
+      </div>
+      <div class="wf-content">
+        <div class="wf-topbar"><div class="topbar-title">Settings</div></div>
+        <div class="wf-tabs" style="padding:0 24px; background:var(--wire-surface); border-bottom:1px solid var(--wire-border); margin:0;">
+          <div class="wf-tab">Branding</div><div class="wf-tab">API Keys</div><div class="wf-tab">Team</div><div class="wf-tab active">Billing</div><div class="wf-tab">Scheduling</div>
+        </div>
+        <div class="wf-main" style="max-width:700px;">
+          <div class="two-col">
+            <div class="wf-card">
+              <div class="kpi-label">Current Plan</div>
+              <div class="kpi-value" style="font-size:20px; margin-bottom:4px;">Agency Pro</div>
+              <div style="font-size:10px; color:var(--wire-text-muted);">$149/month · Renews Jul 1, 2026</div>
+              <div class="wf-btn wf-btn-secondary wf-btn-sm" style="margin-top:12px;">Upgrade Plan</div>
+            </div>
+            <div class="wf-card">
+              <div class="kpi-label">API Credits This Month</div>
+              <div class="kpi-value" style="font-size:20px; margin-bottom:4px;">42,184 / 50,000</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:84%; background:var(--wire-warn);"></div></div>
+              <div style="font-size:10px; color:var(--wire-warn); margin-top:6px;">⚠ 84% used — resets Jul 1</div>
+            </div>
+          </div>
+          <div class="wf-card" style="margin-bottom:14px;">
+            <div class="section-title">Automated Report Schedule</div>
+            <div class="section-desc">Reports auto-generate on this day each month and are emailed to the client.</div>
+            <div class="form-row" style="margin-bottom:12px;">
+              <div class="form-group"><label class="form-label">Generate on Day of Month</label><div class="form-input">▾ 1st of month</div></div>
+              <div class="form-group"><label class="form-label">Email Delivery</label><div class="form-input">▾ Same day</div></div>
+            </div>
+            <div class="wf-switch"><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div><div><div class="switch-label">Auto-generate reports for all clients</div><div class="switch-sub">Applies to all clients with scheduling enabled</div></div></div>
+            <div class="wf-switch"><div class="switch-track on" style="background:var(--role-color);"><div class="switch-thumb"></div></div><div><div class="switch-label">Email report to client on generation</div></div></div>
+            <div class="wf-switch"><div class="switch-track"><div class="switch-thumb"></div></div><div><div class="switch-label">Slack notification on report completion</div><div class="switch-sub">Enter Slack webhook URL in config below</div></div></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end;"><div class="wf-btn wf-btn-primary">Save Schedule Settings</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="annotations-panel">
+    <div class="ann-item"><div class="ann-bullet"></div>Schedule stored as CRON expression in agency.report_schedule column</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Team Members can set per-client scheduling but cannot view billing/usage</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Credit warning email auto-sent at 80% and 95% thresholds</div>
+    <div class="ann-item"><div class="ann-bullet"></div>Upgrade Plan links to Stripe billing portal (hosted)</div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+  const total = 10;
+  let current = 0;
+  function showScreen(n) {
+    document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i === n));
+    document.getElementById('screenSelect').value = n;
+    document.getElementById('screenCounter').textContent = (n+1) + ' / ' + total;
+    current = n;
+    window.scrollTo(0,0);
+  }
+  function gotoScreen(v) { showScreen(parseInt(v)); }
+  function nextScreen() { showScreen(Math.min(current + 1, total - 1)); }
+  function prevScreen() { showScreen(Math.max(current - 1, 0)); }
+</script>
+</body>
+</html>

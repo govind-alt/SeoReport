@@ -1,0 +1,61 @@
+/* ── Reports page - 2-color palette override ── */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.reports-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+.preview-container { position: sticky; top: 76px; }
+
+/* Report cover — Deep Navy + Electric Blue */
+.report-cover {
+  background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #4F8EF7 100%);
+  color: white; padding: 28px 24px; text-align: center; position: relative; overflow: hidden;
+}
+.report-cover::before {
+  content: ''; position: absolute; top: -30px; right: -30px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(79,142,247,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+.report-cover-agency { font-size: 10px; opacity: 0.6; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+.report-cover-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; letter-spacing: -0.4px; }
+.report-cover-period { font-size: 13px; opacity: 0.7; }
+.report-cover-score {
+  display: inline-flex; flex-direction: column; align-items: center;
+  background: rgba(79,142,247,0.2); backdrop-filter: blur(8px);
+  border: 1px solid rgba(79,142,247,0.35); border-radius: 12px;
+  padding: 14px 24px; margin-top: 16px;
+}
+.report-cover-score-value { font-size: 36px; font-weight: 900; line-height: 1; }
+.report-cover-score-label { font-size: 10px; opacity: 0.7; margin-top: 3px; letter-spacing: 0.5px; }
+.report-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.report-section:last-child { border-bottom: none; }
+.report-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; }
+.report-metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.report-metric { background: var(--gray-50); border-radius: 8px; padding: 10px; text-align: center; border: 1px solid var(--border); }
+.report-metric-val { font-size: 20px; font-weight: 800; line-height: 1; color: var(--text-primary); }
+.report-metric-label { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.ai-rec { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+.ai-rec:last-child { border-bottom: none; }
+.ai-rec-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; background: var(--primary); }
+.ai-rec-text { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+.ai-rec-text strong { color: var(--text-primary); }
+
+/* Row selection — Electric Blue */
+tr.selected-row { background: linear-gradient(90deg, #EBF2FF, #F0F6FF) !important; }
+tr.selected-row td { border-color: rgba(79,142,247,0.15); }
+
+/* Overdue highlight */
+tr.overdue-row { border-left: 3px solid var(--warning); }
+
+/* Timeline chip */
+.schedule-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--primary-light); color: var(--primary);
+  padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
+}
+
+/* Progress spinner */
+.gen-progress { display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 12px; font-weight: 600; }
+
+@media (max-width: 1080px) {
+  .reports-grid { grid-template-columns: 1fr; }
+  .preview-container { position: static; }
+}
