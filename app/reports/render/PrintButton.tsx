@@ -47,7 +47,15 @@ export default function PrintButton() {
       `;
 
       // Short wait for reflow
-      await delay(100);
+      await delay(150);
+
+      // Measure section boundaries *while* A4 styling is applied!
+      const sections = Array.from(
+        reportPage.querySelectorAll('.cover, .report-section, .report-footer')
+      ) as HTMLElement[];
+
+      const pageTopPx = reportPage.getBoundingClientRect().top + window.scrollY;
+      const breaks: number[] = [0]; // canvas Y positions (at SCALE) where we CAN break
 
       // Capture entire report at once (full height)
       const fullCanvas = await html2canvas(reportPage, {
@@ -56,26 +64,15 @@ export default function PrintButton() {
         allowTaint: true,
         backgroundColor: '#ffffff',
         width: A4_W_PX,
+        height: reportPage.scrollHeight,
         windowWidth: A4_W_PX,
+        x: 0,
+        y: 0,
         scrollX: 0,
         scrollY: 0,
         logging: false,
         foreignObjectRendering: false,
       });
-
-      // Restore original styles and scroll
-      reportPage.setAttribute('style', origStyle);
-      if (toolbar) toolbar.style.visibility = '';
-      window.scrollTo(0, origScrollY);
-
-      // ── Slice the canvas into A4 pages, honouring section boundaries ──
-      // Find section boundaries (in px relative to report-page top)
-      const sections = Array.from(
-        reportPage.querySelectorAll('.cover, .report-section, .report-footer')
-      ) as HTMLElement[];
-
-      const pageTopPx = reportPage.getBoundingClientRect().top + window.scrollY;
-      const breaks: number[] = [0]; // canvas Y positions (at SCALE) where we CAN break
 
       for (const s of sections) {
         const rect = s.getBoundingClientRect();
@@ -85,6 +82,11 @@ export default function PrintButton() {
         if (sBot > 0 && sBot < fullCanvas.height) breaks.push(Math.round(sBot));
       }
       breaks.push(fullCanvas.height);
+
+      // Restore original styles and scroll
+      reportPage.setAttribute('style', origStyle);
+      if (toolbar) toolbar.style.visibility = '';
+      window.scrollTo(0, origScrollY);
 
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -142,7 +144,7 @@ export default function PrintButton() {
   const label =
     status === 'loading' ? '⏳ Building PDF…' :
     status === 'done'    ? '✅ Downloaded!'   :
-                           '⬇ Download PDF';
+                           'Download PDF';
 
   return (
     <button

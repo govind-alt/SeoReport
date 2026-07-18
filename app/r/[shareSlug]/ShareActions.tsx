@@ -7,7 +7,7 @@ export function ShareActions({ href }: { href: string }) {
         className="download-btn"
         onClick={() => window.print()}
       >
-        📥 Download PDF
+        Download PDF
       </button>
       <button
         onClick={() => {

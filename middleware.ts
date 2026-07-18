@@ -21,15 +21,23 @@ export default function middleware(req: NextRequest) {
     url.searchParams.toString().length > 0 ? `?${url.searchParams.toString()}` : ''
   }`;
 
-  // Always pass API routes, render pages and public share links through without rewriting
-  if (path.startsWith('/api/') || path.startsWith('/reports/render/') || path.startsWith('/r/')) {
+  // Always pass API routes, auth callbacks, render pages and public share links through without rewriting
+  if (
+    path.startsWith('/api/') || 
+    path.startsWith('/api/auth/') ||
+    path.includes('/api/auth') ||
+    path.startsWith('/reports/render/') || 
+    path.startsWith('/r/')
+  ) {
     return NextResponse.next();
   }
 
   // Auth cookie check
   const sessionCookie =
     req.cookies.get('authjs.session-token') ||
-    req.cookies.get('__Secure-authjs.session-token');
+    req.cookies.get('__Secure-authjs.session-token') ||
+    req.cookies.get('next-auth.session-token') ||
+    req.cookies.get('__Secure-next-auth.session-token');
 
   const isAuthenticated = Boolean(sessionCookie);
 
@@ -49,10 +57,16 @@ export default function middleware(req: NextRequest) {
     normalizedHostname === 'rankflow.app';
 
   if (isRootDomain) {
+    // Unauthenticated users trying to access protected pages → login
     if (!isAuthenticated && !isPublicPath) {
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
+
+    // For authenticated users on root domain, allow path-based agency routing:
+    // e.g. localhost:3000/demo/clients → app/[domain]/(dashboard)/clients/page.tsx
+    // Next.js will route /demo/... to [domain]/(dashboard)/... naturally.
+    // Only the bare '/' shows the marketing page.
     return NextResponse.next();
   }
 

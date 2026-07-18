@@ -52,20 +52,25 @@ export default function Login() {
         setLoginError(true);
         setLoading(false);
       } else {
-        // Route based on known role emails for demo
+        // Route based on role
         if (email === 'superadmin@rankflow.app') {
           window.location.href = '/admin';
         } else if (email === 'client@acme.com') {
-          // Client portal — hosted under demo subdomain
-          const isLocal = window.location.hostname === 'localhost';
-          window.location.href = isLocal ? 'http://demo.localhost:3000/c/dashboard' : '/c/dashboard';
+          window.location.href = '/c/dashboard';
         } else {
-          // Agency admin
-          const isLocal = window.location.hostname === 'localhost';
-          if (isLocal) {
-            window.location.href = 'http://demo.localhost:3000/';
-          } else {
-            window.location.href = '/';
+          // Agency admin — fetch their agency slug, then go to /{slug}/ path-based dashboard
+          try {
+            const agencyRes = await fetch('/api/agency/settings');
+            if (agencyRes.ok) {
+              const agencyData = await agencyRes.json();
+              const slug = agencyData.slug || agencyData.subdomain || 'demo';
+              window.location.href = `/${slug}/`;
+            } else {
+              // Fallback: try the demo slug
+              window.location.href = '/demo/';
+            }
+          } catch {
+            window.location.href = '/demo/';
           }
         }
       }
@@ -120,7 +125,7 @@ export default function Login() {
   const handleGoogle = (e: React.MouseEvent) => {
     e.preventDefault();
     setLoading(true);
-    signIn('google', { callbackUrl: '/localhost' });
+    signIn('google', { callbackUrl: '/demo/' });
   };
 
   return (

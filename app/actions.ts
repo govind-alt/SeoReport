@@ -194,9 +194,7 @@ export async function createClient(domain: string, data: {
   industry?: string,
   contactEmail?: string,
   contactName?: string,
-  internalNotes?: string,
-  clientPortalEnabled?: boolean,
-  gscConnected?: boolean
+  notes?: string,
 }) {
   let agency = await prisma.agency.findFirst({
     where: { OR: [{ slug: domain }, { subdomain: domain }] }
@@ -225,9 +223,7 @@ export async function createClient(domain: string, data: {
       industry: data.industry || null,
       contactEmail: data.contactEmail || null,
       contactName: data.contactName || null,
-      internalNotes: data.internalNotes || null,
-      clientPortalEnabled: data.clientPortalEnabled || false,
-      gscConnected: data.gscConnected || false,
+      notes: data.notes || null,
       agencyId: agency.id
     }
   });

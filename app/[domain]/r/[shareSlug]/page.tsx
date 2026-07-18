@@ -3,7 +3,7 @@
 import { useState, use } from 'react';
 import { toast } from 'sonner';
 
-export default function PublicReportView({ params }: { params: Promise<{ domain: string, slug: string }> }) {
+export default function PublicReportView({ params }: { params: Promise<{ domain: string, shareSlug: string }> }) {
   const resolvedParams = use(params);
   const [isLocked, setIsLocked] = useState(true);
   const [password, setPassword] = useState('');
@@ -76,7 +76,7 @@ export default function PublicReportView({ params }: { params: Promise<{ domain:
           <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '4px' }}>May 2024 · Prepared by Digital Horizons Agency</div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => toast.info('Downloading PDF...')}>📥 Download PDF</button>
+          <button className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => toast.info('Downloading PDF...')}>Download PDF</button>
           <button className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => toast.success('Link copied to clipboard!')}>📋 Copy Link</button>
           <button className="btn btn-secondary btn-sm" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }} onClick={() => window.print()}>🖨 Print</button>
         </div>

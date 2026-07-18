@@ -386,28 +386,6 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
             </div>
           </div>
         </div>
-
-        {/* ── Quick Actions Bar ── */}
-        <div style={{
-          marginTop: 20, padding: '16px 20px', borderRadius: 12,
-          background: 'white', border: '1px solid var(--border)',
-          display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
-          boxShadow: 'var(--shadow-card)',
-        }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginRight: 4 }}>Quick Actions</div>
-          <Link href={`${basePath}/clients/new`} className="btn btn-sm btn-secondary" style={{ fontSize: 12 }}>
-            <Users size={13} /> Add Client
-          </Link>
-          <Link href={`${basePath}/reports`} className="btn btn-sm btn-primary" style={{ fontSize: 12 }}>
-            <FileText size={13} /> Generate Report
-          </Link>
-          <button className="btn btn-sm btn-secondary" style={{ fontSize: 12 }} onClick={forceSync}>
-            <RefreshCw size={13} className={isSyncing ? 'spinner' : ''} /> Sync SE Ranking
-          </button>
-          <Link href={`${basePath}/settings`} className="btn btn-sm btn-secondary" style={{ fontSize: 12 }}>
-            <Activity size={13} /> View Settings
-          </Link>
-        </div>
       </div>
     </>
   );

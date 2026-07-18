@@ -376,7 +376,7 @@ export default function ClientDashboardPage() {
                   onClick={() => triggerDownloadPDF(downloadModalReport)}
                   style={{ padding: '8px 18px', borderRadius: 8, background: THEME.primary, color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
                 >
-                  ⬇ Download PDF
+                  Download PDF
                 </button>
               </div>
             </div>
@@ -549,7 +549,7 @@ export default function ClientDashboardPage() {
                     onClick={() => setDownloadModalReport(demoReports[0])}
                     style={{ padding: '8px 12px', border: `1px solid ${THEME.border}`, borderRadius: 6, background: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: THEME.textLight }}
                   >
-                    ⬇ PDF
+                    PDF
                   </button>
                 </div>
               </div>
@@ -607,7 +607,7 @@ export default function ClientDashboardPage() {
                             onClick={() => setDownloadModalReport(report)}
                             style={{ padding: '4px 8px', borderRadius: 4, background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 600, color: THEME.primary }}
                           >
-                            ⬇ PDF
+                            PDF
                           </button>
                         </div>
                       </td>
@@ -855,7 +855,7 @@ export default function ClientDashboardPage() {
                 onClick={() => triggerDownloadPDF(downloadModalReport)}
                 style={{ padding: '8px 18px', borderRadius: 8, background: THEME.primary, color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
               >
-                ⬇ Download PDF
+                Download PDF
               </button>
             </div>
           </div>
