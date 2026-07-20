@@ -292,9 +292,14 @@ ul, ol { list-style: none; }
   position: absolute; bottom: calc(100% + 6px); left: 8px; right: 8px;
   background: #1E293B; border: 1px solid rgba(255,255,255,0.1);
   border-radius: 12px; box-shadow: 0 -8px 32px rgba(0,0,0,0.4);
-  z-index: 200; display: none; padding: 6px; overflow: hidden;
+  z-index: 300; padding: 6px; overflow: hidden;
 }
-#userMenu.open { display: block; animation: scaleIn 0.15s ease; }
+#userMenu.open { display: block; }
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
 
 .user-menu-header {
   padding: 10px 12px 8px;

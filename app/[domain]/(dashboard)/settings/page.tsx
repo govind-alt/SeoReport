@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   Settings, Palette, Key, Users, CreditCard, Save, CheckCircle, AlertCircle,
@@ -90,7 +91,27 @@ function StatusBadge({ status }: { status: 'connected' | 'disconnected' | 'comin
 }
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab]               = useState<Tab>('general');
+  const searchParams  = useSearchParams();
+  const router        = useRouter();
+  const [activeTab, setActiveTabState] = useState<Tab>('general');
+
+  // Sync tab from URL param on load and when param changes
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') as Tab | null;
+    const valid: Tab[] = ['general', 'branding', 'api-keys', 'team', 'billing', 'notifications', 'security'];
+    if (tabParam && valid.includes(tabParam)) {
+      setActiveTabState(tabParam);
+    }
+  }, [searchParams]);
+
+  // Switch tab + update URL
+  const setActiveTab = (tab: Tab) => {
+    setActiveTabState(tab);
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab', tab);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
   const [isUpdateKeyModalOpen, setIsUpdateKeyModalOpen] = useState(false);
   const [isCnameModalOpen, setIsCnameModalOpen] = useState(false);
   const [cnameVerifying, setCnameVerifying]     = useState(false);
