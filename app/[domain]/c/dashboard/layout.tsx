@@ -73,21 +73,20 @@ export default function ClientPortalLayout({ children }: { children: React.React
         /* ── SIDEBAR ── */
         .cp-sidebar {
           width: 240px;
-          min-width: 240px;
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
           background: linear-gradient(170deg, #1A1A2E 0%, #16213E 60%, #0F3460 100%);
           display: flex;
           flex-direction: column;
-          height: 100vh;
-          position: sticky;
-          top: 0;
           overflow-y: auto;
           z-index: 60;
-          transition: width 0.3s ease, min-width 0.3s ease;
+          transition: width 0.3s ease, left 0.3s ease;
           border-right: 1px solid rgba(255,255,255,0.06);
         }
         .cp-sidebar.collapsed {
           width: 68px;
-          min-width: 68px;
         }
         .cp-sidebar-logo {
           padding: 22px 18px 16px;
@@ -215,6 +214,11 @@ export default function ClientPortalLayout({ children }: { children: React.React
           min-width: 0;
           display: flex;
           flex-direction: column;
+          margin-left: 240px;
+          transition: margin-left 0.3s ease;
+        }
+        .cp-main.expanded {
+          margin-left: 68px;
         }
 
         /* ── TOPBAR ── */
@@ -308,16 +312,18 @@ export default function ClientPortalLayout({ children }: { children: React.React
 
         @media (max-width: 768px) {
           .cp-sidebar {
-            position: fixed;
             left: -240px;
-            height: 100vh;
-            z-index: 60;
-            transition: left 0.3s ease;
+            width: 240px !important;
           }
-          .cp-sidebar.mobile-open { left: 0; }
+          .cp-sidebar.mobile-open {
+            left: 0;
+          }
           .cp-mobile-overlay { display: block; }
           .cp-topbar-hamburger { display: flex; }
           .cp-page { padding: 20px 16px 48px; }
+          .cp-main {
+            margin-left: 0 !important;
+          }
         }
       `}</style>
 
@@ -381,7 +387,7 @@ export default function ClientPortalLayout({ children }: { children: React.React
         </aside>
 
         {/* MAIN */}
-        <div className="cp-main">
+        <div className={`cp-main ${!sidebarOpen ? 'expanded' : ''}`}>
           {/* Topbar */}
           <div className="cp-topbar">
             <button className="cp-topbar-hamburger" onClick={() => setMobileMenuOpen(true)}>
