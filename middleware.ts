@@ -63,10 +63,26 @@ export default function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // For authenticated users on root domain, allow path-based agency routing:
+    // For the marketing landing page, pass through as-is
+    if (path === '/') {
+      return NextResponse.next();
+    }
+
+    // Client portal paths: /c/... → rewrite to /localhost/c/...
+    if (path.startsWith('/c/')) {
+      return NextResponse.rewrite(new URL(`/localhost${path}`, req.url));
+    }
+
+    // For authenticated users on root domain, path-based agency routing:
     // e.g. localhost:3000/demo/clients → app/[domain]/(dashboard)/clients/page.tsx
-    // Next.js will route /demo/... to [domain]/(dashboard)/... naturally.
-    // Only the bare '/' shows the marketing page.
+    // Only rewrite if the first segment looks like a tenant slug (not reserved paths)
+    const firstSegment = path.split('/')[1];
+    const reservedPaths = ['login', 'register', 'forgot-password', 'admin', 'settings'];
+    if (firstSegment && !reservedPaths.includes(firstSegment)) {
+      // Already includes domain segment (e.g. /localhost/...) — pass through
+      return NextResponse.next();
+    }
+
     return NextResponse.next();
   }
 
