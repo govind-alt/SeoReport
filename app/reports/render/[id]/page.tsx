@@ -104,7 +104,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <CloseButton />
-          <PrintButton />
+          <PrintButton filename={`${clientName}_SEO_Report_${period}`} />
         </div>
       </div>
 

@@ -7,7 +7,11 @@ const A4_H_MM = 297;
 const SCALE = 3; // higher scale = crisper text in PDF
 const A4_W_PX = 794; // A4 at 96dpi
 
-export default function PrintButton() {
+interface PrintButtonProps {
+  filename?: string;
+}
+
+export default function PrintButton({ filename }: PrintButtonProps) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle');
 
   const handleDownload = async () => {
@@ -140,8 +144,37 @@ export default function PrintButton() {
         pageNum++;
       }
 
-      const slug = document.title.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').slice(0, 50);
-      pdf.save(`${slug || 'SEO_Report'}.pdf`);
+      // Derive clean human-readable filename
+      let cleanName = filename;
+      if (!cleanName) {
+        const clientElem = document.querySelector('.cover-client-name');
+        const periodElem = document.querySelector('.cover-period');
+        const clientStr = clientElem?.textContent?.trim().replace(/[^a-zA-Z0-9]/g, '_') || '';
+        const periodStr = periodElem?.textContent?.split('·')[0]?.trim().replace(/[^a-zA-Z0-9]/g, '_') || '';
+
+        if (clientStr && periodStr) {
+          cleanName = `${clientStr}_SEO_Report_${periodStr}`;
+        } else if (clientStr) {
+          cleanName = `${clientStr}_SEO_Report`;
+        } else {
+          cleanName = 'SEO_Performance_Report';
+        }
+      }
+
+      cleanName = cleanName.replace(/_+/g, '_').replace(/^_|_$/g, '');
+      if (!cleanName.toLowerCase().endsWith('.pdf')) cleanName += '.pdf';
+
+      // Export Blob and trigger explicit browser download
+      const pdfBlob = pdf.output('blob');
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = cleanName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
       setStatus('done');
       setTimeout(() => setStatus('idle'), 3000);
 
