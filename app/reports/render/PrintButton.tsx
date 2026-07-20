@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 const A4_W_MM = 210;
 const A4_H_MM = 297;
-const SCALE = 2.5;
+const SCALE = 3; // higher scale = crisper text in PDF
 const A4_W_PX = 794; // A4 at 96dpi
 
 export default function PrintButton() {
@@ -28,36 +28,37 @@ export default function PrintButton() {
       // Hide toolbar so it doesn't appear in PDF
       if (toolbar) toolbar.style.visibility = 'hidden';
 
-      // Save scroll position and scroll to top for accurate coordinate mapping
       const origScrollY = window.scrollY;
       window.scrollTo(0, 0);
-      await delay(100);
+      await delay(150);
 
       const reportPage = document.querySelector('.report-page') as HTMLElement;
-      if (!reportPage) { window.print(); window.scrollTo(0, origScrollY); return; }
+      if (!reportPage) {
+        if (toolbar) toolbar.style.visibility = '';
+        window.print();
+        window.scrollTo(0, origScrollY);
+        return;
+      }
 
-      // Force report-page to render at exactly A4 width, no shadow, no border-radius
+      // Force A4 width, remove decorative styles that would distort layout
       const origStyle = reportPage.getAttribute('style') || '';
-      reportPage.style.cssText += `
+      reportPage.style.cssText = `
         width: ${A4_W_PX}px !important;
         max-width: ${A4_W_PX}px !important;
         border-radius: 0 !important;
         box-shadow: none !important;
-        margin: 0 !important;
+        margin: 0 auto !important;
+        overflow: visible !important;
       `;
+      await delay(200);
 
-      // Short wait for reflow
-      await delay(150);
-
-      // Measure section boundaries *while* A4 styling is applied!
+      // Measure section bottom edges for smart page breaks
       const sections = Array.from(
         reportPage.querySelectorAll('.cover, .report-section, .report-footer')
       ) as HTMLElement[];
-
       const pageTopPx = reportPage.getBoundingClientRect().top + window.scrollY;
-      const breaks: number[] = [0]; // canvas Y positions (at SCALE) where we CAN break
 
-      // Capture entire report at once (full height)
+      // Render full report to a single canvas at 3× scale for crisp text
       const fullCanvas = await html2canvas(reportPage, {
         scale: SCALE,
         useCORS: true,
@@ -66,24 +67,28 @@ export default function PrintButton() {
         width: A4_W_PX,
         height: reportPage.scrollHeight,
         windowWidth: A4_W_PX,
-        x: 0,
-        y: 0,
         scrollX: 0,
         scrollY: 0,
         logging: false,
         foreignObjectRendering: false,
+        onclone: (doc: Document) => {
+          // Ensure print-color-adjust on cloned doc
+          const style = doc.createElement('style');
+          style.textContent = '* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }';
+          doc.head.appendChild(style);
+        },
       });
 
+      // Build page-break candidates at section boundaries
+      const breaks: number[] = [0];
       for (const s of sections) {
         const rect = s.getBoundingClientRect();
-        const sTop = (rect.top + window.scrollY - pageTopPx) * SCALE;
-        const sBot = sTop + rect.height * SCALE;
-        // Allow break at the BOTTOM of each section
-        if (sBot > 0 && sBot < fullCanvas.height) breaks.push(Math.round(sBot));
+        const sBot = Math.round((rect.top + window.scrollY - pageTopPx + rect.height) * SCALE);
+        if (sBot > 0 && sBot < fullCanvas.height) breaks.push(sBot);
       }
       breaks.push(fullCanvas.height);
 
-      // Restore original styles and scroll
+      // Restore styles
       reportPage.setAttribute('style', origStyle);
       if (toolbar) toolbar.style.visibility = '';
       window.scrollTo(0, origScrollY);
@@ -95,33 +100,43 @@ export default function PrintButton() {
         compress: true,
       });
 
-      const pageHpx = (A4_H_MM / A4_W_MM) * A4_W_PX * SCALE; // A4 height in canvas px
+      // Conversion: A4_W_PX * SCALE canvas pixels = A4_W_MM mm
+      const mmPerCanvasPx = A4_W_MM / (A4_W_PX * SCALE);
+      // How many canvas px fit in one A4 page height
+      const pageHpx = Math.round(A4_H_MM / mmPerCanvasPx);
 
       let sliceStart = 0;
       let pageNum = 0;
 
       while (sliceStart < fullCanvas.height) {
-        const sliceEnd = findBestBreak(breaks, sliceStart + pageHpx, fullCanvas.height);
+        // Find a good natural break close to one A4 page height
+        const idealEnd = sliceStart + pageHpx;
+        const sliceEnd = findBestBreak(breaks, idealEnd, fullCanvas.height);
         const sliceH = sliceEnd - sliceStart;
 
-        // Create a slice canvas
+        // Draw this slice into a temporary canvas
         const sliceCanvas = document.createElement('canvas');
         sliceCanvas.width = fullCanvas.width;
         sliceCanvas.height = sliceH;
         const ctx = sliceCanvas.getContext('2d')!;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-        ctx.drawImage(fullCanvas, 0, sliceStart, fullCanvas.width, sliceH, 0, 0, fullCanvas.width, sliceH);
+        ctx.drawImage(
+          fullCanvas,
+          0, sliceStart, fullCanvas.width, sliceH,
+          0, 0, fullCanvas.width, sliceH
+        );
 
-        const imgH = (sliceH / fullCanvas.height) * (fullCanvas.height / fullCanvas.width) * A4_W_MM;
+        // Exact mm height for this slice
+        const sliceHmm = sliceH * mmPerCanvasPx;
 
-        if (pageNum > 0) pdf.addPage();
+        if (pageNum > 0) pdf.addPage([A4_W_MM, sliceHmm < A4_H_MM ? A4_H_MM : sliceHmm], 'portrait');
         pdf.addImage(
-          sliceCanvas.toDataURL('image/jpeg', 0.98),
+          sliceCanvas.toDataURL('image/jpeg', 0.96),
           'JPEG',
           0, 0,
           A4_W_MM,
-          imgH,
+          sliceHmm,
         );
 
         sliceStart = sliceEnd;
@@ -163,11 +178,14 @@ export default function PrintButton() {
   );
 }
 
-// Pick the nearest section boundary ≤ targetY, or just use targetY if none fits
+// Find the nearest section boundary that is at or before targetY
 function findBestBreak(breaks: number[], targetY: number, maxY: number): number {
-  const candidates = breaks.filter(b => b <= targetY && b > 0);
-  if (candidates.length === 0) return Math.min(targetY, maxY);
-  return Math.min(candidates[candidates.length - 1], maxY);
+  const below = breaks.filter(b => b <= targetY && b > 0);
+  if (below.length === 0) return Math.min(targetY, maxY);
+  // If the best break is too far back (less than 60% of page), just cut at targetY
+  const best = below[below.length - 1];
+  if (best < targetY * 0.6) return Math.min(targetY, maxY);
+  return Math.min(best, maxY);
 }
 
 function loadScript(src: string): Promise<void> {
