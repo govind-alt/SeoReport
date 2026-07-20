@@ -13,7 +13,7 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
 
   // Base path for navigation
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = `/${domain}`;
 
   const nextStep = () => setStep(s => Math.min(4, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));

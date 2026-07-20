@@ -140,12 +140,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
   
-  let basePath = '';
-  if (domain !== 'localhost') {
-    basePath = '';
-  } else {
-    basePath = `/${domain}`;
-  }
+  const basePath = `/${domain}`;
 
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);

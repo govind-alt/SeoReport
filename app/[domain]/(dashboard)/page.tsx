@@ -78,12 +78,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  let basePath = '';
-  if (domain !== 'localhost') {
-    basePath = '';
-  } else {
-    basePath = `/${domain}`;
-  }
+  const basePath = `/${domain}`;
 
   useEffect(() => {
     fetch('/api/dashboard/summary')

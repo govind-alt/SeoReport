@@ -49,12 +49,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
   const clientId = resolvedParams.clientId;
   const domain = resolvedParams.domain || 'localhost';
 
-  let basePath = '';
-  if (domain !== 'localhost') {
-    basePath = '';
-  } else {
-    basePath = `/${domain}`;
-  }
+  const basePath = `/${domain}`;
 
   useEffect(() => {
     setLoading(true);

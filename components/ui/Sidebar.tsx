@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Users, FileText, Settings, HelpCircle,
@@ -48,11 +48,15 @@ export function Sidebar() {
   const roleMeta = ROLE_META[userRole] ?? ROLE_META.member;
 
   // ── Domain / base path ────────────────────────────────────────────────────
+  const params = useParams();
+  const paramDomain = params?.domain as string | undefined;
+
   const pathSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathSegments[0];
-  const isDomainSegment = firstSegment && !['clients', 'reports', 'settings', 'help', 'login', 'register'].includes(firstSegment);
-  const domain   = isDomainSegment ? firstSegment : null;
-  const basePath = domain ? `/${domain}` : '';
+  const isDomainSegment = firstSegment && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(firstSegment);
+
+  const domain = paramDomain || (isDomainSegment ? firstSegment : null) || 'digital-horizons';
+  const basePath = `/${domain}`;
 
   // ── Fetch real agency info (plan + client count) ─────────────────────────
   const fetchAgencyInfo = useCallback(async () => {
@@ -100,7 +104,7 @@ export function Sidebar() {
 
   // ── Nav items ─────────────────────────────────────────────────────────────
   const navItems = [
-    { href: `${basePath}/`,        label: 'Dashboard', icon: LayoutDashboard, exact: true  },
+    { href: `${basePath}`,         label: 'Dashboard', icon: LayoutDashboard, exact: true  },
     { href: `${basePath}/clients`, label: 'Clients',   icon: Users,            exact: false },
     { href: `${basePath}/reports`, label: 'Reports',   icon: FileText,         exact: false },
   ];
@@ -114,20 +118,20 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       {/* ── Logo ── */}
-      <div className="sidebar-logo">
+      <Link href={basePath} className="sidebar-logo" style={{ textDecoration: 'none' }}>
         <div className="sidebar-logo-icon">RF</div>
         <div>
           <div className="sidebar-logo-text">RankFlow</div>
           <div className="sidebar-logo-sub">SEO Automation</div>
         </div>
-      </div>
+      </Link>
 
       {/* ── Navigation ── */}
       <nav className="sidebar-nav">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const isItemActive = exact
-            ? pathname === href || pathname === `${basePath}/`
-            : pathname.startsWith(href) && href !== `${basePath}/`;
+            ? pathname === href || pathname === `${href}/`
+            : pathname.startsWith(href) && href !== basePath;
 
           return (
             <Link

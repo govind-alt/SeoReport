@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -42,19 +42,27 @@ function timeAgo(iso: string): string {
 // ── Breadcrumb ───────────────────────────────────────────────────────────────
 function Breadcrumb() {
   const pathname = usePathname();
+  const params = useParams();
+  const paramDomain = params?.domain as string | undefined;
+
   const segments = pathname.split('/').filter(Boolean);
-  const displaySegments = segments.filter(s => !s.includes('.') && s.length < 30);
+  const isDomainSeg = segments[0] && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(segments[0]);
+  const domain = paramDomain || (isDomainSeg ? segments[0] : null) || 'digital-horizons';
+  const basePath = `/${domain}`;
 
-  const breadcrumbs = displaySegments.map((seg, i) => ({
-    label: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' '),
-    href: '/' + displaySegments.slice(0, i + 1).join('/'),
-  }));
+  const displaySegments = segments.filter(s => s !== domain && !s.includes('.') && s.length < 30);
 
-  if (breadcrumbs.length === 0) return null;
+  const breadcrumbs = displaySegments.map((seg, i) => {
+    const href = `${basePath}/${displaySegments.slice(0, i + 1).join('/')}`;
+    return {
+      label: seg.charAt(0).toUpperCase() + seg.slice(1).replace(/-/g, ' '),
+      href,
+    };
+  });
 
   return (
     <nav className="breadcrumb">
-      <Link href="/">Home</Link>
+      <Link href={basePath}>Dashboard</Link>
       {breadcrumbs.map((crumb, i) => (
         <span key={crumb.href} style={{ display: 'contents' }}>
           <span className="breadcrumb-sep">/</span>
@@ -166,7 +174,12 @@ export function Topbar() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // ── Search results ───────────────────────────────────────────────────────
-  const domain = pathname.split('/').filter(Boolean)[0] || 'digital-horizons';
+  const params = useParams();
+  const paramDomain = params?.domain as string | undefined;
+  const pathSegments = pathname.split('/').filter(Boolean);
+  const firstSeg = pathSegments[0];
+  const isDomainSeg = firstSeg && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(firstSeg);
+  const domain = paramDomain || (isDomainSeg ? firstSeg : null) || 'digital-horizons';
   const base = `/${domain}`;
 
   const ALL_SEARCH_ITEMS = [

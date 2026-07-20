@@ -67,13 +67,7 @@ export default function AddClientPage({ params }: { params: Promise<{ domain: st
   };
 
   // Base path calculation for links
-  let basePath = '';
-  if (domain !== 'localhost') {
-    basePath = '';
-  } else {
-    // When using path-based routing locally
-    basePath = `/${domain}`;
-  }
+  const basePath = `/${domain}`;
 
   return (
     <>
