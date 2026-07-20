@@ -164,12 +164,14 @@ export default function PrintButton({ filename }: PrintButtonProps) {
       cleanName = cleanName.replace(/_+/g, '_').replace(/^_|_$/g, '');
       if (!cleanName.toLowerCase().endsWith('.pdf')) cleanName += '.pdf';
 
-      // Export Blob and trigger explicit browser download
-      const pdfBlob = pdf.output('blob');
+      // Export explicit application/pdf Blob so OS and browser recognize it as a real PDF document
+      const arrayBuffer = pdf.output('arraybuffer');
+      const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
       const blobUrl = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
       link.href = blobUrl;
       link.download = cleanName;
+      link.type = 'application/pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
