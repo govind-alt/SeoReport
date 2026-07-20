@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Users, FileText, Settings, HelpCircle,
-  ChevronUp, LogOut, CreditCard, User, Zap, Shield, ExternalLink
+  ChevronUp, LogOut, CreditCard, User, Zap, Shield
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -35,7 +35,6 @@ export function Sidebar() {
   const [agencyInfo, setAgencyInfo] = useState<AgencyInfo | null>(null);
   const { data: session } = useSession();
   const pathname = usePathname();
-  const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // ── Session data ──────────────────────────────────────────────────────────
@@ -97,12 +96,6 @@ export function Sidebar() {
     setIsUserMenuOpen(false);
     toast.loading('Signing out…');
     await signOut({ callbackUrl: '/login' });
-  };
-
-  // ── Navigate to settings with a specific tab ─────────────────────────────
-  const goToSettings = (tab: string) => {
-    setIsUserMenuOpen(false);
-    router.push(`${basePath}/settings?tab=${tab}`);
   };
 
   // ── Nav items ─────────────────────────────────────────────────────────────
@@ -251,20 +244,24 @@ export function Sidebar() {
 
               {/* Menu items */}
               <div style={{ padding: '6px' }}>
-                <button
+
+                {/* Account Settings → /settings?tab=general */}
+                <Link
+                  href={`${basePath}/settings?tab=general`}
                   className="user-menu-item"
-                  style={{ display: 'flex', width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: '10px', alignItems: 'center' }}
-                  onClick={() => goToSettings('general')}
+                  onClick={() => setIsUserMenuOpen(false)}
+                  style={{ display: 'flex', width: '100%', textDecoration: 'none', gap: '10px', alignItems: 'center' }}
                 >
                   <User size={14} />
                   <span style={{ flex: 1 }}>Account Settings</span>
-                  <ExternalLink size={10} style={{ opacity: 0.4 }} />
-                </button>
+                </Link>
 
-                <button
+                {/* Billing & Plan → /settings?tab=billing */}
+                <Link
+                  href={`${basePath}/settings?tab=billing`}
                   className="user-menu-item"
-                  style={{ display: 'flex', width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: '10px', alignItems: 'center' }}
-                  onClick={() => goToSettings('billing')}
+                  onClick={() => setIsUserMenuOpen(false)}
+                  style={{ display: 'flex', width: '100%', textDecoration: 'none', gap: '10px', alignItems: 'center' }}
                 >
                   <CreditCard size={14} />
                   <span style={{ flex: 1 }}>Billing &amp; Plan</span>
@@ -276,25 +273,29 @@ export function Sidebar() {
                       {planInfo?.label}
                     </span>
                   )}
-                </button>
+                </Link>
 
-                <button
+                {/* Security → /settings?tab=security */}
+                <Link
+                  href={`${basePath}/settings?tab=security`}
                   className="user-menu-item"
-                  style={{ display: 'flex', width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: '10px', alignItems: 'center' }}
-                  onClick={() => goToSettings('security')}
+                  onClick={() => setIsUserMenuOpen(false)}
+                  style={{ display: 'flex', width: '100%', textDecoration: 'none', gap: '10px', alignItems: 'center' }}
                 >
                   <Shield size={14} />
                   <span style={{ flex: 1 }}>Security</span>
-                </button>
+                </Link>
 
-                <button
+                {/* Help & Support → /help */}
+                <Link
+                  href={`${basePath}/help`}
                   className="user-menu-item"
-                  style={{ display: 'flex', width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: '10px', alignItems: 'center' }}
-                  onClick={() => { setIsUserMenuOpen(false); router.push(`${basePath}/help`); }}
+                  onClick={() => setIsUserMenuOpen(false)}
+                  style={{ display: 'flex', width: '100%', textDecoration: 'none', gap: '10px', alignItems: 'center' }}
                 >
                   <HelpCircle size={14} />
                   <span style={{ flex: 1 }}>Help &amp; Support</span>
-                </button>
+                </Link>
 
                 <div className="user-menu-divider" />
 
@@ -309,6 +310,7 @@ export function Sidebar() {
               </div>
             </div>
           )}
+
 
           {/* ── User chip (trigger) ── */}
           <div

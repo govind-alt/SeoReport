@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -90,7 +90,7 @@ function StatusBadge({ status }: { status: 'connected' | 'disconnected' | 'comin
   );
 }
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams  = useSearchParams();
   const router        = useRouter();
   const [activeTab, setActiveTabState] = useState<Tab>('general');
@@ -973,5 +973,17 @@ export default function SettingsPage() {
         </div>
       )}
     </>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: 'var(--text-muted)', fontSize: 14 }}>
+        Loading settings…
+      </div>
+    }>
+      <SettingsContent />
+    </Suspense>
   );
 }
