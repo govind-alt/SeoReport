@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import {
   LayoutDashboard, FileText, User,
-  BarChart2, TrendingUp, ChevronRight, Menu, Sparkles, LogOut
+  BarChart2, TrendingUp, ChevronRight, ChevronDown, Menu, Sparkles, LogOut
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -51,6 +51,12 @@ export default function ClientPortalLayout({ children }: { children: React.React
       const hash = item.path.split('#')[1];
       window.location.hash = hash;
       setActiveHash('#' + hash);
+    } else {
+      // Dashboard — clear the hash so page.tsx shows the dashboard section
+      history.replaceState(null, '', window.location.pathname);
+      setActiveHash('');
+      // Manually fire hashchange so page.tsx listener picks it up
+      window.dispatchEvent(new Event('hashchange'));
     }
     setMobileMenuOpen(false);
   };
@@ -277,25 +283,34 @@ export default function ClientPortalLayout({ children }: { children: React.React
         .cp-topbar-user {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 6px 12px;
-          border-radius: 8px;
-          background: #F8FAFC;
+          gap: 10px;
+          padding: 6px 14px 6px 6px;
+          border-radius: 30px;
+          background: #fff;
           border: 1px solid #E4E9F2;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 1px 2px rgba(26,26,46,0.03);
+        }
+        .cp-topbar-user:hover {
+          border-color: #4F8EF7;
+          background: #F8FAFC;
+          box-shadow: 0 2px 6px rgba(79,142,247,0.1);
         }
         .cp-topbar-avatar {
-          width: 28px;
-          height: 28px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           background: linear-gradient(135deg, #4F8EF7, #2563EB);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 800;
           color: white;
+          box-shadow: 0 2px 6px rgba(79,142,247,0.3);
         }
-        .cp-topbar-name { font-size: 12px; font-weight: 700; color: #1A1A2E; }
+        .cp-topbar-name { font-size: 13px; font-weight: 700; color: #1A1A2E; }
 
         /* ── PAGE CONTENT ── */
         .cp-page { flex: 1; padding: 28px 28px 48px; }
@@ -344,10 +359,7 @@ export default function ClientPortalLayout({ children }: { children: React.React
             </div>
           </div>
 
-          {/* Collapse Toggle */}
-          <button className="cp-sidebar-collapse-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <ChevronRight size={14} style={{ transform: sidebarOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-          </button>
+
 
           {/* Nav */}
           <nav className="cp-sidebar-nav">
@@ -403,10 +415,6 @@ export default function ClientPortalLayout({ children }: { children: React.React
               </span>
             </div>
             <div className="cp-topbar-actions">
-              <div className="cp-badge">
-                <Sparkles size={11} />
-                SEO Reports
-              </div>
               <div className="cp-topbar-user">
                 <div className="cp-topbar-avatar">{initials}</div>
                 <span className="cp-topbar-name">{session?.user?.name ?? 'Client'}</span>

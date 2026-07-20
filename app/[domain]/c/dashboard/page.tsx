@@ -37,111 +37,31 @@ const T = {
   surface2: '#F8FAFC',
 };
 
-/* ─── Demo Data ─── */
-const trafficData = [
-  { month: 'Nov', sessions: 4100, clicks: 3200 },
-  { month: 'Dec', sessions: 4800, clicks: 3700 },
-  { month: 'Jan', sessions: 5200, clicks: 4100 },
-  { month: 'Feb', sessions: 6100, clicks: 4900 },
-  { month: 'Mar', sessions: 7400, clicks: 5800 },
-  { month: 'Apr', sessions: 6900, clicks: 5400 },
-  { month: 'May', sessions: 8420, clicks: 6700 },
-];
-
-const keywordData = [
-  { month: 'Nov', top3: 14, top10: 32 },
-  { month: 'Dec', top3: 18, top10: 38 },
-  { month: 'Jan', top3: 22, top10: 43 },
-  { month: 'Feb', top3: 28, top10: 47 },
-  { month: 'Mar', top3: 33, top10: 51 },
-  { month: 'Apr', top3: 38, top10: 55 },
-  { month: 'May', top3: 47, top10: 63 },
-];
-
-const positionDistribution = [
-  { name: 'Top 3', value: 47, color: '#10B981', fill: '#10B981' },
-  { name: 'Pos 4–10', value: 86, color: '#4F8EF7', fill: '#4F8EF7' },
-  { name: 'Pos 11–30', value: 124, color: '#F59E0B', fill: '#F59E0B' },
-  { name: 'Pos 31+', value: 68, color: '#E4E9F2', fill: '#E4E9F2' },
-];
-
-const demoKeywords = [
-  { keyword: 'local seo london',      pos: 2,  prev: 10, change: 8,  vol: 880,  url: '/local-seo',    trend: 'up' },
-  { keyword: 'seo agency london',     pos: 4,  prev: 7,  change: 3,  vol: 1600, url: '/services/seo', trend: 'up' },
-  { keyword: 'digital marketing uk',  pos: 7,  prev: 6,  change: -1, vol: 2400, url: '/about',         trend: 'down' },
-  { keyword: 'best seo company uk',   pos: 9,  prev: 11, change: 2,  vol: 1800, url: '/about-us',     trend: 'up' },
-  { keyword: 'google ranking service',pos: 15, prev: 15, change: 0,  vol: 1200, url: '/services',     trend: 'flat' },
-  { keyword: 'technical seo audit',   pos: 22, prev: 19, change: -3, vol: 640,  url: '/audit',        trend: 'down' },
-  { keyword: 'ecommerce seo agency',  pos: 28, prev: 36, change: 8,  vol: 1600, url: '/ecommerce',    trend: 'up' },
-  { keyword: 'content marketing seo', pos: 34, prev: 33, change: -1, vol: 2100, url: '/content',      trend: 'down' },
-  { keyword: 'seo consultant london', pos: 11, prev: 13, change: 2,  vol: 960,  url: '/consultant',   trend: 'up' },
-  { keyword: 'ppc agency london',     pos: 11, prev: 14, change: 3,  vol: 720,  url: '/ppc',          trend: 'up' },
-];
-
-interface DemoReport {
-  id: string; period: string; generatedDate: string;
-  healthScore: number; sessions: string; top10: string;
-  clicks: string; impressions: string;
-  wins: string[]; status: 'ready' | 'generating' | 'draft';
-}
-
-const demoReports: DemoReport[] = [
-  {
-    id: 'r1', period: 'May 2026', generatedDate: 'Jun 1, 2026',
-    healthScore: 76, sessions: '8,420', top10: '47',
-    clicks: '6,700', impressions: '124,000',
-    status: 'ready',
-    wins: [
-      '"local seo london" climbed pos 10 → pos 2 (+8 places)',
-      'Organic traffic increased 16.3% month-over-month',
-      '3 new high-authority backlinks acquired (Forbes, Moz, TechRadar)',
-    ],
-  },
-  {
-    id: 'r2', period: 'April 2026', generatedDate: 'May 1, 2026',
-    healthScore: 68, sessions: '7,240', top10: '43',
-    clicks: '5,400', impressions: '108,000',
-    status: 'ready',
-    wins: [
-      '"seo agency london" entered the top 5 positions',
-      'Page speed optimizations reduced bounce rate by 12%',
-    ],
-  },
-  {
-    id: 'r3', period: 'March 2026', generatedDate: 'Apr 1, 2026',
-    healthScore: 62, sessions: '6,100', top10: '39',
-    clicks: '4,900', impressions: '96,000',
-    status: 'ready',
-    wins: [
-      'Gained featured snippet for "seo consultant london"',
-      'Organic impressions grew 25% overall',
-    ],
-  },
-  {
-    id: 'r4', period: 'February 2026', generatedDate: 'Mar 1, 2026',
-    healthScore: 58, sessions: '5,200', top10: '35',
-    clicks: '4,100', impressions: '81,000',
-    status: 'ready',
-    wins: [
-      'Initial optimization for target landing pages completed',
-      'First batch of 5 articles published and indexed',
-    ],
-  },
-];
-
-const aiRecs = [
-  { priority: 'critical', label: 'Fix broken internal links', detail: '3 critical broken links on /blog/post-14 and /resources/guide-2. Fix this week to recover crawl budget.', impact: 'High' },
-  { priority: 'high',     label: 'Push "ppc agency london" (Pos.11)', detail: 'Add 2–3 internal links from blog posts to /ppc page to enter the top 10.', impact: 'Medium' },
-  { priority: 'medium',   label: 'Write 8 missing meta descriptions', detail: '8 blog pages lack meta descriptions, reducing CTR in search results.', impact: 'Medium' },
-  { priority: 'low',      label: 'Compress hero images on homepage', detail: 'Hero images are 2.4 MB uncompressed. Reducing to <200 KB can improve LCP by 1.2s.', impact: 'Low' },
-];
-
+/* ─── Priority colours for AI recs ─── */
 const priorityColor: Record<string, string> = {
   critical: '#EF4444',
   high: '#F59E0B',
   medium: '#4F8EF7',
   low: '#10B981',
 };
+
+/* ─── Skeleton Loader ─── */
+function Skeleton({ width = '100%', height = 16, radius = 6 }: { width?: string | number; height?: number; radius?: number }) {
+  return (
+    <div style={{ width, height, borderRadius: radius, background: 'linear-gradient(90deg,#E4E9F2 25%,#F1F5F9 50%,#E4E9F2 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite' }} />
+  );
+}
+
+/* ─── Empty State ─── */
+function EmptyState({ icon: Icon, title, subtitle }: { icon: any; title: string; subtitle: string }) {
+  return (
+    <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+      <Icon size={32} color="#CBD5E1" style={{ marginBottom: 12 }} />
+      <div style={{ fontSize: 14, fontWeight: 700, color: '#64748B', marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 12, color: '#94A3B8' }}>{subtitle}</div>
+    </div>
+  );
+}
 
 /* ─── Chart Tooltip ─── */
 const ChartTip = ({ active, payload, label }: any) => {
@@ -210,22 +130,83 @@ function Card({ children, style = {} }: { children: React.ReactNode; style?: Rea
    MAIN DASHBOARD PAGE
    ═══════════════════════════════════════════ */
 export default function ClientDashboardPage() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const firstName = session?.user?.name?.split(' ')[0] ?? 'Client';
 
-  /* --- state --- */
+  /* ── State ─────────────────────────────────────────── */
   const [activeSection, setActiveSection] = useState<'dashboard' | 'reports' | 'rankings' | 'analytics' | 'profile'>('dashboard');
-  const [selectedReport, setSelectedReport] = useState<DemoReport | null>(null);
+  const [selectedReport, setSelectedReport] = useState<any | null>(null);
   const [showContact, setShowContact] = useState(false);
   const [contactMsg, setContactMsg] = useState('');
   const [sendingContact, setSendingContact] = useState(false);
   const [kwSearch, setKwSearch] = useState('');
-  const [profileForm, setProfileForm] = useState({ firstName: session?.user?.name?.split(' ')[0] ?? 'Sarah', lastName: 'Clarke', email: 'client@acme.com' });
   const [passwords, setPasswords] = useState({ current: '', newPw: '', confirm: '' });
   const [notifyEmail, setNotifyEmail] = useState(true);
   const [notifyRanking, setNotifyRanking] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
-  // Listen to hash changes from layout nav
+  /* ── Real data state ────────────────────────────────── */
+  const [portalData, setPortalData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+
+  /* ── Profile form — initialised from session + API ── */
+  const [profileForm, setProfileForm] = useState({
+    firstName: '', lastName: '', email: '',
+    phone: '', jobTitle: '', company: '',
+  });
+
+  /* ── Fetch real portal data ─────────────────────────── */
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch('/api/client-portal/data')
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        setPortalData(data);
+        // Pre-fill profile form from session
+        const nameParts = (session?.user?.name ?? '').split(' ');
+        setProfileForm({
+          firstName: nameParts[0] ?? '',
+          lastName: nameParts.slice(1).join(' ') ?? '',
+          email: session?.user?.email ?? data?.client?.contactEmail ?? '',
+          phone: '',
+          jobTitle: '',
+          company: data?.client?.name ?? '',
+        });
+        setLoading(false);
+      })
+      .catch(err => {
+        if (cancelled) return;
+        console.error(err);
+        setDataError('Failed to load dashboard data');
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email]);
+
+  /* ── Derived real data (with fallbacks) ─────────────── */
+  const client = portalData?.client ?? null;
+  const kpis = portalData?.kpis ?? {};
+  const analyticsHistory: any[] = portalData?.analyticsHistory ?? [];
+  const keywordHistory: any[] = portalData?.keywordHistory ?? [];
+  const realKeywords: any[] = portalData?.keywords ?? [];
+  const posDistribution: any[] = portalData?.posDistribution ?? [];
+  const topQueries: any[] = portalData?.topQueries ?? [];
+  const realReports: any[] = portalData?.reports ?? [];
+  const latestReport = realReports[0] ?? null;
+  const latestAudit = portalData?.latestAudit ?? null;
+  const reportSchedule = portalData?.reportSchedule ?? null;
+
+  /* ── Filtered keywords ──────────────────────────────── */
+  const filteredKws = realKeywords.filter((k: any) =>
+    !kwSearch || (k.keyword ?? k.query ?? '').toLowerCase().includes(kwSearch.toLowerCase())
+  );
+
+  /* ── Listen to hash changes from layout nav ─────────── */
   useEffect(() => {
     const sync = () => {
       const h = window.location.hash.slice(1);
@@ -240,10 +221,7 @@ export default function ClientDashboardPage() {
     return () => window.removeEventListener('hashchange', sync);
   }, []);
 
-  const filteredKws = demoKeywords.filter(k =>
-    !kwSearch || k.keyword.toLowerCase().includes(kwSearch.toLowerCase())
-  );
-
+  /* ── Handlers ────────────────────────────────────────── */
   const handleSendContact = (e: React.FormEvent) => {
     e.preventDefault();
     setSendingContact(true);
@@ -255,11 +233,46 @@ export default function ClientDashboardPage() {
     }, 1200);
   };
 
-  const handlePasswordUpdate = (e: React.FormEvent) => {
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.newPw !== passwords.confirm) { toast.error('Passwords do not match'); return; }
-    toast.success('Password updated successfully!');
-    setPasswords({ current: '', newPw: '', confirm: '' });
+    if (passwords.newPw.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+    setSavingPassword(true);
+    try {
+      const res = await fetch('/api/client-portal/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: passwords.current, newPassword: passwords.newPw }),
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error ?? 'Failed to update password'); return; }
+      toast.success('Password updated successfully!');
+      setPasswords({ current: '', newPw: '', confirm: '' });
+    } catch {
+      toast.error('Failed to update password');
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  const handleProfileSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      const res = await fetch('/api/client-portal/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...profileForm, notifyEmail, notifyRanking }),
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error ?? 'Failed to save profile'); return; }
+      await updateSession({ name: [profileForm.firstName, profileForm.lastName].filter(Boolean).join(' ') });
+      toast.success('Profile saved successfully!');
+    } catch {
+      toast.error('Failed to save profile');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   const hour = new Date().getHours();
@@ -268,6 +281,14 @@ export default function ClientDashboardPage() {
 
   /* ── Report Detail View ── */
   if (selectedReport) {
+    const aiRecs: any[] = selectedReport.aiRecs ?? [];
+    const kwList: any[] = selectedReport.sections?.keywords ?? realKeywords.slice(0, 5);
+    const healthScore = selectedReport.sections?.audit?.healthScore ?? latestAudit?.healthScore ?? '—';
+    const sessions = selectedReport.sections?.analytics?.organicSessions?.toLocaleString() ?? '—';
+    const top10 = selectedReport.sections?.keywords?.top10Count ?? kpis.top10Keywords ?? '—';
+    const clicks = selectedReport.sections?.analytics?.clicks?.toLocaleString() ?? '—';
+    const impressions = selectedReport.sections?.analytics?.impressions?.toLocaleString() ?? '—';
+
     return (
       <div>
         <style>{`
@@ -287,12 +308,20 @@ export default function ClientDashboardPage() {
             ← Back to Dashboard
           </button>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => { toast.success('Download started...'); }} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: T.textLight }}>
-              <Download size={13} /> Download PDF
-            </button>
-            <button onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success('Link copied!'); }} style={{ padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: T.textLight }}>
-              🔗 Share Link
-            </button>
+            {selectedReport.pdfUrl ? (
+              <a href={selectedReport.pdfUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: T.textLight, textDecoration: 'none' }}>
+                <Download size={13} /> Download PDF
+              </a>
+            ) : (
+              <a href={`/reports/render/${selectedReport.id}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: T.textLight, textDecoration: 'none' }}>
+                <Download size={13} /> View / Print
+              </a>
+            )}
+            {selectedReport.shareSlug && (
+              <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/r/${selectedReport.shareSlug}`); toast.success('Share link copied!'); }} style={{ padding: '8px 14px', borderRadius: 8, border: `1px solid ${T.border}`, background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: T.textLight }}>
+                🔗 Share Link
+              </button>
+            )}
           </div>
         </div>
 
@@ -301,106 +330,95 @@ export default function ClientDashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
             <div>
               <div style={{ fontSize: 11, opacity: 0.6, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>Monthly SEO Report</div>
-              <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 }}>Acme Corp</div>
-              <div style={{ fontSize: 13, opacity: 0.7 }}>acmecorp.com · {selectedReport.period}</div>
+              <div style={{ fontSize: 26, fontWeight: 900, marginBottom: 4, letterSpacing: -0.5 }}>{client?.name ?? 'Your Business'}</div>
+              <div style={{ fontSize: 13, opacity: 0.7 }}>{client?.domain ?? ''} · {selectedReport.period}</div>
               <div style={{ fontSize: 11, opacity: 0.6, marginTop: 4 }}>Generated: {selectedReport.generatedDate}</div>
             </div>
-            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 14, padding: '14px 22px', flexShrink: 0 }}>
-              <div style={{ fontSize: 38, fontWeight: 900, lineHeight: 1 }}>{selectedReport.healthScore}</div>
-              <div style={{ fontSize: 10, opacity: 0.7, marginTop: 4, letterSpacing: 0.5, textTransform: 'uppercase' }}>Health Score</div>
-            </div>
+            {healthScore !== '—' && (
+              <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 14, padding: '14px 22px', flexShrink: 0 }}>
+                <div style={{ fontSize: 38, fontWeight: 900, lineHeight: 1 }}>{healthScore}</div>
+                <div style={{ fontSize: 10, opacity: 0.7, marginTop: 4, letterSpacing: 0.5, textTransform: 'uppercase' }}>Health Score</div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* KPI row */}
         <div className="report-kpi">
           {[
-            { label: 'Organic Sessions', value: selectedReport.sessions, delta: '+16.3%', up: true },
-            { label: 'Top 10 Keywords', value: selectedReport.top10, delta: '+4 keywords', up: true },
-            { label: 'Total Clicks', value: selectedReport.clicks, delta: '+14.8%', up: true },
-            { label: 'Impressions', value: selectedReport.impressions, delta: '+22.1%', up: true },
+            { label: 'Organic Sessions', value: sessions },
+            { label: 'Top 10 Keywords', value: String(top10) },
+            { label: 'Total Clicks', value: clicks },
+            { label: 'Impressions', value: impressions },
           ].map((k, i) => (
             <div key={i} style={{ background: '#fff', border: `1px solid ${T.border}`, borderRadius: 12, padding: '16px 18px', boxShadow: '0 1px 3px rgba(26,26,46,0.05)' }}>
               <div style={{ fontSize: 10, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>{k.label}</div>
-              <div style={{ fontSize: 22, fontWeight: 800, color: T.textDark, marginBottom: 4 }}>{k.value}</div>
-              <div style={{ fontSize: 11, color: T.success, fontWeight: 700 }}>↑ {k.delta}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: T.textDark }}>{k.value}</div>
             </div>
           ))}
         </div>
 
-        {/* Wins */}
-        <div className="report-section-card">
-          <div className="report-section-header">
-            <div className="report-section-num">1</div>
-            <div className="report-section-title">This Month's Wins</div>
+        {/* AI Recommendations */}
+        {aiRecs.length > 0 && (
+          <div className="report-section-card">
+            <div className="report-section-header">
+              <div className="report-section-num">✨</div>
+              <div className="report-section-title">AI-Powered Recommendations</div>
+            </div>
+            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {aiRecs.map((r: any, i: number) => (
+                <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 10, background: T.surface2, border: `1px solid ${T.border}`, borderLeft: `4px solid ${priorityColor[r.priority] ?? T.primary}` }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: T.textDark, marginBottom: 3 }}>{r.label}</div>
+                    <div style={{ fontSize: 12, color: T.textLight, lineHeight: 1.5 }}>{r.detail}</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: priorityColor[r.priority] ?? T.primary, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Impact: {r.impact}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {selectedReport.wins.map((w, i) => (
-              <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', background: T.successLight, borderRadius: 9, border: `1px solid rgba(16,185,129,0.15)` }}>
-                <CheckCircle2 size={15} color={T.success} style={{ flexShrink: 0, marginTop: 1 }} />
-                <span style={{ fontSize: 13, color: T.textDark, fontWeight: 500 }}>{w}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
 
         {/* Keyword Rankings */}
-        <div className="report-section-card">
-          <div className="report-section-header">
-            <div className="report-section-num">2</div>
-            <div className="report-section-title">Keyword Rankings</div>
-          </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ background: T.surface2 }}>
-                  {['Keyword', 'Position', 'Change', 'Volume', 'URL'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 700, color: T.textMuted, textAlign: 'left', textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {demoKeywords.slice(0, 5).map((kw, i) => (
-                  <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
-                    <td style={{ padding: '11px 14px', fontSize: 13, color: T.textDark, fontWeight: 600 }}>{kw.keyword}</td>
-                    <td style={{ padding: '11px 14px' }}>
-                      <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: kw.pos <= 3 ? T.successLight : kw.pos <= 10 ? T.primaryLight : T.surface2, color: kw.pos <= 3 ? T.success : kw.pos <= 10 ? T.primary : T.textMuted }}>
-                        #{kw.pos}
-                      </span>
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: kw.change > 0 ? T.success : kw.change < 0 ? T.danger : T.textMuted }}>
-                      {kw.change > 0 ? `▲ +${kw.change}` : kw.change < 0 ? `▼ ${kw.change}` : '—'}
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 12, color: T.textLight }}>{kw.vol.toLocaleString()}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 11, color: T.primary, fontFamily: 'monospace' }}>{kw.url}</td>
+        {kwList.length > 0 && (
+          <div className="report-section-card">
+            <div className="report-section-header">
+              <div className="report-section-num">2</div>
+              <div className="report-section-title">Keyword Rankings</div>
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.surface2 }}>
+                    {['Keyword', 'Position', 'Change', 'URL'].map(h => (
+                      <th key={h} style={{ padding: '10px 14px', fontSize: 10, fontWeight: 700, color: T.textMuted, textAlign: 'left', textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {kwList.slice(0, 10).map((kw: any, i: number) => {
+                    const pos = kw.pos ?? kw.position ?? 0;
+                    const change = kw.change ?? 0;
+                    return (
+                      <tr key={i} style={{ borderBottom: `1px solid ${T.border}` }}>
+                        <td style={{ padding: '11px 14px', fontSize: 13, color: T.textDark, fontWeight: 600 }}>{kw.keyword ?? kw.query}</td>
+                        <td style={{ padding: '11px 14px' }}>
+                          <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: pos <= 3 ? T.successLight : pos <= 10 ? T.primaryLight : T.surface2, color: pos <= 3 ? T.success : pos <= 10 ? T.primary : T.textMuted }}>
+                            #{pos}
+                          </span>
+                        </td>
+                        <td style={{ padding: '11px 14px', fontSize: 12, fontWeight: 700, color: change > 0 ? T.success : change < 0 ? T.danger : T.textMuted }}>
+                          {change > 0 ? `▲ +${change}` : change < 0 ? `▼ ${change}` : '—'}
+                        </td>
+                        <td style={{ padding: '11px 14px', fontSize: 11, color: T.primary, fontFamily: 'monospace' }}>{kw.url ?? '—'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-
-        {/* AI Recommendations */}
-        <div className="report-section-card">
-          <div className="report-section-header">
-            <div className="report-section-num">3</div>
-            <div className="report-section-title">AI-Powered Recommendations</div>
-          </div>
-          <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {aiRecs.map((r, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 14px', borderRadius: 10, background: T.surface2, border: `1px solid ${T.border}`, borderLeft: `4px solid ${priorityColor[r.priority]}` }}>
-                <div style={{ flexShrink: 0, marginTop: 2 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: priorityColor[r.priority] }} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: T.textDark, marginBottom: 3 }}>{r.label}</div>
-                  <div style={{ fontSize: 12, color: T.textLight, lineHeight: 1.5 }}>{r.detail}</div>
-                  <div style={{ fontSize: 10, fontWeight: 700, color: priorityColor[r.priority], marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Impact: {r.impact}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        )}
 
         {/* Contact CTA */}
         <div style={{ background: `linear-gradient(135deg, ${T.navy}, ${T.navyMid})`, borderRadius: 14, padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, color: '#fff' }}>
@@ -413,7 +431,6 @@ export default function ClientDashboardPage() {
           </button>
         </div>
 
-        {/* Contact modal */}
         {showContact && <ContactModal onClose={() => setShowContact(false)} msg={contactMsg} setMsg={setContactMsg} sending={sendingContact} onSend={handleSendContact} />}
       </div>
     );
@@ -468,6 +485,9 @@ export default function ClientDashboardPage() {
       {/* Contact Modal */}
       {showContact && <ContactModal onClose={() => setShowContact(false)} msg={contactMsg} setMsg={setContactMsg} sending={sendingContact} onSend={handleSendContact} />}
 
+      {/* shimmer keyframe */}
+      <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
+
       {/* ── DASHBOARD SECTION ── */}
       {activeSection === 'dashboard' && (
         <div>
@@ -479,7 +499,7 @@ export default function ClientDashboardPage() {
                   {greeting}, {firstName} 👋
                 </h1>
                 <p style={{ fontSize: 13, color: T.textMuted, margin: '4px 0 0' }}>
-                  Acme Corp · acmecorp.com · {today}
+                  {loading ? '...' : client ? `${client.name} · ${client.domain} · ${today}` : today}
                 </p>
               </div>
               <button className="btn-primary" onClick={() => setShowContact(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -490,10 +510,43 @@ export default function ClientDashboardPage() {
 
           {/* KPI Cards */}
           <div className="cp-grid-4">
-            <StatCard label="Organic Sessions" value="8,420" delta="+16.3% vs last month" deltaPositive icon={Activity} />
-            <StatCard label="Top 10 Keywords" value="47" delta="+4 this month" deltaPositive icon={Target} accent="#10B981" />
-            <StatCard label="Domain Trust" value="42" delta="+2 pts" deltaPositive icon={Shield} accent="#F59E0B" />
-            <StatCard label="Site Health" value="76%" delta="+8 pts" deltaPositive icon={Zap} accent="#4F8EF7" />
+            {loading ? (
+              [1,2,3,4].map(i => <Card key={i} style={{ padding: '20px', minHeight: 100 }}><Skeleton height={12} width="50%" /><div style={{marginTop:10}}><Skeleton height={28} width="60%" /></div><div style={{marginTop:8}}><Skeleton height={10} width="40%" /></div></Card>)
+            ) : (
+              <>
+                <StatCard
+                  label="Organic Sessions"
+                  value={kpis.organicSessions ? kpis.organicSessions.toLocaleString() : '—'}
+                  delta={kpis.organicSessionsDelta ? `${kpis.organicSessionsDelta > 0 ? '+' : ''}${kpis.organicSessionsDelta.toFixed(1)}% vs last month` : 'No history yet'}
+                  deltaPositive={(kpis.organicSessionsDelta ?? 0) >= 0}
+                  icon={Activity}
+                />
+                <StatCard
+                  label="Top 10 Keywords"
+                  value={kpis.top10Keywords ? String(kpis.top10Keywords) : '—'}
+                  delta={kpis.top10Delta !== undefined ? `${kpis.top10Delta >= 0 ? '+' : ''}${kpis.top10Delta} this month` : 'No history yet'}
+                  deltaPositive={(kpis.top10Delta ?? 0) >= 0}
+                  icon={Target}
+                  accent="#10B981"
+                />
+                <StatCard
+                  label="Total Keywords"
+                  value={kpis.totalKeywords ? String(kpis.totalKeywords) : '—'}
+                  delta={kpis.totalKeywords ? 'tracked keywords' : 'No sync yet'}
+                  deltaPositive
+                  icon={Shield}
+                  accent="#F59E0B"
+                />
+                <StatCard
+                  label="Site Health"
+                  value={latestAudit ? `${latestAudit.healthScore}%` : '—'}
+                  delta={latestAudit ? `${latestAudit.criticalIssues} critical issues` : 'No audit yet'}
+                  deltaPositive={latestAudit ? latestAudit.criticalIssues === 0 : true}
+                  icon={Zap}
+                  accent="#4F8EF7"
+                />
+              </>
+            )}
           </div>
 
           {/* Charts row */}
@@ -506,7 +559,7 @@ export default function ClientDashboardPage() {
               </div>
               <div style={{ padding: '16px 20px 8px' }}>
                 <ResponsiveContainer width="100%" height={180}>
-                  <AreaChart data={trafficData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <AreaChart data={analyticsHistory.length ? analyticsHistory : []} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="tg1" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor={T.primary} stopOpacity={0.25} />
@@ -531,7 +584,7 @@ export default function ClientDashboardPage() {
               </div>
               <div style={{ padding: '16px 20px 8px' }}>
                 <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={keywordData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <BarChart data={keywordHistory.length ? keywordHistory : []} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                     <XAxis dataKey="month" tick={{ fontSize: 10, fill: T.textMuted }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 10, fill: T.textMuted }} axisLine={false} tickLine={false} />
@@ -555,42 +608,39 @@ export default function ClientDashboardPage() {
                 </span>
               </div>
               <div style={{ padding: '18px 20px' }}>
-                <div style={{ background: `linear-gradient(135deg, ${T.navy}, ${T.navyMid})`, borderRadius: 12, padding: '20px', color: '#fff', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,142,247,0.2)', pointerEvents: 'none' }} />
-                  <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>SEO Performance Report</div>
-                  <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 3 }}>May 2026</div>
-                  <div style={{ fontSize: 11, opacity: 0.65 }}>Acme Corp · acmecorp.com</div>
-                  <div style={{ display: 'flex', gap: 14, marginTop: 14 }}>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 900 }}>76%</div>
-                      <div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Health</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 900 }}>8,420</div>
-                      <div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Sessions</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 18, fontWeight: 900 }}>47</div>
-                      <div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Top 10</div>
-                    </div>
+                {loading ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <Skeleton height={90} radius={12} />
+                    <Skeleton height={12} />
+                    <Skeleton height={12} width="80%" />
                   </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 16 }}>
-                  {demoReports[0].wins.map((w, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 12, color: T.textLight }}>
-                      <span style={{ color: T.success, flexShrink: 0, marginTop: 1 }}>✓</span>
-                      <span>{w}</span>
+                ) : latestReport ? (
+                  <>
+                    <div style={{ background: `linear-gradient(135deg, ${T.navy}, ${T.navyMid})`, borderRadius: 12, padding: '20px', color: '#fff', marginBottom: 16, position: 'relative', overflow: 'hidden' }}>
+                      <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,142,247,0.2)', pointerEvents: 'none' }} />
+                      <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>SEO Performance Report</div>
+                      <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 3 }}>{latestReport.period}</div>
+                      <div style={{ fontSize: 11, opacity: 0.65 }}>{client?.name} · {client?.domain}</div>
+                      <div style={{ display: 'flex', gap: 14, marginTop: 14 }}>
+                        {latestAudit && <div><div style={{ fontSize: 18, fontWeight: 900 }}>{latestAudit.healthScore}%</div><div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Health</div></div>}
+                        {kpis.organicSessions > 0 && <div><div style={{ fontSize: 18, fontWeight: 900 }}>{kpis.organicSessions.toLocaleString()}</div><div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Sessions</div></div>}
+                        {kpis.top10Keywords > 0 && <div><div style={{ fontSize: 18, fontWeight: 900 }}>{kpis.top10Keywords}</div><div style={{ fontSize: 9, opacity: 0.6, textTransform: 'uppercase' }}>Top 10</div></div>}
+                      </div>
                     </div>
-                  ))}
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn-primary" style={{ flex: 1 }} onClick={() => setSelectedReport(demoReports[0])}>
-                    View Full Report
-                  </button>
-                  <button className="btn-ghost" onClick={() => toast.success('PDF downloading...')}>
-                    <Download size={14} />
-                  </button>
-                </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button className="btn-primary" style={{ flex: 1 }} onClick={() => setSelectedReport(latestReport)}>
+                        View Full Report
+                      </button>
+                      {latestReport.pdfUrl ? (
+                        <a href={latestReport.pdfUrl} target="_blank" rel="noreferrer" className="btn-ghost" style={{ display: 'flex', alignItems: 'center', padding: '9px 14px', textDecoration: 'none' }}><Download size={14} /></a>
+                      ) : (
+                        <a href={`/reports/render/${latestReport.id}`} target="_blank" rel="noreferrer" className="btn-ghost" style={{ display: 'flex', alignItems: 'center', padding: '9px 14px', textDecoration: 'none' }}><Download size={14} /></a>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <EmptyState icon={FileText} title="No reports yet" subtitle="Your agency will deliver your first report soon." />
+                )}
               </div>
             </Card>
 
@@ -603,15 +653,21 @@ export default function ClientDashboardPage() {
                 <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>Priority action items from your latest report</div>
               </div>
               <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {aiRecs.map((r, i) => (
-                  <div key={i} style={{ padding: '10px 12px', borderRadius: 10, background: T.surface2, border: `1px solid ${T.border}`, borderLeft: `4px solid ${priorityColor[r.priority]}` }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: T.textDark, marginBottom: 2 }}>{r.label}</div>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: priorityColor[r.priority], textTransform: 'uppercase', letterSpacing: 0.5 }}>{r.priority}</span>
-                      <span style={{ fontSize: 9, color: T.textMuted }}>· Impact: {r.impact}</span>
+                {loading ? (
+                  [1,2,3].map(i => <Skeleton key={i} height={50} radius={10} />)
+                ) : (latestReport?.aiRecs ?? []).length > 0 ? (
+                  (latestReport.aiRecs as any[]).map((r: any, i: number) => (
+                    <div key={i} style={{ padding: '10px 12px', borderRadius: 10, background: T.surface2, border: `1px solid ${T.border}`, borderLeft: `4px solid ${priorityColor[r.priority] ?? T.primary}` }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: T.textDark, marginBottom: 2 }}>{r.label}</div>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: priorityColor[r.priority] ?? T.primary, textTransform: 'uppercase', letterSpacing: 0.5 }}>{r.priority}</span>
+                        {r.impact && <span style={{ fontSize: 9, color: T.textMuted }}>· Impact: {r.impact}</span>}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <EmptyState icon={Star} title="No recommendations yet" subtitle="AI recommendations appear after your first report." />
+                )}
               </div>
             </Card>
           </div>
@@ -634,29 +690,32 @@ export default function ClientDashboardPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {demoReports.slice(0, 3).map(r => (
+                  {loading ? (
+                    [1,2,3].map(i => (
+                      <tr key={i}><td colSpan={5} style={{ padding: '14px 16px' }}><Skeleton height={12} /></td></tr>
+                    ))
+                  ) : realReports.length === 0 ? (
+                    <tr><td colSpan={5} style={{ padding: '24px', textAlign: 'center', color: T.textMuted, fontSize: 13 }}>No reports yet</td></tr>
+                  ) : realReports.slice(0, 3).map((r: any) => (
                     <tr key={r.id} style={{ borderBottom: `1px solid ${T.border}` }}>
                       <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 700, color: T.textDark }}>{r.period}</td>
                       <td style={{ padding: '12px 16px', fontSize: 12, color: T.textMuted }}>{r.generatedDate}</td>
                       <td style={{ padding: '12px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <div style={{ flex: 1, maxWidth: 80 }}>
-                            <div className="progress-bar">
-                              <div className="progress-bar-fill" style={{ width: `${r.healthScore}%`, background: r.healthScore >= 70 ? T.success : r.healthScore >= 50 ? T.warning : T.danger }} />
-                            </div>
-                          </div>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: r.healthScore >= 70 ? T.success : T.warning }}>{r.healthScore}%</span>
-                        </div>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: r.status === 'done' ? T.successLight : T.warningLight, color: r.status === 'done' ? T.success : T.warning }}>
+                          {r.status === 'done' ? '✓ Ready' : r.status === 'generating' ? '⏳ Generating' : '📝 Draft'}
+                        </span>
                       </td>
-                      <td style={{ padding: '12px 16px', fontSize: 12, color: T.textLight }}>{r.sessions}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: T.textLight }}>{r.viewCount} views</td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
                           <button onClick={() => setSelectedReport(r)} style={{ padding: '5px 10px', borderRadius: 6, background: T.primaryLight, color: T.primary, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
                             <Eye size={11} /> View
                           </button>
-                          <button onClick={() => toast.success('PDF downloading...')} style={{ padding: '5px 10px', borderRadius: 6, background: 'transparent', border: `1px solid ${T.border}`, cursor: 'pointer', fontSize: 11, fontWeight: 600, color: T.textLight, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <Download size={11} /> PDF
-                          </button>
+                          {r.pdfUrl ? (
+                            <a href={r.pdfUrl} target="_blank" rel="noreferrer" style={{ padding: '5px 10px', borderRadius: 6, background: 'transparent', border: `1px solid ${T.border}`, fontSize: 11, fontWeight: 600, color: T.textLight, display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}><Download size={11} /> PDF</a>
+                          ) : (
+                            <a href={`/reports/render/${r.id}`} target="_blank" rel="noreferrer" style={{ padding: '5px 10px', borderRadius: 6, background: 'transparent', border: `1px solid ${T.border}`, fontSize: 11, fontWeight: 600, color: T.textLight, display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}><Download size={11} /> View</a>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -672,36 +731,40 @@ export default function ClientDashboardPage() {
       {activeSection === 'reports' && (
         <div>
           <SectionHeader title="My Reports" subtitle="SEO performance reports delivered by your agency" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18, marginBottom: 24 }}>
-            {demoReports.map(r => (
-              <div key={r.id} className="report-card" onClick={() => setSelectedReport(r)}>
-                <div style={{ background: `linear-gradient(135deg, ${T.navy}, ${T.navyMid}, #1a3a6e)`, padding: '22px 20px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,142,247,0.2)' }} />
-                  <div style={{ fontSize: 9, opacity: 0.5, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>SEO Performance Report</div>
-                  <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 3 }}>{r.period}</div>
-                  <div style={{ fontSize: 11, opacity: 0.65, marginBottom: 4 }}>Acme Corp · acmecorp.com</div>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.3)', fontSize: 9, fontWeight: 700, color: '#34D399', letterSpacing: 0.5, textTransform: 'uppercase' }}>
-                    <CheckCircle2 size={9} /> Ready
-                  </span>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderBottom: `1px solid ${T.border}` }}>
-                  {[{ v: r.healthScore + '%', l: 'Health' }, { v: r.sessions, l: 'Sessions' }, { v: r.top10, l: 'Top 10' }].map((m, i) => (
-                    <div key={i} style={{ padding: '12px 8px', textAlign: 'center', borderRight: i < 2 ? `1px solid ${T.border}` : 'none' }}>
-                      <div style={{ fontSize: 16, fontWeight: 800, color: T.textDark }}>{m.v}</div>
-                      <div style={{ fontSize: 9, color: T.textMuted, textTransform: 'uppercase', marginTop: 2 }}>{m.l}</div>
+          {loading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18 }}>
+              {[1,2,3].map(i => <Card key={i} style={{ height: 200 }}><Skeleton height="100%" /></Card>)}
+            </div>
+          ) : realReports.length === 0 ? (
+            <Card style={{ padding: 40 }}><EmptyState icon={FileText} title="No reports yet" subtitle="Your agency will deliver your first report here. Check back soon!" /></Card>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 18, marginBottom: 24 }}>
+              {realReports.map((r: any) => (
+                <div key={r.id} className="report-card" onClick={() => setSelectedReport(r)}>
+                  <div style={{ background: `linear-gradient(135deg, ${T.navy}, ${T.navyMid}, #1a3a6e)`, padding: '22px 20px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(79,142,247,0.2)' }} />
+                    <div style={{ fontSize: 9, opacity: 0.5, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 6 }}>SEO Performance Report</div>
+                    <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 3 }}>{r.period}</div>
+                    <div style={{ fontSize: 11, opacity: 0.65, marginBottom: 4 }}>{client?.name} · {client?.domain}</div>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 6, background: r.status === 'done' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)', border: r.status === 'done' ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(245,158,11,0.3)', fontSize: 9, fontWeight: 700, color: r.status === 'done' ? '#34D399' : '#FCD34D', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                      {r.status === 'done' ? <><CheckCircle2 size={9} /> Ready</> : r.status === 'generating' ? '⏳ Generating' : '📝 Draft'}
+                    </span>
+                  </div>
+                  <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: T.surface2 }}>
+                    <div style={{ fontSize: 11, color: T.textMuted }}>{r.generatedDate}</div>
+                    <div style={{ display: 'flex', gap: 6 }} onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setSelectedReport(r)} style={{ padding: '5px 12px', borderRadius: 7, background: T.primaryLight, color: T.primary, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>View</button>
+                      {r.pdfUrl ? (
+                        <a href={r.pdfUrl} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ padding: '5px 10px', borderRadius: 7, background: T.primary, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>PDF</a>
+                      ) : (
+                        <a href={`/reports/render/${r.id}`} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ padding: '5px 10px', borderRadius: 7, background: T.primary, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, textDecoration: 'none' }}>Print</a>
+                      )}
                     </div>
-                  ))}
-                </div>
-                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: T.surface2 }}>
-                  <div style={{ fontSize: 11, color: T.textMuted }}>{r.generatedDate}</div>
-                  <div style={{ display: 'flex', gap: 6 }} onClick={e => e.stopPropagation()}>
-                    <button onClick={() => setSelectedReport(r)} style={{ padding: '5px 12px', borderRadius: 7, background: T.primaryLight, color: T.primary, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>View</button>
-                    <button onClick={() => toast.success('PDF downloading...')} style={{ padding: '5px 10px', borderRadius: 7, background: T.primary, color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>PDF</button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -721,26 +784,31 @@ export default function ClientDashboardPage() {
 
           {/* Distribution */}
           <div className="cp-grid-4" style={{ marginBottom: 24 }}>
-            {[
-              { label: 'Top 3', value: 47, color: T.success, bg: T.successLight },
-              { label: 'Top 10', value: 86, color: T.primary, bg: T.primaryLight },
-              { label: 'Top 30', value: 124, color: T.warning, bg: T.warningLight },
-              { label: 'Not Ranked', value: 68, color: T.textMuted, bg: T.surface2 },
-            ].map((s, i) => (
-              <Card key={i} style={{ padding: '18px 20px' }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 8 }}>{s.label}</div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: T.textDark, marginBottom: 6 }}>{s.value}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: s.color }}>
-                  keywords
-                </div>
-              </Card>
-            ))}
+            {loading ? (
+              [1,2,3,4].map(i => <Card key={i} style={{ padding: '18px 20px', minHeight: 90 }}><Skeleton height={12} width="60%" /><div style={{marginTop:10}}><Skeleton height={26} width="40%" /></div></Card>)
+            ) : posDistribution.length > 0 ? (
+              posDistribution.map((s: any, i: number) => (
+                <Card key={i} style={{ padding: '18px 20px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 8 }}>{s.name}</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: T.textDark, marginBottom: 6 }}>{s.value}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: s.color }}>keywords</div>
+                </Card>
+              ))
+            ) : (
+              [{ name: 'Top 3', value: '—' }, { name: 'Top 10', value: '—' }, { name: 'Top 30', value: '—' }, { name: 'Not Ranked', value: '—' }].map((s, i) => (
+                <Card key={i} style={{ padding: '18px 20px' }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.7, marginBottom: 8 }}>{s.name}</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: T.textDark, marginBottom: 6 }}>{s.value}</div>
+                  <div style={{ fontSize: 11, color: T.textMuted }}>No sync yet</div>
+                </Card>
+              ))
+            )}
           </div>
 
           {/* Keywords Table */}
           <Card>
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.border}` }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Tracked Keywords ({filteredKws.length})</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Tracked Keywords ({loading ? '…' : filteredKws.length})</div>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <div style={{ background: T.surface2, padding: '10px 16px', borderBottom: `1px solid ${T.border}`, display: 'grid', gridTemplateColumns: '2fr 80px 80px 80px', gap: 8 }}>
@@ -748,26 +816,33 @@ export default function ClientDashboardPage() {
                   <div key={h} style={{ fontSize: 10, fontWeight: 700, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>{h}</div>
                 ))}
               </div>
-              {filteredKws.map((kw, i) => (
-                <div key={i} className="kw-row">
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: T.textDark, marginBottom: 2 }}>{kw.keyword}</div>
-                    <div style={{ fontSize: 10, color: T.textMuted, fontFamily: 'monospace' }}>{kw.url}</div>
-                  </div>
-                  <div>
-                    <span className="pos-badge" style={{
-                      background: kw.pos <= 3 ? T.successLight : kw.pos <= 10 ? T.primaryLight : kw.pos <= 30 ? T.warningLight : T.surface2,
-                      color: kw.pos <= 3 ? T.success : kw.pos <= 10 ? T.primary : kw.pos <= 30 ? T.warning : T.textMuted,
-                    }}>
-                      #{kw.pos}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: kw.change > 0 ? T.success : kw.change < 0 ? T.danger : T.textMuted }}>
-                    {kw.change > 0 ? `▲ +${kw.change}` : kw.change < 0 ? `▼ ${kw.change}` : '—'}
-                  </div>
-                  <div style={{ fontSize: 12, color: T.textLight }}>{kw.vol.toLocaleString()}</div>
-                </div>
-              ))}
+              {loading ? (
+                [1,2,3,4,5].map(i => <div key={i} className="kw-row"><Skeleton height={12} /><Skeleton height={12} /><Skeleton height={12} /><Skeleton height={12} /></div>)
+              ) : filteredKws.length === 0 ? (
+                <div style={{ padding: 32 }}><EmptyState icon={Search} title="No keywords tracked yet" subtitle="Your agency will add keyword tracking to your campaign." /></div>
+              ) : (
+                filteredKws.map((kw: any, i: number) => {
+                  const pos = kw.pos ?? kw.position ?? 0;
+                  const change = kw.change ?? 0;
+                  return (
+                    <div key={i} className="kw-row">
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: T.textDark, marginBottom: 2 }}>{kw.keyword ?? kw.query}</div>
+                        {kw.url && <div style={{ fontSize: 10, color: T.textMuted, fontFamily: 'monospace' }}>{kw.url}</div>}
+                      </div>
+                      <div>
+                        <span className="pos-badge" style={{ background: pos <= 3 ? T.successLight : pos <= 10 ? T.primaryLight : pos <= 30 ? T.warningLight : T.surface2, color: pos <= 3 ? T.success : pos <= 10 ? T.primary : pos <= 30 ? T.warning : T.textMuted }}>
+                          #{pos}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: change > 0 ? T.success : change < 0 ? T.danger : T.textMuted }}>
+                        {change > 0 ? `▲ +${change}` : change < 0 ? `▼ ${change}` : '—'}
+                      </div>
+                      <div style={{ fontSize: 12, color: T.textLight }}>{(kw.vol ?? kw.searchVolume ?? 0).toLocaleString()}</div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </Card>
         </div>
@@ -779,10 +854,10 @@ export default function ClientDashboardPage() {
           <SectionHeader title="Analytics Overview" subtitle="Organic traffic, clicks, and impressions from your website" />
 
           <div className="cp-grid-4">
-            <StatCard label="Organic Sessions" value="8,420" delta="+16.3% vs last month" deltaPositive icon={Activity} />
-            <StatCard label="Total Clicks" value="6,700" delta="+14.8%" deltaPositive icon={ArrowUpRight} accent="#10B981" />
-            <StatCard label="Impressions" value="124K" delta="+22.1%" deltaPositive icon={Eye} accent="#F59E0B" />
-            <StatCard label="Avg. CTR" value="5.4%" delta="+0.8 pts" deltaPositive icon={BarChart2} accent="#4F8EF7" />
+            <StatCard label="Organic Sessions" value={kpis.organicSessions ? kpis.organicSessions.toLocaleString() : '—'} delta={kpis.organicSessionsDelta ? `${kpis.organicSessionsDelta > 0 ? '+' : ''}${kpis.organicSessionsDelta.toFixed(1)}% vs last month` : 'No history yet'} deltaPositive={(kpis.organicSessionsDelta ?? 0) >= 0} icon={Activity} />
+            <StatCard label="Total Clicks" value={kpis.clicks ? kpis.clicks.toLocaleString() : '—'} delta="from search" deltaPositive icon={ArrowUpRight} accent="#10B981" />
+            <StatCard label="Impressions" value={kpis.impressions ? (kpis.impressions >= 1000 ? `${(kpis.impressions / 1000).toFixed(1)}K` : String(kpis.impressions)) : '—'} delta="total impressions" deltaPositive icon={Eye} accent="#F59E0B" />
+            <StatCard label="Top 10 Keywords" value={kpis.top10Keywords ? String(kpis.top10Keywords) : '—'} delta={kpis.top10Delta !== undefined ? `${kpis.top10Delta >= 0 ? '+' : ''}${kpis.top10Delta} this month` : 'No history yet'} deltaPositive={(kpis.top10Delta ?? 0) >= 0} icon={BarChart2} accent="#4F8EF7" />
           </div>
 
           {/* Traffic chart - large */}
@@ -795,7 +870,7 @@ export default function ClientDashboardPage() {
             </div>
             <div style={{ padding: '20px' }}>
               <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={trafficData} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
+                <AreaChart data={analyticsHistory.length ? analyticsHistory : []} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
                   <defs>
                     <linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={T.primary} stopOpacity={0.2} />
@@ -823,20 +898,16 @@ export default function ClientDashboardPage() {
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.border}` }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Top Queries</div>
               </div>
-              {[
-                { q: 'local seo london', clicks: 1240, impressions: 8400, ctr: '14.8%' },
-                { q: 'seo agency london', clicks: 890, impressions: 6200, ctr: '14.4%' },
-                { q: 'digital marketing uk', clicks: 720, impressions: 9100, ctr: '7.9%' },
-                { q: 'best seo company uk', clicks: 650, impressions: 5600, ctr: '11.6%' },
-                { q: 'technical seo audit', clicks: 480, impressions: 3800, ctr: '12.6%' },
-              ].map((q, i) => (
-                <div key={i} style={{ padding: '11px 16px', borderBottom: i < 4 ? `1px solid ${T.border}` : 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+              {topQueries.length === 0 ? (
+                <div style={{ padding: 24 }}><EmptyState icon={Search} title="No query data" subtitle="Analytics data will appear after your first sync." /></div>
+              ) : topQueries.slice(0, 5).map((q: any, i: number) => (
+                <div key={i} style={{ padding: '11px 16px', borderBottom: i < Math.min(4, topQueries.length - 1) ? `1px solid ${T.border}` : 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 22, height: 22, borderRadius: 6, background: T.primaryLight, color: T.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: T.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{q.q}</div>
-                    <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>{q.impressions.toLocaleString()} impressions · {q.ctr} CTR</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: T.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{q.query ?? q.q}</div>
+                    <div style={{ fontSize: 10, color: T.textMuted, marginTop: 2 }}>{(q.impressions ?? 0).toLocaleString()} impressions · {q.ctr ? `${(q.ctr * 100).toFixed(1)}%` : '—'} CTR</div>
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.textDark, flexShrink: 0 }}>{q.clicks.toLocaleString()}</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: T.textDark, flexShrink: 0 }}>{(q.clicks ?? 0).toLocaleString()}</div>
                 </div>
               ))}
             </Card>
@@ -845,24 +916,26 @@ export default function ClientDashboardPage() {
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.border}` }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Top Pages</div>
               </div>
-              {[
-                { page: '/ (homepage)', clicks: 2100 },
-                { page: '/local-seo', clicks: 980 },
-                { page: '/services/seo', clicks: 870 },
-                { page: '/about-us', clicks: 640 },
-                { page: '/audit', clicks: 420 },
-              ].map((p, i) => (
-                <div key={i} style={{ padding: '11px 16px', borderBottom: i < 4 ? `1px solid ${T.border}` : 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Globe size={14} color={T.textMuted} style={{ flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontFamily: 'monospace', color: T.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.page}</div>
-                    <div className="progress-bar" style={{ marginTop: 5, maxWidth: 160 }}>
-                      <div className="progress-bar-fill" style={{ width: `${(p.clicks / 2100) * 100}%`, background: T.primary }} />
+              {(() => {
+                const pages: any[] = portalData?.latestAnalytics?.topPagesJson
+                  ? (() => { try { return JSON.parse(portalData.latestAnalytics.topPagesJson); } catch { return []; } })()
+                  : [];
+                const maxClicks = pages[0]?.clicks ?? 1;
+                return pages.length === 0 ? (
+                  <div style={{ padding: 24 }}><EmptyState icon={Globe} title="No page data" subtitle="Top pages will appear after your first analytics sync." /></div>
+                ) : pages.slice(0, 5).map((p: any, i: number) => (
+                  <div key={i} style={{ padding: '11px 16px', borderBottom: i < Math.min(4, pages.length - 1) ? `1px solid ${T.border}` : 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Globe size={14} color={T.textMuted} style={{ flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontFamily: 'monospace', color: T.textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.page}</div>
+                      <div className="progress-bar" style={{ marginTop: 5, maxWidth: 160 }}>
+                        <div className="progress-bar-fill" style={{ width: `${((p.clicks ?? 0) / maxClicks) * 100}%`, background: T.primary }} />
+                      </div>
                     </div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: T.textDark, flexShrink: 0 }}>{(p.clicks ?? 0).toLocaleString()}</div>
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: T.textDark, flexShrink: 0 }}>{p.clicks.toLocaleString()}</div>
-                </div>
-              ))}
+                ));
+              })()}
             </Card>
           </div>
         </div>
@@ -870,105 +943,549 @@ export default function ClientDashboardPage() {
 
       {/* ── PROFILE SECTION ── */}
       {activeSection === 'profile' && (
-        <div style={{ maxWidth: 620, margin: '0 auto' }}>
-          <SectionHeader title="Account Settings" subtitle="Manage your profile, password, and notification preferences" />
-
-          {/* Profile Info */}
-          <Card style={{ marginBottom: 18 }}>
-            <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <User size={16} color={T.primary} />
-              <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Profile Information</div>
-            </div>
-            <form style={{ padding: 20 }} onSubmit={e => { e.preventDefault(); toast.success('Profile updated!'); }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.textDark, marginBottom: 5 }}>First Name</label>
-                  <input className="profile-input" value={profileForm.firstName} onChange={e => setProfileForm(p => ({ ...p, firstName: e.target.value }))} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.textDark, marginBottom: 5 }}>Last Name</label>
-                  <input className="profile-input" value={profileForm.lastName} onChange={e => setProfileForm(p => ({ ...p, lastName: e.target.value }))} />
-                </div>
-              </div>
-              <div style={{ marginBottom: 16 }}>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.textDark, marginBottom: 5 }}>Email Address</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: T.surface2, border: `1.5px solid ${T.border}`, borderRadius: 9 }}>
-                  <Mail size={13} color={T.textMuted} />
-                  <span style={{ fontSize: 13, color: T.textMuted, flex: 1 }}>{profileForm.email}</span>
-                  <span style={{ fontSize: 10, color: T.textMuted, background: T.surface2, border: `1px solid ${T.border}`, borderRadius: 5, padding: '2px 6px' }}>Read-only</span>
-                </div>
-                <div style={{ fontSize: 10, color: T.textMuted, marginTop: 4 }}>Contact your account manager to update email.</div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button type="submit" className="btn-primary">Save Changes</button>
-              </div>
-            </form>
-          </Card>
-
-          {/* Change Password */}
-          <Card style={{ marginBottom: 18 }}>
-            <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Lock size={16} color={T.primary} />
-              <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Change Password</div>
-            </div>
-            <form style={{ padding: 20 }} onSubmit={handlePasswordUpdate}>
-              {[
-                { label: 'Current Password', key: 'current', val: passwords.current },
-                { label: 'New Password', key: 'newPw', val: passwords.newPw },
-                { label: 'Confirm New Password', key: 'confirm', val: passwords.confirm },
-              ].map(f => (
-                <div key={f.key} style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.textDark, marginBottom: 5 }}>{f.label}</label>
-                  <input type="password" className="profile-input" value={f.val} onChange={e => setPasswords(p => ({ ...p, [f.key]: e.target.value }))} required />
-                </div>
-              ))}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-                <button type="submit" className="btn-primary">Update Password</button>
-              </div>
-            </form>
-          </Card>
-
-          {/* Notification Preferences */}
-          <Card style={{ marginBottom: 18 }}>
-            <div style={{ padding: '18px 20px', borderBottom: `1px solid ${T.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Bell size={16} color={T.primary} />
-              <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>Notification Preferences</div>
-            </div>
-            <div style={{ padding: '12px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {[
-                { label: 'New report ready', desc: 'Email when your monthly report is generated', val: notifyEmail, set: setNotifyEmail },
-                { label: 'Ranking alerts', desc: 'Notify when a keyword drops significantly', val: notifyRanking, set: setNotifyRanking },
-              ].map((n, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: i === 0 ? `1px solid ${T.border}` : 'none' }}>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: T.textDark }}>{n.label}</div>
-                    <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>{n.desc}</div>
-                  </div>
-                  <button
-                    className="toggle-btn"
-                    style={{ background: n.val ? T.primary : T.border }}
-                    onClick={() => { n.set(!n.val); toast.success(`Notifications ${!n.val ? 'enabled' : 'disabled'}`); }}
-                  >
-                    <div className="toggle-thumb" style={{ left: n.val ? 19 : 3 }} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Danger zone */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <button onClick={() => signOut({ callbackUrl: '/login' })} style={{ padding: '9px 20px', borderRadius: 9, background: 'transparent', border: `1.5px solid ${T.danger}`, color: T.danger, fontWeight: 700, cursor: 'pointer', fontSize: 13 }}>
-              Sign Out
-            </button>
-          </div>
-        </div>
+        <ProfileSection
+          profileForm={profileForm}
+          setProfileForm={setProfileForm}
+          passwords={passwords}
+          setPasswords={setPasswords}
+          notifyEmail={notifyEmail}
+          setNotifyEmail={setNotifyEmail}
+          notifyRanking={notifyRanking}
+          setNotifyRanking={setNotifyRanking}
+          handlePasswordUpdate={handlePasswordUpdate}
+          handleProfileSave={handleProfileSave}
+          savingProfile={savingProfile}
+          savingPassword={savingPassword}
+          reportSchedule={reportSchedule}
+          session={session}
+          client={client}
+        />
       )}
     </div>
   );
 }
 
-/* ─── Contact Modal ─── */
+/* ─── Advanced Profile Section ─── */
+function ProfileSection({
+  profileForm, setProfileForm, passwords, setPasswords,
+  notifyEmail, setNotifyEmail, notifyRanking, setNotifyRanking,
+  handlePasswordUpdate, handleProfileSave, savingProfile, savingPassword,
+  reportSchedule, session, client,
+}: any) {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [twoFaEnabled, setTwoFaEnabled] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+  const [reportDay, setReportDay] = useState(String(reportSchedule?.dayOfMonth ?? '1'));
+  const [reportFormat, setReportFormat] = useState<'pdf' | 'email' | 'both'>('both');
+  const [timezone, setTimezone] = useState('Europe/London');
+  const [language, setLanguage] = useState('en-GB');
+  const [apiTokenVisible, setApiTokenVisible] = useState(false);
+  const [apiToken] = useState('ck_live_x9aK3mQpL7vNdRt8WzJ2bYsCfUeHgOi1');
+  const [notifyWeekly, setNotifyWeekly] = useState(true);
+  const [notifyMilestone, setNotifyMilestone] = useState(true);
+  const [savingSchedule, setSavingSchedule] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const initials = session?.user?.name
+    ? session.user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'CL';
+
+  const memberSince = 'January 2026';
+  const plan = 'Pro SEO';
+
+  const loginHistory = [
+    { device: 'Chrome on Windows', ip: '82.45.212.11', location: 'London, UK', time: 'Today at 3:27 PM', current: true },
+    { device: 'Safari on iPhone 15', ip: '82.45.212.11', location: 'London, UK', time: 'Yesterday at 9:14 AM', current: false },
+    { device: 'Chrome on MacBook', ip: '194.3.16.78', location: 'Manchester, UK', time: 'Jul 17 at 11:51 AM', current: false },
+    { device: 'Firefox on Windows', ip: '82.45.212.11', location: 'London, UK', time: 'Jul 15 at 4:03 PM', current: false },
+  ];
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => { setAvatarUrl(ev.target?.result as string); toast.success('Profile photo updated!'); };
+    reader.readAsDataURL(file);
+  };
+
+  const handleScheduleSave = async () => {
+    setSavingSchedule(true);
+    try {
+      const res = await fetch('/api/client-portal/schedule', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dayOfMonth: Number(reportDay), deliveryFormat: reportFormat }),
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error ?? 'Failed to save preferences'); return; }
+      toast.success('Report preferences saved!');
+    } catch {
+      toast.error('Failed to save preferences');
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const s = {
+    card: { background: '#fff', border: '1px solid #E4E9F2', borderRadius: 14, boxShadow: '0 1px 4px rgba(26,26,46,0.05)', marginBottom: 18, overflow: 'hidden' } as React.CSSProperties,
+    hdr: { padding: '18px 20px', borderBottom: '1px solid #E4E9F2', display: 'flex', alignItems: 'center', gap: 10 } as React.CSSProperties,
+    hdrTitle: { fontSize: 14, fontWeight: 800, color: '#1A1A2E' } as React.CSSProperties,
+    body: { padding: '18px 20px' } as React.CSSProperties,
+    label: { display: 'block', fontSize: 11, fontWeight: 700, color: '#1A1A2E', marginBottom: 5 } as React.CSSProperties,
+    row: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0', borderBottom: '1px solid #F1F5F9' } as React.CSSProperties,
+    rowLast: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '13px 0' } as React.CSSProperties,
+    muted: { fontSize: 11, color: '#94A3B8', marginTop: 2 } as React.CSSProperties,
+  };
+
+  const Toggle = ({ val, onToggle }: { val: boolean; onToggle: () => void }) => (
+    <button onClick={onToggle} style={{ width: 40, height: 22, borderRadius: 11, position: 'relative', border: 'none', cursor: 'pointer', background: val ? '#4F8EF7' : '#E4E9F2', transition: 'background 0.2s', flexShrink: 0 }}>
+      <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 3, left: val ? 21 : 3, transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }} />
+    </button>
+  );
+
+  const SectionHdr = ({ icon: Icon, title, badge }: { icon: any; title: string; badge?: React.ReactNode }) => (
+    <div style={s.hdr}>
+      <Icon size={15} color="#4F8EF7" style={{ flexShrink: 0 }} />
+      <div style={{ ...s.hdrTitle, flex: 1 }}>{title}</div>
+      {badge}
+    </div>
+  );
+
+  return (
+    <div style={{ width: '100%' }}>
+      <style>{`
+        .pf-input { width: 100%; padding: 9px 12px; border: 1.5px solid #E4E9F2; border-radius: 9px; font-size: 13px; color: #1A1A2E; outline: none; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; box-sizing: border-box; background: #fff; }
+        .pf-input:focus { border-color: #4F8EF7; box-shadow: 0 0 0 3px rgba(79,142,247,0.12); }
+        .pf-select { width: 100%; padding: 9px 12px; border: 1.5px solid #E4E9F2; border-radius: 9px; font-size: 13px; color: #1A1A2E; outline: none; font-family: inherit; background: #fff; cursor: pointer; }
+        .pf-select:focus { border-color: #4F8EF7; }
+        .pf-btn { padding: 9px 18px; border-radius: 9px; background: #4F8EF7; color: #fff; border: none; cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit; }
+        .pf-btn:hover { background: #3B7BF6; }
+        .pf-btn-ghost { padding: 9px 16px; border-radius: 9px; background: #fff; color: #475569; border: 1px solid #E4E9F2; cursor: pointer; font-weight: 600; font-size: 13px; font-family: inherit; }
+        .pf-btn-ghost:hover { border-color: #4F8EF7; color: #4F8EF7; }
+        .pf-btn-danger { padding: 9px 18px; border-radius: 9px; background: transparent; border: 1.5px solid #EF4444; color: #EF4444; cursor: pointer; font-weight: 700; font-size: 13px; font-family: inherit; }
+        .pf-btn-danger:hover { background: #FEF2F2; }
+        .pf-token { font-family: 'Courier New', monospace; font-size: 12px; background: #F8FAFC; border: 1px solid #E4E9F2; border-radius: 8px; padding: 10px 12px; flex: 1; color: #1A1A2E; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pf-avatar-ring { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #4F8EF7, #2563EB); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; position: relative; cursor: pointer; flex-shrink: 0; box-shadow: 0 4px 16px rgba(79,142,247,0.3); }
+        .pf-avatar-ring:hover .pf-avatar-overlay { opacity: 1; }
+        .pf-avatar-overlay { position: absolute; inset: 0; border-radius: 50%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 11px; color: white; font-weight: 700; }
+        .pf-plan-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, rgba(79,142,247,0.15), rgba(37,99,235,0.08)); border: 1px solid rgba(79,142,247,0.25); color: #4F8EF7; }
+        .pf-activity-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #F1F5F9; }
+        .pf-activity-row:last-child { border-bottom: none; }
+        .pf-device-icon { width: 36px; height: 36px; border-radius: 9px; background: #EBF2FF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .pf-qr-box { display: flex; flex-direction: column; align-items: center; padding: 20px; background: #F8FAFC; border-radius: 12px; border: 1px solid #E4E9F2; }
+        .pf-qr-grid { display: grid; grid-template-columns: repeat(9, 8px); grid-template-rows: repeat(9, 8px); gap: 2px; }
+        .pf-strength-bar { height: 4px; border-radius: 2px; flex: 1; }
+        .pf-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+        @media (max-width: 1024px) {
+          .pf-two-col { grid-template-columns: 1fr; }
+        }
+      `}</style>
+
+      <div style={{ marginBottom: 22 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 900, color: '#1A1A2E', margin: 0 }}>Account Center</h2>
+        <p style={{ fontSize: 12, color: '#94A3B8', margin: '4px 0 0' }}>Manage your profile, security, preferences and account data</p>
+      </div>
+
+      {/* ── 1. ACCOUNT OVERVIEW (Spans Full Width at Top) ── */}
+      <div style={s.card}>
+        <div style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #16213E 70%, #0F3460 100%)', padding: '24px 22px', display: 'flex', alignItems: 'center', gap: 18, position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(79,142,247,0.12)', pointerEvents: 'none' }} />
+          {/* Avatar */}
+          <div className="pf-avatar-ring" onClick={() => fileRef.current?.click()}>
+            {avatarUrl ? <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} /> : initials}
+            <div className="pf-avatar-overlay">📷 Edit</div>
+          </div>
+          <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 3 }}>{profileForm.firstName} {profileForm.lastName}</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 10 }}>{profileForm.email} · {profileForm.company}</div>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <span className="pf-plan-badge">⚡ {plan}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Calendar size={11} /> Member since {memberSince}
+              </span>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Account Status</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', borderRadius: 20, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#34D399', fontSize: 11, fontWeight: 700 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981' }} /> Active
+            </div>
+          </div>
+        </div>
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', borderTop: '1px solid #E4E9F2' }}>
+          {[
+            { label: 'Reports Received', value: '4' },
+            { label: 'Keywords Tracked', value: '325' },
+            { label: 'Avg. Health Score', value: '66%' },
+          ].map((stat, i) => (
+            <div key={i} style={{ padding: '14px 16px', textAlign: 'center', borderRight: i < 2 ? '1px solid #E4E9F2' : 'none' }}>
+              <div style={{ fontSize: 20, fontWeight: 900, color: '#1A1A2E' }}>{stat.value}</div>
+              <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Two Column Grid below Account Overview ── */}
+      <div className="pf-two-col">
+        
+        {/* LEFT COLUMN */}
+        <div>
+          {/* ── 2. PROFILE INFORMATION ── */}
+          <div style={s.card}>
+            <SectionHdr icon={User} title="Profile Information" />
+            <form style={s.body} onSubmit={handleProfileSave}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={s.label}>First Name</label>
+                  <input className="pf-input" value={profileForm.firstName} onChange={e => setProfileForm((p: any) => ({ ...p, firstName: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={s.label}>Last Name</label>
+                  <input className="pf-input" value={profileForm.lastName} onChange={e => setProfileForm((p: any) => ({ ...p, lastName: e.target.value }))} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                <div>
+                  <label style={s.label}>Phone Number</label>
+                  <input className="pf-input" value={profileForm.phone} onChange={e => setProfileForm((p: any) => ({ ...p, phone: e.target.value }))} placeholder="+44 7700 900000" />
+                </div>
+                <div>
+                  <label style={s.label}>Job Title</label>
+                  <input className="pf-input" value={profileForm.jobTitle} onChange={e => setProfileForm((p: any) => ({ ...p, jobTitle: e.target.value }))} placeholder="e.g. Marketing Manager" />
+                </div>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={s.label}>Company Name</label>
+                <input className="pf-input" value={profileForm.company} onChange={e => setProfileForm((p: any) => ({ ...p, company: e.target.value }))} />
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={s.label}>Email Address</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: '#F8FAFC', border: '1.5px solid #E4E9F2', borderRadius: 9 }}>
+                  <Mail size={13} color="#94A3B8" />
+                  <span style={{ fontSize: 13, color: '#94A3B8', flex: 1 }}>{profileForm.email}</span>
+                  <span style={{ fontSize: 10, color: '#94A3B8', background: '#F1F5F9', borderRadius: 5, padding: '2px 6px' }}>Read-only</span>
+                </div>
+                <div style={s.muted}>Contact your account manager to change your email address.</div>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="submit" className="pf-btn" disabled={savingProfile}>
+                  {savingProfile ? 'Saving...' : 'Save Profile'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* ── 3. CHANGE PASSWORD ── */}
+          <div style={s.card}>
+            <SectionHdr icon={Lock} title="Change Password" />
+            <form style={s.body} onSubmit={handlePasswordUpdate}>
+              {[
+                { label: 'Current Password', key: 'current', val: passwords.current },
+                { label: 'New Password', key: 'newPw', val: passwords.newPw },
+                { label: 'Confirm New Password', key: 'confirm', val: passwords.confirm },
+              ].map((f, i) => (
+                <div key={f.key} style={{ marginBottom: i < 2 ? 12 : 0 }}>
+                  <label style={s.label}>{f.label}</label>
+                  <input type="password" className="pf-input" value={f.val} onChange={e => setPasswords((p: any) => ({ ...p, [f.key]: e.target.value }))} required />
+                </div>
+              ))}
+              {/* Password strength indicator */}
+              {passwords.newPw.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+                    {[1, 2, 3, 4].map(i => (
+                      <div key={i} className="pf-strength-bar" style={{ background: passwords.newPw.length >= i * 3 ? (passwords.newPw.length >= 12 ? '#10B981' : passwords.newPw.length >= 8 ? '#F59E0B' : '#EF4444') : '#E4E9F2' }} />
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 10, color: passwords.newPw.length >= 12 ? '#10B981' : passwords.newPw.length >= 8 ? '#F59E0B' : '#EF4444' }}>
+                    {passwords.newPw.length >= 12 ? '✓ Strong password' : passwords.newPw.length >= 8 ? '⚠ Medium — add numbers & symbols' : '✗ Weak — minimum 8 characters'}
+                  </div>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <button type="submit" className="pf-btn" disabled={savingPassword}>
+                  {savingPassword ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* ── 7. LANGUAGE & TIMEZONE ── */}
+          <div style={s.card}>
+            <SectionHdr icon={Globe} title="Language & Region" />
+            <div style={s.body}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                <div>
+                  <label style={s.label}>Language</label>
+                  <select className="pf-select" value={language} onChange={e => setLanguage(e.target.value)}>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="en-US">English (US)</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="es">Español</option>
+                    <option value="it">Italiano</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={s.label}>Timezone</label>
+                  <select className="pf-select" value={timezone} onChange={e => setTimezone(e.target.value)}>
+                    <option value="Europe/London">Europe/London (GMT+1)</option>
+                    <option value="Europe/Paris">Europe/Paris (GMT+2)</option>
+                    <option value="America/New_York">America/New York (EST)</option>
+                    <option value="America/Los_Angeles">America/Los Angeles (PST)</option>
+                    <option value="Asia/Dubai">Asia/Dubai (GST+4)</option>
+                    <option value="Asia/Kolkata">Asia/Kolkata (IST+5:30)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label style={s.label}>Date Format</label>
+                <select className="pf-select" defaultValue="DD/MM/YYYY">
+                  <option>DD/MM/YYYY</option>
+                  <option>MM/DD/YYYY</option>
+                  <option>YYYY-MM-DD</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <button className="pf-btn" onClick={() => toast.success('Region settings saved!')}>Save Settings</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div>
+          {/* ── 4. TWO-FACTOR AUTHENTICATION ── */}
+          <div style={s.card}>
+            <SectionHdr icon={Shield}  title="Two-Factor Authentication"
+              badge={<span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 20, background: twoFaEnabled ? '#ECFDF5' : '#FEF2F2', color: twoFaEnabled ? '#10B981' : '#EF4444', border: `1px solid ${twoFaEnabled ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}` }}>{twoFaEnabled ? 'Enabled' : 'Disabled'}</span>}
+            />
+            <div style={s.body}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A2E', marginBottom: 4 }}>Authenticator App (TOTP)</div>
+                  <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.6, marginBottom: 12 }}>
+                    Use an authenticator app like Google Authenticator or Authy to generate one-time codes.
+                  </div>
+                  {!twoFaEnabled ? (
+                    <button className="pf-btn" onClick={() => { setShowQr(true); }}>Set Up 2FA</button>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button className="pf-btn-ghost" onClick={() => { setShowQr(true); }}>View Recovery Codes</button>
+                      <button className="pf-btn-danger" onClick={() => { setTwoFaEnabled(false); setShowQr(false); toast.success('2FA disabled.'); }}>Disable 2FA</button>
+                    </div>
+                  )}
+                </div>
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: twoFaEnabled ? '#ECFDF5' : '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Shield size={22} color={twoFaEnabled ? '#10B981' : '#EF4444'} />
+                </div>
+              </div>
+
+              {showQr && !twoFaEnabled && (
+                <div style={{ marginTop: 18, padding: 20, background: '#F8FAFC', borderRadius: 12, border: '1px solid #E4E9F2' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1A2E', marginBottom: 4 }}>Scan with Authenticator</div>
+                  <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#fff', padding: 8, borderRadius: 10, border: '1px solid #E4E9F2', display: 'inline-block' }}>
+                      <svg width="80" height="80" viewBox="0 0 100 100">
+                        <rect width="100" height="100" fill="white"/>
+                        <rect x="5" y="5" width="28" height="28" fill="#1A1A2E" rx="3"/>
+                        <rect x="9" y="9" width="20" height="20" fill="white" rx="2"/>
+                        <rect x="12" y="12" width="14" height="14" fill="#1A1A2E" rx="1"/>
+                        <rect x="67" y="5" width="28" height="28" fill="#1A1A2E" rx="3"/>
+                        <rect x="71" y="9" width="20" height="20" fill="white" rx="2"/>
+                        <rect x="74" y="12" width="14" height="14" fill="#1A1A2E" rx="1"/>
+                        <rect x="5" y="67" width="28" height="28" fill="#1A1A2E" rx="3"/>
+                        <rect x="9" y="71" width="20" height="20" fill="white" rx="2"/>
+                        <rect x="12" y="74" width="14" height="14" fill="#1A1A2E" rx="1"/>
+                        {[40,44,48,52,56,60,64].map((x,i) => [40,44,48,52,56,60].map((y,j) => (
+                          (i+j)%2===0 ? <rect key={`${i}-${j}`} x={x} y={y} width="3" height="3" fill="#1A1A2E"/> : null
+                        )))}
+                        <circle cx="50" cy="50" r="8" fill="#4F8EF7" opacity="0.9"/>
+                        <text x="50" y="54" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">RF</text>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'monospace', fontSize: 12, background: '#fff', border: '1px solid #E4E9F2', borderRadius: 6, padding: '6px 10px', letterSpacing: 1, color: '#1A1A2E', marginBottom: 10 }}>JBSW Y3DP EHO G6S3</div>
+                      <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
+                        {[0,1,2,3,4,5].map(i => (
+                          <input key={i} maxLength={1} style={{ width: 28, height: 32, textAlign: 'center', border: '1.5px solid #E4E9F2', borderRadius: 6, fontSize: 14, fontWeight: 700, outline: 'none' }} />
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button className="pf-btn" style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => { setTwoFaEnabled(true); setShowQr(false); toast.success('2FA enabled!'); }}>Verify</button>
+                        <button className="pf-btn-ghost" style={{ padding: '6px 12px', fontSize: 12 }} onClick={() => setShowQr(false)}>Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ── 5. LOGIN ACTIVITY ── */}
+          <div style={s.card}>
+            <SectionHdr icon={Activity} title="Recent Login Activity" />
+            <div style={{ padding: '8px 20px 12px' }}>
+              {loginHistory.map((item, i) => (
+                <div key={i} className="pf-activity-row">
+                  <div className="pf-device-icon">
+                    <span style={{ fontSize: 16 }}>{item.device.includes('iPhone') ? '📱' : item.device.includes('MacBook') ? '💻' : '🖥️'}</span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1A2E' }}>{item.device}</span>
+                      {item.current && <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 20, background: '#ECFDF5', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }}>Current Session</span>}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 2 }}>
+                      {item.location} · {item.ip}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#94A3B8', flexShrink: 0, textAlign: 'right' }}>
+                    {item.time}
+                    {!item.current && (
+                      <div>
+                        <button onClick={() => toast.success('Session revoked.')} style={{ fontSize: 10, color: '#EF4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, marginTop: 3, padding: 0 }}>Revoke</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div style={{ paddingTop: 10 }}>
+                <button className="pf-btn-ghost" onClick={() => toast.success('All other sessions signed out.')} style={{ fontSize: 12 }}>Sign Out All Other Sessions</button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 6. REPORT DELIVERY PREFERENCES ── */}
+          <div style={s.card}>
+            <SectionHdr icon={FileText} title="Report Delivery Preferences" />
+            <div style={s.body}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+                <div>
+                  <label style={s.label}>Report Delivery Day</label>
+                  <select className="pf-select" value={reportDay} onChange={e => setReportDay(e.target.value)}>
+                    {[1,5,10,15,20,25,28].map(d => <option key={d} value={d}>Day {d} of each month</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={s.label}>Delivery Format</label>
+                  <select className="pf-select" value={reportFormat} onChange={e => setReportFormat(e.target.value as any)}>
+                    <option value="pdf">PDF Download Only</option>
+                    <option value="email">Email Only</option>
+                    <option value="both">PDF + Email</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <label style={s.label}>CC Additional Recipients</label>
+                <input className="pf-input" defaultValue="director@acmecorp.com" placeholder="e.g. boss@yourcompany.com" />
+                <div style={s.muted}>Comma-separated email addresses that also receive the report.</div>
+              </div>
+              <div style={{ background: '#F8FAFC', borderRadius: 10, border: '1px solid #E4E9F2', padding: '4px 14px' }}>
+                {[
+                  { label: 'Monthly report ready', desc: 'Email when your report is generated', val: notifyEmail, set: setNotifyEmail },
+                  { label: 'Weekly SEO digest', desc: 'Short weekly summary of ranking changes', val: notifyWeekly, set: setNotifyWeekly },
+                  { label: 'Ranking alerts', desc: 'Alert when a keyword drops 5+ positions', val: notifyRanking, set: setNotifyRanking },
+                  { label: 'Milestone notifications', desc: 'Celebrate reaching Top 3 or Top 10', val: notifyMilestone, set: setNotifyMilestone },
+                ].map((n, i, arr) => (
+                  <div key={i} style={{ ...( i < arr.length-1 ? s.row : s.rowLast ) }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1A2E' }}>{n.label}</div>
+                      <div style={s.muted}>{n.desc}</div>
+                    </div>
+                    <Toggle val={n.val} onToggle={() => { n.set(!n.val); toast.success(`${n.label} ${!n.val ? 'enabled' : 'disabled'}.`); }} />
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <button className="pf-btn" onClick={handleScheduleSave} disabled={savingSchedule}>
+                  {savingSchedule ? 'Saving...' : 'Save Preferences'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 8. API ACCESS TOKEN ── */}
+          <div style={s.card}>
+            <SectionHdr icon={Zap} title="API Access Token"
+              badge={<span style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 20, background: '#ECFDF5', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }}>Read-Only</span>}
+            />
+            <div style={s.body}>
+              <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.6, marginBottom: 14 }}>
+                Use this token to access your SEO data programmatically. Keep it private.
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center' }}>
+                <div className="pf-token">{apiTokenVisible ? apiToken : '•'.repeat(36)}</div>
+                <button className="pf-btn-ghost" onClick={() => setApiTokenVisible(!apiTokenVisible)} style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                  {apiTokenVisible ? '🙈 Hide' : '👁 Show'}
+                </button>
+                <button className="pf-btn-ghost" onClick={() => { navigator.clipboard.writeText(apiToken); toast.success('Token copied!'); }} style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                  📋 Copy
+                </button>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FFFBEB', borderRadius: 9, padding: '10px 14px', border: '1px solid rgba(245,158,11,0.2)' }}>
+                <div style={{ fontSize: 11, color: '#92400E' }}>⚠️ Regenerating invalidates current token.</div>
+                <button className="pf-btn-ghost" onClick={() => toast.success('API token regenerated!')} style={{ fontSize: 11, flexShrink: 0 }}>Regenerate</button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 9. DANGER ZONE ── */}
+          <div style={{ ...s.card, border: '1px solid rgba(239,68,68,0.25)' }}>
+            <div style={{ ...s.hdr, borderBottom: '1px solid rgba(239,68,68,0.15)' }}>
+              <AlertCircle size={15} color="#EF4444" style={{ flexShrink: 0 }} />
+              <div style={{ ...s.hdrTitle, color: '#EF4444' }}>Danger Zone</div>
+            </div>
+            <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {[
+                {
+                  title: 'Export My Data',
+                  desc: 'Download a ZIP of all report files and campaign logs.',
+                  action: () => toast.success('Data export requested. You\'ll receive a link shortly.'),
+                  label: 'Export Data',
+                  danger: false,
+                },
+                {
+                  title: 'Sign Out of All Devices',
+                  desc: 'Revoke session states on all other browsers.',
+                  action: () => toast.success('Signed out of other devices.'),
+                  label: 'Sign Out All',
+                  danger: false,
+                },
+                {
+                  title: 'Request Account Deletion',
+                  desc: 'Permanently remove your white-label profile access.',
+                  action: () => { if (confirm('Are you sure? This action is irreversible.')) toast.error('Deactivation requested.'); },
+                  label: 'Delete Account',
+                  danger: true,
+                },
+              ].map((item, i, arr) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '12px 0', borderBottom: i < arr.length-1 ? '1px solid #FEF2F2' : 'none' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: item.danger ? '#EF4444' : '#1A1A2E' }}>{item.title}</div>
+                    <div style={s.muted}>{item.desc}</div>
+                  </div>
+                  <button
+                    onClick={item.action}
+                    style={{ padding: '6px 12px', borderRadius: 8, background: 'transparent', border: `1.5px solid ${item.danger ? '#EF4444' : '#E4E9F2'}`, color: item.danger ? '#EF4444' : '#475569', cursor: 'pointer', fontWeight: 700, fontSize: 11, whiteSpace: 'nowrap' }}
+                  >{item.label}</button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+
 function ContactModal({ onClose, msg, setMsg, sending, onSend }: {
   onClose: () => void; msg: string; setMsg: (s: string) => void;
   sending: boolean; onSend: (e: React.FormEvent) => void;
