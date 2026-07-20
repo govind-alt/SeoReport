@@ -154,7 +154,9 @@ html, body {
   color: rgba(255,255,255,0.5);
 }
 
-/* Score strip */
+/* ══════════════════════════════════════
+   COVER PAGE SCORES
+   ══════════════════════════════════════ */
 .cover-scores {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -168,27 +170,32 @@ html, body {
   z-index: 1;
 }
 .cover-score-item {
-  padding: 16px 16px;
+  padding: 14px 14px;
   text-align: center;
   background: rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .cover-score-item + .cover-score-item {
   border-left: 1px solid rgba(255,255,255,0.1);
 }
 .cover-score-value {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1;
+  line-height: 1.2;
   letter-spacing: -1px;
+  margin-bottom: 4px;
 }
 .cover-score-label {
-  font-size: 10px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
-  margin-top: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.65);
   letter-spacing: 1px;
   text-transform: uppercase;
+  line-height: 1.3;
 }
 
 .cover-footer {
@@ -197,7 +204,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid rgba(255,255,255,0.08);
 }
 .cover-footer-agency {
@@ -214,7 +221,7 @@ html, body {
    SECTION LAYOUT
    ══════════════════════════════════════ */
 .report-section {
-  padding: 36px 48px;
+  padding: 28px 44px;
   border-bottom: 1px solid #E4E9F2;
   page-break-inside: avoid;
   break-inside: avoid;
@@ -225,7 +232,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 .section-num {
   width: 24px; height: 24px;
@@ -245,6 +252,7 @@ html, body {
   letter-spacing: 1.5px;
   text-transform: uppercase;
   color: #64748B;
+  line-height: 1.3;
 }
 .section-rule {
   flex: 1;
@@ -269,7 +277,7 @@ html, body {
 .exec-body {
   font-size: 13px;
   color: #475569;
-  line-height: 1.8;
+  line-height: 1.75;
 }
 .exec-body p + p { margin-top: 10px; }
 .exec-body strong { color: #1A1A2E; font-weight: 700; }
@@ -288,11 +296,15 @@ html, body {
 .kpi-card {
   border: 1px solid #E4E9F2;
   border-radius: 12px;
-  padding: 18px 16px;
+  padding: 16px 14px;
   text-align: center;
   background: #FAFBFC;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .kpi-card.accent { background: #F4F7FF; border-color: #BFCEF7; }
 .kpi-card-top-bar {
@@ -302,27 +314,31 @@ html, body {
   background: linear-gradient(90deg, #1A1A2E, #0F3460);
 }
 .kpi-value {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 900;
   color: #1A1A2E;
-  line-height: 1;
+  line-height: 1.25;
   letter-spacing: -0.8px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  display: block;
 }
 .kpi-label {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  color: #94A3B8;
+  color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.8px;
+  line-height: 1.35;
   margin-bottom: 6px;
+  display: block;
 }
 .kpi-change {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
   display: inline-block;
+  line-height: 1.3;
 }
 .kpi-change.up { background: #ECFDF5; color: #059669; }
 .kpi-change.dn { background: #FEF2F2; color: #DC2626; }

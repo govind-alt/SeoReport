@@ -114,10 +114,10 @@ export default function PrintButton() {
         const sliceEnd = findBestBreak(breaks, idealEnd, fullCanvas.height);
         const sliceH = sliceEnd - sliceStart;
 
-        // Draw this slice into a temporary canvas
+        // Draw this slice into a temporary canvas formatted to full A4 page height
         const sliceCanvas = document.createElement('canvas');
         sliceCanvas.width = fullCanvas.width;
-        sliceCanvas.height = sliceH;
+        sliceCanvas.height = pageHpx;
         const ctx = sliceCanvas.getContext('2d')!;
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
@@ -127,16 +127,13 @@ export default function PrintButton() {
           0, 0, fullCanvas.width, sliceH
         );
 
-        // Exact mm height for this slice
-        const sliceHmm = sliceH * mmPerCanvasPx;
-
-        if (pageNum > 0) pdf.addPage([A4_W_MM, sliceHmm < A4_H_MM ? A4_H_MM : sliceHmm], 'portrait');
+        if (pageNum > 0) pdf.addPage([A4_W_MM, A4_H_MM], 'portrait');
         pdf.addImage(
           sliceCanvas.toDataURL('image/jpeg', 0.96),
           'JPEG',
           0, 0,
           A4_W_MM,
-          sliceHmm,
+          A4_H_MM,
         );
 
         sliceStart = sliceEnd;
