@@ -62,7 +62,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
     if (au) healthScore = au.healthScore;
     if (an) { sessions = an.organicSessions; clicks = Math.round(sessions * 1.2); impressions = Math.round(clicks * 11.66); ctr = parseFloat((clicks / impressions * 100).toFixed(2)); }
     if (kw) { top3Count = kw.top3Count; top10Count = kw.top10Count; top30Count = Math.round(top10Count * 2.97); }
-    if (bl) { backlinkCount = bl.totalBacklinks ?? 2840; domainAuthority = bl.domainAuthority ?? 42; }
+    if (bl) { backlinkCount = bl.totalBacklinks ?? 2840; domainAuthority = (bl as any).domainTrust ?? (bl as any).domainAuthority ?? 42; }
 
     if (an && prevAn?.organicSessions) {
       const d = ((an.organicSessions - prevAn.organicSessions) / prevAn.organicSessions * 100);

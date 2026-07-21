@@ -20,14 +20,15 @@ export async function GET(request: Request) {
     for (const client of clients) {
       console.log(`[CRON] Processing client: ${client.name} (${client.domain})`);
 
-      const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
-      const reportTitle = `${currentMonth} SEO Report`;
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
       // Check if a report for this month already exists to avoid duplicates
       const existingReport = await prisma.report.findFirst({
         where: {
           clientId: client.id,
-          title: reportTitle,
+          periodStart: { gte: firstOfMonth },
         }
       });
 
@@ -36,18 +37,17 @@ export async function GET(request: Request) {
         const report = await prisma.report.create({
           data: {
             clientId: client.id,
-            title: reportTitle,
-            status: 'generated',
-            // In a real app, you might trigger a background worker here 
-            // to actually render the PDF and upload it to S3, saving the URL here.
-            pdfUrl: `/api/reports/generate?id=${client.id}`, 
-            sections: JSON.stringify(['traffic', 'keywords', 'backlinks', 'audit'])
+            periodStart: firstOfMonth,
+            periodEnd: lastOfMonth,
+            status: 'done',
+            sectionsJson: JSON.stringify({ keywords: true, backlinks: true, audit: true, analytics: true }),
           }
         });
 
         // Simulate sending the email
         if (client.contactEmail) {
-          await sendReportReadyEmail(client.contactEmail, client.name, reportTitle, report.id, client.agency.name);
+          const currentMonth = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+          await sendReportReadyEmail(client.contactEmail, client.name, `${currentMonth} SEO Report`, report.id, client.agency.name);
         }
 
         results.push({ clientId: client.id, status: 'created', reportId: report.id });

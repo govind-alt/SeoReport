@@ -7,7 +7,8 @@ import { usePathname, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Users, FileText, Settings, HelpCircle,
-  ChevronUp, LogOut, CreditCard, User, Zap, Shield
+  ChevronUp, LogOut, CreditCard, User, Zap, Shield, Inbox,
+  Search, Calendar, CheckSquare
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -53,7 +54,7 @@ export function Sidebar() {
 
   const pathSegments = pathname.split('/').filter(Boolean);
   const firstSegment = pathSegments[0];
-  const isDomainSegment = firstSegment && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(firstSegment);
+  const isDomainSegment = firstSegment && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin', 'keyword-explorer', 'schedules', 'tasks'].includes(firstSegment);
 
   const domain = paramDomain || (isDomainSegment ? firstSegment : null) || 'digital-horizons';
   const basePath = `/${domain}`;
@@ -102,11 +103,14 @@ export function Sidebar() {
     await signOut({ callbackUrl: '/login' });
   };
 
-  // ── Nav items ─────────────────────────────────────────────────────────────
   const navItems = [
-    { href: `${basePath}`,         label: 'Dashboard', icon: LayoutDashboard, exact: true  },
-    { href: `${basePath}/clients`, label: 'Clients',   icon: Users,            exact: false },
-    { href: `${basePath}/reports`, label: 'Reports',   icon: FileText,         exact: false },
+    { href: `${basePath}`,                   label: 'Dashboard',         icon: LayoutDashboard, exact: true  },
+    { href: `${basePath}/inbox`,             label: 'Inbox',             icon: Inbox,            exact: false },
+    { href: `${basePath}/clients`,           label: 'Clients',           icon: Users,            exact: false },
+    { href: `${basePath}/reports`,           label: 'Reports',           icon: FileText,         exact: false },
+    { href: `${basePath}/keyword-explorer`, label: 'Keyword Research', icon: Search,           exact: false },
+    { href: `${basePath}/schedules`,         label: 'Report Schedules',  icon: Calendar,         exact: false },
+    { href: `${basePath}/tasks`,             label: 'SEO Action Tasks',  icon: CheckSquare,      exact: false },
   ];
 
   const planInfo  = PLAN_META[agencyInfo?.plan ?? 'pro'];
@@ -164,36 +168,7 @@ export function Sidebar() {
         </Link>
       </nav>
 
-      {/* ── Plan chip ── */}
-      <div style={{ padding: '0 10px 8px' }}>
-        <div style={{
-          background: `${planColor}18`,
-          border: `1px solid ${planColor}35`,
-          borderRadius: '10px',
-          padding: '10px 12px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: 7 }}>
-            <Zap size={11} style={{ color: planColor, flexShrink: 0 }} />
-            <span style={{ color: planColor, fontWeight: 700, fontSize: 11 }}>
-              {planInfo?.label ?? 'Pro'} Plan
-            </span>
-            <span style={{ color: '#6B7CA8', fontSize: 11, marginLeft: 'auto' }}>
-              {agencyInfo ? `${agencyInfo.clientCount}/${agencyInfo.maxClients}` : '—'} clients
-            </span>
-          </div>
-          {/* Usage bar */}
-          <div style={{ height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-            <div style={{
-              height: '100%', borderRadius: 4,
-              width: `${usedPct}%`,
-              background: usedPct > 85
-                ? 'linear-gradient(90deg, #F59E0B, #EF4444)'
-                : `linear-gradient(90deg, ${planColor}, ${planColor}cc)`,
-              transition: 'width 0.6s ease',
-            }} />
-          </div>
-        </div>
-      </div>
+
 
       {/* ── User footer ── */}
       <div className="sidebar-footer">

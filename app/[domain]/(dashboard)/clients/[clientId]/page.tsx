@@ -261,13 +261,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
             <div className="card" style={{ padding: '20px' }}>
               <div style={{ fontWeight: 700, marginBottom: '14px' }}>Backlink Profile Strength</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', justifyBetween: 'space-between', fontSize: '13px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                   <span>Domain Trust score:</span> <span style={{ fontWeight: 'bold' }}>42/100</span>
                 </div>
-                <div style={{ display: 'flex', justifyBetween: 'space-between', fontSize: '13px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                   <span>Total backlinks:</span> <span style={{ fontWeight: 'bold' }}>1,284</span>
                 </div>
-                <div style={{ display: 'flex', justifyBetween: 'space-between', fontSize: '13px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
                   <span>Dofollow links:</span> <span style={{ fontWeight: 'bold', color: '#10B981' }}>86%</span>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {mockAuditIssues.map((issue, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyBetween: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--gray-50)', borderRadius: '8px' }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '13px' }}>{issue.issue}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{issue.pages}</div>
@@ -338,13 +338,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
                     <td><span className="badge badge-success">Done</span></td>
                     <td>{rep.viewCount} views</td>
                     <td>
-                      <a href={`/r/${rep.shareSlug}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <a href={`/report/${rep.shareSlug}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         View public link <ExternalLink size={12} />
                       </a>
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <Link href={`/r/${rep.shareSlug}`} className="btn btn-secondary btn-sm"><Eye size={12} /> View</Link>
+                        <Link href={`/report/${rep.shareSlug}`} className="btn btn-secondary btn-sm"><Eye size={12} /> View</Link>
                       </div>
                     </td>
                   </tr>

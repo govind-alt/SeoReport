@@ -5,15 +5,16 @@ import { useParams } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import {
   LayoutDashboard, FileText, User,
-  BarChart2, TrendingUp, ChevronRight, ChevronDown, Menu, Sparkles, LogOut
+  BarChart2, TrendingUp, ChevronRight, ChevronDown, Menu, Sparkles, LogOut, Sliders
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard',  icon: LayoutDashboard, path: '/c/dashboard' },
-  { id: 'reports',   label: 'My Reports', icon: FileText,         path: '/c/dashboard#reports' },
-  { id: 'rankings',  label: 'Rankings',   icon: TrendingUp,       path: '/c/dashboard#rankings' },
-  { id: 'analytics', label: 'Analytics',  icon: BarChart2,        path: '/c/dashboard#analytics' },
-  { id: 'profile',   label: 'Profile',    icon: User,             path: '/c/dashboard#profile' },
+  { id: 'dashboard',   label: 'Dashboard',       icon: LayoutDashboard, path: '/client/dashboard' },
+  { id: 'reports',     label: 'My Reports',      icon: FileText,         path: '/client/dashboard#reports' },
+  { id: 'rankings',    label: 'Rankings',        icon: TrendingUp,       path: '/client/dashboard#rankings' },
+  { id: 'analytics',   label: 'Analytics',       icon: BarChart2,        path: '/client/dashboard#analytics' },
+  { id: 'manage-data', label: 'Manage SEO Data', icon: Sliders,          path: '/client/dashboard#manage-data' },
+  { id: 'profile',     label: 'Profile',         icon: User,             path: '/client/dashboard#profile' },
 ];
 
 export default function ClientPortalLayout({ children }: { children: React.ReactNode }) {
@@ -390,7 +391,7 @@ export default function ClientPortalLayout({ children }: { children: React.React
             </div>
             <button
               className="cp-signout-btn"
-              onClick={() => signOut({ callbackUrl: `/${domain}/c/login` })}
+              onClick={() => signOut({ callbackUrl: `/${domain}/client/login` })}
               title="Sign out"
             >
               <LogOut size={14} />

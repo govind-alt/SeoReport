@@ -3,11 +3,12 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { downloadInvoicePDF, getInvoiceHTML } from '@/lib/invoicePdfGenerator';
 import {
   Settings, Palette, Key, Users, CreditCard, Save, CheckCircle, AlertCircle,
   ExternalLink, Shield, Mail, Lock, Eye, EyeOff, Globe, Building2,
   Bell, RefreshCw, Copy, Trash2, UserPlus, ChevronRight, ArrowUpRight,
-  Download, FileText, XCircle, Info, Activity, Code2, Plus, Laptop, Tablet, MobileIcon
+  Download, FileText, XCircle, Info, Activity, Code2, Plus, Laptop, Tablet, Smartphone
 } from 'lucide-react';
 
 type Tab = 'general' | 'branding' | 'api-keys' | 'team' | 'billing' | 'notifications' | 'security';
@@ -149,13 +150,27 @@ function SettingsContent() {
   // Security
   const [mfaEnabled, setMfaEnabled] = useState(false);
 
-  const [plan] = useState('pro');
+  // Billing
+  const [plan, setPlan] = useState<'starter' | 'pro' | 'agency'>('pro');
+  const [paymentMethod, setPaymentMethod] = useState({ type: 'Visa', last4: '4242', exp: '12/28', holder: 'Alex Johnson' });
+  const [upgradeTargetPlan, setUpgradeTargetPlan] = useState<'starter' | 'pro' | 'agency' | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isPortalModalOpen, setIsPortalModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelStatus, setCancelStatus] = useState<'active' | 'canceling'>('active');
+  const [cardHolderInput, setCardHolderInput] = useState('Alex Johnson');
+  const [cardNumberInput, setCardNumberInput] = useState('4242 4242 4242 4242');
+  const [cardExpInput, setCardExpInput] = useState('12/28');
+  const [cardCvcInput, setCardCvcInput] = useState('123');
+  const [selectedInvoiceForModal, setSelectedInvoiceForModal] = useState<typeof INVOICES[0] | null>(null);
+  const [isDownloadingPdfModal, setIsDownloadingPdfModal] = useState(false);
 
   useEffect(() => {
     fetch('/api/agency/settings')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
+        if (data.plan) setPlan(data.plan);
         if (data.name)         setAgencyName(data.name);
         if (data.subdomain)    setSubdomain(data.subdomain);
         if (data.billingEmail) setBillingEmail(data.billingEmail);
@@ -751,7 +766,15 @@ function SettingsContent() {
                       <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.5px', marginBottom: 6 }}>${meta.price}<span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></div>
                       <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14, height: 36 }}>{meta.desc}</div>
                       <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20, borderTop: '1px solid var(--border)', paddingTop: 14, fontWeight: 600 }}>{meta.clients === 999 ? 'Unlimited' : meta.clients} clients · {meta.reports}</div>
-                      {!isActive && <button className="btn btn-primary" style={{ width: '100%', fontSize: 12, justifyContent: 'center', borderRadius: 8, padding: '10px 0' }} onClick={() => toast.info(`Upgrade to ${p} plan coming soon`)}>Upgrade Tier</button>}
+                      {!isActive && (
+                        <button
+                          className="btn btn-primary"
+                          style={{ width: '100%', fontSize: 12, justifyContent: 'center', borderRadius: 8, padding: '10px 0' }}
+                          onClick={() => setUpgradeTargetPlan(p)}
+                        >
+                          Upgrade Tier
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -762,16 +785,31 @@ function SettingsContent() {
                 <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 20, background: 'var(--gray-50)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 6 }}>Next Invoice</div>
-                    <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>$149.00</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Billed on <strong>Aug 1, 2026</strong></div>
+                    <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>
+                      ${PLAN_META[plan].price}.00
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                      {cancelStatus === 'canceling' ? (
+                        <span style={{ color: '#EF4444', fontWeight: 700 }}>Canceling on Aug 1, 2026</span>
+                      ) : (
+                        <>Billed on <strong>Aug 1, 2026</strong></>
+                      )}
+                    </div>
                   </div>
-                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--primary)' }} />
+                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: cancelStatus === 'canceling' ? '#EF4444' : 'var(--primary)' }} />
                 </div>
                 <div style={{ border: '1px solid var(--border)', borderRadius: 12, padding: 20, background: 'var(--gray-50)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 6 }}>Payment Method</div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}><span>💳</span> Visa ending in 4242</div>
-                    <button style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary-dark)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }} onClick={() => toast.info('Billing portal opening soon')}>Update Details →</button>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span>💳</span> {paymentMethod.type} ending in {paymentMethod.last4}
+                    </div>
+                    <button
+                      style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary-dark)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => setIsPaymentModalOpen(true)}
+                    >
+                      Update Details →
+                    </button>
                   </div>
                 </div>
               </div>
@@ -783,23 +821,57 @@ function SettingsContent() {
                 </div>
                 {INVOICES.map((inv, i) => (
                   <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 100px 40px', padding: '16px 20px', borderBottom: i < INVOICES.length - 1 ? '1px solid var(--border)' : 'none', alignItems: 'center', background: 'var(--surface)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <FileText size={14} style={{ color: 'var(--text-muted)' }} />
-                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{inv.id}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => setSelectedInvoiceForModal(inv)}>
+                      <FileText size={14} style={{ color: 'var(--primary)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', textDecoration: 'underline', textUnderlineOffset: '3px' }}>{inv.id}</span>
+                      <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 12, background: 'rgba(79,142,247,0.08)', color: 'var(--primary)', fontWeight: 700 }}>Preview PDF</span>
                     </div>
                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{inv.date}</span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{inv.amount}</span>
-                    <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: 6, borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => toast.success(`Downloading ${inv.id}…`)}>
+                    <button
+                      title="Download PDF Invoice file"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: 6, borderRadius: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        toast.loading(`Generating PDF ${inv.id}…`);
+                        try {
+                          await downloadInvoicePDF({
+                            id: inv.id,
+                            date: inv.date,
+                            amount: inv.amount,
+                            agencyName,
+                            billingEmail,
+                            paymentMethod: `${paymentMethod.type} ending in ${paymentMethod.last4}`,
+                            planName: plan,
+                            status: inv.status,
+                          });
+                          toast.dismiss();
+                          toast.success(`Downloaded RankFlow_Invoice_${inv.id}.pdf`);
+                        } catch {
+                          toast.dismiss();
+                          toast.error('Failed to export PDF invoice');
+                        }
+                      }}
+                    >
                       <Download size={14} />
                     </button>
                   </div>
                 ))}
               </div>
+
               <div style={{ marginTop: 24, display: 'flex', gap: 12 }}>
-                <button className="btn btn-secondary" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 8 }} onClick={() => toast.info('Billing portal opening soon')}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 8 }}
+                  onClick={() => setIsPortalModalOpen(true)}
+                >
                   <ExternalLink size={12} /> Manage Billing Portal
                 </button>
-                <button className="btn btn-secondary" style={{ fontSize: 12, color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', padding: '10px 18px', borderRadius: 8 }} onClick={() => toast.info('To cancel, contact support@rankflow.app')}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: 12, color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', padding: '10px 18px', borderRadius: 8 }}
+                  onClick={() => setIsCancelModalOpen(true)}
+                >
                   Cancel Subscription
                 </button>
               </div>
@@ -968,6 +1040,362 @@ function SettingsContent() {
                 {isSavingKey ? <RefreshCw size={13} className="spinner" /> : <Lock size={13} />}
                 {isSavingKey ? 'Encrypting…' : 'Save Encrypted Key'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Plan Modal */}
+      {upgradeTargetPlan && (
+        <div className="modal-overlay active" onClick={() => setUpgradeTargetPlan(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 500, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(99,102,241,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CreditCard size={18} style={{ color: '#6366F1' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>
+                    Upgrade to {upgradeTargetPlan.toUpperCase()} Plan
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                    ${PLAN_META[upgradeTargetPlan].price}/month · Billed monthly
+                  </div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setUpgradeTargetPlan(null)}>✕</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '24px' }}>
+              <div style={{ background: 'var(--gray-50)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Tier Feature Highlights:</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
+                  <div>✔ Max Clients Quota: <strong>{PLAN_META[upgradeTargetPlan].clients === 999 ? 'Unlimited' : PLAN_META[upgradeTargetPlan].clients} Clients</strong></div>
+                  <div>✔ Monthly Reports Limit: <strong>{PLAN_META[upgradeTargetPlan].reports}</strong></div>
+                  <div>✔ White-Label PDF Reports & Custom Domain CNAME</div>
+                  <div>✔ Priority Agency Technical Support</div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                Your payment method ({paymentMethod.type} ending in {paymentMethod.last4}) will be charged <strong>${PLAN_META[upgradeTargetPlan].price}.00</strong> prorated for the rest of the billing cycle.
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 28px', display: 'flex', gap: 10 }}>
+              <button className="btn btn-secondary" onClick={() => setUpgradeTargetPlan(null)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => {
+                  setPlan(upgradeTargetPlan);
+                  setCancelStatus('active');
+                  toast.success(`Successfully upgraded to ${upgradeTargetPlan.toUpperCase()} tier ($${PLAN_META[upgradeTargetPlan].price}/mo)!`);
+                  setUpgradeTargetPlan(null);
+                }}
+              >
+                Confirm Upgrade
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Details Modal */}
+      {isPaymentModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsPaymentModalOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 480, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(79,142,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CreditCard size={18} style={{ color: '#4F8EF7' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>Update Payment Method</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Update your default billing credit card</div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setIsPaymentModalOpen(false)}>✕</button>
+            </div>
+
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const last4 = cardNumberInput.replace(/\s+/g, '').slice(-4) || '4242';
+              const cardType = cardNumberInput.startsWith('5') ? 'Mastercard' : cardNumberInput.startsWith('3') ? 'Amex' : 'Visa';
+              setPaymentMethod({ type: cardType, last4, exp: cardExpInput, holder: cardHolderInput });
+              setIsPaymentModalOpen(false);
+              toast.success(`Payment method updated to ${cardType} ending in ${last4}.`);
+            }}>
+              <div className="modal-body" style={{ padding: '24px' }}>
+                <div className="form-group" style={{ marginBottom: 14 }}>
+                  <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>Cardholder Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={cardHolderInput}
+                    onChange={e => setCardHolderInput(e.target.value)}
+                    className="form-input"
+                    style={{ fontSize: 13 }}
+                  />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 14 }}>
+                  <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>Card Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="4242 4242 4242 4242"
+                    value={cardNumberInput}
+                    onChange={e => setCardNumberInput(e.target.value)}
+                    className="form-input"
+                    style={{ fontSize: 13, fontFamily: 'monospace' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>Expiry (MM/YY)</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="12/28"
+                      value={cardExpInput}
+                      onChange={e => setCardExpInput(e.target.value)}
+                      className="form-input"
+                      style={{ fontSize: 13, fontFamily: 'monospace' }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>CVC</label>
+                    <input
+                      type="password"
+                      required
+                      maxLength={4}
+                      placeholder="•••"
+                      value={cardCvcInput}
+                      onChange={e => setCardCvcInput(e.target.value)}
+                      className="form-input"
+                      style={{ fontSize: 13, fontFamily: 'monospace' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 28px', display: 'flex', gap: 10 }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setIsPaymentModalOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>Save Payment Card</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Stripe Billing Portal Modal */}
+      {isPortalModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsPortalModalOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 560, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(99,102,241,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ExternalLink size={18} style={{ color: '#6366F1' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>Stripe Billing Portal</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Manage invoice receipts and customer billing account</div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setIsPortalModalOpen(false)}>✕</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '24px' }}>
+              <div style={{ background: 'var(--gray-50)', padding: 18, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>Active Subscription Summary</div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div>Plan: <strong style={{ color: 'var(--primary)', textTransform: 'capitalize' }}>RankFlow {plan} Tier</strong></div>
+                  <div>Monthly Cost: <strong>${PLAN_META[plan].price}.00 / month</strong></div>
+                  <div>Next Renewal: <strong>Aug 1, 2026</strong></div>
+                  <div>Billing Email: <strong>{billingEmail}</strong></div>
+                </div>
+              </div>
+
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Billing Actions:</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <button
+                  onClick={() => { setIsPortalModalOpen(false); setIsPaymentModalOpen(true); }}
+                  className="btn btn-secondary"
+                  style={{ justifyContent: 'space-between', padding: '10px 14px', fontSize: 12 }}
+                >
+                  <span>Update Default Credit Card ({paymentMethod.type} •••• {paymentMethod.last4})</span>
+                  <ChevronRight size={14} />
+                </button>
+                <button
+                  onClick={() => { toast.success('Sent full PDF receipts to ' + billingEmail); setIsPortalModalOpen(false); }}
+                  className="btn btn-secondary"
+                  style={{ justifyContent: 'space-between', padding: '10px 14px', fontSize: 12 }}
+                >
+                  <span>Email All Past Invoices to {billingEmail}</span>
+                  <ChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 28px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="btn btn-primary" onClick={() => setIsPortalModalOpen(false)}>Close Portal</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Subscription Modal */}
+      {isCancelModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsCancelModalOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 480, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <AlertCircle size={18} style={{ color: '#EF4444' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>Cancel Subscription</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>RankFlow {plan.toUpperCase()} Plan</div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setIsCancelModalOpen(false)}>✕</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '24px' }}>
+              <div style={{ fontSize: 13, color: 'var(--text-primary)', marginBottom: 14, lineHeight: 1.5 }}>
+                Are you sure you want to cancel your <strong>RankFlow {plan.toUpperCase()}</strong> subscription?
+              </div>
+
+              <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 10, padding: 14, marginBottom: 20, fontSize: 12, color: '#92400E', lineHeight: 1.5 }}>
+                💡 <strong>Retention Offer:</strong> Get <strong>50% off for the next 2 months</strong> (${(PLAN_META[plan].price / 2).toFixed(2)}/mo instead of ${PLAN_META[plan].price}.00/mo).
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ flex: 1, justifyContent: 'center', fontSize: 12, background: '#ECFDF5', borderColor: '#A7F3D0', color: '#059669', fontWeight: 700 }}
+                  onClick={() => {
+                    setIsCancelModalOpen(false);
+                    toast.success('Applied 50% discount for next 2 months!');
+                  }}
+                >
+                  Claim 50% Discount
+                </button>
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 28px', display: 'flex', gap: 10 }}>
+              <button className="btn btn-secondary" onClick={() => setIsCancelModalOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>Keep Subscription</button>
+              <button
+                className="btn btn-secondary"
+                style={{ flex: 1, justifyContent: 'center', color: '#DC2626', borderColor: 'rgba(220,38,38,0.3)', background: 'rgba(220,38,38,0.06)' }}
+                onClick={() => {
+                  setCancelStatus('canceling');
+                  setIsCancelModalOpen(false);
+                  toast.warning('Subscription scheduled for cancellation on Aug 1, 2026.');
+                }}
+              >
+                Confirm Cancellation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Executive Invoice Preview & Download Modal */}
+      {selectedInvoiceForModal && (
+        <div className="modal-overlay active" onClick={() => setSelectedInvoiceForModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 860, maxWidth: '92vw', maxHeight: '92vh', overflowY: 'auto', borderRadius: 16, padding: 0 }}>
+            {/* Modal Header */}
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '16px 24px', background: 'var(--surface)', position: 'sticky', top: 0, zIndex: 10, borderRadius: '16px 16px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(79,142,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <FileText size={18} style={{ color: 'var(--primary)' }} />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Invoice Document ({selectedInvoiceForModal.id})</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2, whiteSpace: 'nowrap' }}>Issued on {selectedInvoiceForModal.date} · {selectedInvoiceForModal.amount}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <button
+                  className="btn btn-secondary"
+                  style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 8, whiteSpace: 'nowrap' }}
+                  onClick={() => {
+                    const win = window.open('', '_blank');
+                    if (win) {
+                      win.document.write(getInvoiceHTML({
+                        id: selectedInvoiceForModal.id,
+                        date: selectedInvoiceForModal.date,
+                        amount: selectedInvoiceForModal.amount,
+                        agencyName,
+                        billingEmail,
+                        paymentMethod: `${paymentMethod.type} ending in ${paymentMethod.last4}`,
+                        planName: plan,
+                        status: selectedInvoiceForModal.status,
+                      }));
+                      win.document.close();
+                      win.focus();
+                      setTimeout(() => win.print(), 300);
+                    }
+                  }}
+                >
+                  <Copy size={13} /> Print Invoice
+                </button>
+
+                <button
+                  className="btn btn-primary"
+                  disabled={isDownloadingPdfModal}
+                  style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 18px', borderRadius: 8, whiteSpace: 'nowrap' }}
+                  onClick={async () => {
+                    setIsDownloadingPdfModal(true);
+                    toast.loading(`Generating PDF ${selectedInvoiceForModal.id}…`);
+                    try {
+                      await downloadInvoicePDF({
+                        id: selectedInvoiceForModal.id,
+                        date: selectedInvoiceForModal.date,
+                        amount: selectedInvoiceForModal.amount,
+                        agencyName,
+                        billingEmail,
+                        paymentMethod: `${paymentMethod.type} ending in ${paymentMethod.last4}`,
+                        planName: plan,
+                        status: selectedInvoiceForModal.status,
+                      });
+                      toast.dismiss();
+                      toast.success(`Downloaded ${selectedInvoiceForModal.id}.pdf successfully!`);
+                    } catch {
+                      toast.dismiss();
+                      toast.error('Failed to generate PDF document');
+                    } finally {
+                      setIsDownloadingPdfModal(false);
+                    }
+                  }}
+                >
+                  {isDownloadingPdfModal ? <RefreshCw size={13} className="spinner" /> : <Download size={13} />}
+                  {isDownloadingPdfModal ? 'Exporting PDF…' : 'Download PDF File'}
+                </button>
+
+                <button className="modal-close" onClick={() => setSelectedInvoiceForModal(null)} style={{ marginLeft: 4 }}>✕</button>
+              </div>
+            </div>
+
+            {/* Live Render Preview Container */}
+            <div style={{ padding: '24px 20px', background: '#F8FAFC', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: '100%', maxWidth: '740px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', borderRadius: 12, overflow: 'hidden', background: '#FFFFFF' }}
+                dangerouslySetInnerHTML={{
+                  __html: getInvoiceHTML({
+                    id: selectedInvoiceForModal.id,
+                    date: selectedInvoiceForModal.date,
+                    amount: selectedInvoiceForModal.amount,
+                    agencyName,
+                    billingEmail,
+                    paymentMethod: `${paymentMethod.type} ending in ${paymentMethod.last4}`,
+                    planName: plan,
+                    status: selectedInvoiceForModal.status,
+                  })
+                }}
+              />
             </div>
           </div>
         </div>

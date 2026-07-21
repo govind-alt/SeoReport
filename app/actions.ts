@@ -170,7 +170,17 @@ export async function registerAgency(data: any) {
 export async function getClients(domain: string) {
   const agency = await prisma.agency.findFirst({
     where: { OR: [{ slug: domain }, { subdomain: domain }] },
-    include: { clients: { include: { auditSnapshots: { orderBy: { date: 'desc' }, take: 1 } } } }
+    include: {
+      clients: {
+        include: {
+          serankingProject: {
+            include: {
+              auditSnapshots: { orderBy: { date: 'desc' }, take: 1 }
+            }
+          }
+        }
+      }
+    }
   });
   if (!agency) return [];
 
@@ -178,7 +188,7 @@ export async function getClients(domain: string) {
     id: c.id,
     name: c.name,
     website: c.domain,
-    health: c.auditSnapshots[0]?.healthScore ?? null,
+    health: c.serankingProject?.auditSnapshots[0]?.healthScore ?? null,
     initials: c.name.substring(0, 2).toUpperCase(),
     color: '#4F46E5',
     lastReport: 'N/A',
@@ -231,3 +241,197 @@ export async function createClient(domain: string, data: {
   revalidatePath('/[domain]/clients', 'page');
   return { success: true, client };
 }
+
+export async function registerClient(data: any) {
+  const { firstName, lastName, email, companyName, domain, password } = data;
+
+  if (!firstName || !lastName || !email || !companyName || !domain || !password) {
+    return { error: 'Missing required fields' };
+  }
+
+  try {
+    // Check if email already registered
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return { error: 'Email already registered' };
+    }
+
+    const sanitizedDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const slug = companyName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 1. Create the Agency
+    const agency = await prisma.agency.create({
+      data: {
+        name: `${companyName} Agency`,
+        slug,
+        subdomain: slug,
+        plan: 'pro'
+      }
+    });
+
+    // 2. Create the User (role: client)
+    const user = await prisma.user.create({
+      data: {
+        name: `${firstName} ${lastName}`.trim(),
+        email,
+        password: hashedPassword,
+        role: 'client',
+        agencyId: agency.id
+      }
+    });
+
+    // 3. Create the Client
+    const client = await prisma.client.create({
+      data: {
+        name: companyName,
+        domain: sanitizedDomain,
+        contactEmail: email,
+        contactName: `${firstName} ${lastName}`.trim(),
+        agencyId: agency.id
+      }
+    });
+
+    // 4. Create Accepted Invitation so Client Dashboard resolves immediately
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(20).toString('hex');
+    await prisma.invitation.create({
+      data: {
+        email,
+        token,
+        agencyId: agency.id,
+        clientId: client.id,
+        invitedById: user.id,
+        acceptedAt: new Date(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      }
+    });
+
+    // 5. Create SERankingProject
+    const serankingId = Math.floor(1000000 + Math.random() * 9000000);
+    const project = await prisma.sERankingProject.create({
+      data: {
+        serankingId,
+        name: companyName,
+        url: sanitizedDomain,
+        clientId: client.id
+      }
+    });
+
+    // 6. Seed 6 months of historical keyword and analytics snapshots
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 15);
+      const monthName = months[date.getMonth()];
+      
+      const factor = 1 + (5 - i) * 0.08; // gradual positive growth trend
+      const top3Count = Math.round(10 * factor);
+      const top10Count = Math.round(35 * factor);
+      const top30Count = Math.round(90 * factor);
+      const totalKeywords = Math.round(200 * factor);
+      const avgPosition = parseFloat((22.4 - (5 - i) * 0.8).toFixed(1));
+
+      const sessions = Math.round(5000 * factor);
+      const clicks = Math.round(6000 * factor);
+      const impressions = Math.round(100000 * factor);
+      const ctr = parseFloat((clicks / impressions).toFixed(4));
+
+      await prisma.keywordSnapshot.create({
+        data: {
+          date,
+          serankingProjectId: project.id,
+          top3Count,
+          top10Count,
+          top30Count,
+          top100Count: totalKeywords,
+          totalKeywords,
+          avgPosition,
+          positionsJson: JSON.stringify([
+            { keyword: 'seo services', pos: Math.round(15 - (5-i)), change: 1, vol: 1600, url: '/services' },
+            { keyword: 'rank checking', pos: Math.round(8 - (5-i)), change: 2, vol: 880, url: '/features' },
+            { keyword: 'report builder', pos: Math.round(4 - (5-i)), change: 3, vol: 1200, url: '/' },
+          ])
+        }
+      });
+
+      await prisma.analyticsSnapshot.create({
+        data: {
+          date,
+          serankingProjectId: project.id,
+          organicSessions: sessions,
+          clicks,
+          impressions,
+          ctr,
+          avgPosition: 12.5,
+          topQueriesJson: JSON.stringify([
+            { query: 'seo services', impressions: Math.round(4000 * factor), clicks: Math.round(300 * factor), ctr: 0.075 },
+            { query: 'rank checking', impressions: Math.round(2500 * factor), clicks: Math.round(180 * factor), ctr: 0.072 },
+          ]),
+          topPagesJson: JSON.stringify([
+            { page: '/', clicks: Math.round(4000 * factor), impressions: Math.round(60000 * factor) },
+            { page: '/features', clicks: Math.round(2000 * factor), impressions: Math.round(40000 * factor) },
+          ])
+        }
+      });
+    }
+
+    // Also seed a default audit and backlink snapshot for current date
+    await prisma.auditSnapshot.create({
+      data: {
+        date: now,
+        serankingProjectId: project.id,
+        healthScore: 78,
+        pagesCrawled: 154,
+        criticalIssues: 2,
+        warningIssues: 12,
+        noticeIssues: 25,
+        issuesJson: JSON.stringify([
+          { issue: 'Broken Link', severity: 'critical', count: 2, pages: '/about, /blog' },
+          { issue: 'Missing Alt Text', severity: 'warning', count: 12, pages: '12 pages' },
+        ])
+      }
+    });
+
+    await prisma.backlinkSnapshot.create({
+      data: {
+        date: now,
+        serankingProjectId: project.id,
+        domainTrust: 42,
+        totalBacklinks: 2450,
+        newBacklinks: 15,
+        lostBacklinks: 3,
+        referringDomains: 124,
+        dofollowLinks: 1800,
+        nofollowLinks: 650
+      }
+    });
+
+    // Seed 1 default report card for the client
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    await prisma.report.create({
+      data: {
+        clientId: client.id,
+        periodStart: firstOfMonth,
+        periodEnd: lastOfMonth,
+        status: 'done',
+        generatedAt: now,
+        aiRecsJson: JSON.stringify([
+          { priority: 'critical', title: 'Fix broken links', detail: '2 broken links found on /about and /blog.', impact: 'High' },
+          { priority: 'high', title: 'Optimize image alt text', detail: '12 images lack alt text tags.', impact: 'Medium' }
+        ]),
+        sectionsJson: JSON.stringify({ keywords: true, backlinks: true, audit: true, analytics: true }),
+        shareSlug: crypto.randomBytes(7).toString('base64url').slice(0, 10),
+      }
+    });
+
+    return { success: true, client };
+  } catch (err: any) {
+    console.error('Client registration error:', err);
+    return { error: err.message || 'Failed to create client account' };
+  }
+}
+

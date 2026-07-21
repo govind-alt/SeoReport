@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function ReportWizardPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
@@ -11,17 +12,55 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
   
   const [step, setStep] = useState(1);
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [clients, setClients] = useState<any[]>([]);
+  const [generating, setGenerating] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState('last-month');
 
   // Base path for navigation
   const basePath = `/${domain}`;
 
+  useEffect(() => {
+    fetch('/api/clients')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setClients(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
   const nextStep = () => setStep(s => Math.min(4, s + 1));
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
-  const handleGenerate = () => {
-    // In a real app, this would call an API route to generate the report
-    alert('Generating report...');
-    router.push(`${basePath}/reports`);
+  const handleGenerate = async () => {
+    if (!selectedClientId) {
+      toast.error('Please select a client first');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const now = new Date();
+      const periodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const periodEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+      
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: selectedClientId,
+          periodStart: periodStart.toISOString(),
+          periodEnd: periodEnd.toISOString(),
+          sections: { keywords: true, backlinks: true, audit: true, analytics: true, aiRecs: true },
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create report');
+      }
+      toast.success('Report created! Generating now…');
+      router.push(`${basePath}/reports`);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to generate report');
+      setGenerating(false);
+    }
   };
 
   return (
@@ -86,12 +125,17 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
             </div>
 
             <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-              {['Acme Corp', 'TechStart', 'GreenLeaf', 'BlueSky'].map((client, idx) => {
-                const isSelected = selectedClient === client;
+              {(clients.length > 0 ? clients : [
+                { id: 'demo-1', name: 'Acme Corp', domain: 'acme.com' },
+                { id: 'demo-2', name: 'TechStart', domain: 'techstart.io' },
+                { id: 'demo-3', name: 'GreenLeaf', domain: 'greenleaf.co' },
+                { id: 'demo-4', name: 'BlueSky', domain: 'bluesky.co.uk' },
+              ]).map((client: any, idx: number) => {
+                const isSelected = selectedClient === client.name;
                 return (
                   <div 
-                    key={client}
-                    onClick={() => setSelectedClient(client)}
+                    key={client.id}
+                    onClick={() => { setSelectedClient(client.name); setSelectedClientId(client.id); }}
                     style={{
                       border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
                       borderRadius: '8px',
@@ -102,17 +146,16 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
                   >
                     <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
                       <div style={{width: '36px', height: '36px', borderRadius: '6px', background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: 'var(--text-muted)'}}>
-                        LOGO
+                        {client.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <div style={{fontSize: '14px', fontWeight: 700, color: isSelected ? 'var(--primary)' : 'inherit'}}>{client} {isSelected && '✓'}</div>
-                        <div style={{fontSize: '11px', color: 'var(--text-muted)'}}>{client.toLowerCase().replace(' ', '')}.com</div>
+                        <div style={{fontSize: '14px', fontWeight: 700, color: isSelected ? 'var(--primary)' : 'inherit'}}>{client.name} {isSelected && '✓'}</div>
+                        <div style={{fontSize: '11px', color: 'var(--text-muted)'}}>{client.domain}</div>
                       </div>
                     </div>
                     <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
-                      <span className="badge badge-success">GSC ✅</span>
-                      <span className="badge badge-primary">{124 - idx * 20} kws</span>
-                      {idx === 0 && <span className="badge badge-secondary">Health 76%</span>}
+                      <span className="badge badge-success">Active</span>
+                      <span className="badge badge-primary">{client.industry || 'Client'}</span>
                     </div>
                   </div>
                 )
@@ -374,8 +417,8 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
                 </div>
               </div>
 
-              <button className="btn btn-primary" onClick={handleGenerate} style={{width: '100%', justifyContent: 'center', padding: '12px', marginTop: '16px', fontSize: '14px'}}>
-                🚀 Generate Report Now
+              <button className="btn btn-primary" onClick={handleGenerate} disabled={generating} style={{width: '100%', justifyContent: 'center', padding: '12px', marginTop: '16px', fontSize: '14px'}}>
+                {generating ? '⏳ Generating…' : '🚀 Generate Report Now'}
               </button>
             </div>
           </div>

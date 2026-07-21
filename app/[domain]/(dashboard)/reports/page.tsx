@@ -272,7 +272,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
       const res = await fetch(`/api/reports/${id}/share`, { method: 'POST' });
       if (!res.ok) throw new Error();
       const { shareSlug } = await res.json();
-      const shareUrl = `${window.location.origin}/r/${shareSlug}`;
+      const shareUrl = `${window.location.origin}/report/${shareSlug}`;
       await navigator.clipboard.writeText(shareUrl).catch(() => {});
       toast.success('Share link copied to clipboard!', { id: 'share' });
     } catch {

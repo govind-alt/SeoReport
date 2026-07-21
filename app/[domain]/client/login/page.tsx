@@ -31,7 +31,7 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
         setError('Invalid email or password. Please check your credentials.');
         setLoading(false);
       } else {
-        window.location.href = `http://${window.location.host}/c/dashboard`;
+        window.location.href = `http://${window.location.host}/client/dashboard`;
       }
     } catch {
       setError('Something went wrong. Please try again.');
@@ -43,7 +43,7 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
     setGoogleLoading(true);
     const host = window.location.host;
     await signIn('google', {
-      callbackUrl: `http://${host}/c/dashboard`,
+      callbackUrl: `http://${host}/client/dashboard`,
     });
   };
 

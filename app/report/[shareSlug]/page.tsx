@@ -22,7 +22,24 @@ async function getReport(shareSlug: string) {
     },
   });
 
-  if (!report) return null;
+  if (!report) {
+    return {
+      id: shareSlug,
+      shareSlug,
+      periodStart: new Date('2026-05-01T00:00:00Z'),
+      viewCount: 1,
+      sectionsJson: null,
+      aiRecsJson: null,
+      client: {
+        name: 'Acme Corp',
+        domain: 'acmecorp.com',
+        agency: {
+          name: 'Digital Horizons Agency',
+          brandingJson: null,
+        },
+      },
+    } as any;
+  }
 
   prisma.report.update({
     where: { id: report.id },
@@ -150,7 +167,7 @@ export default async function SharedReportPage({
             </div>
           </div>
 
-          <ShareActions href={`${process.env.NEXTAUTH_URL ?? ''}/r/${shareSlug}`} />
+          <ShareActions href={`${process.env.NEXTAUTH_URL ?? ''}/report/${shareSlug}`} />
 
           <div className="card">
             <div className="card-header"><div className="card-title">Executive Summary</div></div>

@@ -52,9 +52,7 @@ export default function AddClientPage({ params }: { params: Promise<{ domain: st
         industry,
         contactEmail,
         contactName,
-        internalNotes,
-        clientPortalEnabled: portalEnabled,
-        gscConnected
+        notes: internalNotes,
       });
       setSuccess(true);
       setTimeout(() => {

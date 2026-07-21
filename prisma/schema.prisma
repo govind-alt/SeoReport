@@ -32,6 +32,7 @@ model Agency {
   reportSchedules ReportSchedule[]
   invitations     Invitation[]
   notifications   Notification[]
+  messages        Message[]
 }
 
 model User {
@@ -108,6 +109,7 @@ model Client {
   reports            Report[]
   reportSchedule     ReportSchedule?
   invitations        Invitation[]
+  messages           Message[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -285,3 +287,26 @@ model Notification {
   @@index([agencyId, createdAt])
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGES (Client Inbox)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Message {
+  id           String   @id @default(cuid())
+  subject      String?
+  body         String
+  isRead       Boolean  @default(false)
+  isFromAgency Boolean  @default(false)
+  senderName   String?
+  
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  agencyId     String
+  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+
+  @@index([agencyId, createdAt])
+  @@index([clientId, createdAt])
+}

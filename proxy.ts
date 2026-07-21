@@ -7,7 +7,7 @@ export const config = {
   ],
 };
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
   const hostname = req.headers.get('host') || '';
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000';
@@ -27,9 +27,15 @@ export default function middleware(req: NextRequest) {
     path.startsWith('/api/auth/') ||
     path.includes('/api/auth') ||
     path.startsWith('/reports/render/') || 
-    path.startsWith('/r/')
+    path.startsWith('/report/')
   ) {
     return NextResponse.next();
+  }
+
+  // Redirect old /c/ paths to /client/
+  if (path.startsWith('/c/')) {
+    url.pathname = path.replace(/^\/c\//, '/client/');
+    return NextResponse.redirect(url);
   }
 
   // Auth cookie check
@@ -45,10 +51,10 @@ export default function middleware(req: NextRequest) {
   const isPublicPath =
     path === '/' ||
     path.startsWith('/login') ||
-    path.startsWith('/c/login') ||
+    path.startsWith('/client/login') ||
     path.startsWith('/register') ||
     path.startsWith('/forgot-password') ||
-    path.startsWith('/r/'); // public share report links
+    path.startsWith('/report/'); // public share report links
 
   // Root domain — serve as-is
   const isRootDomain =
@@ -68,8 +74,8 @@ export default function middleware(req: NextRequest) {
       return NextResponse.next();
     }
 
-    // Client portal paths: /c/... → rewrite to /localhost/c/...
-    if (path.startsWith('/c/')) {
+    // Client portal paths: /client/... → rewrite to /localhost/client/...
+    if (path.startsWith('/client/')) {
       return NextResponse.rewrite(new URL(`/localhost${path}`, req.url));
     }
 
@@ -92,7 +98,7 @@ export default function middleware(req: NextRequest) {
     .split('.')[0];
 
   if (!isAuthenticated && !isPublicPath) {
-    url.pathname = '/c/login';
+    url.pathname = '/client/login';
     return NextResponse.redirect(url);
   }
 

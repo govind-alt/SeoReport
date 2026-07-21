@@ -3,7 +3,7 @@
 import './login.css';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { registerAgency } from '../../actions';
+import { registerClient } from '../../actions';
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState<'signin' | 'register' | 'forgot' | 'verify'>('signin');
@@ -56,7 +56,7 @@ export default function Login() {
         if (email === 'superadmin@rankflow.app') {
           window.location.href = '/admin';
         } else if (email === 'client@acme.com') {
-          window.location.href = '/c/dashboard';
+          window.location.href = '/client/dashboard';
         } else {
           // Agency admin — fetch their agency slug, then go to /{slug}/ path-based dashboard
           try {
@@ -91,12 +91,12 @@ export default function Login() {
 
     setLoading(true);
 
-    const res = await registerAgency({
+    const res = await registerClient({
       firstName: regFirstName,
       lastName: regLastName,
       email: regEmail,
-      agencyName: regAgency,
-      subdomain: regSubdomain.toLowerCase().replace(/[^a-z0-9-]/g, ''),
+      companyName: regAgency, // regAgency maps to Company Name in form
+      domain: regSubdomain,   // regSubdomain maps to Website Domain in form
       password: regPassword
     });
 
@@ -114,8 +114,7 @@ export default function Login() {
     });
 
     if (!loginRes?.error) {
-      // Redirect to their new subdomain
-      window.location.href = getSubdomainUrl(regSubdomain);
+      window.location.href = '/client/dashboard';
     } else {
       setActiveTab('signin');
       setLoading(false);
@@ -290,25 +289,22 @@ export default function Login() {
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="workEmail">Work Email <span className="req">*</span></label>
-                  <input className="form-input" id="workEmail" type="email" placeholder="john@youragency.com" required value={regEmail} onChange={e => setRegEmail(e.target.value)}/>
+                  <input className="form-input" id="workEmail" type="email" placeholder="john@acmecorp.com" required value={regEmail} onChange={e => setRegEmail(e.target.value)}/>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="agencyName">Agency Name <span className="req">*</span></label>
-                  <input className="form-input" id="agencyName" type="text" placeholder="Digital Horizons Agency" required value={regAgency} onChange={e => {
+                  <label className="form-label" htmlFor="agencyName">Company Name <span className="req">*</span></label>
+                  <input className="form-input" id="agencyName" type="text" placeholder="Acme Corp" required value={regAgency} onChange={e => {
                     setRegAgency(e.target.value);
                     if (!regSubdomain) {
-                      setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+                      setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com');
                     }
                   }}/>
-                  <div className="form-hint">Shown on all client reports</div>
+                  <div className="form-hint">Your company or organization name</div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label" htmlFor="subdomain">Agency Subdomain <span className="req">*</span></label>
-                  <div className="subdomain-group">
-                    <input className="form-input success" id="subdomain" type="text" placeholder="digital-horizons" value={regSubdomain} onChange={e => setRegSubdomain(e.target.value)} required/>
-                    <div className="subdomain-suffix">.rankflow.app</div>
-                  </div>
-                  {regSubdomain && <div className="form-hint" style={{color: 'var(--success)'}}>✓ Dashboard will be: {regSubdomain.toLowerCase().replace(/[^a-z0-9-]/g, '')}.rankflow.app</div>}
+                  <label className="form-label" htmlFor="subdomain">Website Domain <span className="req">*</span></label>
+                  <input className="form-input" id="subdomain" type="text" placeholder="acmecorp.com" value={regSubdomain} onChange={e => setRegSubdomain(e.target.value)} required/>
+                  <div className="form-hint">E.g., yourcompany.com (used to track rankings)</div>
                 </div>
                 <div className="form-group">
                   <label className="form-label" htmlFor="regPassword">Password <span className="req">*</span></label>
@@ -328,7 +324,7 @@ export default function Login() {
                   </div>
                 </div>
                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Creating Account...' : 'Create Agency Account →'}
+                  {loading ? 'Creating Account...' : 'Create Client Account →'}
                 </button>
               </form>
 

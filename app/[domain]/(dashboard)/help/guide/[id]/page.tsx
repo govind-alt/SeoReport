@@ -129,7 +129,7 @@ const GUIDES: Record<string, {
 };
 
 export default function GuidePage({ params }: { params: Promise<{ domain: string; id: string }> }) {
-  const { id } = use(params);
+  const { domain, id } = use(params);
   const guide = GUIDES[id];
 
   if (!guide) {
@@ -138,7 +138,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
         <BookOpen size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 16px', display: 'block' }} />
         <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>Guide not found</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>The guide you&apos;re looking for doesn&apos;t exist yet.</p>
-        <Link href="/help" className="btn btn-primary">← Back to Help Center</Link>
+        <Link href={`/${domain}/help`} className="btn btn-primary">← Back to Help Center</Link>
       </div>
     );
   }
@@ -147,7 +147,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
     <>
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/help" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, textDecoration: 'none' }}>
+          <Link href={`/${domain}/help`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, textDecoration: 'none' }}>
             <ArrowLeft size={14} /> Help Center
           </Link>
           <span style={{ color: 'var(--border)' }}>|</span>
@@ -241,7 +241,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
             <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Support team replies within 2 hours.</div>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <Link href="/help" style={{
+            <Link href={`/${domain}/help`} style={{
               display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px',
               borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface-2)',
               fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none',

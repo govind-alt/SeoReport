@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   BookOpen, Palette, CreditCard, Wrench, Search, Mail, Phone,
   ArrowRight, ChevronDown, MessageSquare, Info, ShieldAlert,
@@ -64,6 +65,8 @@ const FAQS = [
 ];
 
 export default function HelpPage() {
+  const params = useParams();
+  const domain = params?.domain as string || 'digital-horizons';
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isSending, setIsSending] = useState(false);
@@ -71,7 +74,7 @@ export default function HelpPage() {
   const [message, setMessage] = useState('');
   const [issueType, setIssueType] = useState('Technical Support');
 
-  const submitSupport = (e: React.FormEvent) => {
+  const submitSupport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!subject.trim() || !message.trim()) {
       toast.error('Please fill in all support fields.');
@@ -79,12 +82,25 @@ export default function HelpPage() {
     }
     setIsSending(true);
     
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ issueType, subject, message })
+      });
+
+      if (res.ok) {
+        setSubject('');
+        setMessage('');
+        toast.success('Support ticket created! Check your email for confirmation.');
+      } else {
+        toast.error('Failed to submit support ticket');
+      }
+    } catch {
+      toast.error('Network error submitting support ticket');
+    } finally {
       setIsSending(false);
-      setSubject('');
-      setMessage('');
-      toast.success('Support ticket created! Check your email for confirmation.');
-    }, 1500);
+    }
   };
 
   const filteredFaqs = FAQS.filter(
@@ -172,7 +188,7 @@ export default function HelpPage() {
             {/* Categories Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 36 }}>
               {filteredCategories.map(cat => (
-                <Link key={cat.id} href={`/help/guide/${cat.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link key={cat.id} href={`/${domain}/help/guide/${cat.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div style={{
                     background: 'var(--surface)',
                     border: '1px solid var(--border)',

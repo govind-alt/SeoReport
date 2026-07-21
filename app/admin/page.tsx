@@ -13,7 +13,8 @@ import {
   BarChart2, Lock, Settings, LogOut, Bell, Search,
   ArrowUpRight, ArrowDownRight, Database, Cpu,
   Download, X, Mail, Send, Check, UserPlus, ExternalLink,
-  FileText, LayoutDashboard, CreditCard, Sliders, TrendingDown
+  FileText, LayoutDashboard, CreditCard, Sliders, TrendingDown,
+  Radio, Megaphone, SlidersHorizontal, ToggleLeft, ToggleRight, Key, Plus, Edit2, Trash2, Terminal, CheckCircle, AlertTriangle, Layers, Wifi, CloudLightning
 } from 'lucide-react';
 
 /* ─── Types ─── */
@@ -117,7 +118,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
   suspended: { bg: '#FEF2F2', color: '#DC2626' },
 };
 
-type Tab = 'overview' | 'agencies' | 'users' | 'system' | 'billing';
+type Tab = 'overview' | 'agencies' | 'users' | 'system' | 'billing' | 'broadcast' | 'feature-flags' | 'integrations';
 
 /* ─── Modal Component ─── */
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
@@ -1387,10 +1388,53 @@ export default function SuperAdminDashboard() {
   const [agencies, setAgencies] = useState<Agency[]>(initialAgencies);
   const [users, setUsers] = useState<PlatformUser[]>(initialUsers);
 
+  // Broadcasts state
+  const [broadcasts, setBroadcasts] = useState([
+    { id: '1', title: 'Scheduled Platform Maintenance Notice', target: 'All Agencies & Clients', type: 'System Warning', date: 'Jul 20, 2026', status: 'active', reach: '29 agencies' },
+    { id: '2', title: 'New AI SEO Summary Recommendations Available', target: 'Pro & Enterprise', type: 'Feature Release', date: 'Jul 15, 2026', status: 'active', reach: '24 agencies' },
+    { id: '3', title: 'SERanking Gateway Update Required', target: 'All Agencies', type: 'Critical Alert', date: 'Jul 02, 2026', status: 'archived', reach: '29 agencies' },
+  ]);
+
+  const [newBroadcast, setNewBroadcast] = useState({
+    title: '',
+    target: 'All Agencies & Clients',
+    type: 'Feature Release',
+    message: '',
+    actionUrl: '',
+  });
+
+  // Feature flags state
+  const [featureFlags, setFeatureFlags] = useState({
+    publicSignups: true,
+    aiRecommendations: true,
+    autoSslProvisioning: true,
+    whiteLabelPdfs: true,
+    staggeredSync: true,
+    directMessaging: true,
+    maintenanceMode: false,
+  });
+
+  const [tierLimits, setTierLimits] = useState({
+    starter: { price: 99, maxClients: 5, maxKeywords: 50, maxReports: 15, seats: 2 },
+    pro: { price: 299, maxClients: 25, maxKeywords: 500, maxReports: 100, seats: 10 },
+    enterprise: { price: 999, maxClients: 999, maxKeywords: 10000, maxReports: 9999, seats: 50 },
+  });
+
+  // Integrations state
+  const [gateways, setGateways] = useState([
+    { id: 'seranking', name: 'SE Ranking API Gateway', key: 'ser_live_948f2j48dfh4982dh29d287dh91', status: 'Operational', limit: '1,000 req/min', latency: '34ms', tested: '1 min ago' },
+    { id: 'openai', name: 'OpenAI GPT-4o Service', key: 'sk-proj-498dh28hd92hd92dh28dhd28h2d', status: 'Operational', limit: '10,000 tokens/min', latency: '120ms', tested: '5 mins ago' },
+    { id: 'resend', name: 'Resend Email Gateway', key: 're_498dh28h_92hd28hd92hd92dh', status: 'Operational', limit: '500 emails/day', latency: '45ms', tested: '12 mins ago' },
+    { id: 'stripe', name: 'Stripe Billing Webhooks', key: 'whsec_9482jd982hd92hd92dh298dh', status: 'Operational', limit: 'Live Webhook Handler', latency: '18ms', tested: '3 mins ago' },
+  ]);
+
   // Modals
   const [viewAgency, setViewAgency] = useState<Agency | null>(null);
   const [agencyDashView, setAgencyDashView] = useState<Agency | null>(null);
   const [showInvite, setShowInvite] = useState(false);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [editAgencyModal, setEditAgencyModal] = useState<Agency | null>(null);
+  const [editUserModal, setEditUserModal] = useState<PlatformUser | null>(null);
   const [activeSystemModal, setActiveSystemModal] = useState<'security' | 'settings' | 'audit' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -1714,6 +1758,9 @@ export default function SuperAdminDashboard() {
             { id: 'users', label: 'Users', icon: <Users size={14} /> },
             { id: 'system', label: 'System Health', icon: <Server size={14} /> },
             { id: 'billing', label: 'Billing', icon: <DollarSign size={14} /> },
+            { id: 'broadcast', label: 'Broadcasts', icon: <Megaphone size={14} /> },
+            { id: 'feature-flags', label: 'Feature Flags', icon: <SlidersHorizontal size={14} /> },
+            { id: 'integrations', label: 'Integrations', icon: <Zap size={14} /> },
           ] as { id: Tab; label: string; icon: React.ReactNode }[]).map(tab => (
             <button
               key={tab.id}
@@ -1995,6 +2042,11 @@ export default function SuperAdminDashboard() {
                               style={{ padding: '5px 10px', border: '1px solid #E4E9F2', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12, color: '#475569', display: 'flex', alignItems: 'center', gap: 4 }}>
                               <Eye size={12} /> View
                             </button>
+                            <button
+                              onClick={() => setEditAgencyModal(a)}
+                              style={{ padding: '5px 10px', border: '1px solid #BFDBFE', borderRadius: 7, background: '#EBF2FF', cursor: 'pointer', fontSize: 12, color: '#2563EB', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Edit2 size={12} /> Edit
+                            </button>
                             {a.status === 'active' && (
                               <button
                                 onClick={() => toggleSuspend(a.id)}
@@ -2034,9 +2086,14 @@ export default function SuperAdminDashboard() {
                   <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Platform Users</h1>
                   <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>{users.length} users across all agencies</p>
                 </div>
-                <button onClick={exportUsersCSV} style={btnSecondary}>
-                  <Download size={13} /> Export CSV
-                </button>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={() => setShowCreateUser(true)} style={btnPrimary}>
+                    <Plus size={13} /> Create User
+                  </button>
+                  <button onClick={exportUsersCSV} style={btnSecondary}>
+                    <Download size={13} /> Export CSV
+                  </button>
+                </div>
               </div>
               <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -2076,9 +2133,9 @@ export default function SuperAdminDashboard() {
                         <td style={{ padding: '13px 16px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button
-                              onClick={() => showToast(`Manage panel for ${u.name} coming soon`)}
-                              style={{ padding: '5px 12px', border: '1px solid #E4E9F2', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12, color: '#475569' }}>
-                              Manage
+                              onClick={() => setEditUserModal(u)}
+                              style={{ padding: '5px 10px', border: '1px solid #BFDBFE', borderRadius: 7, background: '#EBF2FF', cursor: 'pointer', fontSize: 12, color: '#2563EB', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Edit2 size={12} /> Edit
                             </button>
                             {u.role !== 'superadmin' && (
                               <button
@@ -2227,6 +2284,370 @@ export default function SuperAdminDashboard() {
             </>
           )}
 
+          {/* ═══ BROADCASTS TAB ═══ */}
+          {activeTab === 'broadcast' && (
+            <>
+              <div style={{ marginBottom: 22 }}>
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Platform Announcements & Broadcasts</h1>
+                <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 3 }}>Compose and dispatch global alerts, maintenance notices, and feature releases</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 20, alignItems: 'start' }}>
+                {/* Left: Broadcast Form */}
+                <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, padding: 22, boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1A2E', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Megaphone size={16} style={{ color: '#4F8EF7' }} /> Compose New Broadcast
+                  </div>
+
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!newBroadcast.title || !newBroadcast.message) return;
+                    const created = {
+                      id: String(Date.now()),
+                      title: newBroadcast.title,
+                      target: newBroadcast.target,
+                      type: newBroadcast.type,
+                      date: 'Today',
+                      status: 'active',
+                      reach: `${agencies.length} agencies`,
+                    };
+                    setBroadcasts(prev => [created, ...prev]);
+                    setNewBroadcast({ title: '', target: 'All Agencies & Clients', type: 'Feature Release', message: '', actionUrl: '' });
+                    showToast(`Broadcast "${created.title}" dispatched successfully!`);
+                  }}>
+                    <div style={{ marginBottom: 14 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Announcement Title</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="e.g. Scheduled System Upgrade on Saturday"
+                        value={newBroadcast.title}
+                        onChange={e => setNewBroadcast({ ...newBroadcast, title: e.target.value })}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Target Audience</label>
+                        <select
+                          value={newBroadcast.target}
+                          onChange={e => setNewBroadcast({ ...newBroadcast, target: e.target.value })}
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}
+                        >
+                          <option value="All Agencies & Clients">All Agencies & Clients</option>
+                          <option value="Agencies Only">Agencies Only</option>
+                          <option value="Pro & Enterprise">Pro & Enterprise Tiers</option>
+                          <option value="Clients Only">Clients Only</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Notice Category</label>
+                        <select
+                          value={newBroadcast.type}
+                          onChange={e => setNewBroadcast({ ...newBroadcast, type: e.target.value })}
+                          style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}
+                        >
+                          <option value="Feature Release">Feature Release</option>
+                          <option value="System Warning">System Warning</option>
+                          <option value="Critical Alert">Critical Alert</option>
+                          <option value="Billing Notice">Billing Notice</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Message Content</label>
+                      <textarea
+                        required
+                        rows={4}
+                        placeholder="Type announcement description for users..."
+                        value={newBroadcast.message}
+                        onChange={e => setNewBroadcast({ ...newBroadcast, message: e.target.value })}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC', resize: 'vertical', fontFamily: 'inherit' }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: 18 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Action Button URL (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. /settings?tab=branding or https://docs.rankflow.app"
+                        value={newBroadcast.actionUrl}
+                        onChange={e => setNewBroadcast({ ...newBroadcast, actionUrl: e.target.value })}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}
+                      />
+                    </div>
+
+                    <button type="submit" style={{ ...btnPrimary, width: '100%', justifyContent: 'center' }}>
+                      <Send size={13} /> Dispatch Announcement
+                    </button>
+                  </form>
+                </div>
+
+                {/* Right: Broadcast History */}
+                <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: '1px solid #E4E9F2', fontSize: 14, fontWeight: 800, color: '#1A1A2E', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Broadcast History ({broadcasts.length})</span>
+                    <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>Active Alerts</span>
+                  </div>
+                  <div style={{ maxHeight: 480, overflowY: 'auto' }}>
+                    {broadcasts.length === 0 ? (
+                      <div style={{ padding: 30, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>No broadcasts recorded</div>
+                    ) : (
+                      broadcasts.map(b => (
+                        <div key={b.id} style={{ padding: '16px 20px', borderBottom: '1px solid #F1F5F9', background: b.status === 'active' ? '#FFFFFF' : '#F8FAFC' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#1A1A2E' }}>{b.title}</div>
+                            <span style={{
+                              fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
+                              background: b.status === 'active' ? '#ECFDF5' : '#F1F5F9',
+                              color: b.status === 'active' ? '#059669' : '#94A3B8'
+                            }}>
+                              {b.status.toUpperCase()}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 11, color: '#64748B', display: 'flex', gap: 12, marginBottom: 10 }}>
+                            <span>Audience: <strong>{b.target}</strong></span>
+                            <span>Reach: <strong>{b.reach}</strong></span>
+                            <span>Date: <strong>{b.date}</strong></span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                            <button
+                              onClick={() => {
+                                setBroadcasts(prev => prev.map(x => x.id === b.id ? { ...x, status: x.status === 'active' ? 'archived' : 'active' } : x));
+                                showToast(`Broadcast "${b.title}" ${b.status === 'active' ? 'archived' : 'restored'}`);
+                              }}
+                              style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #E4E9F2', background: '#F8FAFC', fontSize: 11, fontWeight: 600, color: '#475569', cursor: 'pointer' }}
+                            >
+                              {b.status === 'active' ? 'Archive' : 'Restore'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setBroadcasts(prev => prev.filter(x => x.id !== b.id));
+                                showToast(`Deleted broadcast "${b.title}"`);
+                              }}
+                              style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', fontSize: 11, fontWeight: 600, color: '#DC2626', cursor: 'pointer' }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ═══ FEATURE FLAGS TAB ═══ */}
+          {activeTab === 'feature-flags' && (
+            <>
+              <div style={{ marginBottom: 22 }}>
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Feature Flags & Subscription Tier Configurator</h1>
+                <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 3 }}>Enable global system capabilities and set resource limits per pricing tier</p>
+              </div>
+
+              {/* Global Feature Flags Grid */}
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, padding: 22, boxShadow: '0 1px 3px rgba(26,26,46,0.06)', marginBottom: 24 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1A2E', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <SlidersHorizontal size={16} style={{ color: '#4F8EF7' }} /> Global System Feature Toggles
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                  {[
+                    { key: 'publicSignups', title: 'Public Self-Serve Signups', desc: 'Allows new agencies to register directly from /login' },
+                    { key: 'aiRecommendations', title: 'AI Recommendations Engine', desc: 'Generates automated AI SEO tips inside report PDFs' },
+                    { key: 'autoSslProvisioning', title: 'Automatic SSL Certificates', desc: 'Auto-provisions Let\'s Encrypt SSL for custom domain CNAMEs' },
+                    { key: 'whiteLabelPdfs', title: 'White-Label Branding System', desc: 'Removes RankFlow watermarks for Pro and Enterprise plans' },
+                    { key: 'staggeredSync', title: 'Staggered API Rate-Limiter', desc: 'Queues background SERanking API checks to prevent 429 errors' },
+                    { key: 'directMessaging', title: 'Client Portal Direct Chat', desc: 'Enables 2-way real-time messaging between clients and agencies' },
+                  ].map(flag => {
+                    const enabled = (featureFlags as any)[flag.key];
+                    return (
+                      <div key={flag.key} style={{ background: '#F8FAFC', border: '1px solid #E4E9F2', borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A2E' }}>{flag.title}</span>
+                            <button
+                              onClick={() => {
+                                const next = !enabled;
+                                setFeatureFlags(prev => ({ ...prev, [flag.key]: next }));
+                                showToast(`${flag.title} ${next ? 'enabled' : 'disabled'}`);
+                              }}
+                              style={{ border: 'none', background: 'none', cursor: 'pointer', color: enabled ? '#10B981' : '#94A3B8' }}
+                            >
+                              {enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
+                            </button>
+                          </div>
+                          <div style={{ fontSize: 11, color: '#64748B', lineHeight: 1.5 }}>{flag.desc}</div>
+                        </div>
+                        <div style={{ marginTop: 12, fontSize: 10, fontWeight: 700, color: enabled ? '#059669' : '#94A3B8' }}>
+                          Status: {enabled ? '● ACTIVE GLOBALLY' : '○ DISABLED'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Pricing Tier Limits Configurator */}
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, padding: 22, boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1A2E' }}>Subscription Tier Resource Limits</div>
+                    <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 2 }}>Define pricing and quotas for Starter, Pro, and Enterprise tiers</div>
+                  </div>
+                  <button onClick={() => showToast('Subscription Tier configurations updated successfully!')} style={btnPrimary}>
+                    <Check size={13} /> Save Tier Configurations
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 18 }}>
+                  {(['starter', 'pro', 'enterprise'] as const).map(tier => {
+                    const data = tierLimits[tier];
+                    return (
+                      <div key={tier} style={{ background: '#F8FAFC', border: '1px solid #E4E9F2', borderRadius: 12, padding: 18 }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: '#1A1A2E', textTransform: 'capitalize', marginBottom: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>{tier} Tier</span>
+                          <span style={{ fontSize: 12, color: '#2563EB', fontWeight: 800 }}>${data.price}/mo</span>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          <div>
+                            <label style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Price ($/month)</label>
+                            <input
+                              type="number"
+                              value={data.price}
+                              onChange={e => setTierLimits({ ...tierLimits, [tier]: { ...data, price: Number(e.target.value) } })}
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E4E9F2', fontSize: 12, background: 'white' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Max Clients Quota</label>
+                            <input
+                              type="number"
+                              value={data.maxClients}
+                              onChange={e => setTierLimits({ ...tierLimits, [tier]: { ...data, maxClients: Number(e.target.value) } })}
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E4E9F2', fontSize: 12, background: 'white' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Max Keywords Tracked</label>
+                            <input
+                              type="number"
+                              value={data.maxKeywords}
+                              onChange={e => setTierLimits({ ...tierLimits, [tier]: { ...data, maxKeywords: Number(e.target.value) } })}
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E4E9F2', fontSize: 12, background: 'white' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Max Reports / Month</label>
+                            <input
+                              type="number"
+                              value={data.maxReports}
+                              onChange={e => setTierLimits({ ...tierLimits, [tier]: { ...data, maxReports: Number(e.target.value) } })}
+                              style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: '1px solid #E4E9F2', fontSize: 12, background: 'white' }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* ═══ INTEGRATIONS TAB ═══ */}
+          {activeTab === 'integrations' && (
+            <>
+              <div style={{ marginBottom: 22 }}>
+                <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Global Integration Gateways & API Monitoring</h1>
+                <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 3 }}>Manage system-wide API credentials, gateway rate limits, and webhook event listeners</p>
+              </div>
+
+              {/* Gateway cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 18, marginBottom: 24 }}>
+                {gateways.map((g, idx) => (
+                  <div key={idx} style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color: '#1A1A2E' }}>{g.name}</div>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: '#ECFDF5', color: '#059669' }}>
+                        ● {g.status}
+                      </span>
+                    </div>
+
+                    <div style={{ background: '#F8FAFC', border: '1px solid #E4E9F2', borderRadius: 9, padding: '8px 12px', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <code style={{ fontSize: 11, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '75%' }}>
+                        {g.key}
+                      </code>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(g.key);
+                          showToast(`Copied ${g.name} token to clipboard`);
+                        }}
+                        style={{ border: 'none', background: 'none', color: '#2563EB', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, color: '#64748B' }}>
+                      <span>Limit: <strong>{g.limit}</strong> · Latency: <strong>{g.latency}</strong></span>
+                      <button
+                        onClick={() => showToast(`Tested connection to ${g.name}: 200 OK (${g.latency})`)}
+                        style={{ padding: '5px 12px', borderRadius: 7, background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Test Connection
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Incoming Webhook Event Logs */}
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid #E4E9F2', fontSize: 14, fontWeight: 800, color: '#1A1A2E', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Global Webhook & Event Dispatch Logs</span>
+                  <span style={{ fontSize: 11, color: '#10B981', fontWeight: 700 }}>● Listening on /api/webhooks/*</span>
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E4E9F2' }}>
+                      {['Event ID', 'Gateway / Source', 'Event Type', 'Payload Status', 'HTTP Code', 'Processed At'].map(h => (
+                        <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94A3B8' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { id: 'evt_3Mj84d29hd92', source: 'Stripe Gateway', type: 'customer.subscription.created', status: 'Success', code: 200, time: '2 mins ago' },
+                      { id: 'evt_94Kf92kd92kd', source: 'SE Ranking Proxy', type: 'project.audit.completed', status: 'Success', code: 200, time: '14 mins ago' },
+                      { id: 'evt_10X83jd92hd9', source: 'Resend Mailer', type: 'email.delivered.report_ready', status: 'Success', code: 200, time: '1 hour ago' },
+                      { id: 'evt_48K2kd92hd92', source: 'OpenAI Gateway', type: 'response.recommendations.generated', status: 'Success', code: 200, time: '3 hours ago' },
+                    ].map((row, i) => (
+                      <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '12px 16px', fontSize: 12, fontFamily: 'monospace', color: '#475569' }}>{row.id}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 700, color: '#1A1A2E' }}>{row.source}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, color: '#2563EB', fontFamily: 'monospace' }}>{row.type}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ padding: '2px 8px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: '#ECFDF5', color: '#059669' }}>
+                            {row.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px', fontSize: 12, fontWeight: 700, color: '#10B981' }}>{row.code}</td>
+                        <td style={{ padding: '12px 16px', fontSize: 11, color: '#94A3B8' }}>{row.time}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
           </>)}
         </div>
       </div>
@@ -2234,6 +2655,37 @@ export default function SuperAdminDashboard() {
       {/* ─── Modals ─── */}
       {viewAgency && <AgencyDetailModal agency={viewAgency} onClose={() => setViewAgency(null)} onVisitDashboard={() => { setAgencyDashView(viewAgency); setActiveTab('agencies'); }} />}
       {showInvite && <InviteAgencyModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
+      {showCreateUser && (
+        <CreateUserModal
+          onClose={() => setShowCreateUser(false)}
+          agencies={agencies}
+          onSave={(newUser) => {
+            setUsers(prev => [newUser, ...prev]);
+            showToast(`User ${newUser.name} created successfully.`);
+          }}
+        />
+      )}
+      {editAgencyModal && (
+        <EditAgencyModal
+          agency={editAgencyModal}
+          onClose={() => setEditAgencyModal(null)}
+          onSave={(updated) => {
+            setAgencies(prev => prev.map(a => a.id === updated.id ? updated : a));
+            showToast(`Agency "${updated.name}" updated successfully.`);
+          }}
+        />
+      )}
+      {editUserModal && (
+        <EditUserModal
+          user={editUserModal}
+          onClose={() => setEditUserModal(null)}
+          showToast={showToast}
+          onSave={(updated) => {
+            setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+            showToast(`User "${updated.name}" updated successfully.`);
+          }}
+        />
+      )}
       {activeSystemModal === 'security' && <SecurityModal onClose={() => setActiveSystemModal(null)} showToast={showToast} />}
       {activeSystemModal === 'settings' && <SettingsModal onClose={() => setActiveSystemModal(null)} showToast={showToast} />}
       {activeSystemModal === 'audit' && <AuditLogsModal onClose={() => setActiveSystemModal(null)} />}
@@ -2526,6 +2978,185 @@ function AuditLogsModal({ onClose }: { onClose: () => void }) {
           Close Logs
         </button>
       </div>
+    </Modal>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   CREATE USER MODAL
+══════════════════════════════════════════════════════ */
+function CreateUserModal({ onClose, onSave, agencies }: { onClose: () => void; onSave: (u: PlatformUser) => void; agencies: Agency[] }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [agency, setAgency] = useState(agencies[0]?.name || 'RankFlow Platform');
+  const [role, setRole] = useState<'superadmin' | 'admin' | 'member' | 'client'>('admin');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim()) return;
+    onSave({
+      id: String(Date.now()),
+      name,
+      email,
+      agency,
+      role,
+      last: 'Just now',
+      status: 'active',
+    });
+    onClose();
+  };
+
+  return (
+    <Modal title="Create New Platform User" onClose={onClose}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Full Name</label>
+          <input required type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Sarah Connor" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Email Address</label>
+          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="e.g. sarah@agency.com" style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Assigned Agency</label>
+            <select value={agency} onChange={e => setAgency(e.target.value)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="RankFlow Platform">RankFlow Platform (Internal)</option>
+              {agencies.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Platform Role</label>
+            <select value={role} onChange={e => setRole(e.target.value as any)} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="admin">Agency Admin</option>
+              <option value="member">Team Member</option>
+              <option value="client">Client</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+          <button type="submit" style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: 'linear-gradient(135deg,#1A1A2E,#2563EB)', color: 'white', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create User</button>
+          <button type="button" onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   EDIT AGENCY MODAL
+══════════════════════════════════════════════════════ */
+function EditAgencyModal({ agency, onClose, onSave }: { agency: Agency; onClose: () => void; onSave: (updated: Agency) => void }) {
+  const [formData, setFormData] = useState<Agency>({ ...agency });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
+
+  return (
+    <Modal title={`Edit Agency: ${agency.name}`} onClose={onClose}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Agency Name</label>
+          <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Subdomain</label>
+            <input required type="text" value={formData.subdomain} onChange={e => setFormData({ ...formData, subdomain: e.target.value.toLowerCase() })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Subscription Plan</label>
+            <select value={formData.plan} onChange={e => {
+              const p = e.target.value as Agency['plan'];
+              const mrr = p === 'starter' ? 99 : p === 'pro' ? 299 : 999;
+              setFormData({ ...formData, plan: p, mrr });
+            }} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="starter">Starter ($99/mo)</option>
+              <option value="pro">Pro ($299/mo)</option>
+              <option value="enterprise">Enterprise ($999/mo)</option>
+            </select>
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Status</label>
+            <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as any })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="active">Active</option>
+              <option value="trial">Trial</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>MRR ($/mo)</label>
+            <input type="number" value={formData.mrr} onChange={e => setFormData({ ...formData, mrr: Number(e.target.value) })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+          <button type="submit" style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: 'linear-gradient(135deg,#1A1A2E,#2563EB)', color: 'white', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Save Changes</button>
+          <button type="button" onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+/* ══════════════════════════════════════════════════════
+   EDIT USER MODAL
+══════════════════════════════════════════════════════ */
+function EditUserModal({ user, onClose, onSave, showToast }: { user: PlatformUser; onClose: () => void; onSave: (u: PlatformUser) => void; showToast: (msg: string) => void }) {
+  const [formData, setFormData] = useState<PlatformUser>({ ...user });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+    onClose();
+  };
+
+  return (
+    <Modal title={`Edit User: ${user.name}`} onClose={onClose}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Full Name</label>
+          <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+        </div>
+        <div>
+          <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Email Address</label>
+          <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Role</label>
+            <select value={formData.role} onChange={e => setFormData({ ...formData, role: e.target.value as any })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="admin">Agency Admin</option>
+              <option value="member">Team Member</option>
+              <option value="client">Client</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
+          </div>
+          <div>
+            <label style={{ fontSize: 11, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 5 }}>Status</label>
+            <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as any })} style={{ width: '100%', padding: '9px 12px', borderRadius: 9, fontSize: 13, border: '1.5px solid #E4E9F2', outline: 'none', background: '#F8FAFC' }}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div style={{ background: '#F8FAFC', border: '1px solid #E4E9F2', borderRadius: 10, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#1A1A2E' }}>Password Reset</div>
+            <div style={{ fontSize: 11, color: '#94A3B8' }}>Send password reset link to {formData.email}</div>
+          </div>
+          <button type="button" onClick={() => showToast(`Password reset link sent to ${formData.email}`)} style={{ padding: '6px 12px', borderRadius: 7, background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Send Link</button>
+        </div>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+          <button type="submit" style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: 'linear-gradient(135deg,#1A1A2E,#2563EB)', color: 'white', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Save Changes</button>
+          <button type="button" onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+        </div>
+      </form>
     </Modal>
   );
 }

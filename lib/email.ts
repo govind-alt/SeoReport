@@ -44,3 +44,84 @@ The ${agencyName} Team
   
   return true;
 }
+
+export async function sendClientMessageNotificationEmail(
+  agencyEmail: string,
+  clientName: string,
+  subject: string,
+  messageBody: string,
+  agencyName: string
+) {
+  // We simulate a network delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const emailContent = `
+==================================================
+[SIMULATED EMAIL DISPATCH TO SUPPORT]
+To: ${agencyEmail}
+From: portal-alerts@rankflow.app
+Subject: New Query Raised by Client [${clientName}] - ${subject || 'No Subject'}
+
+Hello ${agencyName} Support Team,
+
+Your client "${clientName}" has raised a new inquiry via their secure client portal:
+
+--------------------------------------------------
+Subject: ${subject || 'General Inquiry'}
+Message:
+${messageBody}
+--------------------------------------------------
+
+You can view this message and reply to it in your Client Inbox here:
+http://localhost:3000/localhost/inbox
+
+Best regards,
+RankFlow Platform Team
+==================================================
+  `;
+
+  console.log(emailContent);
+  return true;
+}
+
+export async function sendSupportTicketEmail(
+  adminEmail: string,
+  userEmail: string,
+  userName: string,
+  agencyName: string,
+  issueType: string,
+  subject: string,
+  message: string
+) {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const emailContent = `
+==================================================
+[SIMULATED SUPPORT TICKET DISPATCH]
+To: ${adminEmail}
+Reply-To: ${userEmail}
+From: helpdesk@rankflow.app
+Subject: [${issueType}] Support Ticket from ${agencyName} - ${subject}
+
+Hello Support Team,
+
+A new support ticket has been submitted by an agency user:
+
+User: ${userName} (${userEmail})
+Agency: ${agencyName}
+Issue Type: ${issueType}
+Subject: ${subject}
+
+Message Details:
+--------------------------------------------------
+${message}
+--------------------------------------------------
+
+Please respond directly to their email.
+==================================================
+  `;
+
+  console.log(emailContent);
+  return true;
+}
+
