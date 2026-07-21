@@ -15,7 +15,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
           <h3>1. Connect SERanking API</h3>
           <p>Before any data can be pulled, you need to add your SERanking API key in the <strong>Settings &gt; Integrations</strong> panel. Ensure your API key has Read access to Projects and Rankings.</p>
           <h3>2. Add a Client</h3>
-          <p>Navigate to the Clients tab and click "Add Client". You will need the exact Project ID from SERanking.</p>
+          <p>Navigate to the Clients tab and click &quot;Add Client&quot;. You will need the exact Project ID from SERanking.</p>
           <h3>3. Generate Your First Report</h3>
           <p>Once synced, head to the Reports tab to generate a beautiful, white-labeled PDF report for your client.</p>
         </>
@@ -51,7 +51,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
         <>
           <p>Having issues? Check the common solutions below.</p>
           <h3>Missing Keywords</h3>
-          <p>If keywords aren't showing up, verify that the project in SERanking is actively tracking those keywords and that the date range has recorded data.</p>
+          <p>If keywords aren&apos;t showing up, verify that the project in SERanking is actively tracking those keywords and that the date range has recorded data.</p>
           <h3>API 429 Errors</h3>
           <p>If you see a 429 error, you have hit your SERanking API rate limit. Space out your manual syncs or contact SERanking to increase your API quota.</p>
         </>
@@ -61,7 +61,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
 
   const guide = guides[id] || {
     title: 'Guide Not Found',
-    content: <p>We couldn't find the article you're looking for.</p>
+    content: <p>We couldn&apos;t find the article you&apos;re looking for.</p>
   };
 
   return (

@@ -36,3 +36,13 @@ export interface SERankingAuditStatus {
     notices: number;
   };
 }
+
+export interface SERankingBacklinksSummary {
+  domain_trust: number;
+  page_trust: number;
+  backlinks: number;
+  referring_domains: number;
+  new_backlinks_30d: number;
+  lost_backlinks_30d: number;
+}
+

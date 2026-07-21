@@ -1,57 +1,139 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { getReports, generateReportForClient, getClients } from '@/app/actions';
 import './reports.css';
+
+type Report = {
+  id: string;
+  clientId: string;
+  clientName: string;
+  clientInitials: string;
+  title: string;
+  date: string;
+  status: string;
+  period: string;
+};
+
+type Client = {
+  id: string;
+  name: string;
+  website: string;
+  health: number | null;
+  initials: string;
+  color: string;
+  lastReport: string;
+  nextReport: string;
+  status: string;
+};
 
 export default function ReportsPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  
-  const [selectedReport, setSelectedReport] = useState('acme-jun');
+
+  const [reports, setReports] = useState<Report[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isErrorLogOpen, setIsErrorLogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [selectedGenClient, setSelectedGenClient] = useState('');
 
-  const downloadPdf = (reportId: string) => {
-    toast.info('Generating PDF... This may take a few seconds.');
-    window.open(`/api/reports/generate?id=${reportId}`, '_blank');
+  const loadData = async () => {
+    try {
+      const [reportData, clientData] = await Promise.all([
+        getReports(domain),
+        getClients(domain)
+      ]);
+      setReports(reportData);
+      if (reportData.length > 0) setSelectedReport(reportData[0]);
+      setClients(clientData);
+      if (clientData.length > 0) setSelectedGenClient(clientData[0].id);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const bulkGenerate = () => {
+  useEffect(() => {
+    loadData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [domain]);
+
+  const downloadPdf = async (reportId: string) => {
+    const toastId = toast.loading('Generating PDF... This may take 5-10 seconds.');
+    try {
+      const res = await fetch(`/api/reports/generate?id=${reportId}`);
+      if (!res.ok) throw new Error('Failed to generate PDF');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `SEO-Report-${reportId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF downloaded successfully!', { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to generate PDF. Please try again.', { id: toastId });
+    }
+  };
+
+  const generateReport = async () => {
+    if (!selectedGenClient) return;
+    setIsGenerateModalOpen(false);
+    const clientName = clients.find(c => c.id === selectedGenClient)?.name || 'Client';
+    setIsGenerating(selectedGenClient);
+    const toastId = toast.loading(`Generating report for ${clientName}...`);
+    try {
+      const result = await generateReportForClient(domain, selectedGenClient);
+      setIsGenerating(null);
+      toast.success(`Report for ${clientName} generated!`, { id: toastId });
+      await loadData();
+    } catch (e: any) {
+      setIsGenerating(null);
+      toast.error(e.message || 'Failed to generate report', { id: toastId });
+    }
+  };
+
+  const bulkGenerate = async () => {
     setIsBulkModalOpen(false);
-    toast.loading('Queuing bulk generation...');
-    let count = 0;
-    const clients = ['Acme Corp', 'TechStart.io', 'GreenLeaf Organics'];
-    clients.forEach((c, i) => setTimeout(() => {
-      count++;
-      toast.success(`${c} — Report done!`);
-      if (count === clients.length) setTimeout(() => toast.success('✅ All 3 reports generated!'), 600);
-    }, 700 * (i + 1)));
+    const toastId = toast.loading('Generating reports for all clients...');
+    try {
+      for (const c of clients) {
+        await generateReportForClient(domain, c.id);
+        // Small delay to prevent SQLite concurrent lock collisions
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+      toast.success(`✅ Generated ${clients.length} reports!`, { id: toastId });
+      await loadData();
+    } catch (e: any) {
+      toast.error(e.message || 'Bulk generate failed', { id: toastId });
+    }
   };
+
+  const generatedCount = reports.filter(r => r.status === 'generated').length;
+  const failedCount = reports.filter(r => r.status === 'failed').length;
 
   return (
     <>
-      {/* Topbar equivalent (header is usually in layout, so we just provide page content, but we might have a custom topbar in the dashboard page layout? 
-          Wait, the Topbar is part of layout.tsx but the buttons are custom? 
-          Actually, the Topbar in layout.tsx is global. We will just render the content below it.
-          Let's just use page-header here if needed, or just let Topbar be.
-      */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div className="page-title">Reports</div>
-          <div className="page-subtitle">38 total · 6 pending</div>
+          <div className="page-subtitle">{reports.length} total · {generatedCount} generated</div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn btn-secondary btn-sm" onClick={() => setIsBulkModalOpen(true)}>⚡ Bulk Generate</button>
-          <Link href={domain === 'localhost' ? '/localhost/reports/new' : '/reports/new'} className="btn btn-primary btn-sm">＋ Generate Report</Link>
+          <Link href={`/${domain}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>＋ Generate Report</Link>
         </div>
       </div>
 
       <div className="sync-bar">
-        <span>✅ Last sync: Today at 02:14 AM · Next: Tomorrow 02:00 AM · All 24 clients up to date</span>
+        <span>✅ Data synced · {clients.length} clients active · {generatedCount} reports generated</span>
         <button className="btn btn-sm" style={{ background: 'rgba(16,185,129,0.15)', color: '#059669', border: '1px solid rgba(16,185,129,0.3)', fontSize: '11px' }} onClick={() => toast.info('Sync queued...')}>🔄 Sync Now</button>
       </div>
 
@@ -60,170 +142,119 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
         <div className="kpi-grid kpi-grid-4" style={{ marginBottom: '24px' }}>
           <div className="kpi-card success">
             <div className="kpi-icon">📄</div>
-            <div className="kpi-label">Reports This Month</div>
-            <div className="kpi-value">18</div>
-            <div className="kpi-trend trend-up">↑ +3 vs last month</div>
-          </div>
-          <div className="kpi-card">
-            <div className="kpi-icon">📁</div>
             <div className="kpi-label">Total Reports</div>
-            <div className="kpi-value">38</div>
-            <div className="kpi-trend trend-flat">→ Across 24 clients</div>
-          </div>
-          <div className="kpi-card warning">
-            <div className="kpi-icon">⏳</div>
-            <div className="kpi-label">Pending / Overdue</div>
-            <div className="kpi-value" style={{ color: 'var(--warning)' }}>6</div>
-            <div className="kpi-trend" style={{ color: 'var(--warning)' }}>⚠ Action needed</div>
+            <div className="kpi-value">{reports.length}</div>
+            <div className="kpi-trend trend-up">All time</div>
           </div>
           <div className="kpi-card">
-            <div className="kpi-icon">⚡</div>
-            <div className="kpi-label">Avg Gen Time</div>
-            <div className="kpi-value">2.4m</div>
-            <div className="kpi-trend trend-up">↑ 0.3m faster</div>
+            <div className="kpi-icon">✅</div>
+            <div className="kpi-label">Generated</div>
+            <div className="kpi-value">{generatedCount}</div>
+            <div className="kpi-trend trend-up">Success</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-icon">👥</div>
+            <div className="kpi-label">Active Clients</div>
+            <div className="kpi-value">{clients.length}</div>
+            <div className="kpi-trend trend-up">Tracked</div>
+          </div>
+          <div className={`kpi-card ${failedCount > 0 ? 'warning' : ''}`}>
+            <div className="kpi-icon">⚠️</div>
+            <div className="kpi-label">Failed</div>
+            <div className="kpi-value" style={{ color: failedCount > 0 ? 'var(--warning)' : 'inherit' }}>{failedCount}</div>
+            <div className="kpi-trend">Need retry</div>
           </div>
         </div>
 
-        {/* Main grid */}
-        <div className="reports-grid">
-          {/* Table */}
-          <div>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div className="search-input-wrap">
-                <span className="search-icon">🔍</span>
-                <input type="text" className="form-input" placeholder="Search client or period..." style={{ paddingLeft: '34px', width: '220px', fontSize: '12px' }}/>
+        {/* Main Layout */}
+        <div className="reports-layout">
+          {/* Report List */}
+          <div className="reports-list-container">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', padding: '0 4px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>Report History</div>
+              <span className="badge badge-primary">{reports.length} total</span>
+            </div>
+
+            {reports.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)', border: '1px dashed var(--border)', borderRadius: 'var(--radius-md)' }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>📄</div>
+                <div style={{ fontWeight: 600, marginBottom: '8px' }}>No reports yet</div>
+                <div style={{ fontSize: '13px', marginBottom: '16px' }}>Generate your first report to get started</div>
+                <Link href={`/${domain}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>+ Generate Report</Link>
               </div>
-              <select className="form-input" style={{ width: '150px', fontSize: '12px' }}>
-                <option value="">Client: All</option>
-                <option value="Acme Corp">Acme Corp</option>
-                <option value="TechStart.io">TechStart.io</option>
-              </select>
-              <select className="form-input" style={{ width: '130px', fontSize: '12px' }}>
-                <option value="">Status: All</option>
-                <option value="done">✅ Completed</option>
-                <option value="pending">⏳ Pending</option>
-                <option value="failed">❌ Failed</option>
-              </select>
-              <button className="btn btn-secondary btn-sm" onClick={() => toast.info('Exporting CSV...')}>⬇ Export</button>
-            </div>
+            ) : (
+              <div className="table-wrapper" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Client</th>
+                      <th>Period</th>
+                      <th>Status</th>
+                      <th>Generated</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reports.map(report => (
+                      <tr
+                        key={report.id}
+                        onClick={() => setSelectedReport(report)}
+                        style={{ cursor: 'pointer', background: selectedReport?.id === report.id ? 'var(--primary-light)' : 'transparent' }}
+                      >
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className="client-avatar" style={{ background: '#4F46E5', width: '30px', height: '30px', fontSize: '11px' }}>{report.clientInitials}</div>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: '13px' }}>{report.clientName}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td><strong>{report.period}</strong></td>
+                        <td>
+                          <span className={`badge ${report.status === 'generated' ? 'badge-success' : report.status === 'failed' ? 'badge-danger' : 'badge-neutral'}`}>
+                            <span className="badge-dot"></span>
+                            {report.status === 'generated' ? 'Ready' : report.status === 'failed' ? 'Failed' : 'Draft'}
+                          </span>
+                        </td>
+                        <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                          {new Date(report.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={(e) => { e.stopPropagation(); downloadPdf(report.id); }}
+                            >⬇ PDF</button>
+                            <Link
+                              href={`/${domain}/reports/${report.id}`}
+                              className="btn btn-secondary btn-sm"
+                              style={{ textDecoration: 'none' }}
+                              onClick={(e) => e.stopPropagation()}
+                            >👁 View</Link>
+                          </div>
 
-            <div className="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th>Period</th>
-                    <th>Status</th>
-                    <th>Generated</th>
-                    <th>Client Opened?</th>
-                    <th style={{ textAlign: 'right' }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className={selectedReport === 'acme-jun' ? 'selected-row' : ''} style={{ cursor: 'pointer' }} onClick={() => setSelectedReport('acme-jun')}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg,#4F46E5,#7C3AED)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>AC</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>Acme Corp</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>acmecorp.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Jun 2026</strong> <span className="badge badge-primary" style={{ fontSize: '10px', marginLeft: '3px' }}>v2</span></td>
-                    <td><span className="badge badge-success"><span className="badge-dot"></span>Done</span></td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Jun 3, 14:20</td>
-                    <td><span className="badge badge-success">👁 Viewed × 2</span></td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                        <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); setSelectedReport('acme-jun'); }}>👁 View</button>
-                        <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); downloadPdf('acme-jun'); }}>📥</button>
-                        <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); toast.success('Link copied!'); }}>🔗</button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Pending Row */}
-                  <tr className="overdue-row" style={{ cursor: 'default' }}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg,#F59E0B,#D97706)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>GL</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>GreenLeaf Organics</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>greenleaf.com</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>Jun 2026</strong></td>
-                    <td><span className="badge badge-warning"><span className="badge-dot"></span>Pending</span></td>
-                    <td><span className="schedule-chip">📅 Scheduled Jul 1</span></td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>—</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                        <button className="btn btn-primary btn-sm" disabled={isGenerating === 'gl'} onClick={() => {
-                          setIsGenerating('gl');
-                          toast.info('Generating report...');
-                          setTimeout(() => setIsGenerating(null), 2000);
-                        }}>
-                          {isGenerating === 'gl' ? 'Generating...' : '⚡ Generate Now'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Failed Row */}
-                  <tr style={{ cursor: 'default' }}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg,#3B82F6,#2563EB)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>BS</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>BlueSky Marketing</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>bluesky.co.uk</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td><strong>May 2026</strong></td>
-                    <td><span className="badge badge-danger"><span className="badge-dot"></span>Failed</span></td>
-                    <td style={{ fontSize: '12px', color: 'var(--danger)' }}>Failed Jun 1, 09:05</td>
-                    <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>—</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                        <button className="btn btn-secondary btn-sm" onClick={() => toast.success('Retry queued!')}>🔄 Retry</button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => setIsErrorLogOpen(!isErrorLogOpen)}>⚠ Error Log</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-
-              {isErrorLogOpen && (
-                <div style={{ background: 'var(--danger-light)', borderTop: '1px solid #FECACA', padding: '16px 20px' }}>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#7F1D1D', marginBottom: '4px' }}>⚠ Error Details — BlueSky Marketing · May 2026</div>
-                  <div style={{ fontSize: '12px', color: '#991B1B', marginBottom: '8px' }}><strong>Failed at:</strong> Jun 1, 2026 09:05:32 UTC · Retry count: 3/3</div>
-                  <div style={{ background: 'rgba(255,255,255,0.5)', padding: '10px', borderRadius: '6px', fontSize: '11px', fontFamily: 'monospace', color: '#7F1D1D', marginBottom: '12px' }}>
-                    SERankingAPIError: 429 Too Many Requests<br/>
-                    at fetchKeywordPositions (/lib/seranking/client.ts:84)<br/>
-                    Endpoint: GET /sites/47291/positions?range=30&page=1
-                  </div>
-                  <button className="btn btn-danger btn-sm" onClick={() => { setIsErrorLogOpen(false); toast.success('Retry queued!'); }}>🔄 Retry Now</button>
-                </div>
-              )}
-            </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {/* Preview Panel */}
           <div className="preview-container">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>📄 Report Preview</div>
-              <span className="badge badge-primary">{selectedReport === 'acme-jun' ? 'Acme Corp · Jun 2026' : 'Report'}</span>
+              {selectedReport && <span className="badge badge-primary">{selectedReport.clientName} · {selectedReport.period}</span>}
             </div>
 
-            {selectedReport === 'acme-jun' ? (
+            {selectedReport ? (
               <div className="report-preview report-preview-block">
                 <div className="report-cover">
                   <div className="report-cover-agency">Digital Horizons Agency</div>
                   <div className="report-cover-title">Monthly SEO Report</div>
-                  <div className="report-cover-period">Acme Corp · June 2026</div>
+                  <div className="report-cover-period">{selectedReport.clientName} · {selectedReport.period}</div>
                   <div className="report-cover-score">
                     <div className="report-cover-score-value">76</div>
                     <div className="report-cover-score-label">HEALTH SCORE</div>
@@ -233,7 +264,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                 <div className="report-section">
                   <div className="report-section-title">Executive Summary</div>
                   <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-                    <strong style={{ color: 'var(--text-primary)' }}>Strong performance month.</strong> Top 10 keywords grew by 4 to reach 47. Organic sessions up <strong style={{ color: 'var(--success)' }}>+16.3%</strong> to 8,420.
+                    <strong style={{ color: 'var(--text-primary)' }}>Strong performance month.</strong> Top 10 keywords improved. Organic sessions up <strong style={{ color: 'var(--success)' }}>+16.3%</strong>. Site health at 76/100.
                   </div>
                 </div>
 
@@ -247,8 +278,8 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                  <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => downloadPdf('acme-jun')}>📥 Download PDF</button>
-                  <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={() => window.open('/reports/render/acme-jun', '_blank')}>👁 View Web Version</button>
+                  <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => downloadPdf(selectedReport.id)}>⬇ Download PDF</button>
+                  <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={() => window.open(`/reports/render/${selectedReport.id}`, '_blank')}>👁 Web View</button>
                 </div>
               </div>
             ) : (
@@ -256,6 +287,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                 <div style={{ padding: '40px', textAlign: 'center', border: '1px dashed var(--border)', borderRadius: '12px', background: 'var(--gray-50)' }}>
                   <div style={{ fontSize: '24px', marginBottom: '8px' }}>📄</div>
                   <div style={{ fontSize: '14px', fontWeight: 600 }}>Select a report</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Click a report from the list to preview it here</div>
                 </div>
               </div>
             )}
@@ -263,10 +295,10 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Generate Modal */}
       {isGenerateModalOpen && (
-        <div className="modal-overlay" style={{ display: 'flex' }}>
-          <div className="modal">
+        <div className="modal-overlay active" style={{ display: 'flex' }} onClick={() => setIsGenerateModalOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div>
                 <div className="modal-title">Generate New Report</div>
@@ -277,36 +309,54 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
             <div className="modal-body">
               <div className="form-group">
                 <label className="form-label">Select Client *</label>
-                <select className="form-input" id="genClientSelect">
-                  <option value="Acme Corp">Acme Corp</option>
-                  <option value="TechStart.io">TechStart.io</option>
+                <select
+                  className="form-input"
+                  value={selectedGenClient}
+                  onChange={e => setSelectedGenClient(e.target.value)}
+                >
+                  {clients.length === 0 && <option value="">No clients found</option>}
+                  {clients.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
+              </div>
+              <div className="alert alert-info" style={{ marginTop: '12px' }}>
+                Report will be generated using the latest available data for this client.
               </div>
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setIsGenerateModalOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={() => generateReport((document.getElementById('genClientSelect') as HTMLSelectElement).value)}>🚀 Generate</button>
+              <button className="btn btn-primary" onClick={generateReport} disabled={!selectedGenClient}>🚀 Generate</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Bulk Modal */}
       {isBulkModalOpen && (
-        <div className="modal-overlay" style={{ display: 'flex' }}>
-          <div className="modal modal-sm">
+        <div className="modal-overlay active" style={{ display: 'flex' }} onClick={() => setIsBulkModalOpen(false)}>
+          <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div>
                 <div className="modal-title">⚡ Bulk Generate</div>
-                <div className="modal-subtitle">Generate reports for multiple clients</div>
+                <div className="modal-subtitle">Generate reports for all {clients.length} clients</div>
               </div>
               <button className="modal-close" onClick={() => setIsBulkModalOpen(false)}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="alert alert-info">Reports will be emailed automatically.</div>
+              <div className="alert alert-info">This will create new report records for all {clients.length} clients using demo data.</div>
+              <div style={{ marginTop: '12px' }}>
+                {clients.map(c => (
+                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                    <div className="client-avatar" style={{ background: '#4F46E5', width: '28px', height: '28px', fontSize: '10px' }}>{c.initials}</div>
+                    <span style={{ fontSize: '13px', fontWeight: 600 }}>{c.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setIsBulkModalOpen(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={bulkGenerate}>🚀 Generate</button>
+              <button className="btn btn-primary" onClick={bulkGenerate}>🚀 Generate All</button>
             </div>
           </div>
         </div>

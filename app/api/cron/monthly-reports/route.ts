@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendReportReadyEmail } from '@/lib/email';
+import { compileReportPdf } from '@/lib/report-compiler';
+import { after } from 'next/server';
 
-// Typically, this would be secured by a header token (e.g. from Vercel Cron)
-// like checking request.headers.get('Authorization') === `Bearer ${process.env.CRON_SECRET}`
 export async function GET(request: Request) {
+  // Verify cron secret to prevent unauthorized triggers
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
+
     console.log('[CRON] Starting monthly report generation...');
 
     // Fetch all active clients
@@ -32,31 +39,26 @@ export async function GET(request: Request) {
       });
 
       if (!existingReport) {
-        // Generate new report record
+        // Generate new report record in pending status
         const report = await prisma.report.create({
           data: {
             clientId: client.id,
             title: reportTitle,
-            status: 'generated',
-            // In a real app, you might trigger a background worker here 
-            // to actually render the PDF and upload it to S3, saving the URL here.
-            pdfUrl: `/api/reports/generate?id=${client.id}`, 
+            status: 'pending',
             sections: JSON.stringify(['traffic', 'keywords', 'backlinks', 'audit'])
           }
         });
 
-        // Simulate sending the email
-        if (client.contactEmail) {
-          await sendReportReadyEmail(client.contactEmail, client.name, reportTitle, report.id, client.agency.name);
-        }
+        // Spawn non-blocking background compiler task
+        after(() => compileReportPdf(report.id));
 
-        results.push({ clientId: client.id, status: 'created', reportId: report.id });
+        results.push({ clientId: client.id, status: 'created (pending PDF)', reportId: report.id });
       } else {
         results.push({ clientId: client.id, status: 'skipped (already exists)' });
       }
     }
 
-    console.log('[CRON] Monthly report generation completed.');
+    console.log('[CRON] Monthly report generation queued.');
 
     return NextResponse.json({ success: true, processed: results.length, results });
 

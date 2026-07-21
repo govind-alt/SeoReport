@@ -1,4 +1,4 @@
-import type { SERankingSite, SERankingRankingResponse, SERankingCompetitor, SERankingAuditStatus } from './types';
+import type { SERankingSite, SERankingRankingResponse, SERankingCompetitor, SERankingAuditStatus, SERankingBacklinksSummary } from './types';
 
 const API_BASE_URL = 'https://api.seranking.com/v3';
 
@@ -58,5 +58,13 @@ export class SERankingClient {
    */
   async getAudit(siteId: number): Promise<SERankingAuditStatus> {
     return this.fetchApi<SERankingAuditStatus>(`/sites/${siteId}/audit`);
+  }
+
+  /**
+   * GET /sites/{id}/backlinks/summary
+   * Get site backlinks summary.
+   */
+  async getBacklinks(siteId: number): Promise<SERankingBacklinksSummary> {
+    return this.fetchApi<SERankingBacklinksSummary>(`/sites/${siteId}/backlinks/summary`);
   }
 }

@@ -4,6 +4,8 @@ import './login.css';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { registerAgency } from '../../actions';
+import Link from 'next/link';
+
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState<'signin' | 'register' | 'forgot' | 'verify'>('signin');
@@ -190,9 +192,9 @@ export default function Login() {
 
               <form id="loginForm" onSubmit={handleLogin}>
                 <div className="role-selector" id="loginRoleSelector">
-                  <div className={`role-option ${selectedRole === 'agency' ? 'active' : ''}`} onClick={() => setSelectedRole('agency')}>🏢 Agency</div>
-                  <div className={`role-option ${selectedRole === 'client' ? 'active' : ''}`} onClick={() => setSelectedRole('client')}>👤 Client</div>
-                  <div className={`role-option ${selectedRole === 'admin' ? 'active' : ''}`} onClick={() => setSelectedRole('admin')}>🛡️ Admin</div>
+                  <Link href="/login" className="role-option active" style={{ textDecoration: 'none' }}>🏢 Agency</Link>
+                  <Link href="/login/client" className="role-option" style={{ textDecoration: 'none' }}>👤 Client</Link>
+                  <Link href="/login/admin" className="role-option" style={{ textDecoration: 'none' }}>🛡️ Admin</Link>
                 </div>
 
                 <div className="form-group">
@@ -202,7 +204,7 @@ export default function Login() {
                 <div className="form-group">
                   <label className="form-label" htmlFor="loginPassword">
                     Password
-                    <a className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}} onClick={() => setActiveTab('forgot')}>Forgot password?</a>
+                    <Link href="/forgot-password" className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}}>Forgot password?</Link>
                   </label>
                   <div className="input-with-icon">
                     <input className="form-input" id="loginPassword" type={showPassword ? "text" : "password"} placeholder="••••••••••" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
@@ -225,7 +227,7 @@ export default function Login() {
               </a>
 
               <div className="form-footer">
-                No account? <span className="link" onClick={() => setActiveTab('register')}>Sign up free</span>
+                No account? <Link href="/register" className="link">Sign up free →</Link>
               </div>
             </div>
           )}

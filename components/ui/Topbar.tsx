@@ -2,97 +2,129 @@
 
 import { toast } from 'sonner';
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+
+function getPageTitle(pathname: string) {
+  if (pathname.includes('/reports')) return 'Reports';
+  if (pathname.includes('/clients/new')) return 'Add Client';
+  if (pathname.match(/\/clients\/[^/]+/)) return 'Client Details';
+  if (pathname.includes('/clients')) return 'Clients';
+  if (pathname.includes('/settings')) return 'Settings';
+  if (pathname.includes('/help')) return 'Help & Support';
+  return 'Dashboard';
+}
 
 export function Topbar() {
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState('Jun 2026 vs May 2026');
-
-  // Close dropdowns when clicking outside
   const topbarRef = useRef<HTMLElement>(null);
+  const pathname = usePathname() || '';
+  const title = getPageTitle(pathname);
+
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (topbarRef.current && !topbarRef.current.contains(event.target as Node)) {
-        setIsDatePickerOpen(false);
+    const handler = (e: MouseEvent) => {
+      if (topbarRef.current && !topbarRef.current.contains(e.target as Node)) {
         setIsNotifOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const notifications = [
+    { icon: '✅', title: 'Report Generated', desc: 'TechStart.io monthly PDF is ready.', time: '2h ago', unread: true },
+    { icon: '🔄', title: 'Daily Sync Complete', desc: 'SERanking data for all clients synced.', time: '6h ago', unread: true },
+    { icon: '⚠️', title: 'Critical Issues Found', desc: 'Acme Corp has 5 new critical issues.', time: '1d ago', unread: false },
+    { icon: '🔗', title: 'Backlinks Spike', desc: 'BlueSky Marketing gained 18 backlinks.', time: '2d ago', unread: false },
+  ];
+  const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
     <header className="topbar" ref={topbarRef}>
-      <div style={{ flex: '1' }}>
-        <div className="topbar-title">Dashboard</div>
+      <div style={{ flex: 1 }}>
+        <div className="topbar-title">{title}</div>
       </div>
+
       <div className="topbar-actions">
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={async () => {
+            const t = toast.loading('Syncing all clients...');
+            try {
+              const r = await fetch('/api/webhooks/daily-sync', { method: 'POST' });
+              const d = await r.json();
+              toast.dismiss(t);
+              toast.success(d.message || 'Sync complete');
+            } catch {
+              toast.dismiss(t);
+              toast.error('Sync failed');
+            }
+          }}
+        >🔄 Sync All</button>
+
+        {/* Notification Bell */}
         <div className="relative">
-          <button className="date-range-btn" onClick={() => { setIsDatePickerOpen(!isDatePickerOpen); setIsNotifOpen(false); }}>
-            📅 {selectedRange} ▾
+          <button
+            className="topbar-icon-btn"
+            onClick={() => setIsNotifOpen(!isNotifOpen)}
+            aria-label="Notifications"
+          >
+            🔔
+            {unreadCount > 0 && <span className="notif-dot"></span>}
           </button>
-          
-          {isDatePickerOpen && (
-            <div style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'white', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 100, width: '240px', padding: '8px', animation: 'popUp 0.2s cubic-bezier(0.16,1,0.3,1)' }}>
-              <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Select Range</div>
-              {[
-                'Jun 2026 vs May 2026',
-                'Last 30 Days',
-                'Last 3 Months',
-                'Year to Date'
-              ].map(range => (
-                <button 
-                  key={range}
-                  onClick={() => { setSelectedRange(range); setIsDatePickerOpen(false); }}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 12px', background: selectedRange === range ? 'var(--gray-50)' : 'transparent', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: selectedRange === range ? 600 : 500, cursor: 'pointer' }}
-                >
-                  {range}
-                </button>
-              ))}
+
+          {isNotifOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 10px)', right: 0,
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: '16px', boxShadow: 'var(--shadow-lg)',
+              zIndex: 200, width: '340px', animation: 'scaleIn 0.15s ease',
+              overflow: 'hidden', backdropFilter: 'blur(16px)'
+            }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontWeight: 800, fontSize: '14px' }}>Notifications</div>
+                {unreadCount > 0 && (
+                  <span style={{ background: 'var(--primary)', color: 'white', fontSize: '10px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px' }}>
+                    {unreadCount} new
+                  </span>
+                )}
+              </div>
+              <div>
+                {notifications.map((n, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: '12px 16px', display: 'flex', gap: '12px',
+                      alignItems: 'flex-start', cursor: 'pointer',
+                      background: n.unread ? 'var(--primary-light)' : 'transparent',
+                      borderBottom: i < notifications.length - 1 ? '1px solid var(--border)' : 'none',
+                      transition: 'background 0.15s'
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = n.unread ? 'var(--primary-light)' : 'transparent')}
+                  >
+                    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0, border: '1px solid var(--border)' }}>{n.icon}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{n.title}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', lineHeight: '1.4' }}>{n.desc}</div>
+                      <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '5px' }}>{n.time}</div>
+                    </div>
+                    {n.unread && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)', flexShrink: 0, marginTop: '4px' }}></div>}
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '12px', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}
+                onClick={() => setIsNotifOpen(false)}>
+                Mark all as read
+              </div>
             </div>
           )}
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={() => toast.loading('Syncing all clients...', { duration: 2000 })}>
-          🔄 Sync All
-        </button>
-        <button className="btn btn-primary btn-sm" onClick={() => toast.success('Report generation started')}>
-          ＋ Generate Report
-        </button>
-        <div className="relative">
-          <button className="topbar-icon-btn" onClick={() => { setIsNotifOpen(!isNotifOpen); setIsDatePickerOpen(false); }}>
-            🔔
-            <span className="notif-dot"></span>
-          </button>
-          
-          {isNotifOpen && (
-            <div style={{ position: 'absolute', top: 'calc(100% + 12px)', right: 0, background: 'white', border: '1px solid var(--border)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', zIndex: 100, width: '320px', animation: 'popUp 0.2s cubic-bezier(0.16,1,0.3,1)' }}>
-              <div style={{ padding: '16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <strong style={{ fontSize: '14px' }}>Notifications</strong>
-                <span style={{ fontSize: '12px', color: 'var(--primary)', cursor: 'pointer' }} onClick={() => setIsNotifOpen(false)}>Mark all read</span>
-              </div>
-              <div style={{ padding: '8px' }}>
-                <div style={{ padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', borderRadius: '8px', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--gray-50)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <div style={{ fontSize: '18px' }}>✅</div>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>Acme Corp Report Generated</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>The PDF report is ready to download.</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px' }}>10 mins ago</div>
-                  </div>
-                </div>
-                <div style={{ padding: '12px', display: 'flex', gap: '12px', alignItems: 'flex-start', borderRadius: '8px', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--gray-50)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                  <div style={{ fontSize: '18px' }}>🔄</div>
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>Daily Sync Completed</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>SERanking data for 24 clients synced.</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px' }}>2 hours ago</div>
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: '12px', borderTop: '1px solid var(--border)', textAlign: 'center', fontSize: '13px', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>
-                View all notifications
-              </div>
-            </div>
-          )}
+
+        <div style={{ width: '1px', height: '24px', background: 'var(--border)' }}></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: 800 }}>JD</div>
+          Digital Horizons
         </div>
       </div>
     </header>
