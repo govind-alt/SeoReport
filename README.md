@@ -1,30 +1,51 @@
 <div align="center">
-  <h1>🚀 RankFlow — SEO Report Automation</h1>
+  <h1>🚀 RankFlow — SEO Report Automation SaaS</h1>
   <p>
-    <strong>A robust, multi-tenant SaaS platform that automates monthly SEO report generation for agencies.</strong>
+    <strong>A multi-tenant white-label SaaS platform automating monthly SEO report generation, client portals, keyword research, and billing for digital agencies.</strong>
   </p>
   <p>
     <img src="https://img.shields.io/badge/Next.js-16+-black?style=for-the-badge&logo=next.js" alt="Next.js" />
-    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Prisma-7+-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" />
-    <img src="https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white" alt="pnpm" />
+    <img src="https://img.shields.io/badge/jsPDF-2.5-red?style=for-the-badge" alt="jsPDF" />
   </p>
 </div>
 
 ---
 
-## 🎯 Phase 2-5 Features & Improvements
+## 🌟 Latest Major Upgrades & Features
 
-RankFlow is now fully functional from Phase 2 up to the completion of **Phase 5**, including major upgrades to white-label branding, API routes, mock data fallback modes, and premium UI aesthetics.
+RankFlow has been expanded with full **Super Admin Control Capabilities**, **3 Agency Operational Feature Suites**, a **Fully Functional Billing Suite**, and an **Executive High-Resolution Vector PDF Generator**.
 
-### Key Upgrades:
-- **Upgraded Database Schema:** Restructured snaps and reports database schema using Prisma. Added `SERankingProject` models and enhanced reporting configuration arrays (`sectionsJson`, `aiRecsJson`, `shareSlug`).
-- **Interactive Demo Mode:** The system automatically falls back to **rich, highly detailed demo data** if no SE Ranking API key is configured. Agencies can present the entire client portal experience (all 7 tabs, including historic Area/Line charts, keyword position gains, backlinks count, and site audit issue warnings) immediately to clients.
-- **Premium white-label UI Overhaul:**
-  - Animated sidebars with modern Lucide SVG icons.
-  - Interactive tab switches with charts, custom metric rings, and indicator badges.
-  - Custom glassmorphic modals for report generation and bulk operations.
-  - WHITE-LABEL branding color picking preview support in agency Settings.
+---
+
+### 💳 1. Fully Functional Plan & Billing Suite (`/settings?tab=billing`)
+- **Interactive Subscription Plan Upgrades**: Switch between `Starter ($49/mo)`, `Pro ($149/mo)`, and `Agency ($299/mo)` tiers with real-time quota expansions (`maxClients` up to Unlimited).
+- **Payment Method Management**: Dynamic card updating modal with live card brand recognition (Visa, Mastercard, Amex).
+- **Stripe Billing Customer Portal Modal**: Subscription account summary displaying renewal dates, invoice history, and recipient dispatches.
+- **Cancellation & Retention Workflow**: Retention offer workflow featuring a 50% discount claim or scheduled end-of-cycle cancellation.
+
+---
+
+### 📄 2. Executive High-Resolution Vector PDF Invoice Generator (`lib/invoicePdfGenerator.ts`)
+- **High-DPI Vector Canvas Rendering**: Built a 2.5× scale `html2canvas` + `jsPDF` render engine producing crisp, printable A4 PDF documents.
+- **Forced `.pdf` Filename Download**: Forced DOM download link attribute execution ensuring files save directly as `RankFlow_Invoice_INV-2026-06.pdf` across Windows, Mac, iOS, and Android.
+- **Executive Invoice Preview Modal**: Live HTML modal preview on screen with single-click **Download PDF File** and **Print Invoice** options.
+
+---
+
+### 🎯 3. New Agency Operational Feature Suites
+- **Keyword Research & Opportunity Explorer (`/keyword-explorer`)**: Analyze SERP search volumes, Keyword Difficulty (KD 0-100%), Intent categories, and 1-click tracking for client campaigns.
+- **Automated Report Scheduler & Dispatcher (`/schedules`)**: Hero Automation Control Hub, background engine status indicator (`● ENGINE ACTIVE`), batch execution triggers, and live dispatch logs.
+- **SEO Action Task Manager (`/tasks`)**: Hero Campaign Milestone Tracker banner with progress bars, technical audit checklists, priority filters, and client assignment.
+
+---
+
+### 🛠️ 4. Super Admin Control Panel (`/admin`)
+- **Platform Broadcasts Center**: Compose global agency alerts, filter target audiences, and archive broadcast history.
+- **Feature Flags & Tier Limits Configurator**: System Toggles for feature rollouts and tier limits manager (`Starter`, `Pro`, `Agency`).
+- **Integration Gateways Monitor**: Live status dashboard and webhook log console for SE Ranking, OpenAI, Resend, and Stripe.
+- **User & Agency Account Modals**: Full modals for user creation, agency edits, role assignments, and password resets.
 
 ---
 
@@ -33,62 +54,56 @@ RankFlow is now fully functional from Phase 2 up to the completion of **Phase 5*
 ```text
 SEOReport-main/
 ├── app/
-│   ├── [domain]/             ← Multi-tenant Subdomain Dashboard views
+│   ├── [domain]/                ← Multi-tenant Agency Dashboard & Client Portal
 │   │   └── (dashboard)/
-│   │       ├── clients/      ← Clients List and Detail view tabs
-│   │       ├── reports/      ← Reports list and preview workspace
-│   │       └── settings/     ← Agency profile and branding config
+│   │       ├── clients/         ← Client workspaces & detailed audit views
+│   │       ├── keyword-explorer/← Keyword research & volume explorer
+│   │       ├── reports/         ← PDF report generator & preview workspace
+│   │       ├── schedules/       ← Automated PDF report scheduler & cron engine
+│   │       ├── settings/        ← Agency branding, CNAME domain & Billing suite
+│   │       └── tasks/           ← Agency SEO checklist & campaign milestone tracker
+│   ├── admin/                   ← Super Admin Platform Control Panel
 │   ├── api/
-│   │   ├── agency/settings/  ← White-label preferences and encrypted keys
-│   │   ├── clients/          ← Clients CRUD API
-│   │   ├── dashboard/summary/← Global KPIs API aggregation
-│   │   └── seranking/        ← API proxy adapters for rank/audit logs
-│   ├── globals.css           ← Advanced glassmorphism theme system
-│   └── providers.tsx         ← Session Provider and Sonner notification context
-├── components/               ← Reusable layout items
-├── lib/                      ← Encryption tools and SERanking API wrappers
-├── scripts/                  ← Database seeding scripts for demo presentations
-└── prisma/                   ← DB Schema defining multi-tenant indexes
+│   │   ├── agency/settings/     ← Agency profile & encrypted API keys
+│   │   ├── billing/invoice-pdf/ ← PDF Invoice generation API endpoint
+│   │   ├── clients/             ← Clients CRUD API
+│   │   ├── dashboard/summary/   ← Global KPIs aggregation
+│   │   └── seranking/           ← SE Ranking API proxy adapters
+│   ├── globals.css              ← Glassmorphism & executive dark slate theme
+│   └── providers.tsx            ← Notification & auth context providers
+├── lib/
+│   ├── invoicePdfGenerator.ts   ← High-res vector PDF rendering engine (html2canvas + jsPDF)
+│   ├── seranking.ts             ← SE Ranking API client wrapper
+│   └── prisma.ts                ← Prisma ORM client instance
+└── prisma/                      ← DB schema defining multi-tenant database models
 ```
 
 ---
 
-## 🚀 Local Installation & Seeding
-
-Follow these steps to run the Next.js application locally with the pre-configured developer demo dataset:
+## 🚀 Quick Start Guide
 
 ### 1. Install Dependencies
-Make sure you use **pnpm** (version 11+) to handle package generation:
 ```bash
 pnpm install
 ```
 
 ### 2. Configure Environment Variables
 Create a `.env` file in the root directory:
-```bash
+```env
 DATABASE_URL="file:./dev.db"
 NEXTAUTH_SECRET="super-secret-key-vault-phrase-12345"
 NEXTAUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_ROOT_DOMAIN="localhost:3000"
 ```
 
-### 3. Apply Schema Migrations
+### 3. Run Migrations & Launch Server
 ```bash
 pnpm exec prisma migrate dev --name init
-```
-
-### 4. Seed the Database
-Run the TypeScript seed script using `tsx` to import the 5 preconfigured client records, monthly organic traffic lines, keyword snaps, and audit alerts:
-```bash
-pnpm exec tsx scripts/seed.ts
-```
-
-### 5. Launch the Development Server
-```bash
 pnpm run dev
 ```
 
-### 🔑 Demo Portal Credentials
-- **Access URL:** [http://localhost:3000/login](http://localhost:3000/login)
-- **Login Email:** `demo@rankflow.app`
-- **Password:** `demo123`
+### 🔑 Credentials & Links
+- **Agency Dashboard:** [http://localhost:3000/digital-horizons](http://localhost:3000/digital-horizons)
+- **Plan & Billing Settings:** [http://localhost:3000/digital-horizons/settings?tab=billing](http://localhost:3000/digital-horizons/settings?tab=billing)
+- **Super Admin Panel:** [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Login Email:** `demo@rankflow.app` | **Password:** `demo123`
