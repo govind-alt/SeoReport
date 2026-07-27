@@ -732,9 +732,13 @@ export default function SettingsTabsClient({ domain, initialAgency }: { domain: 
                   }
                 }} className="form-row" style={{ display: 'flex', gap: '16px' }}>
                   <div className="form-group" style={{ flex: 1 }}><label className="form-label">Email</label><input name="email" type="email" className="form-input" placeholder="colleague@agency.com" required /></div>
-                  <div className="form-group" style={{ flex: 1 }}><label className="form-label">Role <span style={{ cursor: 'pointer', fontSize: '10px', color: 'var(--primary)' }} title="Admin: full access. Member: manage clients & reports.">ℹ What can each role do?</span></label>
-                  <select name="role" className="form-input"><option value="admin">Admin</option><option value="member">Member</option></select></div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '4px' }}><button type="submit" className="btn btn-primary btn-sm">Send Invite</button></div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Role</label>
+                    <select name="role" className="form-input"><option value="admin">Admin</option><option value="member">Member</option></select>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '4px' }}>
+                    <button type="submit" className="btn btn-primary btn-sm">Send Invite</button>
+                  </div>
                 </form>
                 <div style={{ marginTop: '8px', background: 'var(--bg)', borderRadius: '5px', padding: '10px', fontSize: '11px', color: 'var(--text-muted)' }}>
                   <strong>Role permissions:</strong> Admin — full access including settings, billing, delete. Member — view/edit clients, generate reports, cannot access billing or team settings.
@@ -747,30 +751,48 @@ export default function SettingsTabsClient({ domain, initialAgency }: { domain: 
           {activeTab === 'scheduling' && (
             <div className="settings-panel active" style={{ maxWidth: '600px' }}>
               <div className="card" style={{ marginBottom: '20px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '16px' }}>Simulate Automation (Webhooks)</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Trigger mock background jobs manually to test system integrations.</div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="btn btn-secondary btn-sm" onClick={async () => {
-                      const t = toast.loading('Running daily sync...');
+                <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '16px' }}>⚡ Live Webhooks & Automation Triggers</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Trigger live background jobs, monthly email cron dispatchers, and alert webhooks.</div>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={async () => {
+                      const t = toast.loading('Dispatching automated monthly email reports...');
                       try {
-                        const r = await fetch('/api/webhooks/daily-sync', { method: 'POST' });
+                        const r = await fetch('/api/cron/email-reports?force=true');
                         const d = await r.json();
-                        toast.success(d.message || 'Sync complete!', { id: t });
+                        toast.success(`Cron Complete! ${d.schedulesEvaluated || 0} reports evaluated & emailed.`, { id: t });
                       } catch {
-                        toast.error('Sync failed', { id: t });
+                        toast.error('Cron dispatch failed', { id: t });
                       }
-                    }}>Trigger Daily Sync</button>
-                    <button className="btn btn-secondary btn-sm" onClick={async () => {
-                      const t = toast.loading('Dispatching reports...');
+                    }}>📧 Run Monthly Email Cron</button>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={async () => {
+                      const t = toast.loading('Sending Slack & Teams test alerts...');
                       try {
-                        const r = await fetch('/api/webhooks/monthly-reports', { method: 'POST' });
+                        const r = await fetch('/api/webhooks/alerts', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ agencyId: agency.id, type: 'Test Audit Alert' })
+                        });
                         const d = await r.json();
-                        toast.success(d.message || 'Reports dispatched!', { id: t });
+                        toast.success(d.message || 'Alert webhooks dispatched!', { id: t });
                       } catch {
-                        toast.error('Dispatch failed', { id: t });
+                        toast.error('Webhook dispatch failed', { id: t });
                       }
-                    }}>Trigger Monthly Reports</button>
+                    }}>🔔 Test Slack & Teams Alerts</button>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={async () => {
+                      const t = toast.loading('Simulating Stripe subscription webhook...');
+                      try {
+                        const r = await fetch('/api/webhooks/stripe', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ type: 'checkout.session.completed', metadata: { agencyId: agency.id, plan: 'enterprise' } })
+                        });
+                        const d = await r.json();
+                        toast.success(`Stripe Webhook applied! Upgraded to ${d.appliedPlan.toUpperCase()} tier.`, { id: t });
+                      } catch {
+                        toast.error('Stripe webhook simulation failed', { id: t });
+                      }
+                    }}>💳 Simulate Stripe Webhook</button>
                   </div>
                 </div>
               </div>

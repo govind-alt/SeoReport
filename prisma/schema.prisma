@@ -41,6 +41,10 @@ model Agency {
   notifyClientLogin   Boolean  @default(false)
   onboardingStep      Int      @default(0) // 0=not started, 1-4=wizard steps, 5=complete
   onboardingSkipped   Boolean  @default(false)
+  slackWebhookUrl     String?
+  teamsWebhookUrl     String?
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   users           User[]

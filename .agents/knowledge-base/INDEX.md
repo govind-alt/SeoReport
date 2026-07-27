@@ -21,3 +21,4 @@ Welcome to the modular Knowledge Base directory located at `.agents/knowledge-ba
 | 📄 [billing.md](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/knowledge-base/billing.md) | Stripe integration, agency subscription tier limits, and invoice rendering. |
 | 📄 [devops.md](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/knowledge-base/devops.md) | 1-command portable setup (`npm run setup`), `.env` environment variables, and Vercel deployment. |
 | 📄 [bugs-and-gotchas.md](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/knowledge-base/bugs-and-gotchas.md) | Resolved issues, common gotchas, infinite loop fixes, and Windows execution rules. |
+| 📄 [expansions.md](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/knowledge-base/expansions.md) | Production features: Email Cron Dispatcher, Stripe Webhooks, GA4/GSC Integration, Slack/Teams Alert Webhooks. |
