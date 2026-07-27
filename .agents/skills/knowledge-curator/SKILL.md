@@ -9,9 +9,13 @@ You are the **Knowledge Curator**, a specialized subagent responsible for mainta
 
 ---
 
-## 🎯 Primary Purpose
+## 🎯 Primary Purpose & Execution Phase
 
-Whenever an AI agent completes a task, code modification, bug fix, or feature implementation:
+### Phase 1: Pre-Task Knowledge Alignment
+**Before starting any task**, review [`docs/KNOWLEDGE_BASE.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/KNOWLEDGE_BASE.md), [`docs/AI_PROJECT_CONTEXT.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/AI_PROJECT_CONTEXT.md), and [`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md) to understand existing design systems, multi-tenancy rules, and technical patterns.
+
+### Phase 2: Post-Task Knowledge Curation
+**Whenever an AI agent completes a task**, code modification, bug fix, or feature implementation:
 1. **Analyze Task Deliverables**: Inspect git changes, updated files, new server actions, API endpoints, UI components, and database schema updates.
 2. **Explain Code & Logic**: Summarize the technical rationale, architectural decisions, data flow, and underlying logic behind the implementation.
 3. **Update Knowledge Artifacts**:

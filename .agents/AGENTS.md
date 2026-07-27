@@ -6,16 +6,29 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ---
 
-# 🤖 GLOBAL RULE: Automatic Knowledge Curator Execution
+# 🤖 MANDATORY GLOBAL AGENT RULES
 
-**Mandatory Rule for All AI Agents:**
-On completion of **ANY** task, code modification, bug fix, or feature implementation:
+All AI Agents working on this repository MUST strictly follow these two mandatory workflow execution rules:
+
+---
+
+## 🔍 RULE 1: MANDATORY PRE-TASK KNOWLEDGE & INSTRUCTIONS REVIEW
+**BEFORE starting ANY task, research, analysis, or code modification:**
+
+1. **Review Master Knowledge Base**: Inspect [`docs/KNOWLEDGE_BASE.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/KNOWLEDGE_BASE.md) to understand current system architecture, design tokens (`#222831`, `#393E46`, `#00ADB5`, `#EEEEEE`), Prisma schema models, and REST endpoints.
+2. **Review Onboarding & Build Context**: Read [`docs/AI_PROJECT_CONTEXT.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/AI_PROJECT_CONTEXT.md) and [`docs/BUILD_LOG.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/BUILD_LOG.md) for date-wise chronological project context.
+3. **Review Global Agent Rules**: Read this file ([`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md)) to align with repository constraints, multi-tenancy rules, and coding standards.
+4. **No Assumption Policy**: Do NOT guess variable names, routes, or schema fields — verify against existing knowledge base documents first.
+
+---
+
+## 🧠 RULE 2: AUTOMATIC KNOWLEDGE CURATOR POST-TASK EXECUTION
+**ON COMPLETION of ANY task, code modification, bug fix, or feature implementation:**
 
 1. **Trigger Knowledge Curator SubAgent**: Execute the Knowledge Curator workflow defined in [SKILL.md](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/skills/knowledge-curator/SKILL.md).
 2. **Gather Technical Insights**: Inspect modified files, trace implementation logic, extract code rationale, and document database or route changes.
-3. **Update Knowledge Base**:
+3. **Update Knowledge Base Documents**:
    - Update date-wise timeline in [`docs/KNOWLEDGE_BASE.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/KNOWLEDGE_BASE.md).
-   - Append execution logs to [`docs/BUILD_LOG.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/BUILD_LOG.md).
+   - Append date-wise execution log to [`docs/BUILD_LOG.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/BUILD_LOG.md).
    - Refresh token-optimized context in [`docs/AI_PROJECT_CONTEXT.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/AI_PROJECT_CONTEXT.md).
-4. **Ensure Inter-Agent Portability**: Guarantee that all newly acquired project knowledge, architectural decisions, and setup instructions are immediately accessible to any AI agent pair programming on this repository.
-
+4. **Ensure Inter-Agent Portability**: Guarantee that all newly acquired project knowledge, architectural decisions, and setup instructions are immediately accessible to any AI agent working on this repository.
