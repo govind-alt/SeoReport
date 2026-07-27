@@ -68,7 +68,7 @@ timeline
   - Dark Charcoal Surface (`#16161A` & `#1F1F24`)
   - Electric Crimson Red Accent (`#FF1E42` & hover `#E01435`)
   - Crisp Light Neutral (`#F4F4F6`)
-- **Complete Elimination of Legacy Hexes**: Systematically replaced all hardcoded teal hex values across superadmin console components, login portals, database explorer UI, badges, and active sidebar tabs with Crimson Red (`#FF1E42`).
+- **Mandatory Git Push Rule**: Updated [`.agents/skills/knowledge-curator/SKILL.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/skills/knowledge-curator/SKILL.md) and [`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md) mandating an automatic `git add . && git commit -m "..." && git push origin main` pipeline immediately after every Knowledge Curator run.
 - **Default Agency Branding Update** ([`lib/branding.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/lib/branding.ts)): Set default fallback agency colors to `#FF1E42` and `#E01435`.
 
 ---
