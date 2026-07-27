@@ -12,8 +12,8 @@ export interface AgencyBranding {
 
 const DEFAULTS: AgencyBranding = {
   name: 'RankFlow',
-  primaryColor: '#6366f1',
-  accentColor: '#8b5cf6',
+  primaryColor: '#FF1E42',
+  accentColor: '#E01435',
   font: "'Inter', sans-serif",
   logoUrl: null,
   whiteLabelEnabled: false,

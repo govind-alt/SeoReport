@@ -62,9 +62,14 @@ timeline
 #### 🌆 Afternoon: Auto-Seeding, Multi-Role Authentication & Passwords
 - **Automatic Multi-Tenant Seeding** ([`seedAgencyDemoData`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/actions.ts)): Automated demo data generation auto-populating 3 clients (`Acme E-Commerce Store`, `Apex Tech Solutions`, `GreenEarth Organics`), 6-month historical snapshots, site audits, and reports for any empty or newly registered agency.
 - **New Profile Infinite Loop Resolution** ([`app/api/auth/register/route.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/api/auth/register/route.ts)): Resolved loading loop issues for newly created accounts by auto-seeding demo data during account registration.
-- **Multi-Role Sign-In Suite**: Built role-specific portals (`/login`, `/login/client`, `/login/admin`) featuring 1-click **Auto Fill ⚡** credential buttons.
-- **Global Password Reset**: Re-hashed and synchronized all 16 user account passwords in the database to **`Password123!`** via `scripts/reset-passwords.ts` and enhanced `lib/auth.ts`.
-- **Knowledge Curator SubAgent & Global Rule**: Created dedicated subagent skill ([`.agents/skills/knowledge-curator/SKILL.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/skills/knowledge-curator/SKILL.md)) and enforced a global agent rule ([`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md)) requiring automatic knowledge base curation after every task completion.
+#### 🌆 Afternoon: Cyber Black & Crimson Red Design System Transformation
+- **Black & Red Design Token Overhaul** ([`app/globals.css`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/globals.css)): Transformed design system tokens to a high-contrast Cyber Black & Crimson Red theme:
+  - Deep Onyx Black Background (`#0D0D0D`)
+  - Dark Charcoal Elevation Surface (`#16161A` & `#1F1F24`)
+  - Electric Crimson Red Accent (`#FF1E42` & hover `#E01435`)
+  - Crisp Light Neutral (`#F4F4F6`)
+- **Agency Fallback Branding** ([`lib/branding.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/lib/branding.ts)): Updated default fallback agency primary and accent colors to `#FF1E42` and `#E01435`.
+- **Radial Crimson Background Effects**: Applied subtle radial red glow highlights (`rgba(255, 30, 66, 0.08)`) and crimson active aura shadows across buttons, active sidebar items, and table borders.
 
 ---
 
@@ -72,12 +77,12 @@ timeline
 
 | Token Name | Color Hex / RGB | Application / Context |
 |---|---|---|
-| `--bg` | `#222831`<br>`rgb(34, 40, 49)` | Deep dark canvas background across all pages and modal backdrops. |
-| `--surface` | `#393E46`<br>`rgb(57, 62, 70)` | Elevation cards, table wrappers, sidebar containers, and navigation headers. |
-| `--primary` | `#00ADB5`<br>`rgb(0, 173, 181)` | Primary CTA buttons, active tab borders, chart accents, and glowing aura highlights. |
-| `--text-primary` | `#EEEEEE`<br>`rgb(238, 238, 238)` | High-contrast typography, primary page titles, KPI values, and table headers. |
-| `--text-secondary` | `#B5BEC9`<br>`rgb(181, 190, 201)` | Sub-headings, secondary metrics, field labels, and descriptions. |
-| `--text-muted` | `#8491A2`<br>`rgb(132, 145, 162)` | Timestamps, table captions, search placeholders, and muted footers. |
+| `--bg` | `#0D0D0D`<br>`rgb(13, 13, 13)` | Pure deep onyx black canvas background across all pages and modal backdrops. |
+| `--surface` | `#16161A`<br>`rgb(22, 22, 26)` | Dark charcoal elevation cards, table wrappers, sidebar containers, and navigation headers. |
+| `--primary` | `#FF1E42`<br>`rgb(255, 30, 66)` | Primary CTA buttons, active tab borders, chart accents, and crimson glowing aura highlights. |
+| `--text-primary` | `#F4F4F6`<br>`rgb(244, 244, 246)` | High-contrast typography, primary page titles, KPI values, and table headers. |
+| `--text-secondary` | `#A0A0AA`<br>`rgb(160, 160, 170)` | Sub-headings, secondary metrics, field labels, and descriptions. |
+| `--text-muted` | `#71717A`<br>`rgb(113, 113, 122)` | Timestamps, table captions, search placeholders, and muted footers. |
 
 ---
 

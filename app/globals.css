@@ -7,50 +7,50 @@
 
 /* ─── Core Design Tokens ─── */
 :root {
-  /* Ultra-Professional Teal & Dark Slate Theme (#222831, #393E46, #00ADB5, #EEEEEE) */
-  --primary: #00ADB5; /* Vibrant Teal Accent */
-  --primary-hover: #008C93;
-  --primary-light: rgba(0, 173, 181, 0.15);
-  --primary-dark: #006B70;
-  --primary-glow: 0 0 20px rgba(0, 173, 181, 0.4);
+  /* Ultra-Professional Cyber Black & Crimson Red Theme (#0D0D0D, #16161A, #FF1E42, #F4F4F6) */
+  --primary: #FF1E42; /* Electric Crimson Red Accent */
+  --primary-hover: #E01435;
+  --primary-light: rgba(255, 30, 66, 0.15);
+  --primary-dark: #C00A28;
+  --primary-glow: 0 0 25px rgba(255, 30, 66, 0.5);
 
   --success: #10B981;
   --success-light: rgba(16, 185, 129, 0.15);
   --warning: #F59E0B;
   --warning-light: rgba(245, 158, 11, 0.15);
-  --danger: #EF4444;
-  --danger-light: rgba(239, 68, 68, 0.15);
-  --info: #00ADB5;
-  --info-light: rgba(0, 173, 181, 0.15);
+  --danger: #FF1E42;
+  --danger-light: rgba(255, 30, 66, 0.15);
+  --info: #FF1E42;
+  --info-light: rgba(255, 30, 66, 0.15);
 
-  --gray-50: #1E2228;
-  --gray-100: #2A2F37;
-  --gray-200: #393E46;
-  --gray-300: #4B525D;
-  --gray-400: #687280;
-  --gray-500: #8491A2;
-  --gray-600: #B5BEC9;
-  --gray-700: #D8DFE7;
-  --gray-800: #EEEEEE;
+  --gray-50: #121215;
+  --gray-100: #18181C;
+  --gray-200: #222228;
+  --gray-300: #2E2E36;
+  --gray-400: #52525B;
+  --gray-500: #71717A;
+  --gray-600: #A0A0AA;
+  --gray-700: #D4D4D8;
+  --gray-800: #F4F4F6;
   --gray-900: #FFFFFF;
 
-  --bg: #222831; /* Primary Deep Dark Background */
-  --surface: #393E46; /* Card & Container Surface */
-  --surface-2: #2D323A; /* Slightly darker container */
-  --surface-glass: rgba(57, 62, 70, 0.85);
+  --bg: #0D0D0D; /* Pure Deep Onyx Black Background */
+  --surface: #16161A; /* Card & Container Surface */
+  --surface-2: #1F1F24; /* Elevated container */
+  --surface-glass: rgba(22, 22, 26, 0.88);
   --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(0, 173, 181, 0.3);
+  --border-strong: rgba(255, 30, 66, 0.35);
 
-  --text-primary: #EEEEEE; /* Crisp Primary Light Neutral */
-  --text-secondary: #B5BEC9;
-  --text-muted: #8491A2;
-  --text-inverse: #222831;
+  --text-primary: #F4F4F6; /* Crisp Primary Light Neutral */
+  --text-secondary: #A0A0AA;
+  --text-muted: #71717A;
+  --text-inverse: #0D0D0D;
 
-  --sidebar-bg: #1A1E24;
+  --sidebar-bg: #111114;
   --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active: rgba(0, 173, 181, 0.18);
-  --sidebar-text: #8491A2;
-  --sidebar-text-active: #EEEEEE;
+  --sidebar-active: rgba(255, 30, 66, 0.18);
+  --sidebar-text: #71717A;
+  --sidebar-text-active: #F4F4F6;
   --sidebar-border: rgba(255, 255, 255, 0.08);
 
   --radius-sm: 8px;
@@ -60,12 +60,12 @@
   --radius-xl: 32px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
-  --shadow: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-md: 0 8px 24px rgba(0,0,0,0.5);
-  --shadow-lg: 0 16px 40px rgba(0,0,0,0.6);
-  --shadow-glow: 0 0 0 2px rgba(0, 173, 181, 0.4);
-  --shadow-card: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.5);
+  --shadow: 0 4px 12px rgba(0,0,0,0.6);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.7);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.8);
+  --shadow-glow: 0 0 0 2px rgba(255, 30, 66, 0.4);
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
 
   --transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   --transition-fast: all 0.15s ease-out;
@@ -78,8 +78,8 @@ html { font-size: 14px; scroll-behavior: smooth; }
 body {
   font-family: var(--font-outfit), 'Outfit', -apple-system, sans-serif;
   background: var(--bg);
-  background-image: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08), transparent 25%),
-                    radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05), transparent 25%);
+  background-image: radial-gradient(circle at 15% 50%, rgba(255, 30, 66, 0.08), transparent 30%),
+                    radial-gradient(circle at 85% 30%, rgba(224, 20, 53, 0.06), transparent 30%);
   background-attachment: fixed;
   color: var(--text-primary);
   line-height: 1.55;
@@ -88,7 +88,7 @@ body {
   min-height: 100vh;
 }
 a { color: var(--primary); text-decoration: none; transition: var(--transition-fast); }
-a:hover { color: var(--info); text-shadow: 0 0 8px rgba(6, 182, 212, 0.4); }
+a:hover { color: #FF4D6D; text-shadow: 0 0 12px rgba(255, 30, 66, 0.5); }
 img { max-width: 100%; display: block; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 input,select,textarea { font-family: inherit; }
