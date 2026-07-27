@@ -116,6 +116,7 @@ export async function getClientDetails(clientId: string) {
     name: client.name,
     domain: client.domain,
     status: 'active',
+    serankingProjectId: client.serankingProjectId,
     reports: client.reports
   };
 }
@@ -157,6 +158,143 @@ export async function registerAgency(data: any) {
             role: 'admin'
           }
         }
+      }
+    });
+
+    const crypto = require('crypto');
+
+    // 1. Seed initial starter client for agency
+    const client = await prisma.client.create({
+      data: {
+        name: 'Acme Corp (Sample Client)',
+        domain: 'acme-sample.com',
+        industry: 'SaaS / Tech',
+        contactEmail: 'client@acme-sample.com',
+        contactName: 'Sarah Jenkins',
+        notes: 'Sample client automatically created to help you explore your new RankFlow agency portal.',
+        agencyId: agency.id
+      }
+    });
+
+    // 2. Create SERanking Project
+    const serankingId = Math.floor(1000000 + Math.random() * 9000000);
+    const project = await prisma.sERankingProject.create({
+      data: {
+        serankingId,
+        name: client.name,
+        url: client.domain,
+        clientId: client.id
+      }
+    });
+
+    // 3. Seed 6 months of historical keyword & analytics snapshots
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 15);
+      const factor = 1 + (5 - i) * 0.08;
+      const top3Count = Math.round(12 * factor);
+      const top10Count = Math.round(42 * factor);
+      const top30Count = Math.round(110 * factor);
+      const totalKeywords = Math.round(250 * factor);
+
+      await prisma.keywordSnapshot.create({
+        data: {
+          date,
+          serankingProjectId: project.id,
+          top3Count,
+          top10Count,
+          top30Count,
+          top100Count: totalKeywords,
+          totalKeywords,
+          avgPosition: parseFloat((21.5 - (5 - i) * 0.7).toFixed(1)),
+          positionsJson: JSON.stringify([
+            { keyword: 'seo services london', pos: Math.round(12 - (5 - i)), change: 2, vol: 1600, url: '/services' },
+            { keyword: 'rank tracker software', pos: Math.round(6 - (5 - i)), change: 1, vol: 2400, url: '/features' },
+            { keyword: 'white label seo reports', pos: Math.round(3 - (5 - i)), change: 3, vol: 1900, url: '/' }
+          ])
+        }
+      });
+
+      await prisma.analyticsSnapshot.create({
+        data: {
+          date,
+          serankingProjectId: project.id,
+          organicSessions: Math.round(6500 * factor),
+          clicks: Math.round(7200 * factor),
+          impressions: Math.round(140000 * factor),
+          ctr: 0.051,
+          avgPosition: 14.2,
+          topQueriesJson: JSON.stringify([
+            { query: 'seo software demo', impressions: Math.round(5000 * factor), clicks: Math.round(350 * factor), ctr: 0.07 },
+            { query: 'automated client reports', impressions: Math.round(3200 * factor), clicks: Math.round(220 * factor), ctr: 0.068 }
+          ]),
+          topPagesJson: JSON.stringify([
+            { page: '/', clicks: Math.round(4500 * factor), impressions: Math.round(80000 * factor) },
+            { page: '/pricing', clicks: Math.round(2100 * factor), impressions: Math.round(35000 * factor) }
+          ])
+        }
+      });
+    }
+
+    // 4. Seed Audit and Backlink Snapshots
+    await prisma.auditSnapshot.create({
+      data: {
+        date: now,
+        serankingProjectId: project.id,
+        healthScore: 84,
+        pagesCrawled: 186,
+        criticalIssues: 1,
+        warningIssues: 8,
+        noticeIssues: 14,
+        issuesJson: JSON.stringify([
+          { issue: 'Missing H1 Tag', severity: 'warning', count: 3, pages: '/blog/post-1' },
+          { issue: 'Broken Internal Link', severity: 'critical', count: 1, pages: '/services' }
+        ])
+      }
+    });
+
+    await prisma.backlinkSnapshot.create({
+      data: {
+        date: now,
+        serankingProjectId: project.id,
+        domainTrust: 48,
+        totalBacklinks: 3120,
+        newBacklinks: 24,
+        lostBacklinks: 2,
+        referringDomains: 168,
+        dofollowLinks: 2400,
+        nofollowLinks: 720
+      }
+    });
+
+    // 5. Seed an initial SEO Report card
+    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    await prisma.report.create({
+      data: {
+        clientId: client.id,
+        periodStart: firstOfMonth,
+        periodEnd: lastOfMonth,
+        status: 'done',
+        generatedAt: now,
+        aiRecsJson: JSON.stringify([
+          { priority: 'critical', title: 'Fix broken internal link on /services', detail: '1 broken link found. Fix to protect crawl budget.', impact: 'High' },
+          { priority: 'high', title: 'Target "rank tracker software" Pos. 5', detail: 'Internal link push can move this keyword into top 3.', impact: 'High' }
+        ]),
+        sectionsJson: JSON.stringify({ keywords: true, backlinks: true, audit: true, analytics: true }),
+        shareSlug: crypto.randomBytes(7).toString('base64url').slice(0, 10),
+      }
+    });
+
+    // 6. Create Welcome Notification
+    await prisma.notification.create({
+      data: {
+        agencyId: agency.id,
+        type: 'alert',
+        title: `Welcome to RankFlow, ${agencyName}! 🚀`,
+        body: 'Your workspace is ready. We have created a sample client record so you can test all reporting and portal features right away.',
+        link: `/${subdomain}/clients`
       }
     });
     

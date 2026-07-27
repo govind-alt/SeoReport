@@ -9,6 +9,7 @@ import type {
   SERankingAnalyticsOverview,
   SERankingGSCQuery,
   SERankingGSCPage,
+  SERankingKeywordResearch,
 } from './types';
 
 const API_BASE_URL = 'https://api.seranking.com/v3';
@@ -39,6 +40,17 @@ export class SERankingClient {
   /** GET /sites — List all projects */
   async getSites(): Promise<SERankingSite[]> {
     return this.fetchApi<SERankingSite[]>('/sites');
+  }
+
+  // ── Keyword Research ──────────────────────────────────────────────────────
+
+  /** GET /research/keywords?keyword={keyword}&country_id={country_id} */
+  async getKeywordResearch(keyword: string, countryId = 840 /* US by default */): Promise<SERankingKeywordResearch[]> {
+    // In SE Ranking v3, keyword data might come from different endpoints depending on the module. 
+    // This is a proxy method for the data/v3/keyword_research endpoint.
+    return this.fetchApi<SERankingKeywordResearch[]>(
+      `/data/v3/keyword_research?keyword=${encodeURIComponent(keyword)}&country_id=${countryId}`
+    );
   }
 
   // ── Rankings ─────────────────────────────────────────────────────────────

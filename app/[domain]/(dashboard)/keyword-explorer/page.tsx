@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import {
   Search, TrendingUp, DollarSign, BarChart2, CheckCircle2,
@@ -42,33 +42,60 @@ export default function KeywordExplorerPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [keywords, setKeywords] = useState<KeywordResult[]>(INITIAL_KEYWORDS);
   const [selectedKw, setSelectedKw] = useState<KeywordResult | null>(null);
+  const [clients, setClients] = useState<{id: string, name: string, domain: string}[]>(MOCK_CLIENTS);
   const [assignClientId, setAssignClientId] = useState(MOCK_CLIENTS[0].id);
   const [intentFilter, setIntentFilter] = useState<string>('all');
   const [diffFilter, setDiffFilter] = useState<string>('all');
 
-  const handleSearch = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetch('/api/clients')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setClients(data);
+          setAssignClientId(data[0].id);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
-    setTimeout(() => {
-      setIsSearching(false);
-      const q = searchQuery.toLowerCase();
-      const generated: KeywordResult[] = [
-        { id: String(Date.now()), keyword: q, volume: 18400, difficulty: Math.floor(Math.random() * 40) + 40, cpc: +(Math.random() * 10 + 5).toFixed(2), intent: 'Commercial', topResult: `${q.replace(/\s+/g, '')}.com`, trend: 'up' },
-        { id: String(Date.now() + 1), keyword: `best ${q}`, volume: 9200, difficulty: Math.floor(Math.random() * 30) + 30, cpc: +(Math.random() * 8 + 4).toFixed(2), intent: 'Transactional', topResult: `top${q.replace(/\s+/g, '')}.io`, trend: 'up' },
-        { id: String(Date.now() + 2), keyword: `${q} pricing & reviews`, volume: 5600, difficulty: Math.floor(Math.random() * 25) + 20, cpc: +(Math.random() * 6 + 3).toFixed(2), intent: 'Informational', topResult: `review-${q.replace(/\s+/g, '')}.org`, trend: 'stable' },
-        { id: String(Date.now() + 3), keyword: `how to choose ${q}`, volume: 4300, difficulty: Math.floor(Math.random() * 20) + 15, cpc: +(Math.random() * 5 + 2).toFixed(2), intent: 'Informational', topResult: 'guide.net', trend: 'up' },
-      ];
+    try {
+      const res = await fetch(`/api/seranking/keyword-research?keyword=${encodeURIComponent(searchQuery)}`);
+      if (!res.ok) throw new Error('Failed to fetch keyword research');
+      
+      const data = await res.json();
+      
+      // Transform SERanking data to KeywordResult format if needed, 
+      // or directly use it since the demo mock matches the schema mostly.
+      const mappedResults: KeywordResult[] = data.map((item: any, i: number) => ({
+        id: String(Date.now() + i),
+        keyword: item.keyword,
+        volume: item.search_volume || 0,
+        difficulty: item.difficulty || 0,
+        cpc: item.cpc || 0,
+        intent: item.intent || 'Informational',
+        topResult: item.topResult || 'google.com',
+        trend: item.trend || 'stable',
+      }));
 
-      setKeywords(prev => [...generated, ...prev]);
-      toast.success(`Found 4 new keyword research results for "${searchQuery}"`);
-    }, 1200);
+      setKeywords(prev => [...mappedResults, ...prev]);
+      toast.success(`Found ${mappedResults.length} new keyword research results for "${searchQuery}"`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to get keyword research data');
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleTrackKeyword = () => {
     if (!selectedKw) return;
-    const client = MOCK_CLIENTS.find(c => c.id === assignClientId);
+    const client = clients.find(c => c.id === assignClientId);
     toast.success(`Keyword "${selectedKw.keyword}" added to ${client?.name}'s tracking campaign!`);
     setSelectedKw(null);
   };
@@ -304,7 +331,7 @@ export default function KeywordExplorerPage() {
                   className="form-input"
                   style={{ fontSize: 13 }}
                 >
-                  {MOCK_CLIENTS.map(c => (
+                  {clients.map(c => (
                     <option key={c.id} value={c.id}>{c.name} ({c.domain})</option>
                   ))}
                 </select>

@@ -45,6 +45,13 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
   const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [rankings, setRankings] = useState<any[]>(mockKeywords);
+  const [rankingsLoading, setRankingsLoading] = useState(false);
+  const [backlinks, setBacklinks] = useState<any>(null);
+  const [backlinksLoading, setBacklinksLoading] = useState(false);
+  const [audit, setAudit] = useState<any>(null);
+  const [auditLoading, setAuditLoading] = useState(false);
+  
   const resolvedParams = use(params);
   const clientId = resolvedParams.clientId;
   const domain = resolvedParams.domain || 'localhost';
@@ -78,6 +85,54 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
       setLoading(false);
     });
   }, [clientId]);
+
+  // Fetch Rankings Data
+  useEffect(() => {
+    if (activeTab === 'keywords' && client?.serankingProjectId) {
+      setRankingsLoading(true);
+      fetch(`/api/seranking/rankings?siteId=${client.serankingProjectId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.positions) {
+            setRankings(data.positions);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setRankingsLoading(false));
+    }
+  }, [activeTab, client?.serankingProjectId]);
+
+  // Fetch Backlinks Data
+  useEffect(() => {
+    if (activeTab === 'backlinks' && client?.domain) {
+      setBacklinksLoading(true);
+      fetch(`/api/seranking/backlinks?domain=${client.domain}&type=summary`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.error) {
+            setBacklinks(data);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setBacklinksLoading(false));
+    }
+  }, [activeTab, client?.domain]);
+
+  // Fetch Audit Data
+  useEffect(() => {
+    if (activeTab === 'audit' && client?.serankingProjectId) {
+      setAuditLoading(true);
+      fetch(`/api/seranking/audit?siteId=${client.serankingProjectId}&includeIssues=true`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && !data.error) {
+            setAudit(data);
+          }
+        })
+        .catch(console.error)
+        .finally(() => setAuditLoading(false));
+    }
+  }, [activeTab, client?.serankingProjectId]);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -219,9 +274,11 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
                 </tr>
               </thead>
               <tbody>
-                {mockKeywords.map(kw => (
-                  <tr key={kw.id}>
-                    <td style={{ fontWeight: 600 }}>{kw.keyword}</td>
+                {rankingsLoading ? (
+                  <tr><td colSpan={6} style={{padding: '20px', textAlign: 'center'}}>Loading rankings...</td></tr>
+                ) : rankings.map((kw: any) => (
+                  <tr key={kw.id || kw.keyword_id}>
+                    <td style={{ fontWeight: 600 }}>{kw.keyword || kw.keyword_name}</td>
                     <td>{kw.position}</td>
                     <td>
                       <span className={`badge ${kw.change > 0 ? 'badge-success' : kw.change < 0 ? 'badge-danger' : 'badge-neutral'}`}>
@@ -260,17 +317,24 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
             </div>
             <div className="card" style={{ padding: '20px' }}>
               <div style={{ fontWeight: 700, marginBottom: '14px' }}>Backlink Profile Strength</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Domain Trust score:</span> <span style={{ fontWeight: 'bold' }}>42/100</span>
+              {backlinksLoading ? (
+                <div>Loading backlinks...</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Domain Trust score:</span> <span style={{ fontWeight: 'bold' }}>{backlinks?.domain_trust ?? 42}/100</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Total backlinks:</span> <span style={{ fontWeight: 'bold' }}>{(backlinks?.total_backlinks ?? 1284).toLocaleString()}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                    <span>Dofollow links:</span> 
+                    <span style={{ fontWeight: 'bold', color: '#10B981' }}>
+                      {backlinks ? Math.round((backlinks.dofollow_links / backlinks.total_backlinks) * 100) : 86}%
+                    </span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Total backlinks:</span> <span style={{ fontWeight: 'bold' }}>1,284</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                  <span>Dofollow links:</span> <span style={{ fontWeight: 'bold', color: '#10B981' }}>86%</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -279,28 +343,36 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
       {/* TAB: AUDIT */}
       {activeTab === 'audit' && (
         <div className="tab-panel active">
-          <div className="card" style={{ padding: '20px', marginBottom: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <span style={{ fontSize: '24px' }}>🛡️</span>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '16px' }}>Health Score: 76%</div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Crawl date: Today at 02:14 AM</div>
+          {auditLoading ? (
+            <div style={{padding: '40px', textAlign: 'center'}}>Loading audit data...</div>
+          ) : (
+            <div className="card" style={{ padding: '20px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+                <span style={{ fontSize: '24px' }}>🛡️</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '16px' }}>Health Score: {audit?.status?.health_score ?? 76}%</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    Crawl date: {audit?.status?.last_audit_date ? new Date(audit.status.last_audit_date).toLocaleString() : 'Today at 02:14 AM'}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {(audit?.issues || mockAuditIssues).map((issue: any, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--gray-50)', borderRadius: '8px' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '13px' }}>{issue.issue || issue.description || issue.type?.replace(/_/g, ' ')}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        {issue.pages || (issue.affected_pages ? `${issue.affected_pages.length} pages` : '')}
+                      </div>
+                    </div>
+                    <span className={`badge ${issue.severity === 'critical' ? 'badge-danger' : issue.severity === 'warning' ? 'badge-warning' : 'badge-neutral'}`}>
+                      {issue.severity.toUpperCase()} ({issue.count})
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {mockAuditIssues.map((issue, idx) => (
-                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'var(--gray-50)', borderRadius: '8px' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '13px' }}>{issue.issue}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{issue.pages}</div>
-                  </div>
-                  <span className={`badge ${issue.severity === 'critical' ? 'badge-danger' : issue.severity === 'warning' ? 'badge-warning' : 'badge-neutral'}`}>
-                    {issue.severity.toUpperCase()} ({issue.count})
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       )}
 

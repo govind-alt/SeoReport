@@ -11,7 +11,7 @@ export interface SERankingSite {
   created_at?: string;
 }
 
-// ── Keywords & Rankings ───────────────────────────────────────────────────────
+// ── Keywords & Keyword Research ───────────────────────────────────────────────
 
 export interface SERankingKeyword {
   id: number;
@@ -19,6 +19,14 @@ export interface SERankingKeyword {
   group_id?: number;
   volume?: number;
   difficulty?: number;
+}
+
+export interface SERankingKeywordResearch {
+  keyword: string;
+  search_volume: number;
+  cpc: number;
+  difficulty: number;
+  intent?: 'Informational' | 'Commercial' | 'Transactional' | 'Navigational';
 }
 
 export interface SERankingPosition {
