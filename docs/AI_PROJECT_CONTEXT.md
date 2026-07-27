@@ -22,6 +22,7 @@ SEOReportAutomationApp/
 ├── AI_PROJECT_CONTEXT.md        ← THIS FILE (read first)
 ├── README.md                    ← Quick overview
 ├── docs/
+│   ├── KNOWLEDGE_BASE.md        ← MASTER Knowledge & Architecture Documentation
 │   ├── 01_PROJECT_SCOPE.md      ← Business requirements, user roles, modules
 │   ├── 02_TECH_STACK.md         ← Full stack decisions + package.json manifest
 │   ├── 03_ARCHITECTURE.md       ← Multi-tenancy design, system diagram

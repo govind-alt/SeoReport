@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!agency) {
-      return NextResponse.json({ clients: 0, reports: 0 });
+      return NextResponse.json({ clients: 0, reports: 0, agencyName: '' });
     }
 
     const clientIds = agency.clients.map(c => c.id);
@@ -21,9 +21,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       clients: agency.clients.length,
-      reports: reportCount
+      reports: reportCount,
+      agencyName: agency.name
     });
   } catch {
-    return NextResponse.json({ clients: 0, reports: 0 });
+    return NextResponse.json({ clients: 0, reports: 0, agencyName: '' });
   }
 }
+

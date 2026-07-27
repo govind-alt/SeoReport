@@ -1,48 +1,50 @@
-# RankFlow Build Log
+# RankFlow Build & Execution Log
 
-This document serves as the **source of truth** for the current state of the RankFlow repository. It is heavily token-optimized to allow AI agents to instantly understand the architecture and resume development.
+This document serves as the **chronological source of truth** for the development timeline of the RankFlow repository.
 
-## Current State
-**Phase 4 (Next.js Application Architecture & Refinement) is 100% COMPLETE.**
-- The repository has been fully migrated from static HTML/CSS to a **Next.js 15 App Router** architecture.
-- The original static wireframes are preserved in the `archive/src/` folder for reference.
-- Dynamic routing, multi-tenant structures (`[domain]`), and API integrations (like headless PDF generation) are fully functional.
+---
 
-## Repository Architecture
+## 📅 Date-Wise Chronological Execution History
 
-### 1. Global Configuration
-- **Next.js 15 App Router:** The application utilizes the new app router paradigm, including `page.tsx`, `layout.tsx`, and `route.ts` conventions.
-- **Styling:** We maintained the pure, high-fidelity CSS styling from Phase 1 (`app/globals.css`, `app/marketing.css`), avoiding Tailwind to preserve the exact pixel-perfect aesthetics of the original designs.
-- **Database / Auth:** Prisma schema is configured with SQLite/PostgreSQL support. NextAuth is set up in `lib/auth.ts`, though Google OAuth is currently mocked to bypass directly into the dashboard for rapid prototyping.
+### 📆 2026-06-23 — System Architecture & Data Model Mapping
+- Finalized multi-tenant SaaS architecture, subdomain middleware routing strategy, and 4-tier user roles (`Superadmin`, `Agency Admin`, `Team Member`, `Client User`).
+- Defined complete Prisma database schema (`Agency`, `User`, `Client`, `KeywordSnapshot`, `AnalyticsSnapshot`, `AuditSnapshot`, `BacklinkSnapshot`, `Report`, `AuditLog`).
 
-### 2. Multi-Tenant Dashboard (`app/[domain]/(dashboard)`)
-The core SaaS portal is built with multi-tenant routing, dynamically determining the agency environment based on the `[domain]` parameter.
-- **Routing Note:** Next.js 15 handles dynamic route params as Promises. We successfully unwrapped these using `React.use(params)` to prevent sync-API access errors.
-- **Dashboard (`page.tsx`):** Features interactive Recharts graphs for sessions and keywords, KPI cards, and functional action buttons.
-- **Clients (`clients/page.tsx` & `clients/[clientId]/page.tsx`):** Client management tables and detailed drill-down views.
-- **Reports (`reports/page.tsx`):** The reporting hub for tracking and generating white-labeled PDF reports.
-- **Settings (`settings/page.tsx`):** Agency branding, API configurations, and billing settings.
-- **Help Center (`help/page.tsx` & `help/guide/[id]/page.tsx`):** Interactive knowledge base cards with functional dedicated article pages.
-- **Sidebar Navigation:** A unified `Sidebar.tsx` component automatically injects the current tenant's domain into all navigation links to prevent 404s.
+---
 
-### 3. Headless PDF Generation (`app/reports/render` & `app/api/reports/generate`)
-- We built a powerful headless PDF rendering pipeline.
-- The `app/reports/render/[id]/page.tsx` route acts as a print-optimized web view, specifically styled to look exactly like an A4 document on screen.
-- `app/api/reports/generate/route.ts` spins up a **Puppeteer** headless browser in the background. It navigates to the render page and snaps a high-fidelity PDF. 
-- *Windows Resolution Note:* The API explicitly falls back to the system's local Google Chrome or Microsoft Edge executable to ensure PDF generation works flawlessly across OS environments without false-positive antivirus blocks.
+### 📆 2026-07-03 — Phase 0 & Phase 1 Foundation
+- Scaffolded Next.js 15 App Router architecture with TypeScript and pure vanilla CSS tokens (`app/globals.css`).
+- Built subdomain middleware ([`middleware.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/middleware.ts)) to handle wildcard subdomains (`agency.rankflow.app`) and path slugs (`/[domain]`).
+- Configured NextAuth.js (`lib/auth.ts`) credentials and session handlers.
 
-### 4. Authentication (`app/(auth)/login`)
-- A unified login portal supporting sign-in, registration, and password resets.
-- "Sign in with Google" has been explicitly mocked to simulate a successful login and route the user directly to the dashboard, ensuring a seamless prototype experience without requiring complex Google Cloud API setups.
+---
 
-## Getting Started
-To run the Next.js development server locally:
-```bash
-npm run dev
-```
-Then open `http://localhost:3000/localhost/reports` or `http://localhost:3000/login` in your browser.
+### 📆 2026-07-10 — Phase 2 to Phase 5 Sync Pipelines & PDF Engine
+- Integrated SERanking API proxy client with AES-256 encrypted API key storage.
+- Developed Puppeteer serverless PDF report rendering engine ([`app/api/reports/generate/route.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/api/reports/generate/route.ts)).
+- Configured Nodemailer transactional email delivery for report notifications and welcome emails.
 
-## Next Steps (Phase 5)
-- **Goal:** Connect the real SERanking API endpoints.
-- **Focus:** Replace the dummy JSON data in the dashboard and client drill-downs with live data fetched via Server Actions or API routes.
-- **Database:** Finalize the Prisma database migrations to store connected API keys, agency brand settings, and synced historical data.
+---
+
+### 📆 2026-07-18 — Phase 6 to Phase 9 Client Portal & White-Label Suite
+- Built read-only Client Portal interface ([`app/[domain]/c/dashboard/page.tsx`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/%5Bdomain%5D/c/dashboard/page.tsx)).
+- Created white-label CSS variable branding injector ([`lib/branding.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/lib/branding.ts)) for agency custom colors and logos.
+
+---
+
+### 📆 2026-07-27 — Production Overhaul & Enterprise Launch
+
+#### 🌅 Morning: Database Explorer REST API & User Modals
+- Built Database Explorer UI ([`app/superadmin/database/page.tsx`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/superadmin/database/page.tsx)) with full REST endpoints (`GET`, `POST`, `PUT`, `DELETE` across 15 Prisma models), live search filtering, CSV and JSON exporters.
+- Implemented styled interactive modals for Superadmin user management (**"＋ Register User"**, **"⚙️ Role"**, **"🚫 Deactivate"**).
+
+#### ☀️ Midday: Upscaled Teal & Dark Slate Design System
+- Standardized global design tokens in [`app/globals.css`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/globals.css) using exact user palette: `#222831` (Deep Dark Background), `#393E46` (Dark Slate Surface), `#00ADB5` (Vibrant Teal Accent), `#EEEEEE` (Crisp Light Neutral).
+- Applied surface micro-gradients (`linear-gradient(180deg, #393E46 0%, #292E36 100%)`) and active teal glowing hovers (`0 0 18px rgba(0, 173, 181, 0.25)`).
+
+#### 🌆 Afternoon: Auto-Seeding, Multi-Role Login Suite & Password Reset
+- Built `seedAgencyDemoData(domain)` pipeline auto-populating 3 demo clients (`Acme E-Commerce Store`, `Apex Tech Solutions`, `GreenEarth Organics`), 6 months of historical keyword/traffic snapshots, audits, and reports on demand.
+- Resolved new profile registration loading loops in [`app/api/auth/register/route.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/api/auth/register/route.ts).
+- Created multi-role login portals (`/login`, `/login/client`, `/login/admin`) with 1-click **Auto Fill ⚡** buttons.
+- Synchronized all 16 user account passwords in the database to **`Password123!`** via `scripts/reset-passwords.ts` and enhanced `lib/auth.ts`.
+- Created master knowledge base documentation ([`docs/KNOWLEDGE_BASE.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/docs/KNOWLEDGE_BASE.md)).

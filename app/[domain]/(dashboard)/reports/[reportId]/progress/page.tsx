@@ -17,6 +17,7 @@ export default function ReportProgressPage({ params }: { params: Promise<{ domai
   const router = useRouter();
   const resolvedParams = use(params);
   const { domain, reportId } = resolvedParams;
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   const [currentStage, setCurrentStage] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -173,7 +174,7 @@ export default function ReportProgressPage({ params }: { params: Promise<{ domai
           }}>
             👁 View Report
           </Link>
-          <Link href={`/${domain}/clients`} style={{
+          <Link href={`${basePath}/clients`} style={{
             padding: "14px 24px", background: "var(--gray-50)", border: "1px solid var(--border)",
             borderRadius: "10px", color: "var(--text-primary)", textDecoration: "none",
             fontSize: "14px", fontWeight: 600
@@ -191,7 +192,7 @@ export default function ReportProgressPage({ params }: { params: Promise<{ domai
           }}>
             🔄 Retry
           </button>
-          <Link href={`/${domain}/reports`} style={{
+          <Link href={`${basePath}/reports`} style={{
             padding: "12px 20px", background: "var(--gray-50)", border: "1px solid var(--border)",
             borderRadius: "10px", color: "var(--text-primary)", textDecoration: "none", fontSize: "14px"
           }}>

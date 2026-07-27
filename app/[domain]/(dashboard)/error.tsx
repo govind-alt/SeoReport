@@ -12,6 +12,7 @@ export default function DashboardError({
 }) {
   const params = useParams();
   const domain = (params?.domain as string) || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   return (
     <div
@@ -71,7 +72,7 @@ export default function DashboardError({
           🔄 Try Again
         </button>
         <Link
-          href={`/${domain}`}
+          href={`${basePath}`}
           className="btn btn-secondary"
           style={{ textDecoration: 'none' }}
         >

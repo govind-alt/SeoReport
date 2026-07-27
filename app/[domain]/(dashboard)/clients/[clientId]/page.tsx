@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { getClientDetails, generateReportForClient, deleteClient, updateClient, sendClientPortalInvite } from '@/app/actions';
+import { getClientDetails, generateReportForClient, deleteClient, updateClient, sendClientPortalInvite, triggerOnDemandAudit, addCompetitorToClient, removeCompetitorFromClient } from '@/app/actions';
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell
@@ -14,6 +14,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function ClientDetailPage({ params }: { params: Promise<{ domain: string; clientId: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   const clientId = resolvedParams.clientId;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'keywords' | 'traffic' | 'backlinks' | 'audit' | 'competitors' | 'reports'>('overview');
@@ -97,7 +98,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
       <div style={{ padding: '60px', textAlign: 'center' }}>
         <div style={{ fontSize: '32px', marginBottom: '12px' }}>❌</div>
         <div style={{ fontSize: '16px', fontWeight: 700 }}>Client not found</div>
-        <Link href={`/${domain}/clients`} className="btn btn-secondary" style={{ marginTop: '16px', display: 'inline-block' }}>← Back to Clients</Link>
+        <Link href={`${basePath}/clients`} className="btn btn-secondary" style={{ marginTop: '16px', display: 'inline-block' }}>← Back to Clients</Link>
       </div>
     );
   }
@@ -155,7 +156,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
     try {
       await deleteClient(domain, clientId);
       toast.success(`${client.name} deleted`);
-      window.location.href = `/${domain}/clients`;
+      window.location.href = `${basePath}/clients`;
     } catch (e: any) {
       toast.error(e.message || 'Failed to delete client');
     }
@@ -177,12 +178,53 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
     }
   };
 
+  const handleRunAudit = async () => {
+    const t = toast.loading(`Triggering SERanking site audit for ${client.name}...`);
+    try {
+      await triggerOnDemandAudit(domain, clientId);
+      toast.success('Site audit complete! Health score refreshed.', { id: t });
+      const updated = await getClientDetails(clientId);
+      if (updated) setClient(updated);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to run audit', { id: t });
+    }
+  };
+
+  const handleAddCompetitorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompetitor.trim()) return;
+    setAddingCompetitor(true);
+    const t = toast.loading(`Adding competitor ${newCompetitor}...`);
+    try {
+      const res = await addCompetitorToClient(domain, clientId, newCompetitor);
+      if (res.competitors) setCompetitors(res.competitors);
+      toast.success(`Competitor ${newCompetitor} added!`, { id: t });
+      setNewCompetitor('');
+      setShowAddCompetitor(false);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to add competitor', { id: t });
+    } finally {
+      setAddingCompetitor(false);
+    }
+  };
+
+  const handleRemoveCompetitorSubmit = async (comp: string) => {
+    const t = toast.loading(`Removing ${comp}...`);
+    try {
+      const res = await removeCompetitorFromClient(domain, clientId, comp);
+      if (res.competitors) setCompetitors(res.competitors);
+      toast.success(`Removed ${comp}`, { id: t });
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to remove competitor', { id: t });
+    }
+  };
+
   return (
     <>
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Link href={`/${domain}/clients`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '13px' }}>← Clients</Link>
+          <Link href={`${basePath}/clients`} style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '13px' }}>← Clients</Link>
           <div className="client-avatar" style={{ background: '#4F46E5', width: '42px', height: '42px', fontSize: '14px', flexShrink: 0 }}>{client.name.substring(0, 2).toUpperCase()}</div>
           <div>
             <div className="page-title" style={{ marginBottom: '2px' }}>{client.name}</div>
@@ -494,13 +536,25 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
       {/* Tab: Audit */}
       {activeTab === 'audit' && (
         <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            <button className="btn btn-primary btn-sm" onClick={handleRunAudit}>🔄 Trigger On-Demand Audit</button>
+          </div>
           <div className="kpi-grid kpi-grid-4" style={{ marginBottom: '24px' }}>
             {[
-              { icon: '❤️', label: 'Health Score', val: `${latest.au.healthScore}%`, trend: 'Overall site health', color: latest.au.healthScore >= 80 ? 'success' : 'warning' },
-              { icon: '🚨', label: 'Critical Issues', val: latest.au.criticalIssues.toString(), trend: 'Requires immediate action', color: latest.au.criticalIssues > 0 ? 'warning' : 'success' },
-              { icon: '⚠️', label: 'Warnings', val: latest.au.warnings.toString(), trend: 'Recommended fixes', color: '' },
-              { icon: 'ℹ️', label: 'Notices', val: latest.au.notices.toString(), trend: 'Low priority items', color: '' },
-            ].map(k => (
+              { icon: '❤️', label: 'Health Score', val: `${latest.au.healthScore}%`, trend: 'Overall site health', color: latest.au.healthScore >= 80 ? 'success' : 'warning', link: '' },
+              { icon: '🚨', label: 'Critical Issues', val: latest.au.criticalIssues.toString(), trend: 'Click to resolve ➔', color: latest.au.criticalIssues > 0 ? 'warning' : 'success', link: `${basePath}/audit-issues` },
+              { icon: '⚠️', label: 'Warnings', val: latest.au.warnings.toString(), trend: 'Recommended fixes ➔', color: '', link: `${basePath}/audit-issues` },
+              { icon: 'ℹ️', label: 'Notices', val: latest.au.notices.toString(), trend: 'Low priority items ➔', color: '', link: `${basePath}/audit-issues` },
+            ].map(k => k.link ? (
+              <Link key={k.label} href={k.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className={`kpi-card ${k.color}`} style={{ cursor: 'pointer' }}>
+                  <div className="kpi-icon">{k.icon}</div>
+                  <div className="kpi-label">{k.label}</div>
+                  <div className="kpi-value">{k.val}</div>
+                  <div className="kpi-trend">{k.trend}</div>
+                </div>
+              </Link>
+            ) : (
               <div key={k.label} className={`kpi-card ${k.color}`}>
                 <div className="kpi-icon">{k.icon}</div>
                 <div className="kpi-label">{k.label}</div>
@@ -553,15 +607,18 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
             <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAddCompetitor(false)}>
               <div style={{ background: 'white', borderRadius: '14px', padding: '28px', width: '420px', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
                 <div style={{ fontSize: '16px', fontWeight: 800, marginBottom: '16px' }}>➕ Add Competitor Domain</div>
-                <div className="form-group">
-                  <label className="form-label">Competitor Website</label>
-                  <label className="form-label">Competitor Domain</label>
-                  <input type="text" className="form-input" placeholder="e.g., example.com" value={newCompetitor} onChange={e => setNewCompetitor(e.target.value)} />
-                </div>
-                <div className="modal-footer">
-                  <button className="btn btn-ghost" onClick={() => setShowAddCompetitor(false)}>Cancel</button>
-                  <button className="btn btn-primary" onClick={handleAddCompetitor}>Add Competitor</button>
-                </div>
+                <form onSubmit={handleAddCompetitorSubmit}>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label className="form-label">Competitor Domain</label>
+                    <input type="text" className="form-input" placeholder="e.g., competitor.com" required value={newCompetitor} onChange={e => setNewCompetitor(e.target.value)} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    <button type="button" className="btn btn-ghost" onClick={() => setShowAddCompetitor(false)}>Cancel</button>
+                    <button type="submit" className="btn btn-primary" disabled={addingCompetitor}>
+                      {addingCompetitor ? 'Adding...' : 'Add Competitor'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
@@ -575,7 +632,10 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
             </div>
           ) : (
             <div className="card">
-              <div style={{ fontSize: '14px', fontWeight: 800, marginBottom: '16px' }}>Tracked Competitors ({competitors.length})</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 800 }}>Tracked Competitors ({competitors.length})</div>
+                <button className="btn btn-primary btn-sm" onClick={() => setShowAddCompetitor(true)}>+ Add Competitor</button>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {competitors.map((comp, i) => (
                   <div key={comp} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', background: 'var(--gray-50)', borderRadius: '8px', gap: '14px' }}>
@@ -587,8 +647,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
                       <a href={`https://${comp}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', color: 'var(--primary)', textDecoration: 'none' }}>https://{comp} ↗</a>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button className="btn btn-secondary btn-sm" onClick={() => window.open(`https://seranking.com/research?domain=${comp}`, '_blank')}>📊 Analyze</button>
-                      <button className="btn btn-secondary btn-sm" style={{ color: 'var(--danger)' }} onClick={() => handleRemoveCompetitor(comp)}>🗑</button>
+                      <a href={`https://seranking.com/research?domain=${comp}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}>📊 Analyze</a>
+                      <button className="btn btn-secondary btn-sm" style={{ color: 'var(--danger)' }} onClick={() => handleRemoveCompetitorSubmit(comp)}>🗑</button>
                     </div>
                   </div>
                 ))}
@@ -628,7 +688,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ domain:
                         <td style={{ fontSize: '12px', color: 'var(--text-muted)' }} suppressHydrationWarning>{new Date(r.createdAt).toLocaleDateString()}</td>
                         <td>
                           <div style={{ display: 'flex', gap: '4px' }}>
-                            <button className="btn btn-primary btn-sm" onClick={() => window.open(`/reports/render/${r.id}`, '_blank')}>👁 View</button>
+                            <Link href={`/reports/render/${r.id}`} target="_blank" className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>👁 View</Link>
                           </div>
                         </td>
                       </tr>

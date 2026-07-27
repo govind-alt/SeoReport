@@ -12,6 +12,7 @@ export default function ClientPortalError({
 }) {
   const params = useParams();
   const domain = (params?.domain as string) || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   return (
     <div
@@ -55,7 +56,7 @@ export default function ClientPortalError({
           🔄 Try Again
         </button>
         <Link
-          href={`/${domain}/c/login`}
+          href={`${basePath}/c/login`}
           className="btn btn-secondary"
           style={{ textDecoration: 'none' }}
         >

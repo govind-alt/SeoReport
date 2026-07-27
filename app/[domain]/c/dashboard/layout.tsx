@@ -10,22 +10,23 @@ export default async function ClientDashboardLayout({
 }) {
   const resolvedParams = await params;
   const domain = resolvedParams.domain;
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   
   const session = await auth();
 
   // 1. Session check: user must be logged in
   if (!session || !session.user) {
-    redirect(`/${domain}/c/login`);
+    redirect(`${basePath}/c/login`);
   }
 
   // 2. Role boundary: redirect agency administrators back to the main admin console
   if (session.user.role === 'admin' || session.user.role === 'superadmin') {
-    redirect(`/${domain}`);
+    redirect(`${basePath}`);
   }
 
   // 3. Only role = client users are allowed inside this layout
   if (session.user.role !== 'client') {
-    redirect(`/${domain}/c/login`);
+    redirect(`${basePath}/c/login`);
   }
   
   return (

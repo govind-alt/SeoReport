@@ -6,239 +6,256 @@ import Link from 'next/link';
 import { createClient } from '@/app/actions';
 import { toast } from 'sonner';
 
-export default function AddClientPage({ params }: { params: Promise<{ domain: string }> }) {
+const INDUSTRIES = [
+  'E-commerce', 'Healthcare', 'Legal', 'Finance', 'Real Estate',
+  'SaaS / Technology', 'Education', 'Hospitality & Travel', 'Retail',
+  'Construction & Trades', 'Marketing & Media', 'Non-Profit', 'Other',
+];
+
+export default function NewClientPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [form, setForm] = useState({
+    name: '',
+    clientDomain: '',
+    industry: '',
+    contactEmail: '',
+    contactName: '',
+    serankingProjectId: '',
+    internalNotes: '',
+    clientPortalEnabled: false,
+  });
 
-  // Form State
-  const [name, setName] = useState('');
-  const [industry, setIndustry] = useState('');
-  const [clientDomain, setClientDomain] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [internalNotes, setInternalNotes] = useState('');
-  const [projectId, setProjectId] = useState('');
-  const [portalEnabled, setPortalEnabled] = useState(false);
-  const [gscConnected, setGscConnected] = useState(false);
-  
-  const [competitors, setCompetitors] = useState<string[]>([]);
-  const [newCompetitor, setNewCompetitor] = useState('');
-
-  const handleAddCompetitor = () => {
-    if (newCompetitor && !competitors.includes(newCompetitor)) {
-      setCompetitors([...competitors, newCompetitor]);
-      setNewCompetitor('');
-    }
-  };
-
-  const handleRemoveCompetitor = (comp: string) => {
-    setCompetitors(competitors.filter(c => c !== comp));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name || !form.clientDomain) {
+      toast.error('Client name and website are required.');
+      return;
+    }
     setLoading(true);
-    setError('');
     try {
       const res = await createClient(domain, {
-        name,
-        clientDomain,
-        serankingProjectId: projectId ? parseInt(projectId) : undefined,
-        industry,
-        contactEmail,
-        contactName,
-        internalNotes,
-        clientPortalEnabled: portalEnabled,
-        gscConnected
+        name: form.name,
+        clientDomain: form.clientDomain,
+        industry: form.industry || undefined,
+        contactEmail: form.contactEmail || undefined,
+        contactName: form.contactName || undefined,
+        internalNotes: form.internalNotes || undefined,
+        serankingProjectId: form.serankingProjectId ? parseInt(form.serankingProjectId, 10) : undefined,
+        clientPortalEnabled: form.clientPortalEnabled,
       });
-      setSuccess(true);
-      setTimeout(() => {
-        router.push(domain === 'localhost' ? `/localhost/clients/${res.client.id}` : `/clients/${res.client.id}`);
-      }, 2000);
+      if (res.success) {
+        toast.success(`Client "${form.name}" created successfully!`);
+        router.push(`${basePath}/clients`);
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to create client');
+      toast.error(err?.message || 'Failed to create client.');
       setLoading(false);
     }
   };
 
-  // Base path calculation for links
-  let basePath = '';
-  if (domain !== 'localhost') {
-    basePath = '';
-  } else {
-    // When using path-based routing locally
-    basePath = `/${domain}`;
-  }
-
   return (
-    <>
-      <div className="page-header" style={{marginBottom: '20px'}}>
-        <div>
-          <div className="page-title" style={{fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500}}>
-            <Link href={`${basePath}/clients`} style={{color: 'inherit', textDecoration: 'none'}}>← Clients</Link> / <span style={{color: 'var(--primary)'}}>Add New Client</span>
-          </div>
+    <div style={{ maxWidth: '680px', margin: '0 auto', paddingTop: '8px' }}>
+      {/* Breadcrumb */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '13px', color: 'var(--text-muted)' }}>
+        <Link href={`${basePath}/clients`} style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>
+          Clients
+        </Link>
+        <span>›</span>
+        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Add New Client</span>
+      </div>
+
+      {/* Header */}
+      <div style={{ marginBottom: '28px' }}>
+        <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+          Add New Client
+        </div>
+        <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+          Create a client profile to start tracking their SEO performance and generating reports.
         </div>
       </div>
 
-      <div style={{maxWidth: '680px', margin: '0 auto'}}>
-        {success && (
-          <div className="alert alert-success" style={{marginBottom: '14px'}}>
-            ✅ Client saved! Redirecting to overview...
+      <form onSubmit={handleSubmit}>
+        {/* Basic Info */}
+        <div className="card" style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>👤</span> Client Information
           </div>
-        )}
-        
-        {error && (
-          <div className="alert alert-danger" style={{marginBottom: '14px'}}>
-            ❌ {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="card" style={{marginBottom: '12px'}}>
-            <div style={{fontSize: '14px', fontWeight: 700, marginBottom: '16px'}}>Client Information</div>
-            
-            <div className="form-row mb-3">
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Client / Company Name *</label>
-                <input type="text" className="form-input" required value={name} onChange={e => setName(e.target.value)} placeholder="Acme Corporation" />
-              </div>
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Industry</label>
-                <select className="form-input" value={industry} onChange={e => setIndustry(e.target.value)}>
-                  <option value="">Select Industry...</option>
-                  <option value="B2B SaaS">B2B SaaS</option>
-                  <option value="E-commerce">E-commerce</option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Local Business">Local Business</option>
-                </select>
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Client / Business Name <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <input
+                className="form-input"
+                type="text"
+                name="name"
+                placeholder="e.g. Acme Corp"
+                value={form.name}
+                onChange={handleChange}
+                required
+                style={{ width: '100%' }}
+              />
             </div>
 
-            <div className="form-row mb-3">
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Website URL *</label>
-                <input type="text" className="form-input" required value={clientDomain} onChange={e => setClientDomain(e.target.value)} placeholder="https://acmecorp.com" />
-              </div>
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Contact Email</label>
-                <input type="email" className="form-input" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="sarah@acmecorp.com" />
-              </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Website URL <span style={{ color: 'var(--danger)' }}>*</span>
+              </label>
+              <input
+                className="form-input"
+                type="text"
+                name="clientDomain"
+                placeholder="e.g. acmecorp.com"
+                value={form.clientDomain}
+                onChange={handleChange}
+                required
+                style={{ width: '100%' }}
+              />
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Enter the domain without https://</div>
             </div>
 
-            <div className="form-row mb-3">
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Contact Name</label>
-                <input type="text" className="form-input" value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Sarah Miller" />
-              </div>
-              <div className="form-group" style={{marginBottom: 0}}>
-                <label className="form-label">Logo</label>
-                <div style={{border: '1px dashed var(--border)', borderRadius: '5px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', color: 'var(--text-muted)', cursor: 'pointer', background: 'var(--bg-muted)'}}>
-                  📎 Upload logo (PNG/SVG)
-                </div>
-              </div>
-            </div>
-
-            <div className="form-group mb-0">
-              <label className="form-label">Internal Notes</label>
-              <textarea className="form-input" style={{height: '60px', resize: 'vertical'}} value={internalNotes} onChange={e => setInternalNotes(e.target.value)} placeholder="E-commerce focus, target UK + US markets..."></textarea>
-            </div>
-          </div>
-
-          <div className="card" style={{marginBottom: '12px'}}>
-            <div style={{fontSize: '14px', fontWeight: 700, marginBottom: '4px'}}>SERanking Project</div>
-            <div style={{fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px'}}>Link this client to an existing SERanking project</div>
-            
-            <div className="form-group mb-4">
-              <label className="form-label">SERanking Project ID</label>
-              <input type="number" className="form-input" value={projectId} onChange={e => setProjectId(e.target.value)} placeholder="e.g. 123456" />
-            </div>
-
-            <div className="form-group mb-0">
-              <label className="form-label">Track Competitors (optional)</label>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '8px'}}>
-                {competitors.map(comp => (
-                  <div key={comp} style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                    <div className="form-input" style={{flex: 1, padding: '8px 12px', background: 'var(--bg-muted)'}}>{comp}</div>
-                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => handleRemoveCompetitor(comp)}>✕</button>
-                  </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Industry
+              </label>
+              <select
+                className="form-input"
+                name="industry"
+                value={form.industry}
+                onChange={handleChange}
+                style={{ width: '100%' }}
+              >
+                <option value="">Select industry...</option>
+                {INDUSTRIES.map(ind => (
+                  <option key={ind} value={ind}>{ind}</option>
                 ))}
-                
-                <div style={{display: 'flex', gap: '8px'}}>
-                  <input type="text" className="form-input" placeholder="competitor.com" value={newCompetitor} onChange={e => setNewCompetitor(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddCompetitor())} />
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={handleAddCompetitor}>+ Add</button>
-                </div>
-              </div>
-              <div className="form-hint">Competitors are tracked for comparison charts. Will be fetched from SERanking if linked.</div>
-            </div>
-          </div>
-
-          <div className="card" style={{marginBottom: '12px'}}>
-            <div style={{fontSize: '14px', fontWeight: 700, marginBottom: '16px'}}>Google Search Console</div>
-            
-            {!gscConnected ? (
-              <div style={{border: '1px solid var(--border)', borderRadius: '8px', padding: '20px', textAlign: 'center', background: 'var(--bg-muted)'}}>
-                <div style={{fontSize: '28px', marginBottom: '8px'}}>📊</div>
-                <div style={{fontSize: '14px', fontWeight: 600, color: 'var(--text)', marginBottom: '6px'}}>Connect Google Search Console</div>
-                <div style={{fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px'}}>Required for organic traffic, clicks, impressions, CTR, and avg position data</div>
-                <button type="button" className="btn btn-primary" onClick={() => {
-                  toast.success('Successfully connected to Google Search Console (Simulated)');
-                  setGscConnected(true);
-                }}>🔗 Connect with Google OAuth</button>
-                <div style={{fontSize: '11px', color: 'var(--text-muted)', marginTop: '12px'}}>You&apos;ll be redirected to Google to authorize access to this client&apos;s GSC property</div>
-              </div>
-            ) : (
-              <div style={{border: '1px solid #10b981', borderRadius: '8px', padding: '16px', background: 'rgba(16, 185, 129, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-                <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-                  <div style={{fontSize: '24px'}}>✅</div>
-                  <div>
-                    <div style={{fontSize: '14px', fontWeight: 600, color: 'var(--text)'}}>Google Search Console Connected</div>
-                    <div style={{fontSize: '12px', color: 'var(--text-muted)'}}>Data will be synced during the next scheduled run.</div>
-                  </div>
-                </div>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setGscConnected(false)}>Disconnect</button>
-              </div>
-            )}
-          </div>
-
-          <div className="card" style={{marginBottom: '24px'}}>
-            <div style={{fontSize: '14px', fontWeight: 700, marginBottom: '16px'}}>Client Portal Access</div>
-            <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px'}}>
-              <div className={`switch ${portalEnabled ? 'on' : ''}`} onClick={() => setPortalEnabled(!portalEnabled)} style={{width: '36px', height: '20px', background: portalEnabled ? 'var(--primary)' : 'var(--border)', borderRadius: '10px', position: 'relative', cursor: 'pointer', transition: '0.2s'}}>
-                <div style={{width: '16px', height: '16px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '2px', left: portalEnabled ? '18px' : '2px', transition: '0.2s'}}></div>
-              </div>
-              <div>
-                <div style={{fontSize: '14px', fontWeight: 500}}>Enable client portal login</div>
-                <div style={{fontSize: '12px', color: 'var(--text-muted)'}}>Client receives an email invite to view their reports</div>
-              </div>
+              </select>
             </div>
 
-            {portalEnabled && (
-              <div className="form-row mb-0">
-                <div className="form-group" style={{marginBottom: 0}}>
-                  <label className="form-label">Portal Email</label>
-                  <input type="email" className="form-input" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="sarah@acmecorp.com" />
-                </div>
-                <div className="form-group" style={{marginBottom: 0}}>
-                  <label className="form-label">Display Name</label>
-                  <input type="text" className="form-input" value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Sarah Miller" />
-                </div>
-              </div>
-            )}
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                SERanking Project ID
+              </label>
+              <input
+                className="form-input"
+                type="number"
+                name="serankingProjectId"
+                placeholder="e.g. 123456"
+                value={form.serankingProjectId}
+                onChange={handleChange}
+                style={{ width: '100%' }}
+              />
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Find this in your SERanking dashboard</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        <div className="card" style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>📧</span> Contact Details
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Contact Name
+              </label>
+              <input
+                className="form-input"
+                type="text"
+                name="contactName"
+                placeholder="e.g. Jane Smith"
+                value={form.contactName}
+                onChange={handleChange}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Contact Email
+              </label>
+              <input
+                className="form-input"
+                type="email"
+                name="contactEmail"
+                placeholder="e.g. jane@acmecorp.com"
+                value={form.contactEmail}
+                onChange={handleChange}
+                style={{ width: '100%' }}
+              />
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>Used for client portal access</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Options & Notes */}
+        <div className="card" style={{ marginBottom: '28px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '20px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>⚙️</span> Options
           </div>
 
-          <div style={{display: 'flex', justifyContent: 'flex-end', gap: '12px'}}>
-            <Link href={`${basePath}/clients`} className="btn btn-secondary">Cancel</Link>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Saving...' : 'Save Client →'}
-            </button>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Internal Notes
+            </label>
+            <textarea
+              className="form-input"
+              name="internalNotes"
+              placeholder="Any internal notes about this client..."
+              value={form.internalNotes}
+              onChange={handleChange}
+              rows={3}
+              style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
+            />
           </div>
-        </form>
-      </div>
-    </>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              name="clientPortalEnabled"
+              checked={form.clientPortalEnabled}
+              onChange={handleChange}
+              style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }}
+            />
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Enable Client Portal</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Allow this client to log in and view their reports</div>
+            </div>
+          </label>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <Link
+            href={`${basePath}/clients`}
+            className="btn btn-secondary"
+            style={{ textDecoration: 'none' }}
+          >
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading}
+            style={{ minWidth: '160px' }}
+          >
+            {loading ? '⏳ Creating...' : '✓ Create Client'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

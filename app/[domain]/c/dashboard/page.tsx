@@ -2,6 +2,7 @@
 
 import { toast } from 'sonner';
 import { use, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { getClientPortalData, updateUserAccount, logSupportMessage } from '@/app/actions';
 import {
   AreaChart,
@@ -21,6 +22,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function ClientDashboardPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -315,7 +317,7 @@ export default function ClientDashboardPage({ params }: { params: Promise<{ doma
             <button 
               onClick={() => {
                 toast.success('Signed out successfully!');
-                window.location.href = `/${domain}/c/login`;
+                window.location.href = `${basePath}/c/login`;
               }} 
               className="sidebar-item danger" 
               style={{ width: '100%', marginTop: '8px', border: 'none', background: 'none' }}
@@ -588,7 +590,7 @@ export default function ClientDashboardPage({ params }: { params: Promise<{ doma
                         <td style={{ padding: '14px 20px' }} suppressHydrationWarning>{new Date(report.createdAt).toLocaleDateString()}</td>
                         <td style={{ padding: '14px 20px' }}>
                           <div style={{ display: 'flex', gap: '8px' }}>
-                            <button className="btn btn-secondary btn-sm" onClick={() => window.open(`/${domain}/r/${report.id}`)}>👁️ View</button>
+                            <Link href={`${basePath}/r/${report.id}`} target="_blank" className="btn btn-secondary btn-sm" style={{ textDecoration: 'none' }}>👁️ View</Link>
                             <button className="btn btn-secondary btn-sm" onClick={() => downloadPdf(report.id)}>📥 Download PDF</button>
                           </div>
                         </td>

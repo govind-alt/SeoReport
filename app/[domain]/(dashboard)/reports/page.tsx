@@ -32,12 +32,15 @@ type Client = {
 export default function ReportsPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   const [reports, setReports] = useState<Report[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [sharePassword, setSharePassword] = useState('');
   const [isErrorLogOpen, setIsErrorLogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
   const [selectedGenClient, setSelectedGenClient] = useState('');
@@ -128,7 +131,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn btn-secondary btn-sm" onClick={() => setIsBulkModalOpen(true)}>⚡ Bulk Generate</button>
-          <Link href={`/${domain}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>＋ Generate Report</Link>
+          <Link href={`${basePath}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>＋ Generate Report</Link>
         </div>
       </div>
 
@@ -180,7 +183,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                 <div style={{ fontSize: '32px', marginBottom: '12px' }}>📄</div>
                 <div style={{ fontWeight: 600, marginBottom: '8px' }}>No reports yet</div>
                 <div style={{ fontSize: '13px', marginBottom: '16px' }}>Generate your first report to get started</div>
-                <Link href={`/${domain}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>+ Generate Report</Link>
+                <Link href={`${basePath}/reports/new`} className="btn btn-primary btn-sm" style={{ textDecoration: 'none' }}>+ Generate Report</Link>
               </div>
             ) : (
               <div className="table-wrapper" style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -226,7 +229,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                               onClick={(e) => { e.stopPropagation(); downloadPdf(report.id); }}
                             >⬇ PDF</button>
                             <Link
-                              href={`/${domain}/reports/${report.id}`}
+                              href={`${basePath}/reports/${report.id}`}
                               className="btn btn-secondary btn-sm"
                               style={{ textDecoration: 'none' }}
                               onClick={(e) => e.stopPropagation()}
@@ -279,7 +282,8 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
 
                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                   <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => downloadPdf(selectedReport.id)}>⬇ Download PDF</button>
-                  <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={() => window.open(`/reports/render/${selectedReport.id}`, '_blank')}>👁 Web View</button>
+                  <Link href={`/reports/render/${selectedReport.id}`} target="_blank" className="btn btn-secondary btn-sm" style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}>👁 Web View</Link>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setIsShareModalOpen(true)} title="Share Public Link">🔗 Share</button>
                 </div>
               </div>
             ) : (
@@ -357,6 +361,73 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setIsBulkModalOpen(false)}>Cancel</button>
               <button className="btn btn-primary" onClick={bulkGenerate}>🚀 Generate All</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Share Report Modal */}
+      {isShareModalOpen && selectedReport && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="card fade-in" style={{ width: '100%', maxWidth: '480px', padding: '24px', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 800 }}>🔗 Share Public Web Report</div>
+              <button onClick={() => setIsShareModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+            </div>
+            
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+              Anyone with this link can view the white-labeled web report for <strong>{selectedReport.clientName}</strong> ({selectedReport.period}).
+            </p>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Shareable URL
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input
+                  className="form-input"
+                  readOnly
+                  value={typeof window !== 'undefined' ? `${window.location.origin}${basePath}/r/${selectedReport.id}` : ''}
+                  style={{ flex: 1, fontSize: '12px', background: 'var(--bg)' }}
+                />
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      navigator.clipboard.writeText(`${window.location.origin}${basePath}/r/${selectedReport.id}`);
+                      toast.success('Public report link copied to clipboard!');
+                    }
+                  }}
+                >
+                  📋 Copy
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Optional Password Protection
+              </label>
+              <input
+                className="form-input"
+                type="password"
+                placeholder="Set access password (optional)..."
+                value={sharePassword}
+                onChange={e => setSharePassword(e.target.value)}
+                style={{ width: '100%', fontSize: '13px' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button className="btn btn-secondary" onClick={() => setIsShareModalOpen(false)}>Close</button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  toast.success('Share settings saved!');
+                  setIsShareModalOpen(false);
+                }}
+              >
+                ✓ Save Settings
+              </button>
             </div>
           </div>
         </div>

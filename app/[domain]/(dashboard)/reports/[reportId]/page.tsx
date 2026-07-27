@@ -16,6 +16,7 @@ export default function ReportDetailPage({
   params: Promise<{ domain: string; reportId: string }>;
 }) {
   const { domain, reportId } = use(params);
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
@@ -86,7 +87,7 @@ export default function ReportDetailPage({
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>
         <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>Report Not Found</h2>
         <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>This report may have been deleted or the link is invalid.</p>
-        <Link href={`/${domain}/reports`} className="btn btn-primary">← Back to Reports</Link>
+        <Link href={`${basePath}/reports`} className="btn btn-primary">← Back to Reports</Link>
       </div>
     );
   }
@@ -95,7 +96,7 @@ export default function ReportDetailPage({
     <div style={{ padding: '32px 40px', maxWidth: '960px' }}>
       {/* Breadcrumb */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', fontSize: '13px', color: 'var(--text-muted)' }}>
-        <Link href={`/${domain}/reports`} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Reports</Link>
+        <Link href={`${basePath}/reports`} style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>Reports</Link>
         <span>›</span>
         <span style={{ color: 'var(--text-primary)' }}>{report.title}</span>
       </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-// Define the allowed tables to prevent arbitrary access
+// Allowed tables to prevent arbitrary model access
 const ALLOWED_TABLES = [
   'user',
   'agency',
@@ -13,14 +13,18 @@ const ALLOWED_TABLES = [
   'billingSubscription',
   'invoice',
   'invite',
-  'googleCredential'
+  'googleCredential',
+  'auditSnapshot',
+  'keywordSnapshot',
+  'analyticsSnapshot',
+  'backlinkSnapshot',
+  'auditLog'
 ];
 
 export async function GET(request: NextRequest) {
   const session = await auth();
   
-  // Security: Only Superadmins can access the raw database
-  if (!session?.user || session.user.role !== 'SUPERADMIN') {
+  if (!session?.user || session.user.role?.toLowerCase() !== 'superadmin') {
     return NextResponse.json({ error: 'Unauthorized access. Superadmin only.' }, { status: 403 });
   }
 
@@ -34,10 +38,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Dynamically access the prisma model
     const model = (prisma as any)[table];
-    
-    // Check if table has 'id' column for sorting by checking first record
     const sample = await model.findFirst();
     const hasId = sample && 'id' in sample;
     
@@ -63,6 +64,92 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error(`[DB_ACCESS_ERROR] Failed to fetch table ${table}:`, error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user || session.user.role?.toLowerCase() !== 'superadmin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+
+  try {
+    const { table, id } = await request.json();
+    if (!table || !ALLOWED_TABLES.includes(table) || !id) {
+      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
+    const model = (prisma as any)[table];
+    await model.delete({ where: { id } });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('[DB_DELETE_ERROR]', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user || session.user.role?.toLowerCase() !== 'superadmin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+
+  try {
+    const { table, id, data } = await request.json();
+    if (!table || !ALLOWED_TABLES.includes(table) || !id || !data) {
+      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
+    // Clean data object (strip relation objects if passed)
+    const updatePayload: Record<string, any> = {};
+    for (const [key, val] of Object.entries(data)) {
+      if (key === 'id' || key === 'createdAt' || key === 'updatedAt') continue;
+      if (typeof val === 'object' && val !== null && !(val instanceof Date)) continue;
+      updatePayload[key] = val;
+    }
+
+    const model = (prisma as any)[table];
+    const updated = await model.update({
+      where: { id },
+      data: updatePayload
+    });
+
+    return NextResponse.json({ success: true, row: updated });
+  } catch (error: any) {
+    console.error('[DB_UPDATE_ERROR]', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user || session.user.role?.toLowerCase() !== 'superadmin') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+
+  try {
+    const { table, data } = await request.json();
+    if (!table || !ALLOWED_TABLES.includes(table) || !data) {
+      return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
+    const createPayload: Record<string, any> = {};
+    for (const [key, val] of Object.entries(data)) {
+      if (key === 'id' || key === 'createdAt' || key === 'updatedAt') continue;
+      if (typeof val === 'object' && val !== null && !(val instanceof Date)) continue;
+      createPayload[key] = val;
+    }
+
+    const model = (prisma as any)[table];
+    const created = await model.create({
+      data: createPayload
+    });
+
+    return NextResponse.json({ success: true, row: created });
+  } catch (error: any) {
+    console.error('[DB_CREATE_ERROR]', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@
 import '../login.css';
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { registerAgency } from '../../../actions';
+import { registerAgency } from '@/app/actions';
 import Link from 'next/link';
 
 
@@ -192,9 +192,24 @@ export default function Login() {
 
               <form id="loginForm" onSubmit={handleLogin}>
                 <div className="role-selector" id="loginRoleSelector">
-                  <Link href="/login" className="role-option" style={{ textDecoration: 'none' }}>🏢 Agency</Link>
-                  <Link href="/login/client" className="role-option" style={{ textDecoration: 'none' }}>👤 Client</Link>
-                  <Link href="/login/admin" className="role-option active" style={{ textDecoration: 'none' }}>🛡️ Admin</Link>
+                  <Link href="/login" className="role-option" style={{ textDecoration: 'none' }}>🏢 Agency Admin</Link>
+                  <Link href="/login/client" className="role-option" style={{ textDecoration: 'none' }}>👤 Agency Client</Link>
+                  <Link href="/login/admin" className="role-option active" style={{ textDecoration: 'none' }}>🛡️ Superadmin</Link>
+                </div>
+
+                {/* 1-Click Quick Fill Credentials for Testing */}
+                <div style={{ background: 'rgba(0, 173, 181, 0.1)', border: '1px solid rgba(0, 173, 181, 0.25)', borderRadius: '10px', padding: '10px 14px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '12px', color: '#00ADB5', fontWeight: 600 }}>⚡ Demo Superadmin Credentials</div>
+                  <button
+                    type="button"
+                    style={{ background: '#00ADB5', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                    onClick={() => {
+                      setEmail('superadmin@rankflow.app');
+                      setPassword('Password123!');
+                    }}
+                  >
+                    Auto Fill ⚡
+                  </button>
                 </div>
 
                 <div className="form-group">
@@ -332,7 +347,7 @@ export default function Login() {
                 <div className="success-title">Check your inbox</div>
                 <div className="success-desc">We&apos;ve sent a verification link. Click the link to activate your account.</div>
                 <div className="alert alert-success mb-4">✅ Verification email sent! Check your spam folder if you don&apos;t see it.</div>
-                <button className="btn btn-primary mb-3" onClick={() => window.open('https://mail.google.com', '_blank')}>Open Gmail →</button>
+                <a href="https://mail.google.com" target="_blank" rel="noopener noreferrer" className="btn btn-primary mb-3" style={{ textDecoration: 'none', display: 'inline-block' }}>Open Gmail →</a>
               </div>
 
               <div className="form-footer">

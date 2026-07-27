@@ -82,6 +82,14 @@ export async function POST(req: NextRequest) {
       return { agency, user, verificationToken };
     });
 
+    // Auto-seed demo clients & snapshots so the new agency is fully populated immediately
+    try {
+      const { seedAgencyDemoData } = await import("@/app/actions");
+      await seedAgencyDemoData(cleanSubdomain);
+    } catch (e) {
+      console.error("Auto-seeding demo data for new agency failed:", e);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Account created successfully",

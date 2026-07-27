@@ -7,11 +7,13 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function DashboardPage({ params }: { params: Promise<{ domain: string }> }) {
   const [selectedClient, setSelectedClient] = useState('All Clients');
+  const [selectedPeriod, setSelectedPeriod] = useState('June 2026');
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   useEffect(() => {
     setLoading(true);
@@ -24,7 +26,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
       .then(data => { setMetrics(data); setLoading(false); })
       .catch(e => { console.error(e); setLoading(false); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, selectedClient]);
+  }, [domain, selectedClient, selectedPeriod]);
   
   if (!metrics && loading) {
     return (
@@ -58,7 +60,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <div style={{ fontSize: '14px', fontWeight: 600 }}>Configure Agency Branding</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Set your logo, brand colors, and custom email domains for white-labeling.</div>
               </div>
-              <Link href={`/${domain}/settings?tab=branding`} className="btn btn-primary btn-sm">Configure</Link>
+              <Link href={`${basePath}/settings?tab=branding`} className="btn btn-primary btn-sm">Configure</Link>
             </div>
             <div style={{ display: 'flex', gap: '16px', padding: '16px', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)', alignItems: 'center' }}>
               <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--gray-200)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>2</div>
@@ -66,7 +68,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <div style={{ fontSize: '14px', fontWeight: 600 }}>Connect SERanking API</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Link your SERanking account to automate data imports.</div>
               </div>
-              <Link href={`/${domain}/settings?tab=api-keys`} className="btn btn-secondary btn-sm">Connect API</Link>
+              <Link href={`${basePath}/settings?tab=api-keys`} className="btn btn-secondary btn-sm">Connect API</Link>
             </div>
             <div style={{ display: 'flex', gap: '16px', padding: '16px', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--border)', alignItems: 'center' }}>
               <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'var(--gray-200)', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>3</div>
@@ -74,7 +76,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <div style={{ fontSize: '14px', fontWeight: 600 }}>Add Your First Client</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>Create a client profile and map their SERanking projects.</div>
               </div>
-              <Link href={`/${domain}/clients/new`} className="btn btn-secondary btn-sm">Add Client</Link>
+              <Link href={`${basePath}/clients/new`} className="btn btn-secondary btn-sm">Add Client</Link>
             </div>
           </div>
         </div>
@@ -128,9 +130,61 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
           </div>
         </div>
         <div className="hero-actions">
-          <Link href={`/${domain}/reports`} className="hero-btn hero-btn-solid">📄 Generate Report</Link>
-          <Link href={`/${domain}/clients`} className="hero-btn hero-btn-white">👥 View All Clients</Link>
-          <Link href={`/${domain}/settings`} className="hero-btn hero-btn-white">🔑 Manage API Keys</Link>
+          <Link href={`${basePath}/reports`} className="hero-btn hero-btn-solid">📄 Generate Report</Link>
+          <button
+            className="hero-btn hero-btn-white"
+            onClick={async () => {
+              const { toast } = await import('sonner');
+              const t = toast.loading('Seeding demo test clients & SEO reports...');
+              const { seedAgencyDemoData } = await import('@/app/actions');
+              await seedAgencyDemoData(domain);
+              toast.success('Seeded demo test data! Reloading dashboard...', { id: t });
+              window.location.reload();
+            }}
+          >
+            🌱 Seed Test Data
+          </button>
+          <Link href={`${basePath}/clients`} className="hero-btn hero-btn-white">👥 View All Clients</Link>
+          <Link href={`${basePath}/settings`} className="hero-btn hero-btn-white">🔑 Manage API Keys</Link>
+        </div>
+      </div>
+
+      {/* Date Range & Client Filter Bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            📅 Performance Period:
+          </label>
+          <select
+            className="form-input"
+            value={selectedPeriod}
+            onChange={e => setSelectedPeriod(e.target.value)}
+            style={{ width: 'auto', minWidth: '160px', fontWeight: 600, fontSize: '13px' }}
+          >
+            <option value="June 2026">June 2026 (Latest)</option>
+            <option value="May 2026">May 2026</option>
+            <option value="April 2026">April 2026</option>
+            <option value="March 2026">March 2026</option>
+            <option value="February 2026">February 2026</option>
+            <option value="January 2026">January 2026</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+            👥 Client Scope:
+          </label>
+          <select
+            className="form-input"
+            value={selectedClient}
+            onChange={e => setSelectedClient(e.target.value)}
+            style={{ width: 'auto', minWidth: '180px', fontWeight: 600, fontSize: '13px' }}
+          >
+            <option value="All Clients">All Clients ({metrics?.activeClients || 0})</option>
+            {metrics?.clients?.map((c: any) => (
+              <option key={c.id} value={c.name}>{c.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -154,16 +208,18 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
           <div className="kpi-value">{metrics?.avgHealthScore || 0}%</div>
           <div className="kpi-trend trend-up">Across all clients</div>
         </div>
-        <div className={`kpi-card ${(metrics?.criticalIssues || 0) > 0 ? 'warning' : ''}`}>
-          <div className="kpi-icon" style={{ background: '#FFFBEB' }}>⚠️</div>
-          <div className="kpi-label">Critical Issues</div>
-          <div className="kpi-value" style={{ color: (metrics?.criticalIssues || 0) > 0 ? 'var(--warning)' : 'inherit' }}>
-            {metrics?.criticalIssues || 0}
+        <Link href={`${basePath}/audit-issues`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className={`kpi-card ${(metrics?.criticalIssues || 0) > 0 ? 'warning' : ''}`} style={{ cursor: 'pointer' }}>
+            <div className="kpi-icon" style={{ background: '#FFFBEB' }}>⚠️</div>
+            <div className="kpi-label">Critical Issues</div>
+            <div className="kpi-value" style={{ color: (metrics?.criticalIssues || 0) > 0 ? 'var(--warning)' : 'inherit' }}>
+              {metrics?.criticalIssues || 0}
+            </div>
+            <div className="kpi-trend" style={{ color: (metrics?.criticalIssues || 0) > 0 ? 'var(--warning)' : 'var(--text-muted)' }}>
+              {(metrics?.criticalIssues || 0) > 0 ? 'Need attention ➔' : 'All clear ✓'}
+            </div>
           </div>
-          <div className="kpi-trend" style={{ color: (metrics?.criticalIssues || 0) > 0 ? 'var(--warning)' : 'var(--text-muted)' }}>
-            {(metrics?.criticalIssues || 0) > 0 ? 'Need attention' : 'All clear ✓'}
-          </div>
-        </div>
+        </Link>
       </div>
 
       {/* Charts Row */}
@@ -239,11 +295,11 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
               <div className="card-title">🏆 Client Health Leaderboard</div>
               <div className="card-subtitle">Ranked by latest site health score</div>
             </div>
-            <Link href={`/${domain}/clients`} style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}>View All →</Link>
+            <Link href={`${basePath}/clients`} style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: 600 }}>View All →</Link>
           </div>
           <div className="card-body" style={{ paddingTop: '6px', paddingBottom: '6px' }}>
             {(metrics?.clientsWithHealth || []).slice(0, 5).map((c: any, i: number) => (
-              <Link href={`/${domain}/clients/${c.id}`} key={c.id} className="client-health-row" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--gray-100)' }}>
+              <Link href={`${basePath}/clients/${c.id}`} key={c.id} className="client-health-row" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid var(--gray-100)' }}>
                 <div style={{ width: '22px', textAlign: 'center', fontSize: i < 3 ? '16px' : '11px', fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>
                   {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
                 </div>

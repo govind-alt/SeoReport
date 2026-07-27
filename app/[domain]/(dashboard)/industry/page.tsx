@@ -5,6 +5,7 @@ import ExportButton from './ExportButton';
 export default async function IndustryPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = await params;
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   
   const industries = await getIndustryData(domain);
 
@@ -49,7 +50,7 @@ export default async function IndustryPage({ params }: { params: Promise<{ domai
             </div>
 
             <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border)', textAlign: 'center' }}>
-              <Link href={`/${domain}/clients?industry=${encodeURIComponent(ind.name)}`} style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none' }}>
+              <Link href={`${basePath}/clients?industry=${encodeURIComponent(ind.name)}`} style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)', textDecoration: 'none' }}>
                 View all clients in {ind.name} →
               </Link>
             </div>

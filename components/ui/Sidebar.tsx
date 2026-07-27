@@ -12,19 +12,53 @@ export function Sidebar() {
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname() || '';
 
-  let basePath = '';
-  const firstSegment = pathname.split('/')[1];
-  if (firstSegment && !['clients', 'reports', 'settings', 'help', ''].includes(firstSegment)) {
-    basePath = `/${firstSegment}`;
-  }
+  /**
+   * Derive the agency slug (domain) and base path from the URL pathname.
+   *
+   * On localhost dev the app is accessed as:
+   *   http://localhost:3000/{slug}/clients  →  pathname = "/{slug}/clients"
+   *   pathname.split('/')[1]  →  "{slug}"
+   *
+   * On production subdomains the app is accessed as:
+   *   https://{slug}.rankflow.app/clients  →  pathname = "/clients"
+   *   pathname.split('/')[1]  →  "clients"  (NOT a slug)
+   *
+   * The middleware only rewrites on production subdomains, so on localhost
+   * the first path segment IS the slug. We detect this via window.location.
+   */
+  const getBasePath = (): string => {
+    if (typeof window === 'undefined') return '';
+    const isLocalhost =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+    if (!isLocalhost) return '';
+
+    // On localhost the first path segment is the agency slug
+    const segments = window.location.pathname.split('/').filter(Boolean);
+    const slug = segments[0];
+    // Exclude known non-slug segments that appear at the root level
+    const nonSlugSegments = new Set(['login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'invite', 'superadmin', 'c', 'reports', 'r']);
+    if (slug && !nonSlugSegments.has(slug)) {
+      return `/${slug}`;
+    }
+    return '';
+  };
+
+  const [basePath, setBasePath] = useState('');
 
   useEffect(() => {
-    const domain = firstSegment || 'localhost';
+    setBasePath(getBasePath());
+    // Re-derive on pathname change (catches client-side navigation)
+  }, [pathname]);
+
+  const domain = basePath ? basePath.replace('/', '') : 'localhost';
+
+  useEffect(() => {
     fetch(`/api/counts?domain=${domain}`)
       .then(r => r.json())
       .then(d => { setClientCount(d.clients); setReportCount(d.reports); })
       .catch(() => {});
-  }, [firstSegment]);
+  }, [domain]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -38,6 +72,7 @@ export function Sidebar() {
   }, []);
 
   const [user, setUser] = useState<{ name: string | null; email: string | null; role: string } | null>(null);
+  const [agencyName, setAgencyName] = useState<string>('');
 
   useEffect(() => {
     import('@/app/actions').then(m => m.getCurrentUser()).then(u => {
@@ -49,7 +84,15 @@ export function Sidebar() {
         });
       }
     });
-  }, []);
+
+    // Load agency name from counts endpoint which returns it
+    fetch(`/api/counts?domain=${domain}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.agencyName) setAgencyName(d.agencyName);
+      })
+      .catch(() => {});
+  }, [domain]);
 
   const getInitials = (name: string | null) => {
     if (!name) return 'U';
@@ -65,62 +108,73 @@ export function Sidebar() {
   const displayRole = user?.role || 'Agency Admin';
   const initials = getInitials(displayName);
 
+  // Active state helper - strips basePath before comparing
+  const isActive = (segment: string) => {
+    // Strip the basePath prefix for comparison
+    const rest = basePath ? pathname.replace(basePath, '') : pathname;
+    if (segment === '') {
+      // Dashboard: active when rest is '' or '/'
+      return rest === '' || rest === '/';
+    }
+    return rest.startsWith(`/${segment}`);
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">RF</div>
         <div>
           <div className="sidebar-logo-text">RankFlow</div>
-          <div className="sidebar-logo-sub">Digital Horizons</div>
+          <div className="sidebar-logo-sub">{agencyName || 'Agency'}</div>
         </div>
       </div>
       <nav className="sidebar-nav">
-        <Link href={`${basePath}/`} className={`sidebar-item ${pathname === `${basePath}/` || pathname === basePath || pathname === '/' ? 'active' : ''}`}>
+        <Link href={`${basePath}/`} className={`sidebar-item ${isActive('') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">📈</span>
           <span className="sidebar-item-label">Dashboard</span>
         </Link>
-        <Link href={`${basePath}/clients`} className={`sidebar-item ${pathname.includes('/clients') ? 'active' : ''}`}>
+        <Link href={`${basePath}/clients`} className={`sidebar-item ${isActive('clients') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">👥</span>
           <span className="sidebar-item-label">Clients</span>
           {clientCount !== null && <span className="sidebar-badge">{clientCount}</span>}
         </Link>
-        <Link href={`${basePath}/industry`} className={`sidebar-item ${pathname.includes('/industry') ? 'active' : ''}`}>
+        <Link href={`${basePath}/industry`} className={`sidebar-item ${isActive('industry') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">🏭</span>
           <span className="sidebar-item-label">Industries</span>
         </Link>
-        <Link href={`${basePath}/reports`} className={`sidebar-item ${pathname.includes('/reports') ? 'active' : ''}`}>
+        <Link href={`${basePath}/reports`} className={`sidebar-item ${isActive('reports') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">📄</span>
           <span className="sidebar-item-label">Reports</span>
           {reportCount !== null && <span className="sidebar-badge">{reportCount}</span>}
         </Link>
         <div className="sidebar-section-label">Configuration</div>
-        <Link href={`${basePath}/team`} className={`sidebar-item ${pathname.includes('/team') ? 'active' : ''}`}>
+        <Link href={`${basePath}/team`} className={`sidebar-item ${isActive('team') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">👥</span>
-          <span className="sidebar-item-label">Team & Roles</span>
+          <span className="sidebar-item-label">Team &amp; Roles</span>
         </Link>
-        <Link href={`${basePath}/integrations`} className={`sidebar-item ${pathname.includes('/integrations') ? 'active' : ''}`}>
+        <Link href={`${basePath}/integrations`} className={`sidebar-item ${isActive('integrations') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">🔌</span>
           <span className="sidebar-item-label">Integrations</span>
         </Link>
-        <Link href={`${basePath}/billing`} className={`sidebar-item ${pathname.includes('/billing') ? 'active' : ''}`}>
+        <Link href={`${basePath}/billing`} className={`sidebar-item ${isActive('billing') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">💳</span>
           <span className="sidebar-item-label">Billing</span>
         </Link>
-        <Link href={`${basePath}/audit-log`} className={`sidebar-item ${pathname.includes('/audit-log') ? 'active' : ''}`}>
+        <Link href={`${basePath}/audit-log`} className={`sidebar-item ${isActive('audit-log') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">🗂️</span>
           <span className="sidebar-item-label">Audit Log</span>
         </Link>
-        <Link href={`${basePath}/settings`} className={`sidebar-item ${pathname.includes('/settings') ? 'active' : ''}`}>
+        <Link href={`${basePath}/settings`} className={`sidebar-item ${isActive('settings') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">⚙️</span>
           <span className="sidebar-item-label">Settings</span>
         </Link>
-        <Link href={`${basePath}/help`} className={`sidebar-item ${pathname.includes('/help') ? 'active' : ''}`}>
+        <Link href={`${basePath}/help`} className={`sidebar-item ${isActive('help') ? 'active' : ''}`}>
           <span className="sidebar-item-icon">❓</span>
           <span className="sidebar-item-label">Help &amp; Support</span>
         </Link>
       </nav>
       <div className="sidebar-footer">
-        <div className="sidebar-user-wrap" style={{ position: 'relative' }}>
+        <div className="sidebar-user-wrap" style={{ position: 'relative' }} ref={menuRef}>
           {/* User menu popup */}
           {isUserMenuOpen && (
             <div id="userMenu" style={{ display: 'block' }}>
@@ -129,7 +183,7 @@ export function Sidebar() {
                 <div className="user-menu-email">{displayEmail}</div>
               </div>
               <Link href={`${basePath}/settings?tab=general`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>⚙️ Account Settings</Link>
-              <Link href={`${basePath}/settings?tab=billing`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>💳 Billing &amp; Plan</Link>
+              <Link href={`${basePath}/billing`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>💳 Billing &amp; Plan</Link>
               <Link href={`${basePath}/help`} className="user-menu-item" style={{ display: 'flex', width: '100%', textDecoration: 'none' }}>❓ Help &amp; Support</Link>
               <div className="user-menu-divider"></div>
               <button onClick={() => {

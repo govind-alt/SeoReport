@@ -6,11 +6,19 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 function getPageTitle(pathname: string) {
+  if (pathname.includes('/reports/builder')) return 'Report Builder';
+  if (pathname.includes('/reports/new')) return 'New Report';
+  if (pathname.match(/\/reports\/[^/]+/)) return 'Report Details';
   if (pathname.includes('/reports')) return 'Reports';
   if (pathname.includes('/clients/new')) return 'Add Client';
   if (pathname.match(/\/clients\/[^/]+/)) return 'Client Details';
   if (pathname.includes('/clients')) return 'Clients';
   if (pathname.includes('/settings')) return 'Settings';
+  if (pathname.includes('/billing')) return 'Billing';
+  if (pathname.includes('/team')) return 'Team & Roles';
+  if (pathname.includes('/integrations')) return 'Integrations';
+  if (pathname.includes('/audit-log')) return 'Audit Log';
+  if (pathname.includes('/industry')) return 'Industries';
   if (pathname.includes('/help')) return 'Help & Support';
   return 'Dashboard';
 }
@@ -21,6 +29,36 @@ export function Topbar() {
   const pathname = usePathname() || '';
   const title = getPageTitle(pathname);
 
+  const [user, setUser] = useState<{ name: string | null; email: string | null; role: string } | null>(null);
+  const [agencyName, setAgencyName] = useState<string>('');
+
+  useEffect(() => {
+    // Derive domain slug for API calls
+    const isLocalhost =
+      typeof window !== 'undefined' &&
+      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    let domain = 'localhost';
+    if (isLocalhost) {
+      const segments = window.location.pathname.split('/').filter(Boolean);
+      const nonSlug = new Set(['login', 'register', 'forgot-password', 'superadmin', 'c', 'reports', 'r']);
+      if (segments[0] && !nonSlug.has(segments[0])) {
+        domain = segments[0];
+      }
+    }
+
+    // Load current user
+    import('@/app/actions').then(m => m.getCurrentUser()).then(u => {
+      if (u) setUser({ name: u.name ?? null, email: u.email ?? null, role: u.role });
+    });
+
+    // Load agency name
+    fetch(`/api/counts?domain=${domain}`)
+      .then(r => r.json())
+      .then(d => { if (d.agencyName) setAgencyName(d.agencyName); })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (topbarRef.current && !topbarRef.current.contains(e.target as Node)) {
@@ -30,6 +68,17 @@ export function Topbar() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  const getInitials = (name: string | null) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const displayName = user?.name || '';
+  const displayAgency = agencyName || 'Agency';
+  const initials = getInitials(displayName);
 
   const notifications = [
     { icon: '✅', title: 'Report Generated', desc: 'TechStart.io monthly PDF is ready.', time: '2h ago', unread: true },
@@ -123,8 +172,10 @@ export function Topbar() {
 
         <div style={{ width: '1px', height: '24px', background: 'var(--border)' }}></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
-          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: 800 }}>JD</div>
-          Digital Horizons
+          <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: 800 }}>
+            {initials || 'RF'}
+          </div>
+          {displayAgency}
         </div>
       </div>
     </header>

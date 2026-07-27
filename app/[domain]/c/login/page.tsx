@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 export default function ClientLoginPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,21 +26,21 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
           email,
           password,
           redirect: false,
-          callbackUrl: `/${domain}/c/dashboard`
+          callbackUrl: `${basePath}/c/dashboard`
         });
 
         if (res?.error) {
           toast.error('Invalid email or password');
         } else {
           toast.success('Logged in successfully! Redirecting...');
-          window.location.href = `/${domain}/c/dashboard`;
+          window.location.href = `${basePath}/c/dashboard`;
         }
       } else {
         // Log in using nodemailer magic link
         const res = await signIn('nodemailer', {
           email,
           redirect: false,
-          callbackUrl: `/${domain}/c/dashboard`
+          callbackUrl: `${basePath}/c/dashboard`
         });
 
         if (res?.error) {

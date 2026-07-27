@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Module-level counter for generating stable, unique module IDs.
 // Using a counter avoids calling Date.now() or Math.random() inside React render.
 let moduleIdCounter = 0;
 const nextModuleId = () => { moduleIdCounter += 1; return moduleIdCounter; };
-import { saveReportTemplate } from '@/app/actions';
+import { saveReportTemplate, updateExecutiveSummary } from '@/app/actions';
 
 const AVAILABLE_MODULES = [
   { id: 'executive_summary', title: 'Executive Summary', icon: '📝', description: 'AI-generated summary of overall performance.' },
@@ -21,11 +22,13 @@ const AVAILABLE_MODULES = [
 ];
 
 export default function BuilderClient({ reportId, clientName, initialModules, domain }: { reportId: string, clientName: string, initialModules: string[], domain: string }) {
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   const [activeModules, setActiveModules] = useState<{ id: string; type: string }[]>(() =>
-    // Lazy initializer avoids re-running on every render.
     initialModules.map(m => ({ id: `${m}-${nextModuleId()}`, type: m }))
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [editingExecSummary, setEditingExecSummary] = useState(false);
+  const [execSummaryText, setExecSummaryText] = useState('Over the past 30 days, overall organic search performance demonstrated strong positive momentum across primary KPI metrics.');
   const router = useRouter();
 
   const handleDragStart = (e: React.DragEvent, type: string) => {
@@ -63,7 +66,7 @@ export default function BuilderClient({ reportId, clientName, initialModules, do
       const moduleTypes = activeModules.map(m => m.type);
       await saveReportTemplate(reportId, moduleTypes);
       toast.success('Report layout saved!', { id: t });
-      router.push(`/${domain}/reports`);
+      router.push(`${basePath}/reports`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to save report';
       toast.error(message, { id: t });
@@ -116,7 +119,7 @@ export default function BuilderClient({ reportId, clientName, initialModules, do
             <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>ID: {reportId}</div>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button className="btn btn-secondary" onClick={() => router.push(`/${domain}/reports`)}>Cancel</button>
+            <Link href={`${basePath}/reports`} className="btn btn-secondary" style={{ textDecoration: 'none' }}>Cancel</Link>
             <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Template'}
             </button>
@@ -160,7 +163,15 @@ export default function BuilderClient({ reportId, clientName, initialModules, do
                     </div>
                   </div>
                   
-                  {/* Mock Config Options based on type */}
+                  {/* Config Options based on type */}
+                  {mod.type === 'executive_summary' && (
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => setEditingExecSummary(true)}
+                    >
+                      ✏ Edit Summary
+                    </button>
+                  )}
                   {mod.type === 'custom_text' && (
                     <button className="btn btn-ghost btn-sm" style={{ border: '1px solid var(--border)' }}>Edit Text</button>
                   )}
@@ -194,6 +205,50 @@ export default function BuilderClient({ reportId, clientName, initialModules, do
           </div>
         </div>
       </div>
+
+      {/* Edit Executive Summary Modal */}
+      {editingExecSummary && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="card fade-in" style={{ width: '100%', maxWidth: '560px', padding: '28px', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xl)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ fontSize: '18px', fontWeight: 800 }}>✏ Edit Executive Summary</div>
+              <button onClick={() => setEditingExecSummary(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px' }}>
+                Summary Content (Will appear in Web & PDF Reports)
+              </label>
+              <textarea
+                className="form-input"
+                rows={6}
+                value={execSummaryText}
+                onChange={e => setExecSummaryText(e.target.value)}
+                style={{ width: '100%', resize: 'vertical', fontFamily: 'inherit' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setEditingExecSummary(false)}>Cancel</button>
+              <button
+                className="btn btn-primary"
+                onClick={async () => {
+                  const t = toast.loading('Updating Executive Summary...');
+                  try {
+                    await updateExecutiveSummary(reportId, execSummaryText);
+                    toast.success('Executive Summary updated!', { id: t });
+                    setEditingExecSummary(false);
+                  } catch (e: any) {
+                    toast.error(e?.message || 'Failed to update summary', { id: t });
+                  }
+                }}
+              >
+                ✓ Save Summary
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

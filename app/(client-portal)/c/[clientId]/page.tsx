@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { toast, Toaster } from 'sonner';
 import { getClientDetails } from '@/app/actions';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
@@ -322,9 +323,9 @@ export default function ClientPortalPage({ params }: { params: Promise<{ clientI
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => window.open(`/reports/render/${reports[0].id}`, '_blank')} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
+                    <Link href={`/reports/render/${reports[0].id}`} target="_blank" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
                       👁 Preview
-                    </button>
+                    </Link>
                     <button className="download-btn" onClick={() => downloadPdf(reports[0].id)} disabled={downloadingId === reports[0].id} style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600 }}>
                       {downloadingId === reports[0].id ? '⏳ Generating…' : '⬇ Download PDF'}
                     </button>
@@ -367,9 +368,9 @@ export default function ClientPortalPage({ params }: { params: Promise<{ clientI
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => window.open(`/reports/render/${r.id}`, '_blank')} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500 }}>
+                      <Link href={`/reports/render/${r.id}`} target="_blank" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
                         👁 Preview
-                      </button>
+                      </Link>
                       <button className="download-btn" onClick={() => downloadPdf(r.id)} disabled={downloadingId === r.id} style={{ background: 'linear-gradient(135deg,#6366F1,#8B5CF6)', border: 'none', color: 'white', padding: '8px 16px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, minWidth: '140px', textAlign: 'center' }}>
                         {downloadingId === r.id ? '⏳ Generating…' : '⬇ Download PDF'}
                       </button>

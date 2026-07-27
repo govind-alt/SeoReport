@@ -18,6 +18,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
 
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
 
   const fetchClients = async () => {
     try {
@@ -72,7 +73,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button className="btn btn-secondary" onClick={() => setIsImportModalOpen(true)}>📥 Import CSV</button>
-          <Link href={`/${domain}/clients/new`} className="btn btn-primary">＋ Add Client</Link>
+          <Link href={`${basePath}/clients/new`} className="btn btn-primary">＋ Add Client</Link>
         </div>
       </div>
 
@@ -133,7 +134,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
           <div className="empty-state-icon">👥</div>
           <div className="empty-state-title">{search ? 'No clients found' : 'No clients yet'}</div>
           <div className="empty-state-desc">{search ? `No clients match "${search}". Try a different search.` : 'Add your first client to get started tracking SEO performance.'}</div>
-          {!search && <Link href={`/${domain}/clients/new`} className="btn btn-primary">＋ Add First Client</Link>}
+          {!search && <Link href={`${basePath}/clients/new`} className="btn btn-primary">＋ Add First Client</Link>}
         </div>
       ) : (
         <>
@@ -193,7 +194,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '4px' }}>
-                          <Link href={`/${domain}/clients/${client.id}`} className="btn btn-secondary btn-sm">View</Link>
+                          <Link href={`${basePath}/clients/${client.id}`} className="btn btn-secondary btn-sm">View</Link>
                           <button className="btn btn-sm" style={{ color: 'var(--danger)', border: '1px solid var(--border)' }} onClick={() => handleDelete(client.id, client.name)}>🗑</button>
                         </div>
                       </td>
@@ -249,7 +250,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
                   </div>
                   <div className="client-card-footer">
                     <span className="badge badge-success"><span className="badge-dot"></span>Active</span>
-                    <Link href={`/${domain}/clients/${client.id}`} className="btn btn-primary btn-sm">View Details →</Link>
+                    <Link href={`${basePath}/clients/${client.id}`} className="btn btn-primary btn-sm">View Details →</Link>
                   </div>
                 </div>
               ))}

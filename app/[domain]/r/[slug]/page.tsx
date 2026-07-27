@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, use, useEffect } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   AreaChart,
@@ -18,6 +19,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function PublicReportView({ params }: { params: Promise<{ domain: string, slug: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
+  const basePath = domain === 'localhost' ? '/localhost' : '';
   const slug = resolvedParams.slug;
 
   const [report, setReport] = useState<any>(null);
@@ -158,13 +160,13 @@ export default function PublicReportView({ params }: { params: Promise<{ domain:
       {/* Unlocked Header */}
       <div style={{ background: 'var(--surface)', backdropFilter: 'blur(16px)', borderBottom: '1px solid var(--border)', padding: '16px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button 
+          <Link 
+            href={`${basePath}/c/dashboard`}
             className="btn btn-secondary btn-sm" 
-            onClick={() => window.location.href = `/${domain}/c/dashboard`}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', height: 'fit-content' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', height: 'fit-content', textDecoration: 'none' }}
           >
             ← Back to Portal
-          </button>
+          </Link>
           <div>
             <div style={{ display: 'inline-block', fontSize: '10px', background: 'var(--primary-light)', color: 'var(--primary)', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase', marginBottom: '2px' }}>
               {agencyName}
