@@ -264,10 +264,10 @@ export default function Login() {
 
                 {/* 1-Click Quick Fill Credentials for Testing */}
                 <div style={{ background: 'rgba(0, 173, 181, 0.1)', border: '1px solid rgba(0, 173, 181, 0.25)', borderRadius: '10px', padding: '10px 14px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: '12px', color: '#00ADB5', fontWeight: 600 }}>⚡ Demo Agency Admin Credentials</div>
+                  <div style={{ fontSize: '12px', color: '#FF1E42', fontWeight: 600 }}>⚡ Demo Agency Admin Credentials</div>
                   <button
                     type="button"
-                    style={{ background: '#00ADB5', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
+                    style={{ background: '#FF1E42', color: 'white', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}
                     onClick={() => {
                       setEmail('sarah.jenkins@digitalhorizons.com');
                       setPassword('Password123!');

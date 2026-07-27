@@ -183,10 +183,10 @@ export default function DatabaseExplorer() {
   return (
     <div style={{ minHeight: '100vh', background: '#222831', color: '#EEEEEE', fontFamily: '"Inter", system-ui, sans-serif' }}>
       {/* Topbar Header */}
-      <header style={{ background: '#1A1E24', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
+      <header style={{ background: '#111114', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #00ADB5, #007A80)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px', boxShadow: '0 4px 14px rgba(0,173,181,0.35)' }}>SA</div>
+            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #FF1E42, #C00A28)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px', boxShadow: '0 4px 14px rgba(255,30,66,0.4)' }}>SA</div>
             <span style={{ fontSize: '16px', fontWeight: 800 }}>RankFlow <span style={{ opacity: 0.6, fontSize: '12px', background: 'rgba(255,255,255,0.08)', padding: '2px 8px', borderRadius: '10px', marginLeft: '6px' }}>DATABASE EXPLORER</span></span>
           </div>
           <nav style={{ display: 'flex', gap: '8px' }}>
@@ -203,7 +203,7 @@ export default function DatabaseExplorer() {
 
       <div style={{ display: 'flex', height: 'calc(100vh - 64px)' }}>
         {/* Sidebar Model Selector */}
-        <div style={{ width: '260px', background: '#1A1E24', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '24px 0', overflowY: 'auto' }}>
+        <div style={{ width: '260px', background: '#111114', borderRight: '1px solid rgba(255,255,255,0.06)', padding: '24px 0', overflowY: 'auto' }}>
           <div style={{ padding: '0 20px', fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px' }}>
             PRISMA DATA MODELS ({TABLES.length})
           </div>
@@ -219,10 +219,10 @@ export default function DatabaseExplorer() {
                 width: '100%',
                 padding: '12px 20px',
                 textAlign: 'left',
-                background: activeTable === table ? 'rgba(0, 173, 181, 0.18)' : 'transparent',
-                color: activeTable === table ? '#00ADB5' : 'rgba(255,255,255,0.7)',
+                background: activeTable === table ? 'rgba(255, 30, 66, 0.18)' : 'transparent',
+                color: activeTable === table ? '#FF1E42' : 'rgba(255,255,255,0.7)',
                 border: 'none',
-                borderRight: activeTable === table ? '3px solid #00ADB5' : '3px solid transparent',
+                borderRight: activeTable === table ? '3px solid #FF1E42' : '3px solid transparent',
                 fontSize: '13px',
                 fontWeight: activeTable === table ? 700 : 500,
                 cursor: 'pointer',
@@ -236,7 +236,7 @@ export default function DatabaseExplorer() {
                 <span>{table}</span>
               </div>
               {activeTable === table && (
-                <span style={{ background: '#00ADB5', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', fontWeight: 800 }}>{totalCount}</span>
+                <span style={{ background: '#FF1E42', color: 'white', fontSize: '10px', padding: '2px 6px', borderRadius: '10px', fontWeight: 800 }}>{totalCount}</span>
               )}
             </button>
           ))}

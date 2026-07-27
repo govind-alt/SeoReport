@@ -355,8 +355,8 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
           className="cp-tab-btn"
           onClick={() => setActiveTab(tab.id)}
           style={{
-            borderBottom: activeTab === tab.id ? '2px solid #00ADB5' : '2px solid transparent',
-            color: activeTab === tab.id ? '#00ADB5' : 'rgba(255,255,255,0.5)',
+            borderBottom: activeTab === tab.id ? '2px solid #FF1E42' : '2px solid transparent',
+            color: activeTab === tab.id ? '#FF1E42' : 'rgba(255,255,255,0.5)',
             fontWeight: activeTab === tab.id ? 700 : 500,
             position: 'relative',
             whiteSpace: 'nowrap'
@@ -370,11 +370,11 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#222831', color: '#EEEEEE', fontFamily: '"Inter", system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: '#0D0D0D', color: '#F4F4F6', fontFamily: '"Inter", system-ui, sans-serif' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         .cp-tab-btn { background: none; border: none; cursor: pointer; padding: 20px 4px; font-family: inherit; font-size: 14px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
-        .cp-tab-btn:hover { color: #00ADB5 !important; }
+        .cp-tab-btn:hover { color: #FF1E42 !important; }
         .kpi-card { transition: transform 0.2s, box-shadow 0.2s; }
         .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
         .table-wrapper table th { color: rgba(238,238,238,0.5); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 16px 24px; }
@@ -386,16 +386,16 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
 
       {/* Broadcast Banner (if active) */}
       {broadcastActive && (
-        <div style={{ background: 'linear-gradient(90deg, #00ADB5, #008C93)', color: 'white', padding: '8px 24px', fontSize: '13px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ background: 'linear-gradient(90deg, #FF1E42, #E01435)', color: 'white', padding: '8px 24px', fontSize: '13px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>📢 {broadcastMessage}</div>
           <button onClick={() => setBroadcastActive(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 800 }}>✕</button>
         </div>
       )}
       
       {/* Superadmin Header */}
-      <header style={{ background: '#1A1E24', color: '#EEEEEE', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <header style={{ background: '#111114', color: '#F4F4F6', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #00ADB5 0%, #007A80 100%)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px', boxShadow: '0 4px 14px rgba(0,173,181,0.35)' }}>RF</div>
+          <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #FF1E42 0%, #C00A28 100%)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '14px', boxShadow: '0 4px 14px rgba(255,30,66,0.4)' }}>RF</div>
           <div style={{ fontSize: '16px', fontWeight: 800, letterSpacing: '-0.3px' }}>RankFlow <span style={{ opacity: 0.6, fontWeight: 500, fontSize: '12px', background: 'rgba(255,255,255,0.08)', padding: '2px 8px', borderRadius: '10px', marginLeft: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>SUPER ADMIN CONSOLE</span></div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -796,7 +796,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                         <td style={{ padding: '16px 24px' }}><span style={{ color: '#10B981', fontWeight: 600, fontSize: '12px' }}>🟢 Active</span></td>
                         <td style={{ padding: '16px 24px', textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                            <button className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', color: '#00ADB5' }} onClick={() => handleOpenRoleModal(user)}>⚙️ Role</button>
+                            <button className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', color: '#FF1E42' }} onClick={() => handleOpenRoleModal(user)}>⚙️ Role</button>
                             {user.role !== 'superadmin' && (
                               <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '4px 10px', fontSize: '11px' }} onClick={() => setDeactivateModalUser(user)}>🚫 Deactivate</button>
                             )}
@@ -1460,16 +1460,16 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
               <div style={{ marginBottom: '16px', background: 'rgba(0,0,0,0.2)', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: '#EEEEEE' }}>{roleModalUser.name || 'Unnamed User'}</div>
                 <div style={{ fontSize: '12px', color: '#B5BEC9' }}>{roleModalUser.email}</div>
-                <div style={{ fontSize: '11px', color: '#00ADB5', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Current Role: {roleModalUser.role}</div>
+                <div style={{ fontSize: '11px', color: '#FF1E42', marginTop: '4px', textTransform: 'uppercase', fontWeight: 700 }}>Current Role: {roleModalUser.role}</div>
               </div>
 
               <div className="form-group" style={{ marginBottom: '24px' }}>
-                <label className="form-label" style={{ color: '#EEEEEE' }}>Select New Role *</label>
+                <label className="form-label" style={{ color: '#F4F4F6' }}>Select New Role *</label>
                 <select
                   className="form-input"
                   value={selectedRole}
                   onChange={e => setSelectedRole(e.target.value)}
-                  style={{ background: '#222831', color: '#EEEEEE', border: '1px solid rgba(255,255,255,0.1)' }}
+                  style={{ background: '#16161A', color: '#F4F4F6', border: '1px solid rgba(255,255,255,0.1)' }}
                 >
                   <option value="admin">Agency Admin</option>
                   <option value="member">Team Member / Strategist</option>
@@ -1491,15 +1491,15 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
 
       {/* Confirm Deactivate User Modal */}
       {deactivateModalUser && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10, 15, 28, 0.85)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: '#393E46', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '440px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.88)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#16161A', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '440px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', border: '1px solid rgba(255, 30, 66, 0.4)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#EF4444' }}>🚫 Deactivate User Account</h3>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#FF1E42' }}>🚫 Deactivate User Account</h3>
               <button onClick={() => setDeactivateModalUser(null)} style={{ fontSize: '20px', color: 'rgba(255,255,255,0.45)', border: 'none', background: 'none', cursor: 'pointer' }}>✕</button>
             </div>
 
-            <p style={{ fontSize: '14px', color: '#EEEEEE', marginBottom: '16px' }}>
-              Are you sure you want to deactivate and remove user <strong style={{ color: '#00ADB5' }}>{deactivateModalUser.name || deactivateModalUser.email}</strong>?
+            <p style={{ fontSize: '14px', color: '#F4F4F6', marginBottom: '16px' }}>
+              Are you sure you want to deactivate and remove user <strong style={{ color: '#FF1E42' }}>{deactivateModalUser.name || deactivateModalUser.email}</strong>?
             </p>
 
             <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '12px 16px', borderRadius: '10px', color: '#FCA5A5', fontSize: '12px', marginBottom: '24px' }}>
