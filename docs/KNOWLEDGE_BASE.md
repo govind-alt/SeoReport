@@ -64,6 +64,7 @@ timeline
 - **New Profile Infinite Loop Resolution** ([`app/api/auth/register/route.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/app/api/auth/register/route.ts)): Resolved loading loop issues for newly created accounts by auto-seeding demo data during account registration.
 - **Multi-Role Sign-In Suite**: Built role-specific portals (`/login`, `/login/client`, `/login/admin`) featuring 1-click **Auto Fill ⚡** credential buttons.
 - **Global Password Reset**: Re-hashed and synchronized all 16 user account passwords in the database to **`Password123!`** via `scripts/reset-passwords.ts` and enhanced `lib/auth.ts`.
+- **Knowledge Curator SubAgent & Global Rule**: Created dedicated subagent skill ([`.agents/skills/knowledge-curator/SKILL.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/skills/knowledge-curator/SKILL.md)) and enforced a global agent rule ([`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md)) requiring automatic knowledge base curation after every task completion.
 
 ---
 
