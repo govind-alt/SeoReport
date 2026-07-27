@@ -68,7 +68,7 @@ timeline
   - Dark Charcoal Surface (`#16161A` & `#1F1F24`)
   - Electric Crimson Red Accent (`#FF1E42` & hover `#E01435`)
   - Crisp Light Neutral (`#F4F4F6`)
-- **Mandatory Git Push Rule**: Updated [`.agents/skills/knowledge-curator/SKILL.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/skills/knowledge-curator/SKILL.md) and [`.agents/AGENTS.md`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/AGENTS.md) mandating an automatic `git add . && git commit -m "..." && git push origin main` pipeline immediately after every Knowledge Curator run.
+- **Modular `.agents/knowledge-base/` Architecture**: Restructured [`.agents/knowledge-base/`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/.agents/knowledge-base/INDEX.md) with 12 modular domain files (`INDEX.md`, `PROJECT_SNAPSHOT.md`, `architecture.md`, `multi-tenancy.md`, `auth.md`, `database.md`, `frontend.md`, `api.md`, `pdf-reports.md`, `billing.md`, `devops.md`, `bugs-and-gotchas.md`).
 - **Default Agency Branding Update** ([`lib/branding.ts`](file:///c:/Users/somna/OneDrive/Desktop/SEO%20TASK/SeoReport/lib/branding.ts)): Set default fallback agency colors to `#FF1E42` and `#E01435`.
 
 ---
