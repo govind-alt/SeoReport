@@ -40,7 +40,36 @@ It is engineered as a **Multi-Tenant SaaS** platform utilizing Next.js subdomain
 | Phase 8 | Polish & Error Handling | ✅ Complete |
 | Phase 9 | Launch Prep & Finalization | ✅ Complete |
 
-**The application is 100% feature-complete, zero-error linted, and production-ready.**
+## ⚡ 1-Minute Quick Start (Running on Any New Device)
+
+RankFlow is engineered for **100% device portability**. You can run the project on any Windows, macOS, or Linux machine in 3 simple steps:
+
+### Option A: Via Git Clone
+```bash
+# 1. Clone the repository
+git clone https://github.com/govind-alt/SeoReport.git
+cd SeoReport
+
+# 2. Copy the pre-configured local environment file
+cp .env.example .env   # (On Windows CMD: copy .env.example .env)
+
+# 3. One-Command Setup (Installs packages, initializes DB, seeds test accounts)
+npm run setup
+
+# 4. Start the application
+npm run dev
+```
+
+### Option B: Via File / ZIP Transfer
+1. Copy or extract the project folder to your target machine.
+2. Ensure `.env` exists (if missing, copy `.env.example` to `.env`).
+3. Open a terminal in the folder and run:
+   ```bash
+   npm install
+   npm run setup
+   npm run dev
+   ```
+4. Open `http://localhost:3000` in your browser. All test users (`superadmin@rankflow.app`, `sarah.jenkins@digitalhorizons.com`, `john@acmestore.com`) will work instantly with password **`Password123!`**.
 
 ---
 
