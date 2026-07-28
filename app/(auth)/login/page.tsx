@@ -1,12 +1,22 @@
 "use client";
 
 import './login.css';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { registerClient } from '../../actions';
+import { registerClient, registerAgency } from '../../actions';
 
-export default function Login() {
+function LoginFormContent() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'signin' | 'register' | 'forgot' | 'verify'>('signin');
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const modeParam = searchParams.get('mode');
+    if (tabParam === 'register' || modeParam === 'signup') {
+      setActiveTab('register');
+    }
+  }, [searchParams]);
   const [selectedRole, setSelectedRole] = useState('agency');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
@@ -14,68 +24,48 @@ export default function Login() {
   // Login State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState(false);
+  const [loginError, setLoginError] = useState(''); // empty string = no error
   const [loading, setLoading] = useState(false);
 
   // Register State
+  const [regAccountType, setRegAccountType] = useState<'agency' | 'client'>('agency');
   const [regFirstName, setRegFirstName] = useState('');
   const [regLastName, setRegLastName] = useState('');
   const [regEmail, setRegEmail] = useState('');
-  const [regAgency, setRegAgency] = useState('');
+  const [regAgencyName, setRegAgencyName] = useState('');
   const [regSubdomain, setRegSubdomain] = useState('');
+  const [regClientName, setRegClientName] = useState('');
+  const [regClientDomain, setRegClientDomain] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
 
-  const getSubdomainUrl = (subdomain: string) => {
-    const isLocal = window.location.hostname.includes('localhost');
-    const port = window.location.port ? `:${window.location.port}` : '';
-    if (isLocal) {
-      return `http://${subdomain}.localhost${port}`;
-    }
-    return `https://${subdomain}.rankflow.app`; // Production domain
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setLoginError(false);
-    
+    setLoginError('');
+
     try {
       const res = await signIn('credentials', {
-        email,
+        email: email.trim().toLowerCase(),
         password,
-        redirect: false
+        redirect: false,
       });
-      
+
       if (res?.error) {
-        setLoginError(true);
+        // Surface rate-limit or credential error
+        if (res.error.includes('Too many')) {
+          setLoginError(res.error);
+        } else {
+          setLoginError('Invalid email or password. Please try again.');
+        }
         setLoading(false);
       } else {
-        // Route based on role
-        if (email === 'superadmin@rankflow.app') {
-          window.location.href = '/admin';
-        } else if (email === 'client@acme.com') {
-          window.location.href = '/client/dashboard';
-        } else {
-          // Agency admin — fetch their agency slug, then go to /{slug}/ path-based dashboard
-          try {
-            const agencyRes = await fetch('/api/agency/settings');
-            if (agencyRes.ok) {
-              const agencyData = await agencyRes.json();
-              const slug = agencyData.slug || agencyData.subdomain || 'demo';
-              window.location.href = `/${slug}/`;
-            } else {
-              // Fallback: try the demo slug
-              window.location.href = '/demo/';
-            }
-          } catch {
-            window.location.href = '/demo/';
-          }
-        }
+        // Route via the smart /auth-success page
+        window.location.href = '/auth-success';
       }
-    } catch (error) {
-      setLoginError(true);
+    } catch (error: any) {
+      setLoginError(error?.message ?? 'Something went wrong. Please try again.');
       setLoading(false);
     }
   };
@@ -91,67 +81,131 @@ export default function Login() {
 
     setLoading(true);
 
-    const res = await registerClient({
-      firstName: regFirstName,
-      lastName: regLastName,
-      email: regEmail,
-      companyName: regAgency, // regAgency maps to Company Name in form
-      domain: regSubdomain,   // regSubdomain maps to Website Domain in form
-      password: regPassword
-    });
+    if (regAccountType === 'agency') {
+      const res = await registerAgency({
+        firstName: regFirstName,
+        lastName: regLastName,
+        email: regEmail,
+        agencyName: regAgencyName,
+        subdomain: regSubdomain || regAgencyName.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        password: regPassword
+      });
 
-    if (res.error) {
-      setRegError(res.error);
-      setLoading(false);
-      return;
-    }
+      if (res.error) {
+        setRegError(res.error);
+        setLoading(false);
+        return;
+      }
 
-    // Success! Log them in automatically
-    const loginRes = await signIn('credentials', {
-      email: regEmail,
-      password: regPassword,
-      redirect: false
-    });
+      const loginRes = await signIn('credentials', {
+        email: regEmail,
+        password: regPassword,
+        redirect: false
+      });
 
-    if (!loginRes?.error) {
-      window.location.href = '/client/dashboard';
+      if (!loginRes?.error) {
+        const targetSubdomain = regSubdomain || regAgencyName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        window.location.href = `/${targetSubdomain}/`;
+      } else {
+        setActiveTab('signin');
+        setLoading(false);
+      }
     } else {
-      setActiveTab('signin');
-      setLoading(false);
+      const res = await registerClient({
+        firstName: regFirstName,
+        lastName: regLastName,
+        email: regEmail,
+        companyName: regClientName,
+        domain: regClientDomain,
+        password: regPassword
+      });
+
+      if (res.error) {
+        setRegError(res.error);
+        setLoading(false);
+        return;
+      }
+
+      const loginRes = await signIn('credentials', {
+        email: regEmail,
+        password: regPassword,
+        redirect: false
+      });
+
+      if (!loginRes?.error) {
+        window.location.href = '/client/dashboard';
+      } else {
+        setActiveTab('signin');
+        setLoading(false);
+      }
     }
   };
 
   const handleGoogle = (e: React.MouseEvent) => {
     e.preventDefault();
     setLoading(true);
-    signIn('google', { callbackUrl: '/demo/' });
+    signIn('google', { callbackUrl: '/auth-success' });
   };
+
 
   return (
     <>
       <div className="auth-layout">
         <div className="auth-brand-panel">
           <div className="brand-logo">
-            <div className="brand-icon">RF</div>
-            <div>
-              <div className="brand-name">RankFlow</div>
-              <div className="brand-tagline">SEO Report Automation</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="brand-icon">RF</div>
+              <div>
+                <div className="brand-name">RankFlow</div>
+                <div className="brand-tagline">SEO Report Automation Platform</div>
+              </div>
+            </div>
+            <div className="platform-status-pill">
+              <span className="status-dot"></span> All Systems Operational
             </div>
           </div>
 
           <div className="brand-hero">
+            <div className="brand-badge">⚡ Trusted by 500+ SEO & Digital Marketing Agencies</div>
             <h1 className="brand-hero-title">Automate your<br/><span>SEO reports.</span><br/>Impress every client.</h1>
-            <p className="brand-hero-desc">RankFlow pulls data from SERanking and generates beautiful, branded monthly SEO reports — automatically. Save hours every month.</p>
+            <p className="brand-hero-desc">
+              Connect SERanking, Google Search Console & GA4 in seconds. RankFlow automatically generates 100% white-labeled PDF and interactive web reports for all your clients on the 1st of every month.
+            </p>
 
-            <div className="brand-testimonial" style={{marginTop: '32px'}}>
-              <blockquote>&quot;RankFlow cut our reporting time from 8 hours to 20 minutes per client. Our clients love the reports, and we love the extra time.&quot;</blockquote>
+            <div className="brand-stats-grid">
+              <div className="brand-stat-item">
+                <div className="brand-stat-number">500+</div>
+                <div className="brand-stat-label">Active Agencies</div>
+              </div>
+              <div className="brand-stat-item">
+                <div className="brand-stat-number">1.2M+</div>
+                <div className="brand-stat-label">Reports Delivered</div>
+              </div>
+              <div className="brand-stat-item">
+                <div className="brand-stat-number">99.9%</div>
+                <div className="brand-stat-label">Uptime SLA</div>
+              </div>
+            </div>
+
+            <div className="brand-testimonial">
+              <blockquote>&quot;RankFlow cut our monthly reporting time from 8 hours per client to under 15 minutes. Our clients love the interactive web dashboards, and we save over 35 hours every month!&quot;</blockquote>
               <div className="testimonial-author">
                 <div className="testimonial-avatar">SR</div>
                 <div>
                   <div className="testimonial-name">Sarah Reynolds</div>
-                  <div className="testimonial-role">Founder, PixelRank Agency</div>
+                  <div className="testimonial-role">Founder @ PixelRank Agency (42 Clients)</div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="brand-integrations">
+            <div className="integrations-label">Native Data Integrations</div>
+            <div className="integrations-tags">
+              <span className="integration-tag">SERanking</span>
+              <span className="integration-tag">Google Search Console</span>
+              <span className="integration-tag">Google Analytics 4</span>
+              <span className="integration-tag">PageSpeed Insights</span>
             </div>
           </div>
 
@@ -160,21 +214,21 @@ export default function Login() {
               <div className="brand-feature-icon">📊</div>
               <div className="brand-feature-text">
                 <span className="brand-feature-title">Automated Data Sync</span>
-                Daily SERanking sync — rankings, backlinks, audits, and GSC data all in one place.
+                Daily SERanking keyword position tracking, backlinks, site health audits & organic search metrics.
               </div>
             </div>
             <div className="brand-feature">
               <div className="brand-feature-icon">🎨</div>
               <div className="brand-feature-text">
-                <span className="brand-feature-title">White-Label Reports</span>
-                Fully branded PDF reports with your logo and colors — clients never see RankFlow.
+                <span className="brand-feature-title">100% White-Label Portals & PDFs</span>
+                Custom agency subdomains, custom brand color themes, logo headers, and white-labeled email notifications.
               </div>
             </div>
             <div className="brand-feature">
               <div className="brand-feature-icon">⚡</div>
               <div className="brand-feature-text">
-                <span className="brand-feature-title">Multi-Client Dashboard</span>
-                Manage all clients, track health scores, and generate reports from one dashboard.
+                <span className="brand-feature-title">Multi-Client Agency Hub</span>
+                Centralized dashboard to monitor client health scores, schedule recurring dispatches, and track client portal views.
               </div>
             </div>
           </div>
@@ -195,7 +249,7 @@ export default function Login() {
 
               {loginError && (
                 <div className="alert alert-danger" id="loginError">
-                  ❌ Invalid email or password. Please try again.
+                  ❌ {loginError}
                 </div>
               )}
 
@@ -266,13 +320,52 @@ export default function Login() {
           {activeTab === 'register' && (
             <div className="auth-panel active animate-in" id="panelRegister">
               <div className="form-header">
-                <div className="form-header-title">Start for free 🚀</div>
-                <div className="form-header-desc">14-day trial, no credit card required</div>
+                <div className="form-header-title">Create your account 🚀</div>
+                <div className="form-header-desc">Choose account type to get started</div>
+              </div>
+
+              {/* Account Type Selector */}
+              <div className="role-selector" style={{ marginBottom: '20px' }}>
+                <div className={`role-option ${regAccountType === 'agency' ? 'active' : ''}`} onClick={() => setRegAccountType('agency')}>
+                  🏢 Agency Workspace
+                </div>
+                <div className={`role-option ${regAccountType === 'client' ? 'active' : ''}`} onClick={() => setRegAccountType('client')}>
+                  👤 Client Portal
+                </div>
               </div>
 
               {regError && (
-                <div className="alert alert-danger" style={{marginBottom: '16px'}}>
-                  ❌ {regError}
+                <div className="alert alert-danger" style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ fontWeight: 600 }}>❌ {regError}</div>
+                  {regError.toLowerCase().includes('email') && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEmail(regEmail);
+                          setPassword(regPassword);
+                          setActiveTab('signin');
+                          setRegError('');
+                        }}
+                        style={{
+                          background: '#2563EB',
+                          color: 'white',
+                          border: 'none',
+                          padding: '7px 14px',
+                          borderRadius: '6px',
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginTop: '4px'
+                        }}
+                      >
+                        🔑 Sign in with {regEmail} →
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -287,25 +380,55 @@ export default function Login() {
                     <input className="form-input" id="lastName" type="text" placeholder="Doe" required value={regLastName} onChange={e => setRegLastName(e.target.value)}/>
                   </div>
                 </div>
+
                 <div className="form-group">
                   <label className="form-label" htmlFor="workEmail">Work Email <span className="req">*</span></label>
-                  <input className="form-input" id="workEmail" type="email" placeholder="john@acmecorp.com" required value={regEmail} onChange={e => setRegEmail(e.target.value)}/>
+                  <input className="form-input" id="workEmail" type="email" placeholder="john@company.com" required value={regEmail} onChange={e => setRegEmail(e.target.value)}/>
                 </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="agencyName">Company Name <span className="req">*</span></label>
-                  <input className="form-input" id="agencyName" type="text" placeholder="Acme Corp" required value={regAgency} onChange={e => {
-                    setRegAgency(e.target.value);
-                    if (!regSubdomain) {
-                      setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com');
-                    }
-                  }}/>
-                  <div className="form-hint">Your company or organization name</div>
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="subdomain">Website Domain <span className="req">*</span></label>
-                  <input className="form-input" id="subdomain" type="text" placeholder="acmecorp.com" value={regSubdomain} onChange={e => setRegSubdomain(e.target.value)} required/>
-                  <div className="form-hint">E.g., yourcompany.com (used to track rankings)</div>
-                </div>
+
+                {regAccountType === 'agency' ? (
+                  <>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="agencyName">Agency Name <span className="req">*</span></label>
+                      <input className="form-input" id="agencyName" type="text" placeholder="Apex Digital Marketing" required value={regAgencyName} onChange={e => {
+                        setRegAgencyName(e.target.value);
+                        if (!regSubdomain) {
+                          setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''));
+                        }
+                      }}/>
+                      <div className="form-hint">Your SEO / Digital Marketing agency brand</div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="subdomain">Agency Subdomain <span className="req">*</span></label>
+                      <div className="subdomain-group">
+                        <input className="form-input" id="subdomain" type="text" placeholder="apex" value={regSubdomain} onChange={e => setRegSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} required/>
+                        <div className="subdomain-suffix">.rankflow.app</div>
+                      </div>
+                      <div className="form-hint">Your dedicated white-labeled portal URL</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="clientName">Company Name <span className="req">*</span></label>
+                      <input className="form-input" id="clientName" type="text" placeholder="Acme Corp" required value={regClientName} onChange={e => {
+                        setRegClientName(e.target.value);
+                        if (!regClientDomain) {
+                          setRegClientDomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com');
+                        }
+                      }}/>
+                      <div className="form-hint">Your company or organization name</div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="clientDomain">Website Domain <span className="req">*</span></label>
+                      <input className="form-input" id="clientDomain" type="text" placeholder="acmecorp.com" value={regClientDomain} onChange={e => setRegClientDomain(e.target.value)} required/>
+                      <div className="form-hint">Your domain name to access SEO reports</div>
+                    </div>
+                  </>
+                )}
+
                 <div className="form-group">
                   <label className="form-label" htmlFor="regPassword">Password <span className="req">*</span></label>
                   <div className="input-with-icon">
@@ -313,20 +436,29 @@ export default function Login() {
                     <button type="button" className="input-icon-btn" onClick={() => setShowRegPassword(!showRegPassword)}>{showRegPassword ? "🙈" : "👁"}</button>
                   </div>
                 </div>
+
                 <div className="form-group">
                   <label className="form-label" htmlFor="confirmPwd">Confirm Password <span className="req">*</span></label>
                   <input className="form-input" id="confirmPwd" type="password" placeholder="••••••••••" required value={regConfirm} onChange={e => setRegConfirm(e.target.value)}/>
                 </div>
+
                 <div className="form-group">
                   <div className="checkbox-row mb-3">
                     <input type="checkbox" id="agreeTerms" required/>
                     <label htmlFor="agreeTerms">I agree to the <a href="#" className="link">Terms of Service</a> and <a href="#" className="link">Privacy Policy</a></label>
                   </div>
                 </div>
+
                 <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? 'Creating Account...' : 'Create Client Account →'}
+                  {loading ? 'Creating Account...' : (regAccountType === 'agency' ? 'Create Agency Workspace →' : 'Create Client Account →')}
                 </button>
               </form>
+
+              <div className="divider" style={{ marginTop: '24px' }}>or sign up with</div>
+              <a href="#" onClick={handleGoogle} className="btn btn-google mb-4">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+                Continue with Google
+              </a>
 
               <div className="form-footer">
                 Already have an account? <span className="link" onClick={() => setActiveTab('signin')}>Sign in</span>
@@ -371,5 +503,13 @@ export default function Login() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

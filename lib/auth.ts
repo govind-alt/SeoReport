@@ -1,114 +1,214 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import Credentials from "next-auth/providers/credentials"
-import Nodemailer from "next-auth/providers/nodemailer"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./prisma"
 import bcrypt from "bcryptjs"
+import { isRateLimited, recordFailedAttempt, clearAttempts } from "./rate-limit"
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Strict email validation */
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/** Minimum 8 chars */
+function isValidPassword(password: string): boolean {
+  return typeof password === "string" && password.length >= 8;
+}
+
+// ── NextAuth Config ──────────────────────────────────────────────────────────
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "super-secret-key-vault-phrase-12345",
+  // ── Security ──────────────────────────────────────────────────────────────
+  secret: process.env.AUTH_SECRET,
   trustHost: true,
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login", // Custom login page
+
+  // ── Session: JWT strategy with 24-hour expiry ─────────────────────────────
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,       // 24 hours
+    updateAge: 60 * 60,          // Refresh token every 1 hour
   },
+
+  // ── Custom pages ─────────────────────────────────────────────────────────
+  pages: {
+    signIn: "/login",
+    error: "/login",             // Auth errors redirect here
+  },
+
+  // ── Providers ─────────────────────────────────────────────────────────────
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      checks: ["state"],
-    }),
-    Nodemailer({
-      server: process.env.EMAIL_SERVER || {
-        host: "localhost",
-        port: 1025,
-        auth: {
-          user: "mock",
-          pass: "mock",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      checks: ["state", "pkce"],  // PKCE + state for maximum OAuth security
+      authorization: {
+        params: {
+          prompt: "select_account", // Always show account chooser
+          access_type: "offline",
         },
       },
-      from: process.env.EMAIL_FROM || "noreply@rankflow.app",
-      // Custom sendVerificationRequest to log to console if in development
-      async sendVerificationRequest(params) {
-        const { identifier, url, provider } = params;
-        if (process.env.NODE_ENV !== "production") {
-          console.log(`\n\n[MAGIC LINK GENERATED]`);
-          console.log(`To: ${identifier}`);
-          console.log(`URL: ${url}\n\n`);
-        } else {
-          // If in production, you would use provider.server to actually send the email here
-          // This relies on the standard next-auth nodemailer implementation internally.
-          // For now, we will log it.
-          console.log(`Simulated sending magic link to ${identifier}: ${url}`);
-        }
-      }
     }),
+
     Credentials({
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null
+        const email    = (credentials?.email    as string | undefined)?.trim().toLowerCase();
+        const password = (credentials?.password as string | undefined);
 
+        // ── 1. Basic input validation ────────────────────────────────────
+        if (!email || !password) return null;
+        if (!isValidEmail(email))    return null;
+        if (!isValidPassword(password)) return null;
+
+        // ── 2. Rate-limit check (per email) ─────────────────────────────
+        const { limited, remainingSeconds } = isRateLimited(email);
+        if (limited) {
+          // We throw so NextAuth surfaces the error correctly
+          throw new Error(
+            `Too many failed attempts. Try again in ${Math.ceil((remainingSeconds ?? 900) / 60)} minute(s).`
+          );
+        }
+
+        // ── 3. Look up user ──────────────────────────────────────────────
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-          include: { agency: true }
-        })
+          where: { email },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            password: true,
+            role: true,
+            agencyId: true,
+            image: true,
+          },
+        });
 
-        if (!user || !user.password) return null
+        // No user found → record attempt, return null (generic error to client)
+        if (!user) {
+          recordFailedAttempt(email);
+          return null;
+        }
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        )
+        // Google-only account (no password set) — cannot use credentials
+        if (!user.password) {
+          recordFailedAttempt(email);
+          return null;
+        }
 
-        if (!isPasswordValid) return null
+        // ── 4. Constant-time password compare ────────────────────────────
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        return user
+        if (!isPasswordValid) {
+          const nowLimited = recordFailedAttempt(email);
+          if (nowLimited) {
+            throw new Error("Too many failed attempts. Account temporarily locked for 15 minutes.");
+          }
+          return null; // Wrong password — generic error
+        }
+
+        // ── 5. Success — clear rate-limit ─────────────────────────────────
+        clearAttempts(email);
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          role: user.role,
+          agencyId: user.agencyId,
+        } as any;
       },
     }),
   ],
+
+  // ── Events ───────────────────────────────────────────────────────────────
   events: {
+    /**
+     * Fires once when a brand-new user record is created (Google OAuth first sign-in).
+     * Auto-creates an Agency workspace for them.
+     */
     async createUser({ user }) {
-      if (!user.agencyId) {
-        const agencyName = user.name ? user.name : 'My SEO Agency';
-        const slug = agencyName.toLowerCase().replace(/[^a-z0-9-]/g, '') + '-' + Math.random().toString(36).substring(2, 6);
-        
+      // Only create agency if user doesn't already have one
+      const existingUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { agencyId: true },
+      });
+
+      if (!existingUser?.agencyId) {
+        const baseName = user.name ?? "My Agency";
+        // Slug: lowercase alphanum + random suffix to ensure uniqueness
+        const rawSlug  = baseName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+        const slug     = rawSlug + "-" + Math.random().toString(36).substring(2, 7);
+
         const agency = await prisma.agency.create({
           data: {
-            name: agencyName,
-            slug: slug,
-            subdomain: slug
-          }
+            name: baseName,
+            slug,
+            subdomain: slug,
+          },
         });
-        
+
         await prisma.user.update({
           where: { id: user.id },
-          data: { agencyId: agency.id, role: 'admin' }
+          data: { agencyId: agency.id, role: "admin" },
         });
       }
-    }
+    },
   },
+
+  // ── Callbacks ────────────────────────────────────────────────────────────
   callbacks: {
-    async jwt({ token, user }) {
+    /**
+     * JWT callback — called every time a token is created or refreshed.
+     * Persist custom fields into the token so they survive across requests.
+     */
+    async jwt({ token, user, account, trigger }) {
+      // `user` is only set on initial sign-in
       if (user) {
-        // user object is only available on sign in
-        token.role = user.role
-        token.agencyId = user.agencyId
-        if (user.name) token.name = user.name
+        token.id       = user.id;
+        token.role     = (user as any).role     ?? "member";
+        token.agencyId = (user as any).agencyId ?? null;
+        token.name     = user.name;
+        token.email    = user.email;
+        token.picture  = user.image ?? null;
       }
-      return token
+
+      // For Google sign-ins, re-fetch agencyId from DB so it's always fresh
+      if (account?.provider === "google" && token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where:  { id: token.id as string },
+          select: { role: true, agencyId: true, name: true },
+        });
+        if (dbUser) {
+          token.role     = dbUser.role;
+          token.agencyId = dbUser.agencyId;
+          token.name     = dbUser.name ?? token.name;
+        }
+      }
+
+      return token;
     },
+
+    /**
+     * Session callback — shapes what is returned to the client via useSession().
+     * Never expose sensitive data (password, tokens) here.
+     */
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role as string
-        session.user.agencyId = token.agencyId as string
-        if (token.name) session.user.name = token.name as string
-      }
-      return session
+      session.user.id       = token.id      as string;
+      session.user.role     = token.role    as string;
+      session.user.agencyId = token.agencyId as string | null;
+      session.user.name     = token.name    as string | null;
+      session.user.email    = token.email   as string;
+      session.user.image    = token.picture as string | null;
+      return session;
     },
   },
-})
+});

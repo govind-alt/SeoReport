@@ -124,14 +124,34 @@ export async function getClientDetails(clientId: string) {
 export async function registerAgency(data: any) {
   const { firstName, lastName, email, agencyName, subdomain, password } = data;
 
-  if (!email || !password || !agencyName || !subdomain) {
-    return { error: 'Missing required fields' };
+  // ── Strict field validation ──────────────────────────────────────────────
+  if (!email || !password || !agencyName || !subdomain || !firstName || !lastName) {
+    return { error: 'All fields are required' };
   }
 
-  // Check if email exists
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+  // Email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return { error: 'Invalid email address' };
+  }
+
+  // Password policy: minimum 8 chars
+  if (password.length < 8) {
+    return { error: 'Password must be at least 8 characters' };
+  }
+
+  // Subdomain: only lowercase alphanum and hyphens
+  const subdomainRegex = /^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/;
+  if (!subdomainRegex.test(subdomain)) {
+    return { error: 'Subdomain must be 3-32 characters, lowercase letters, numbers and hyphens only' };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Check if email already exists
+  const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existingUser) {
-    return { error: 'Email already exists' };
+    return { error: 'An account with this email already exists. Please sign in instead.' };
   }
 
   // Check if subdomain exists
@@ -139,10 +159,10 @@ export async function registerAgency(data: any) {
     where: { OR: [{ slug: subdomain }, { subdomain: subdomain }] }
   });
   if (existingAgency) {
-    return { error: 'Subdomain already taken' };
+    return { error: 'This subdomain is already taken. Please choose another.' };
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 12); // Cost 12 for better security
 
   try {
     const agency = await prisma.agency.create({
@@ -153,7 +173,7 @@ export async function registerAgency(data: any) {
         users: {
           create: {
             name: `${firstName} ${lastName}`.trim(),
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
             role: 'admin'
           }
@@ -383,21 +403,35 @@ export async function createClient(domain: string, data: {
 export async function registerClient(data: any) {
   const { firstName, lastName, email, companyName, domain, password } = data;
 
+  // ── Strict field validation ──────────────────────────────────────────────
   if (!firstName || !lastName || !email || !companyName || !domain || !password) {
-    return { error: 'Missing required fields' };
+    return { error: 'All fields are required' };
   }
+
+  // Email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) {
+    return { error: 'Invalid email address' };
+  }
+
+  // Password policy: minimum 8 chars
+  if (password.length < 8) {
+    return { error: 'Password must be at least 8 characters' };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
 
   try {
     // Check if email already registered
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existingUser) {
-      return { error: 'Email already registered' };
+      return { error: 'An account with this email already exists. Please sign in instead.' };
     }
 
     const sanitizedDomain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '');
     const slug = companyName.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 12); // Cost 12 for better security
 
     // 1. Create the Agency
     const agency = await prisma.agency.create({
@@ -413,7 +447,7 @@ export async function registerClient(data: any) {
     const user = await prisma.user.create({
       data: {
         name: `${firstName} ${lastName}`.trim(),
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         role: 'client',
         agencyId: agency.id
