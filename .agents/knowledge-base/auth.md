@@ -87,3 +87,37 @@ session.user = {
 - Post-login routing goes through `/auth-success` which reads DB role → redirects to correct dashboard
 
 ---
+
+## 2026-07-28 17:00 IST — Resend Email Integration
+
+**Task:** Wire real email delivery (password reset, welcome emails) using Resend API.
+
+### Files Changed
+| File | What |
+|------|------|
+| `.env` | Added `RESEND_API_KEY`, `FROM_EMAIL` |
+| `lib/email.ts` | Full rewrite — mock replaced with real Resend calls + HTML templates |
+| `app/api/auth/forgot-password/route.ts` | **NEW** — POST endpoint, generates 15-min reset token, sends email |
+| `app/api/auth/reset-password/route.ts` | **NEW** — POST endpoint, validates token, hashes and stores new password |
+| `app/(auth)/login/page.tsx` | Forgot Password form now calls real API, shows sent confirmation |
+| `app/actions.ts` | `registerAgency` now sends welcome email via Resend after signup |
+
+### Email Types Available
+- **Welcome email** — sent on Agency signup (via `sendWelcomeEmail`)
+- **Password reset** — sent on "Forgot Password" (via `sendPasswordResetEmail`)
+- **Report ready** — available for future use (via `sendReportReadyEmail`)
+- **Client message notification** — available for future use
+- **Support ticket** — available for future use
+
+### Security Details
+- Reset tokens: 32-byte hex via `crypto.randomBytes(32)` — stored in `VerificationToken` table
+- Token expiry: **15 minutes**
+- Used tokens are **deleted immediately** after password reset
+- User enumeration protection: API always returns success even if email not found
+
+### Free Tier Limits (Resend)
+- **3,000 emails/month** — free forever
+- From address: `onboarding@resend.dev` until custom domain is verified
+- To verify custom domain: Resend dashboard → Domains → Add domain
+
+---

@@ -40,6 +40,35 @@ function LoginFormContent() {
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
 
+  // Forgot Password State
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotError, setForgotError] = useState('');
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError('');
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail.trim().toLowerCase() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setForgotSent(true);
+      } else {
+        setForgotError(data.error || 'Something went wrong');
+      }
+    } catch {
+      setForgotError('Network error. Please try again.');
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -474,14 +503,37 @@ function LoginFormContent() {
                 <div className="form-header-desc">Enter your email and we&apos;ll send a reset link</div>
               </div>
 
-              <div className="forgot-state active" id="forgotRequest">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="forgotEmail">Email Address</label>
-                  <input className="form-input" id="forgotEmail" type="email" placeholder="john@agency.com"/>
+              {forgotSent ? (
+                <div>
+                  <div className="alert alert-success" style={{marginBottom: '16px'}}>
+                    ✅ Reset link sent! Check your inbox (and spam folder).
+                  </div>
+                  <button className="btn btn-primary mb-3 w-full" onClick={() => window.open('https://mail.google.com', '_blank')}>Open Gmail →</button>
+                  <div className="text-center"><span className="link btn-ghost" onClick={() => { setForgotSent(false); setActiveTab('signin'); }}>← Back to sign in</span></div>
                 </div>
-                <button className="btn btn-primary mb-3">Send Reset Link</button>
-                <div className="text-center"><span className="link btn-ghost" onClick={() => setActiveTab('signin')}>← Back to login</span></div>
-              </div>
+              ) : (
+                <form onSubmit={handleForgotPassword}>
+                  {forgotError && (
+                    <div className="alert alert-danger" style={{marginBottom: '16px'}}>❌ {forgotError}</div>
+                  )}
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="forgotEmail">Email Address</label>
+                    <input
+                      className="form-input"
+                      id="forgotEmail"
+                      type="email"
+                      placeholder="john@agency.com"
+                      required
+                      value={forgotEmail}
+                      onChange={e => setForgotEmail(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary mb-3" disabled={forgotLoading}>
+                    {forgotLoading ? 'Sending...' : 'Send Reset Link'}
+                  </button>
+                  <div className="text-center"><span className="link btn-ghost" onClick={() => setActiveTab('signin')}>← Back to login</span></div>
+                </form>
+              )}
             </div>
           )}
 

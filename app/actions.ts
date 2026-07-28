@@ -5,6 +5,7 @@ import { encrypt, decrypt } from '@/lib/encryption';
 import { SERankingClient } from '@/lib/seranking/client';
 import { revalidatePath } from 'next/cache';
 import bcrypt from 'bcryptjs';
+import { sendWelcomeEmail } from '@/lib/email';
 
 /**
  * Saves the SERanking API key for an agency.
@@ -317,6 +318,10 @@ export async function registerAgency(data: any) {
         link: `/${subdomain}/clients`
       }
     });
+
+    // 7. Send welcome email via Resend
+    const dashboardUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${subdomain}`;
+    await sendWelcomeEmail(normalizedEmail, `${firstName} ${lastName}`.trim(), agencyName, dashboardUrl);
     
     return { success: true, agency };
   } catch (err: any) {
