@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import puppeteer from 'puppeteer';
+import os from 'os';
+import path from 'path';
+import fs from 'fs';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -104,8 +107,25 @@ export async function GET(req: Request) {
   `;
 
   try {
+    // Try to locate Chrome/Edge on the system
+    const possiblePaths = [
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+      path.join(os.homedir(), '.cache', 'puppeteer', 'chrome', 'win64-150.0.7871.24', 'chrome-win64', 'chrome.exe')
+    ];
+    
+    let execPath: string | undefined = undefined;
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        execPath = p;
+        break;
+      }
+    }
+
     const browser = await puppeteer.launch({
       headless: true,
+      executablePath: execPath,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     const page = await browser.newPage();

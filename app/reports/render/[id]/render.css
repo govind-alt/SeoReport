@@ -623,6 +623,12 @@ html, body {
     break-inside: avoid !important;
   }
 
+  /* Prevent page breaks inside critical elements like tables, cards and charts */
+  .data-table tr, .kpi-card, .recharts-wrapper, .audit-list-item, .metric-row, .grid, .grid-3 {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
   .data-table thead tr {
     background: #1A1A2E !important;
     -webkit-print-color-adjust: exact !important;
