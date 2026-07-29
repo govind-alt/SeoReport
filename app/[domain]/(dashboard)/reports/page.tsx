@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import {
   FileText, Plus, Eye, Download, RefreshCw, X,
   CheckCircle2, Clock, AlertCircle, Zap, Users,
   Calendar, TrendingUp, BarChart2, Send, Search,
-  ChevronRight, ExternalLink
+  ChevronRight, ExternalLink, Trash2
 } from 'lucide-react';
 
 /* ─── Types ─── */
@@ -26,109 +26,6 @@ interface Report {
     metrics: { label: string; value: string }[];
     recommendations?: string[];
   };
-}
-
-/* ─── Demo Data ─── */
-const DEMO_REPORTS: Report[] = [
-  {
-    id: 'acme-jun', clientName: 'Acme Corp', clientDomain: 'acme.com',
-    clientInitials: 'AC', period: 'Jun 2026', status: 'done',
-    generatedAt: 'Jun 20, 14:20', views: 4,
-    preview: {
-      healthScore: 92,
-      summary: 'Excellent month for Acme Corp. Top-10 keywords grew by 18 to reach 237. Organic sessions up +24.3% to 84,200. Site health improved 6 points. All 3 critical issues from last month resolved.',
-      metrics: [{ label: 'Sessions', value: '84,200' }, { label: 'Top-10 KWs', value: '237' }, { label: 'Health', value: '92%' }],
-      recommendations: ['Expand blog content targeting long-tail keywords', 'Improve Core Web Vitals on product pages', 'Build 15 high-DA backlinks this month'],
-    },
-  },
-  {
-    id: 'techvision-jun', clientName: 'TechVision Inc', clientDomain: 'techvision.io',
-    clientInitials: 'TV', period: 'Jun 2026', status: 'done',
-    generatedAt: 'Jun 19, 09:45', views: 2,
-    preview: {
-      healthScore: 84,
-      summary: 'Solid performance. Rankings improved across 34 keywords. Traffic up 18.2%. A few pages still need on-page optimization.',
-      metrics: [{ label: 'Sessions', value: '61,000' }, { label: 'Top-10 KWs', value: '189' }, { label: 'Health', value: '84%' }],
-      recommendations: ['Fix 12 broken internal links', 'Add schema markup to 8 product pages', 'Target 5 new featured snippet opportunities'],
-    },
-  },
-  {
-    id: 'growthlabs-jun', clientName: 'GrowthLabs', clientDomain: 'growthlabs.co',
-    clientInitials: 'GL', period: 'Jun 2026', status: 'pending',
-    generatedAt: '—', views: 0,
-    preview: undefined,
-  },
-  {
-    id: 'nexaretail-jun', clientName: 'NexaRetail', clientDomain: 'nexaretail.com',
-    clientInitials: 'NR', period: 'Jun 2026', status: 'done',
-    generatedAt: 'Jun 22, 16:00', views: 1,
-    preview: {
-      healthScore: 78,
-      summary: 'Good progress on e-commerce SEO. Product page rankings improved. Traffic stable with a slight upward trend.',
-      metrics: [{ label: 'Sessions', value: '53,200' }, { label: 'Top-10 KWs', value: '156' }, { label: 'Health', value: '78%' }],
-      recommendations: ['Optimize product image alt text at scale', 'Improve page load speed (currently 3.8s)', 'Add customer review schema markup'],
-    },
-  },
-  {
-    id: 'bloom-may', clientName: 'BloomAgency', clientDomain: 'bloomagency.co',
-    clientInitials: 'BA', period: 'May 2026', status: 'done',
-    generatedAt: 'May 31, 11:15', views: 5,
-    preview: {
-      healthScore: 88,
-      summary: 'Top performance month. High-quality backlinks acquired, technical issues resolved, and significant ranking improvements across target keywords.',
-      metrics: [{ label: 'Sessions', value: '71,400' }, { label: 'Top-10 KWs', value: '211' }, { label: 'Health', value: '88%' }],
-      recommendations: ['Continue link building campaign', 'Launch content cluster for new service line'],
-    },
-  },
-  {
-    id: 'healthplus-jun', clientName: 'HealthPlus', clientDomain: 'healthplus.io',
-    clientInitials: 'HP', period: 'Jun 2026', status: 'failed',
-    generatedAt: 'Jun 18, 08:30', views: 0,
-    preview: undefined,
-  },
-];
-
-/* ─── Generate Report Modal ─── */
-function GenerateModal({ open, onClose, onGenerate }: { open: boolean; onClose: () => void; onGenerate: (client: string, period: string) => void }) {
-  const [client, setClient] = useState('');
-  const [period, setPeriod] = useState('Jun 2026');
-  const clients = ['Acme Corp', 'TechVision Inc', 'GrowthLabs', 'NexaRetail', 'BloomAgency', 'HealthPlus'];
-
-  if (!open) return null;
-  return (
-    <div className="modal-overlay active" onClick={onClose}>
-      <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <div>
-            <div className="modal-title">Generate Report</div>
-            <div className="modal-subtitle">Create a new SEO performance report</div>
-          </div>
-          <button className="modal-close" onClick={onClose}><X size={18} /></button>
-        </div>
-        <div className="modal-body">
-          <div className="form-group">
-            <label className="form-label">Client <span className="required">*</span></label>
-            <select className="form-input" value={client} onChange={e => setClient(e.target.value)}>
-              <option value="">Select a client…</option>
-              {clients.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">Reporting Period</label>
-            <select className="form-input" value={period} onChange={e => setPeriod(e.target.value)}>
-              {['Jun 2026', 'May 2026', 'Apr 2026', 'Q2 2026', 'Q1 2026'].map(p => <option key={p}>{p}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="modal-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" disabled={!client} onClick={() => { onGenerate(client, period); onClose(); }}>
-            <Zap size={14} /> Generate Now
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 /* ─── Status Badge ─── */
@@ -151,7 +48,7 @@ const StatusBadge = ({ status }: { status: Report['status'] }) => {
   );
 };
 
-/* ─── Stat Ring ─── */
+/* ─── Score Ring ─── */
 const ScoreRing = ({ score }: { score: number }) => {
   const r = 22; const c = 2 * Math.PI * r;
   const fill = (score / 100) * c;
@@ -171,102 +68,253 @@ const ScoreRing = ({ score }: { score: number }) => {
   );
 };
 
+/* ─── Helpers ─── */
+function mapDbReport(dbRep: any): Report {
+  const clientName = dbRep.client?.name ?? 'Unknown Client';
+  const date = dbRep.periodStart ? new Date(dbRep.periodStart) : new Date();
+  const periodStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  const sections = dbRep.sectionsJson ? JSON.parse(dbRep.sectionsJson) : {};
+  const status: Report['status'] = dbRep.status === 'draft' ? 'pending' : dbRep.status;
+
+  return {
+    id: dbRep.id,
+    clientName,
+    clientDomain: dbRep.client?.domain ?? '',
+    clientInitials: clientName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
+    period: periodStr,
+    status,
+    generatedAt: dbRep.generatedAt
+      ? new Date(dbRep.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : '—',
+    views: dbRep.viewCount ?? 0,
+    preview: status === 'done' ? {
+      healthScore: 82,
+      summary: `${clientName} report generated successfully. View full details in the report preview.`,
+      metrics: [
+        { label: 'Period', value: periodStr },
+        { label: 'Sections', value: Object.values(sections).filter(Boolean).length.toString() || '5' },
+        { label: 'Status', value: 'Done' },
+      ],
+    } : undefined,
+  };
+}
+
+/* ─── Generate Report Modal ─── */
+function GenerateModal({ open, onClose, onGenerate }: {
+  open: boolean;
+  onClose: () => void;
+  onGenerate: (clientId: string, clientName: string, period: string) => void;
+}) {
+  const [clientId, setClientId] = useState('');
+  const [period, setPeriod] = useState('last-month');
+  const [clients, setClients] = useState<{ id: string; name: string; domain: string }[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoadingClients(true);
+    fetch('/api/clients')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setClients(Array.isArray(data) ? data : []))
+      .catch(() => setClients([]))
+      .finally(() => setLoadingClients(false));
+  }, [open]);
+
+  if (!open) return null;
+
+  const selectedClient = clients.find(c => c.id === clientId);
+
+  return (
+    <div className="modal-overlay active" onClick={onClose}>
+      <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div>
+            <div className="modal-title">Generate Report</div>
+            <div className="modal-subtitle">Create a new SEO performance report</div>
+          </div>
+          <button className="modal-close" onClick={onClose}><X size={18} /></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-group">
+            <label className="form-label">Client <span className="required">*</span></label>
+            {loadingClients ? (
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>Loading clients…</div>
+            ) : clients.length === 0 ? (
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 0' }}>
+                No clients found. <Link href="../clients/new" style={{ color: 'var(--primary)' }}>Add a client first →</Link>
+              </div>
+            ) : (
+              <select className="form-input" value={clientId} onChange={e => setClientId(e.target.value)}>
+                <option value="">Select a client…</option>
+                {clients.map(c => <option key={c.id} value={c.id}>{c.name} ({c.domain})</option>)}
+              </select>
+            )}
+          </div>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Reporting Period</label>
+            <select className="form-input" value={period} onChange={e => setPeriod(e.target.value)}>
+              <option value="last-month">Last Month</option>
+              <option value="current-month">Current Month</option>
+              <option value="last-quarter">Last Quarter</option>
+            </select>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+          <button
+            className="btn btn-primary"
+            disabled={!clientId}
+            onClick={() => {
+              if (selectedClient) {
+                onGenerate(selectedClient.id, selectedClient.name, period);
+                onClose();
+              }
+            }}
+          >
+            <Zap size={14} /> Generate Now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Page ─── */
 export default function ReportsPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain ?? 'localhost';
   const [reports, setReports] = useState<Report[]>([]);
-  const [selectedId, setSelectedId] = useState('acme-jun');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showGenerate, setShowGenerate] = useState(false);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | Report['status']>('all');
   const [loading, setLoading] = useState(true);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // ── Load reports ──────────────────────────────────────────────────────────
+  const loadReports = useCallback(async () => {
+    try {
+      const res = await fetch('/api/reports');
+      if (!res.ok) return;
+      const data = await res.json();
+      const mapped: Report[] = (Array.isArray(data) ? data : []).map(mapDbReport);
+      setReports(mapped);
+      if (mapped.length > 0 && !selectedId) {
+        setSelectedId(mapped[0].id);
+      }
+    } catch {
+      // ignore
+    }
+  }, [selectedId]);
 
   useEffect(() => {
-    fetch('/api/reports')
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
-        const rawDbReports = Array.isArray(data) ? data : [];
-        const dbReports: Report[] = rawDbReports.map((dbRep: any) => {
-          const clientName = dbRep.client?.name ?? 'Unknown Client';
-          const date = dbRep.periodStart ? new Date(dbRep.periodStart) : new Date();
-          const periodStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-          return {
-            id: dbRep.id,
-            clientName,
-            clientDomain: dbRep.client?.domain ?? '',
-            clientInitials: clientName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2),
-            period: periodStr,
-            status: dbRep.status === 'draft' ? 'pending' : dbRep.status,
-            generatedAt: dbRep.generatedAt ? new Date(dbRep.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—',
-            views: dbRep.viewCount ?? 0,
-            preview: dbRep.status === 'done' ? {
-              healthScore: 82,
-              summary: 'Report generated successfully.',
-              metrics: [{ label: 'Sessions', value: 'N/A' }, { label: 'Top-10 KWs', value: 'N/A' }, { label: 'Health', value: '82%' }]
-            } : undefined
-          };
-        });
-        const merged = [...dbReports, ...DEMO_REPORTS];
-        setReports(merged);
-        if (merged.length > 0) {
-          setSelectedId(merged[0].id);
-        }
-      })
-      .catch(() => setReports(DEMO_REPORTS))
-      .finally(() => setLoading(false));
+    loadReports().finally(() => setLoading(false));
   }, []);
 
-  const handleGenerate = (client: string, period: string) => {
-    const id = `${client.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`;
-    const newReport: Report = {
-      id, clientName: client, clientDomain: `${client.toLowerCase().replace(/\s+/g, '')}.com`,
-      clientInitials: client.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
-      period, status: 'generating', generatedAt: '—', views: 0,
+  // ── Poll for reports that are still 'generating' ──────────────────────────
+  useEffect(() => {
+    const hasGenerating = reports.some(r => r.status === 'generating');
+
+    if (hasGenerating && !pollingRef.current) {
+      pollingRef.current = setInterval(() => {
+        loadReports();
+      }, 3000);
+    }
+
+    if (!hasGenerating && pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
     };
-    setReports(prev => [newReport, ...prev]);
-    toast.loading(`Generating ${client} report…`);
-    setTimeout(() => {
-      setReports(prev => prev.map(r => r.id === id ? {
-        ...r, status: 'done', generatedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        preview: { healthScore: 82, summary: 'Report generated successfully.', metrics: [{ label: 'Sessions', value: 'N/A' }, { label: 'Top-10 KWs', value: 'N/A' }, { label: 'Health', value: '82%' }] },
-      } : r));
-      toast.success(`${client} report ready!`);
-    }, 3000);
+  }, [reports, loadReports]);
+
+  // ── Generate a new report ─────────────────────────────────────────────────
+  const handleGenerate = async (clientId: string, clientName: string, period: string) => {
+    // Calculate period dates
+    const now = new Date();
+    let periodStart: Date, periodEnd: Date;
+
+    if (period === 'last-month') {
+      periodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      periodEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    } else if (period === 'current-month') {
+      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    } else {
+      // last-quarter
+      const qStart = now.getMonth() - 3;
+      periodStart = new Date(now.getFullYear(), qStart, 1);
+      periodEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+    }
+
+    const toastId = toast.loading(`Creating ${clientName} report…`);
+
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          periodStart: periodStart.toISOString(),
+          periodEnd: periodEnd.toISOString(),
+          sections: { keywords: true, backlinks: true, audit: true, analytics: true, aiRecs: true },
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to create report');
+      }
+
+      const newReport = await res.json();
+      const mapped = mapDbReport(newReport);
+      setReports(prev => [mapped, ...prev]);
+      setSelectedId(mapped.id);
+      toast.success(`${clientName} report is generating…`, { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to generate report', { id: toastId });
+    }
   };
 
-  const filtered = reports.filter(r => {
-    const q = search.toLowerCase();
-    const matchSearch = r.clientName.toLowerCase().includes(q) || r.period.toLowerCase().includes(q);
-    const matchStatus = filterStatus === 'all' || r.status === filterStatus;
-    return matchSearch && matchStatus;
-  });
-
-  const selected = reports.find(r => r.id === selectedId);
-  const doneCount = reports.filter(r => r.status === 'done').length;
-  const pendingCount = reports.filter(r => r.status === 'pending').length;
-  const failedCount = reports.filter(r => r.status === 'failed').length;
-
-  // Eye: open preview in new tab
-  const viewReport = (id: string) => {
-    window.open(`/reports/render/${id}`, '_blank');
-  };
-
-  // Download: open print-ready page (auto-triggers window.print)
-  const downloadPdf = (id: string) => {
-    window.open(`/reports/render/${id}`, '_blank');
-  };
-
-  // Share: generate shareSlug via API, copy public link to clipboard
-  const shareReport = async (id: string) => {
-    // Demo reports don't have a DB row — build a fake shareable link
-    const isDemoId = !id.match(/^c[a-z0-9]{24}$/);
-    if (isDemoId) {
-      const link = `${window.location.origin}/reports/render/${id}`;
-      await navigator.clipboard.writeText(link).catch(() => {});
-      toast.success('Preview link copied! (Demo report)');
+  // ── Bulk generate pending reports ─────────────────────────────────────────
+  const handleBulkGenerate = async () => {
+    const pending = filtered.filter(r => r.status === 'pending');
+    if (!pending.length) {
+      toast.info('No pending reports to generate');
       return;
     }
+    toast.loading(`Re-triggering ${pending.length} reports…`);
+    for (const r of pending) {
+      fetch(`/api/reports/${r.id}/process`, { method: 'POST' }).catch(() => {});
+    }
+    setReports(prev => prev.map(r =>
+      pending.find(p => p.id === r.id) ? { ...r, status: 'generating' } : r
+    ));
+    toast.success(`${pending.length} reports queued for generation!`);
+  };
+
+  // ── Delete report ─────────────────────────────────────────────────────────
+  const deleteReport = async (id: string) => {
+    if (!confirm('Delete this report permanently?')) return;
+    try {
+      const res = await fetch(`/api/reports/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      setReports(prev => prev.filter(r => r.id !== id));
+      if (selectedId === id) setSelectedId(reports.find(r => r.id !== id)?.id ?? null);
+      toast.success('Report deleted');
+    } catch {
+      toast.error('Failed to delete report');
+    }
+  };
+
+  // ── Share ─────────────────────────────────────────────────────────────────
+  const shareReport = async (id: string) => {
     try {
       toast.loading('Generating share link…', { id: 'share' });
       const res = await fetch(`/api/reports/${id}/share`, { method: 'POST' });
@@ -280,9 +328,28 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
     }
   };
 
+  const viewReport = (id: string) => window.open(`/reports/render/${id}`, '_blank');
+  const downloadPdf = (id: string) => window.open(`/reports/render/${id}`, '_blank');
+
+  const filtered = reports.filter(r => {
+    const q = search.toLowerCase();
+    const matchSearch = r.clientName.toLowerCase().includes(q) || r.period.toLowerCase().includes(q);
+    const matchStatus = filterStatus === 'all' || r.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
+
+  const selected = reports.find(r => r.id === selectedId);
+  const doneCount = reports.filter(r => r.status === 'done').length;
+  const pendingCount = reports.filter(r => r.status === 'pending').length;
+  const failedCount = reports.filter(r => r.status === 'failed').length;
+
   return (
     <>
-      <GenerateModal open={showGenerate} onClose={() => setShowGenerate(false)} onGenerate={handleGenerate} />
+      <GenerateModal
+        open={showGenerate}
+        onClose={() => setShowGenerate(false)}
+        onGenerate={handleGenerate}
+      />
 
       <div className="page-content">
         {/* ── Header ── */}
@@ -292,21 +359,12 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
             <p className="page-subtitle">Manage and deliver SEO performance reports to your clients</p>
           </div>
           <div className="page-header-actions">
-            <button className="btn btn-secondary" onClick={() => {
-              const ids = filtered.filter(r => r.status === 'pending').map(r => r.id);
-              if (!ids.length) { toast.info('No pending reports to generate'); return; }
-              toast.loading(`Queuing ${ids.length} reports…`);
-              ids.forEach((id, i) => setTimeout(() => {
-                setReports(prev => prev.map(r => r.id === id ? { ...r, status: 'generating' } : r));
-                setTimeout(() => setReports(prev => prev.map(r => r.id === id ? { ...r, status: 'done', generatedAt: 'Just now' } : r)), 2000);
-                toast.success(`Report ${i + 1}/${ids.length} done!`);
-              }, 800 * i));
-            }}>
+            <button className="btn btn-secondary" onClick={handleBulkGenerate}>
               <Zap size={14} /> Bulk Generate
             </button>
-            <button id="generate-report-btn" className="btn btn-primary" onClick={() => setShowGenerate(true)}>
+            <Link href={`/${domain}/reports/new`} id="generate-report-btn" className="btn btn-primary">
               <Plus size={15} /> New Report
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -355,6 +413,9 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                   }}>{s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}</button>
                 ))}
               </div>
+              <button title="Refresh" onClick={() => loadReports()} style={{ padding: '5px 8px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+                <RefreshCw size={13} />
+              </button>
             </div>
 
             {/* Table */}
@@ -367,9 +428,13 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
               ) : filtered.length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-state-icon"><FileText size={40} style={{ color: 'var(--gray-300)' }} /></div>
-                  <div className="empty-state-title">No reports found</div>
-                  <div className="empty-state-desc">Generate your first report to get started.</div>
-                  <button className="btn btn-primary" onClick={() => setShowGenerate(true)}><Plus size={14} /> New Report</button>
+                  <div className="empty-state-title">{search || filterStatus !== 'all' ? 'No matching reports' : 'No reports yet'}</div>
+                  <div className="empty-state-desc">
+                    {search || filterStatus !== 'all' ? 'Try adjusting your search or filter.' : 'Generate your first report to get started.'}
+                  </div>
+                  {!search && filterStatus === 'all' && (
+                    <button className="btn btn-primary" onClick={() => setShowGenerate(true)}><Plus size={14} /> New Report</button>
+                  )}
                 </div>
               ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -415,12 +480,12 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                         <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-muted)' }}>{report.generatedAt}</td>
                         <td style={{ padding: '12px 16px' }}>
                           <div style={{ display: 'flex', gap: 6 }}>
-                             <button title="Preview" onClick={e => { e.stopPropagation(); viewReport(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <button title="Preview" onClick={e => { e.stopPropagation(); viewReport(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <Eye size={12} />
                             </button>
                             {report.status === 'done' && (
                               <>
-                                <button title="Download" onClick={e => { e.stopPropagation(); downloadPdf(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <button title="Download PDF" onClick={e => { e.stopPropagation(); downloadPdf(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                                   <Download size={12} />
                                 </button>
                                 <button title="Share" onClick={e => { e.stopPropagation(); shareReport(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -428,6 +493,14 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                                 </button>
                               </>
                             )}
+                            {report.status === 'failed' && (
+                              <button title="Retry" onClick={e => { e.stopPropagation(); fetch(`/api/reports/${report.id}/process`, { method: 'POST' }); setReports(prev => prev.map(r => r.id === report.id ? { ...r, status: 'generating' } : r)); toast.info('Retrying…'); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: '#F59E0B', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <RefreshCw size={12} />
+                            </button>
+                            )}
+                            <button title="Delete" onClick={e => { e.stopPropagation(); deleteReport(report.id); }} style={{ padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 7, background: 'white', cursor: 'pointer', color: '#EF4444', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Trash2 size={12} />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -480,19 +553,6 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                   <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{selected.preview.summary}</p>
                 </div>
 
-                {/* Recommendations */}
-                {selected.preview.recommendations && (
-                  <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)' }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 10 }}>AI Recommendations</div>
-                    {selected.preview.recommendations.map((rec, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'flex-start' }}>
-                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--primary)', marginTop: 5, flexShrink: 0 }} />
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{rec}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 {/* Actions */}
                 <div style={{ padding: '14px 18px', display: 'flex', gap: 8, background: '#F8FAFC', borderRadius: '0 0 14px 14px' }}>
                   <button className="btn btn-primary btn-sm" style={{ flex: 1, justifyContent: 'center' }} onClick={() => downloadPdf(selected.id)}>
@@ -508,13 +568,25 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                 background: 'white', border: '1px solid var(--border)', borderRadius: 14,
                 padding: '40px 24px', textAlign: 'center', boxShadow: 'var(--shadow-card)',
               }}>
-                {selected?.status === 'pending' ? (
+                {selected?.status === 'generating' ? (
+                  <>
+                    <RefreshCw size={40} style={{ color: '#4F8EF7', margin: '0 auto 14px', display: 'block' }} className="spinner" />
+                    <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Generating Report…</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>Fetching data from SE Ranking and compiling your report. This usually takes under a minute.</div>
+                  </>
+                ) : selected?.status === 'pending' ? (
                   <>
                     <Clock size={40} style={{ color: '#F59E0B', margin: '0 auto 14px', display: 'block' }} />
                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Report Pending</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 }}>This report hasn't been generated yet. Generate it now to see the preview.</div>
-                    <button className="btn btn-primary btn-sm" onClick={() => { if (selected) handleGenerate(selected.clientName, selected.period); }}>
-                      <Zap size={13} /> Generate Report
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.5 }}>This report hasn't been generated yet.</div>
+                    <button className="btn btn-primary btn-sm" onClick={() => {
+                      if (selected) {
+                        fetch(`/api/reports/${selected.id}/process`, { method: 'POST' });
+                        setReports(prev => prev.map(r => r.id === selected.id ? { ...r, status: 'generating' } : r));
+                        toast.info('Report queued for generation!');
+                      }
+                    }}>
+                      <Zap size={13} /> Generate Now
                     </button>
                   </>
                 ) : selected?.status === 'failed' ? (
@@ -522,7 +594,13 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
                     <AlertCircle size={40} style={{ color: '#EF4444', margin: '0 auto 14px', display: 'block' }} />
                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 6 }}>Generation Failed</div>
                     <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Something went wrong. Try regenerating this report.</div>
-                    <button className="btn btn-primary btn-sm" onClick={() => { if (selected) handleGenerate(selected.clientName, selected.period); }}>
+                    <button className="btn btn-primary btn-sm" onClick={() => {
+                      if (selected) {
+                        fetch(`/api/reports/${selected.id}/process`, { method: 'POST' });
+                        setReports(prev => prev.map(r => r.id === selected.id ? { ...r, status: 'generating' } : r));
+                        toast.info('Retrying report generation…');
+                      }
+                    }}>
                       <RefreshCw size={13} /> Retry
                     </button>
                   </>

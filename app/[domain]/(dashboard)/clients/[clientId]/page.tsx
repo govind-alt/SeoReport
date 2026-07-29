@@ -51,6 +51,8 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
   const [backlinksLoading, setBacklinksLoading] = useState(false);
   const [audit, setAudit] = useState<any>(null);
   const [auditLoading, setAuditLoading] = useState(false);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   
   const resolvedParams = use(params);
   const clientId = resolvedParams.clientId;
@@ -133,6 +135,18 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
         .finally(() => setAuditLoading(false));
     }
   }, [activeTab, client?.serankingProjectId]);
+
+  // Fetch Analytics Data from DB snapshots
+  useEffect(() => {
+    if (activeTab === 'analytics') {
+      setAnalyticsLoading(true);
+      fetch(`/api/seranking/analytics?clientId=${clientId}`)
+        .then(res => res.json())
+        .then(data => { if (data && !data.error) setAnalytics(data); })
+        .catch(console.error)
+        .finally(() => setAnalyticsLoading(false));
+    }
+  }, [activeTab, clientId]);
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -379,13 +393,127 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
       {/* TAB: ANALYTICS */}
       {activeTab === 'analytics' && (
         <div className="tab-panel active">
-          <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '12px', border: '1px solid var(--border)' }}>
-            <Info size={32} style={{ color: 'var(--primary)', marginBottom: '10px' }} />
-            <div style={{ fontWeight: 700, marginBottom: '4px' }}>Google Search Console Integration</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto 16px' }}>
-              Connect your client's Google Search Console account in settings to see direct search impressions, CTR trends, and click data.
-            </div>
-          </div>
+          {analyticsLoading ? (
+            <div style={{padding: '40px', textAlign: 'center', color: 'var(--text-muted)'}}>Loading analytics data...</div>
+          ) : (
+            <>
+              {/* KPI row */}
+              <div className="kpi-grid kpi-grid-4" style={{ gap: '14px', marginBottom: '24px' }}>
+                <div className="kpi-card">
+                  <div className="kpi-label">Organic Sessions</div>
+                  <div className="kpi-value" style={{fontSize:'24px'}}>
+                    {analytics?.current?.organicSessions ? (analytics.current.organicSessions / 1000).toFixed(1) + 'K' : '—'}
+                  </div>
+                  {analytics?.prev?.organicSessions ? (
+                    <div className={`kpi-trend ${analytics.current.organicSessions >= analytics.prev.organicSessions ? 'trend-up' : 'trend-down'}`}>
+                      {analytics.current.organicSessions >= analytics.prev.organicSessions ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
+                      {(((analytics.current.organicSessions - analytics.prev.organicSessions) / analytics.prev.organicSessions) * 100).toFixed(1)}% vs last month
+                    </div>
+                  ) : <div className="kpi-trend" style={{color:'var(--text-muted)'}}>No prior data</div>}
+                </div>
+                <div className="kpi-card">
+                  <div className="kpi-label">Total Clicks</div>
+                  <div className="kpi-value" style={{fontSize:'24px'}}>
+                    {analytics?.current?.clicks ? (analytics.current.clicks / 1000).toFixed(1) + 'K' : '—'}
+                  </div>
+                  {analytics?.prev?.clicks ? (
+                    <div className={`kpi-trend ${analytics.current.clicks >= analytics.prev.clicks ? 'trend-up' : 'trend-down'}`}>
+                      {analytics.current.clicks >= analytics.prev.clicks ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
+                      {(((analytics.current.clicks - analytics.prev.clicks) / analytics.prev.clicks) * 100).toFixed(1)}%
+                    </div>
+                  ) : <div className="kpi-trend" style={{color:'var(--text-muted)'}}>No prior data</div>}
+                </div>
+                <div className="kpi-card">
+                  <div className="kpi-label">Impressions</div>
+                  <div className="kpi-value" style={{fontSize:'24px'}}>
+                    {analytics?.current?.impressions ? Math.round(analytics.current.impressions / 1000) + 'K' : '—'}
+                  </div>
+                  {analytics?.prev?.impressions ? (
+                    <div className={`kpi-trend ${analytics.current.impressions >= analytics.prev.impressions ? 'trend-up' : 'trend-down'}`}>
+                      {analytics.current.impressions >= analytics.prev.impressions ? <ArrowUpRight size={12}/> : <ArrowDownRight size={12}/>}
+                      {(((analytics.current.impressions - analytics.prev.impressions) / analytics.prev.impressions) * 100).toFixed(1)}%
+                    </div>
+                  ) : <div className="kpi-trend" style={{color:'var(--text-muted)'}}>No prior data</div>}
+                </div>
+                <div className="kpi-card">
+                  <div className="kpi-label">Avg CTR</div>
+                  <div className="kpi-value" style={{fontSize:'24px'}}>
+                    {analytics?.current?.ctr ? (analytics.current.ctr * 100).toFixed(2) + '%' : '—'}
+                  </div>
+                  <div className="kpi-trend" style={{color:'var(--text-muted)', fontSize:'11px'}}>
+                    Avg pos: {analytics?.current?.avgPosition?.toFixed(1) ?? '—'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sessions chart */}
+              {analytics?.history?.length > 0 && (
+                <div className="chart-card" style={{marginBottom:'20px'}}>
+                  <div className="chart-header">
+                    <div>
+                      <div className="chart-title">Organic Sessions Trend</div>
+                      <div className="chart-subtitle">{analytics.history.length} months of data</div>
+                    </div>
+                  </div>
+                  <div style={{height:'220px', marginTop:'16px'}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={analytics.history}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                        <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize:11, fill:'var(--text-muted)'}} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fontSize:11, fill:'var(--text-muted)'}} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} />
+                        <Tooltip formatter={(v: any) => [v.toLocaleString(), 'Sessions']} contentStyle={{background:'var(--surface)', border:'1px solid var(--border)', borderRadius:'10px', fontSize:'12px'}} />
+                        <Line type="monotone" dataKey="sessions" stroke="var(--primary)" strokeWidth={3} dot={{r:4, fill:'var(--primary)'}} activeDot={{r:6}} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid-2" style={{marginBottom:'20px'}}>
+                {/* Top Queries */}
+                {analytics?.current?.topQueries?.length > 0 && (
+                  <div className="card" style={{padding:'20px'}}>
+                    <div style={{fontWeight:700, marginBottom:'14px', fontSize:'14px'}}>🔍 Top Search Queries</div>
+                    <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
+                      {analytics.current.topQueries.slice(0, 8).map((q: any, i: number) => (
+                        <div key={i} style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'12px', padding:'6px 0', borderBottom:'1px solid var(--border)'}}>
+                          <span style={{color:'var(--text-muted)', width:'16px', textAlign:'right', flexShrink:0}}>{i+1}</span>
+                          <span style={{flex:1, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{q.query}</span>
+                          <span style={{color:'var(--primary)', fontWeight:700, flexShrink:0}}>{q.clicks?.toLocaleString()} clicks</span>
+                          <span style={{color:'var(--text-muted)', flexShrink:0}}>{((q.ctr || 0) * 100).toFixed(1)}% CTR</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Pages */}
+                {analytics?.current?.topPages?.length > 0 && (
+                  <div className="card" style={{padding:'20px'}}>
+                    <div style={{fontWeight:700, marginBottom:'14px', fontSize:'14px'}}>📄 Top Landing Pages</div>
+                    <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
+                      {analytics.current.topPages.slice(0, 8).map((p: any, i: number) => (
+                        <div key={i} style={{display:'flex', alignItems:'center', gap:'10px', fontSize:'12px', padding:'6px 0', borderBottom:'1px solid var(--border)'}}>
+                          <span style={{color:'var(--text-muted)', width:'16px', textAlign:'right', flexShrink:0}}>{i+1}</span>
+                          <span style={{flex:1, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', color:'var(--primary)'}}>{p.page}</span>
+                          <span style={{color:'var(--text-muted)', flexShrink:0}}>{p.clicks?.toLocaleString()} clicks</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No data state */}
+                {(!analytics?.current?.topQueries?.length && !analyticsLoading) && (
+                  <div className="card" style={{padding:'30px', textAlign:'center', gridColumn:'span 2'}}>
+                    <div style={{fontSize:'32px', marginBottom:'8px'}}>📊</div>
+                    <div style={{fontWeight:700, marginBottom:'4px'}}>No Analytics Data Yet</div>
+                    <div style={{fontSize:'13px', color:'var(--text-muted)'}}>Run a sync to pull the latest analytics snapshots from the database.</div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -404,19 +532,32 @@ export default function ClientDetailPage({ params }: { params: Promise<{ clientI
                 </tr>
               </thead>
               <tbody>
-                {(client.reports ?? []).map((rep: any) => (
+                {(client.reports ?? []).length === 0 ? (
+                  <tr><td colSpan={5} style={{padding:'24px', textAlign:'center', color:'var(--text-muted)'}}>No reports yet</td></tr>
+                ) : (client.reports ?? []).map((rep: any) => (
                   <tr key={rep.id}>
-                    <td style={{ fontWeight: 600 }}>June 2026</td>
+                    <td style={{ fontWeight: 600 }}>
+                      {rep.periodStart ? new Date(rep.periodStart).toLocaleDateString('en-US', {month:'long', year:'numeric'}) : 'Report'}
+                    </td>
                     <td><span className="badge badge-success">Done</span></td>
-                    <td>{rep.viewCount} views</td>
+                    <td>{rep.viewCount ?? 0} views</td>
                     <td>
                       <a href={`/report/${rep.shareSlug}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        View public link <ExternalLink size={12} />
+                        Public link <ExternalLink size={12} />
                       </a>
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <Link href={`/report/${rep.shareSlug}`} className="btn btn-secondary btn-sm"><Eye size={12} /> View</Link>
+                        <Link href={`/reports/render/${rep.id}`} target="_blank" className="btn btn-secondary btn-sm"><Eye size={12} /> View</Link>
+                        <a
+                          href={`/reports/render/${rep.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-primary btn-sm"
+                          title="Open report page — then click Download PDF"
+                        >
+                          <Download size={12} /> PDF
+                        </a>
                       </div>
                     </td>
                   </tr>

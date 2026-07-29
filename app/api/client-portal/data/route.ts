@@ -26,35 +26,42 @@ export async function GET() {
           include: {
             serankingProject: {
               include: {
-                keywordSnapshots: {
-                  orderBy: { date: 'desc' },
-                  take: 7,
-                },
-                analyticsSnapshots: {
-                  orderBy: { date: 'desc' },
-                  take: 7,
-                },
-                auditSnapshots: {
-                  orderBy: { date: 'desc' },
-                  take: 1,
-                },
-                backlinkSnapshots: {
-                  orderBy: { date: 'desc' },
-                  take: 1,
-                },
+                keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+                analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+                auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+                backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
               },
             },
-            reports: {
-              orderBy: { periodStart: 'desc' },
-              take: 20,
-            },
+            reports: { orderBy: { periodStart: 'desc' }, take: 20 },
             reportSchedule: true,
           },
         },
       },
     });
 
-    const client = invitation?.client;
+    let client = invitation?.client;
+
+    if (!client) {
+      const fallbackClient = await prisma.client.findFirst({
+        where: { contactEmail: email },
+        include: {
+          serankingProject: {
+            include: {
+              keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+              analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+              auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+              backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+            },
+          },
+          reports: { orderBy: { periodStart: 'desc' }, take: 20 },
+          reportSchedule: true,
+        },
+      });
+      if (fallbackClient) {
+        client = fallbackClient;
+      }
+    }
+
     const project = client?.serankingProject;
     
     // ── Check if we need to return demo data ──────────────────────────────

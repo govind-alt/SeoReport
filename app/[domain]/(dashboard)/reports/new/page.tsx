@@ -124,43 +124,47 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
               </select>
             </div>
 
-            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
-              {(clients.length > 0 ? clients : [
-                { id: 'demo-1', name: 'Acme Corp', domain: 'acme.com' },
-                { id: 'demo-2', name: 'TechStart', domain: 'techstart.io' },
-                { id: 'demo-3', name: 'GreenLeaf', domain: 'greenleaf.co' },
-                { id: 'demo-4', name: 'BlueSky', domain: 'bluesky.co.uk' },
-              ]).map((client: any, idx: number) => {
-                const isSelected = selectedClient === client.name;
-                return (
-                  <div 
-                    key={client.id}
-                    onClick={() => { setSelectedClient(client.name); setSelectedClientId(client.id); }}
-                    style={{
-                      border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
-                      borderRadius: '8px',
-                      padding: '16px',
-                      background: isSelected ? '#f0f2ff' : '#fff',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
-                      <div style={{width: '36px', height: '36px', borderRadius: '6px', background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: 'var(--text-muted)'}}>
-                        {client.name.substring(0, 2).toUpperCase()}
+            {clients.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 16px', background: 'var(--bg-muted)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
+                <div style={{ fontSize: '32px', marginBottom: '8px' }}>👥</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>No clients yet</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>You need to add a client before generating a report.</div>
+                <Link href={`/${domain}/clients/new`} className="btn btn-primary btn-sm">+ Add Client</Link>
+              </div>
+            ) : (
+              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px'}}>
+                {clients.map((client: any) => {
+                  const isSelected = selectedClient === client.name;
+                  return (
+                    <div
+                      key={client.id}
+                      onClick={() => { setSelectedClient(client.name); setSelectedClientId(client.id); }}
+                      style={{
+                        border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        background: isSelected ? '#f0f2ff' : '#fff',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
+                        <div style={{width: '36px', height: '36px', borderRadius: '6px', background: isSelected ? 'var(--primary)' : 'var(--bg-muted)', color: isSelected ? '#fff' : 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700}}>
+                          {client.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{fontSize: '14px', fontWeight: 700, color: isSelected ? 'var(--primary)' : 'inherit'}}>{client.name} {isSelected && '✓'}</div>
+                          <div style={{fontSize: '11px', color: 'var(--text-muted)'}}>{client.domain}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div style={{fontSize: '14px', fontWeight: 700, color: isSelected ? 'var(--primary)' : 'inherit'}}>{client.name} {isSelected && '✓'}</div>
-                        <div style={{fontSize: '11px', color: 'var(--text-muted)'}}>{client.domain}</div>
+                      <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
+                        <span className="badge badge-success">Active</span>
+                        <span className="badge badge-primary">{client.industry || 'Client'}</span>
                       </div>
                     </div>
-                    <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
-                      <span className="badge badge-success">Active</span>
-                      <span className="badge badge-primary">{client.industry || 'Client'}</span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {selectedClient && (

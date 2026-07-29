@@ -96,6 +96,13 @@ export async function POST(request: Request) {
       },
     });
 
+    // Fire-and-forget: trigger background report processing
+    // We don't await this so the response is returned immediately
+    const processUrl = new URL(`/api/reports/${report.id}/process`, request.url);
+    fetch(processUrl.toString(), { method: 'POST' }).catch(err => {
+      console.error('[REPORTS_POST] Failed to trigger process:', err);
+    });
+
     return NextResponse.json(report, { status: 201 });
   } catch (error: unknown) {
     console.error('[REPORTS_POST]', error);

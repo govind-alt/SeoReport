@@ -65,6 +65,7 @@ a:hover { color: var(--primary-hover); }
 .brand-logo {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   position: relative;
   z-index: 1;
@@ -79,13 +80,103 @@ a:hover { color: var(--primary-hover); }
 }
 .brand-name { font-size: 22px; font-weight: 800; color: white; letter-spacing: -0.5px; }
 .brand-tagline { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-.brand-hero { position: relative; z-index: 1; padding: 40px 0; }
+
+.platform-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  color: #4ADE80;
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 10px #22C55E;
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.brand-hero { position: relative; z-index: 1; padding: 28px 0; }
+.brand-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(165, 180, 252, 0.12);
+  border: 1px solid rgba(165, 180, 252, 0.25);
+  color: #C7D2FE;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
 .brand-hero-title {
   font-size: 38px; font-weight: 900; color: white;
   line-height: 1.2; letter-spacing: -1px; margin-bottom: 16px;
 }
 .brand-hero-title span { color: #A5B4FC; }
-.brand-hero-desc { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 360px; }
+.brand-hero-desc { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; max-width: 520px; margin-bottom: 24px; }
+
+.brand-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.brand-stat-item {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  text-align: center;
+}
+.brand-stat-number {
+  font-size: 20px;
+  font-weight: 800;
+  color: #A5B4FC;
+}
+.brand-stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+}
+
+.brand-integrations {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 24px;
+}
+.integrations-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 8px;
+}
+.integrations-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.integration-tag {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+}
+
 .brand-features { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
 .brand-feature {
   display: flex;
@@ -111,11 +202,10 @@ a:hover { color: var(--primary-hover); }
   position: relative;
   z-index: 1;
   backdrop-filter: blur(10px);
-  margin-top: 28px;
 }
 .brand-testimonial blockquote {
   font-size: 13px;
-  color: rgba(255,255,255,0.75);
+  color: rgba(255,255,255,0.85);
   line-height: 1.6;
   font-style: italic;
   margin-bottom: 12px;

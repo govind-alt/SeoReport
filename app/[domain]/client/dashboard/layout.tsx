@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import {
-  LayoutDashboard, FileText, User,
+  LayoutDashboard, FileText, User, MessageSquare,
   BarChart2, TrendingUp, ChevronRight, ChevronDown, Menu, Sparkles, LogOut, Sliders
 } from 'lucide-react';
 
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { id: 'reports',     label: 'My Reports',      icon: FileText,         path: '/client/dashboard#reports' },
   { id: 'rankings',    label: 'Rankings',        icon: TrendingUp,       path: '/client/dashboard#rankings' },
   { id: 'analytics',   label: 'Analytics',       icon: BarChart2,        path: '/client/dashboard#analytics' },
+  { id: 'messages',    label: 'Inbox & Chat',    icon: MessageSquare,    path: '/client/dashboard#messages' },
   { id: 'manage-data', label: 'Manage SEO Data', icon: Sliders,          path: '/client/dashboard#manage-data' },
   { id: 'profile',     label: 'Profile',         icon: User,             path: '/client/dashboard#profile' },
 ];

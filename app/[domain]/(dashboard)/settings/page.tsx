@@ -125,7 +125,16 @@ function SettingsContent() {
   const [isSavingBranding, setIsSavingBranding] = useState(false);
   const [savedId, setSavedId]                   = useState<string | null>(null);
   const [inviteEmail, setInviteEmail]           = useState('');
-  const [inviteRole, setInviteRole]             = useState('Analyst');
+  const [inviteRole, setInviteRole]             = useState('member');
+  const [teamMembers, setTeamMembers]           = useState<any[]>([]);
+  const [inviting, setInviting]                 = useState(false);
+
+  const fetchTeam = () => {
+    fetch('/api/agency/team')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setTeamMembers(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  };
 
   // Profile
   const [agencyName, setAgencyName]       = useState('Digital Horizons Agency');
@@ -186,6 +195,9 @@ function SettingsContent() {
         }
       })
       .catch(() => {});
+
+    // Load team members
+    fetchTeam();
   }, []);
 
   const triggerSaved = (id: string) => {
@@ -614,22 +626,29 @@ function SettingsContent() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px 90px 40px', padding: '12px 20px', background: 'var(--gray-50)', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', borderBottom: '1px solid var(--border)' }}>
                     <span>Member</span><span>Last Active</span><span>Role</span><span>Status</span><span></span>
                   </div>
-                  {DEMO_TEAM.map((m, i) => {
-                    const rs = ROLE_COLORS[m.role] ?? { bg: 'var(--gray-100)', color: 'var(--text-muted)', border: 'var(--border)' };
-                    const ss = m.status === 'Active' ? { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.18)' } : { bg: 'rgba(245,158,11,0.08)', color: '#D97706', border: 'rgba(245,158,11,0.18)' };
+                  {teamMembers.length === 0 ? (
+                    <div style={{ padding: '32px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                      No team members found. Invite someone below.
+                    </div>
+                  ) : teamMembers.map((m: any, i: number) => {
+                    const roleName = m.role.charAt(0).toUpperCase() + m.role.slice(1);
+                    const rs = ROLE_COLORS[roleName] ?? { bg: 'var(--gray-100)', color: 'var(--text-muted)', border: 'var(--border)' };
+                    const isActive = Boolean(m.email);
+                    const ss = isActive ? { bg: 'rgba(16,185,129,0.08)', color: '#059669', border: 'rgba(16,185,129,0.18)' } : { bg: 'rgba(245,158,11,0.08)', color: '#D97706', border: 'rgba(245,158,11,0.18)' };
+                    const initials = (m.name || m.email || '?').split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
                     return (
-                      <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px 90px 40px', padding: '16px 20px', borderBottom: i < DEMO_TEAM.length - 1 ? '1px solid var(--border)' : 'none', alignItems: 'center', background: 'var(--surface)' }}>
+                      <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px 90px 40px', padding: '16px 20px', borderBottom: i < teamMembers.length - 1 ? '1px solid var(--border)' : 'none', alignItems: 'center', background: 'var(--surface)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,var(--primary),var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: 'white', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>{m.avatar}</div>
+                          <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,var(--primary),var(--primary-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: 'white', flexShrink: 0, boxShadow: 'var(--shadow-sm)' }}>{initials}</div>
                           <div>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{m.name}</div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{m.name || 'Pending'}</div>
                             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{m.email}</div>
                           </div>
                         </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.lastSeen}</div>
-                        <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: rs.bg, color: rs.color, border: `1px solid ${rs.border}`, width: 'fit-content' }}>{m.role}</span>
-                        <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, width: 'fit-content' }}>{m.status}</span>
-                        <button onClick={() => toast.info(`Actions for ${m.name}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', borderRadius: 6, padding: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>···</button>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{m.createdAt ? new Date(m.createdAt).toLocaleDateString() : '—'}</div>
+                        <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: rs.bg, color: rs.color, border: `1px solid ${rs.border}`, width: 'fit-content' }}>{roleName}</span>
+                        <span style={{ display: 'inline-flex', padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 700, background: ss.bg, color: ss.color, border: `1px solid ${ss.border}`, width: 'fit-content' }}>Active</span>
+                        <button onClick={() => { if (confirm(`Remove ${m.name || m.email}?`)) { fetch(`/api/agency/team?userId=${m.id}`, { method: 'DELETE' }).then(() => fetchTeam()); } }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', borderRadius: 6, padding: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>···</button>
                       </div>
                     );
                   })}
@@ -644,11 +663,31 @@ function SettingsContent() {
                   <div style={{ display: 'flex', gap: 10 }}>
                     <input className="form-input" style={{ flex: 1, background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' }} placeholder="colleague@youragency.com" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} />
                     <select className="form-input" style={{ width: 140, background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' }} value={inviteRole} onChange={e => setInviteRole(e.target.value)}>
-                      <option>Admin</option><option>Manager</option><option>Analyst</option><option>Viewer</option>
+                      <option value="admin">Admin</option><option value="member">Member</option>
                     </select>
                     <button className="btn btn-primary" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', borderRadius: 8, padding: '10px 20px' }}
-                      onClick={() => { if (!inviteEmail) { toast.error('Enter an email'); return; } toast.success(`Invite sent to ${inviteEmail}`); setInviteEmail(''); }}>
-                      <Plus size={14} /> Send Invite
+                      disabled={inviting}
+                      onClick={async () => {
+                        if (!inviteEmail) { toast.error('Enter an email'); return; }
+                        setInviting(true);
+                        try {
+                          const res = await fetch('/api/agency/team', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: inviteEmail.split('@')[0], email: inviteEmail, role: inviteRole }),
+                          });
+                          if (res.ok) {
+                            toast.success(`Invite sent to ${inviteEmail}`);
+                            setInviteEmail('');
+                            fetchTeam();
+                          } else {
+                            const err = await res.json();
+                            toast.error(err.error || 'Failed to invite');
+                          }
+                        } catch { toast.error('Network error'); }
+                        finally { setInviting(false); }
+                      }}>
+                      <Plus size={14} /> {inviting ? 'Sending…' : 'Send Invite'}
                     </button>
                   </div>
                 </div>

@@ -83,6 +83,17 @@ export async function POST(request: Request) {
       }
     });
 
+    // Create notification for agency
+    await prisma.notification.create({
+      data: {
+        agencyId: resolvedClient.agencyId,
+        type: 'alert',
+        title: `New message from ${resolvedClient.name}`,
+        body: body.length > 90 ? body.slice(0, 87) + '...' : body,
+        link: `/inbox`
+      }
+    }).catch(() => null);
+
     // Send email notification to agency/support team email
     const { sendClientMessageNotificationEmail } = require('@/lib/email');
     const agency = await prisma.agency.findUnique({

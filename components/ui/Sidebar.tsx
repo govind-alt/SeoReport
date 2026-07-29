@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, Users, FileText, Settings, HelpCircle,
   ChevronUp, LogOut, CreditCard, User, Zap, Shield, Inbox,
-  Search, Calendar, CheckSquare
+  Search, Calendar, CheckSquare, Target
 } from 'lucide-react';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -109,6 +109,7 @@ export function Sidebar() {
     { href: `${basePath}/clients`,           label: 'Clients',           icon: Users,            exact: false },
     { href: `${basePath}/reports`,           label: 'Reports',           icon: FileText,         exact: false },
     { href: `${basePath}/keyword-explorer`, label: 'Keyword Research', icon: Search,           exact: false },
+    { href: `${basePath}/competitor-analysis`, label: 'Competitor Analysis', icon: Target,         exact: false },
     { href: `${basePath}/schedules`,         label: 'Report Schedules',  icon: Calendar,         exact: false },
     { href: `${basePath}/tasks`,             label: 'SEO Action Tasks',  icon: CheckSquare,      exact: false },
   ];

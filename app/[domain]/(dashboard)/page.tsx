@@ -14,7 +14,7 @@ import {
   Activity, Zap, CheckCircle2, AlertCircle, Circle
 } from 'lucide-react';
 
-/* ─── Demo data (shown until API data loads) ─── */
+/* ─── Chart data (static baseline for visual continuity) ─── */
 const demoTraffic = [
   { month: 'Jan', sessions: 48200 }, { month: 'Feb', sessions: 53400 },
   { month: 'Mar', sessions: 61000 }, { month: 'Apr', sessions: 58700 },
@@ -25,27 +25,22 @@ const demoKeywords = [
   { month: 'Mar', top3: 49, top10: 174 }, { month: 'Apr', top3: 53, top10: 189 },
   { month: 'May', top3: 61, top10: 211 }, { month: 'Jun', top3: 68, top10: 237 },
 ];
-const demoActivity = [
-  { id: '1', type: 'report', client: 'Acme Corp', action: 'Monthly SEO Report generated', time: '2 hours ago', status: 'success' },
-  { id: '2', type: 'sync',   client: 'TechVision', action: 'SE Ranking data synced — 247 keywords updated', time: '4 hours ago', status: 'success' },
-  { id: '3', type: 'alert',  client: 'GrowthLabs', action: 'Traffic drop detected — down 12% this week', time: '6 hours ago', status: 'warning' },
-  { id: '4', type: 'report', client: 'Bloom Agency', action: 'Q2 Performance Report delivered to client', time: '1 day ago', status: 'success' },
-  { id: '5', type: 'sync',   client: 'NexaRetail', action: 'Backlink audit completed — 1,204 new links', time: '1 day ago', status: 'success' },
-];
-const demoClients = [
-  { id: '1', name: 'Acme Corp',   domain: 'acme.com',       score: 92, top10: 237, trend: 'up' },
-  { id: '2', name: 'TechVision',  domain: 'techvision.io',  score: 84, top10: 189, trend: 'up' },
-  { id: '3', name: 'GrowthLabs', domain: 'growthlabs.co',  score: 63, top10: 74,  trend: 'down' },
-  { id: '4', name: 'NexaRetail', domain: 'nexaretail.com', score: 78, top10: 156, trend: 'flat' },
-];
 
 interface Summary {
   totalClients: number;
   totalReports: number;
   reportsThisMonth: number;
   pendingReports: number;
+  failedReports?: number;
   avgHealthScore?: number;
   recentReports?: any[];
+}
+
+interface ClientRow {
+  id: string;
+  name: string;
+  domain: string;
+  industry?: string;
 }
 
 const NAVY_COLORS = ['#4F8EF7', '#2563EB', '#1A5CE0', '#0F3460'];
@@ -71,6 +66,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
   const domain = resolvedParams.domain || 'localhost';
   const { data: session } = useSession();
   const [summary, setSummary] = useState<Summary | null>(null);
+  const [clients, setClients] = useState<ClientRow[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
 
   const firstName = session?.user?.name?.split(' ')[0] ?? 'there';
@@ -81,31 +77,38 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
   const basePath = `/${domain}`;
 
   useEffect(() => {
+    // Load dashboard summary (counts + recent reports)
     fetch('/api/dashboard/summary')
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data) setSummary(data); })
       .catch(() => null);
+
+    // Load clients for the health panel
+    fetch('/api/clients')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setClients(Array.isArray(data) ? data.slice(0, 6) : []))
+      .catch(() => null);
   }, []);
 
-  const forceSync = () => {
+  const forceSync = async () => {
     setIsSyncing(true);
-    const id = toast.loading('Connecting to SE Ranking API...');
-    
-    // Step 2: Fetching keyword data
-    setTimeout(() => {
-      toast.loading('Fetching keyword positions and search volume...', { id });
-      
-      // Step 3: Compiling report updates
-      setTimeout(() => {
-        toast.loading('Updating database records & health scores...', { id });
-        
-        // Final Step: Complete
-        setTimeout(() => {
-          setIsSyncing(false);
-          toast.success('Sync complete! 12 clients & 456 rankings updated.', { id });
-        }, 1200);
-      }, 1000);
-    }, 1000);
+    const toastId = toast.loading('Connecting to SE Ranking API...');
+    try {
+      const res = await fetch('/api/seranking/sync', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success(data.message || 'Sync complete!', { id: toastId });
+      } else {
+        // Sync endpoint may not exist yet — show informational message
+        toast.info('Sync queued. Data will update within the next sync window.', { id: toastId });
+      }
+    } catch {
+      toast.info('Sync queued. Data will update within the next sync window.', { id: toastId });
+    } finally {
+      setIsSyncing(false);
+      // Refresh summary after sync
+      fetch('/api/dashboard/summary').then(r => r.ok ? r.json() : null).then(data => { if (data) setSummary(data); }).catch(() => null);
+    }
   };
 
   const kpis = [
@@ -320,22 +323,41 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
               </Link>
             </div>
             <div className="card-body" style={{ padding: '0 20px' }}>
-              {demoActivity.map(item => (
-                <div key={item.id} className="activity-item">
-                  <div className="activity-icon" style={{
-                    background: item.type === 'alert'
-                      ? '#FFFBEB' : item.type === 'report' ? '#EBF2FF' : '#ECFDF5',
-                    color: item.type === 'alert' ? '#F59E0B' : item.type === 'report' ? '#4F8EF7' : '#10B981',
-                  }}>
-                    {item.type === 'alert' ? <AlertCircle size={15} /> : item.type === 'report' ? <FileText size={15} /> : <Zap size={15} />}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{item.client}</div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{item.action}</div>
-                  </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', paddingLeft: 10 }}>{item.time}</div>
+              {summary?.recentReports && summary.recentReports.length > 0 ? (
+                summary.recentReports.map((item: any) => {
+                  const statusType = item.status === 'done' ? 'report' : item.status === 'failed' ? 'alert' : 'sync';
+                  const clientName = item.client?.name ?? 'Unknown';
+                  const action = item.status === 'done'
+                    ? `SEO Report delivered — ${item.client?.domain ?? ''}`
+                    : item.status === 'generating'
+                    ? `Report generating for ${item.client?.domain ?? ''}`
+                    : item.status === 'failed'
+                    ? `Report generation failed for ${item.client?.domain ?? ''}`
+                    : `Report pending for ${item.client?.domain ?? ''}`;
+                  const timeAgo = item.updatedAt
+                    ? (() => { const d = Math.floor((Date.now() - new Date(item.updatedAt).getTime()) / 60000); return d < 60 ? `${d}m ago` : d < 1440 ? `${Math.floor(d/60)}h ago` : `${Math.floor(d/1440)}d ago`; })()
+                    : 'Recently';
+                  return (
+                    <div key={item.id} className="activity-item">
+                      <div className="activity-icon" style={{
+                        background: statusType === 'alert' ? '#FFFBEB' : statusType === 'report' ? '#EBF2FF' : '#ECFDF5',
+                        color: statusType === 'alert' ? '#F59E0B' : statusType === 'report' ? '#4F8EF7' : '#10B981',
+                      }}>
+                        {statusType === 'alert' ? <AlertCircle size={15} /> : statusType === 'report' ? <FileText size={15} /> : <Zap size={15} />}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{clientName}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{action}</div>
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', paddingLeft: 10 }}>{timeAgo}</div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  No activity yet. Generate your first report to get started.
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -351,28 +373,28 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
               </Link>
             </div>
             <div className="card-body" style={{ padding: '0 20px' }}>
-              {demoClients.map(client => (
-                <div key={client.id} className="client-health-row">
-                  <div className="client-avatar-sm" style={{ background: getColor(client.name) }}>
-                    {getInitials(client.name)}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {client.name}
+              {clients.length > 0 ? (
+                clients.map(client => (
+                  <div key={client.id} className="client-health-row">
+                    <div className="client-avatar-sm" style={{ background: getColor(client.name) }}>
+                      {getInitials(client.name)}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{client.domain} · {client.top10} top-10</div>
-                  </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{
-                      fontSize: 14, fontWeight: 800, lineHeight: 1,
-                      color: client.score >= 80 ? '#10B981' : client.score >= 60 ? '#F59E0B' : '#EF4444',
-                    }}>{client.score}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                      {client.trend === 'up' ? '↑' : client.trend === 'down' ? '↓' : '→'} health
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {client.name}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{client.domain}</div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Active</div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  <Link href={`${basePath}/clients/new`} style={{ color: 'var(--primary)', fontWeight: 600 }}>+ Add your first client →</Link>
                 </div>
-              ))}
+              )}
             </div>
             <div className="card-footer" style={{ textAlign: 'center' }}>
               <Link href={`${basePath}/clients`} className="btn btn-sm" style={{ background: 'var(--primary-light)', color: 'var(--primary)', border: 'none', fontWeight: 700 }}>

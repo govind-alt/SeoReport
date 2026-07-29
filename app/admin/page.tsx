@@ -44,14 +44,14 @@ interface PlatformUser {
 
 /* ─── Demo data ─── */
 const mrrData = [
-  { month: 'Jan', mrr: 12400 }, { month: 'Feb', mrr: 14800 },
-  { month: 'Mar', mrr: 18200 }, { month: 'Apr', mrr: 16900 },
-  { month: 'May', mrr: 21600 }, { month: 'Jun', mrr: 26800 },
+  { month: 'Feb', mrr: 14800 }, { month: 'Mar', mrr: 18200 },
+  { month: 'Apr', mrr: 16900 }, { month: 'May', mrr: 21600 },
+  { month: 'Jun', mrr: 26800 }, { month: 'Jul', mrr: 31400 },
 ];
 const agencyGrowth = [
-  { month: 'Jan', agencies: 8 }, { month: 'Feb', agencies: 11 },
-  { month: 'Mar', agencies: 14 }, { month: 'Apr', agencies: 18 },
-  { month: 'May', agencies: 23 }, { month: 'Jun', agencies: 29 },
+  { month: 'Feb', agencies: 11 }, { month: 'Mar', agencies: 14 },
+  { month: 'Apr', agencies: 18 }, { month: 'May', agencies: 23 },
+  { month: 'Jun', agencies: 29 }, { month: 'Jul', agencies: 34 },
 ];
 
 const initialAgencies: Agency[] = [
@@ -118,7 +118,7 @@ const statusColors: Record<string, { bg: string; color: string }> = {
   suspended: { bg: '#FEF2F2', color: '#DC2626' },
 };
 
-type Tab = 'overview' | 'agencies' | 'users' | 'system' | 'billing' | 'broadcast' | 'feature-flags' | 'integrations';
+type Tab = 'overview' | 'agencies' | 'clients' | 'reports' | 'messages' | 'activity' | 'users' | 'system' | 'billing' | 'broadcast' | 'feature-flags' | 'integrations';
 
 /* ─── Modal Component ─── */
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
@@ -151,8 +151,27 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
+/* ─── Domain Utility ─── */
+function getAgencyDomainDisplay(subdomain: string) {
+  if (typeof window === 'undefined') return `${subdomain}.rankflow.app`;
+  const host = window.location.host;
+  if (host.includes('localhost')) return `${subdomain}.localhost:3000`;
+  return `${subdomain}.${host}`;
+}
+
+function getAgencyUrl(subdomain: string) {
+  if (typeof window === 'undefined') return `http://${subdomain}.rankflow.app`;
+  const host = window.location.host;
+  const protocol = window.location.protocol;
+  if (host.includes('localhost')) return `${protocol}//${subdomain}.localhost:3000`;
+  return `${protocol}//${subdomain}.${host}`;
+}
+
 /* ─── Agency Detail Modal ─── */
-function AgencyDetailModal({ agency, onClose, onVisitDashboard }: { agency: Agency; onClose: () => void; onVisitDashboard: () => void }) {
+function AgencyDetailModal({ agency, onClose, onVisitDashboard }: { agency: Agency; onClose: () => void; onVisitDashboard: (agency: Agency) => void }) {
+  const liveUrl = getAgencyUrl(agency.subdomain);
+  const displayDomain = getAgencyDomainDisplay(agency.subdomain);
+
   return (
     <Modal title="Agency Details" onClose={onClose}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
@@ -161,7 +180,14 @@ function AgencyDetailModal({ agency, onClose, onVisitDashboard }: { agency: Agen
         </div>
         <div>
           <div style={{ fontSize: 18, fontWeight: 800, color: '#1A1A2E' }}>{agency.name}</div>
-          <div style={{ fontSize: 12, color: '#94A3B8' }}>{agency.subdomain}.rankflow.app</div>
+          <a
+            href={liveUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ fontSize: 12, color: '#2563EB', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}
+          >
+            {displayDomain} <ExternalLink size={10} />
+          </a>
         </div>
         <span style={{ ...statusColors[agency.status], padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700, marginLeft: 'auto' }}>
           {agency.status.charAt(0).toUpperCase() + agency.status.slice(1)}
@@ -188,10 +214,17 @@ function AgencyDetailModal({ agency, onClose, onVisitDashboard }: { agency: Agen
 
       <div style={{ display: 'flex', gap: 10 }}>
         <button
-          onClick={() => { onClose(); onVisitDashboard(); }}
+          onClick={() => { onClose(); onVisitDashboard(agency); }}
           style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: 'linear-gradient(135deg,#1A1A2E,#2563EB)', color: 'white', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
           <LayoutDashboard size={13} /> Visit Dashboard
         </button>
+        <a
+          href={liveUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{ padding: '10px 14px', borderRadius: 10, background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', fontSize: 13, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+          <ExternalLink size={13} /> Open Live Site
+        </a>
         <button onClick={onClose} style={{ flex: 1, padding: '10px 0', borderRadius: 10, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
           Close
         </button>
@@ -306,7 +339,6 @@ function ReportPreviewModal({ report, agencyName, onClose }: {
               <div style={{ display: 'flex', gap: 12, marginTop: 12 }}>
                 {[
                   { label: 'Created', value: report.created },
-                  { label: 'Type', value: report.type },
                   { label: 'Views', value: String(report.views) },
                   { label: 'Organic Traffic', value: totalOrganic.toLocaleString() },
                 ].map((m, i) => (
@@ -318,9 +350,6 @@ function ReportPreviewModal({ report, agencyName, onClose }: {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-              <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: report.type === 'PDF' ? '#FEF3C7' : '#EBF2FF', color: report.type === 'PDF' ? '#92400E' : '#2563EB' }}>
-                {report.type}
-              </span>
               <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.7)' }}>
                 <X size={14} />
               </button>
@@ -1018,7 +1047,7 @@ function AgencyDashboardView({ agency, onBack, onToggleSuspend }: {
             </div>
             <div>
               <div style={{ fontSize: 16, fontWeight: 800, color: '#1A1A2E' }}>{agency.name}</div>
-              <div style={{ fontSize: 11, color: '#94A3B8' }}>{agency.subdomain}.rankflow.app</div>
+              <div style={{ fontSize: 11, color: '#94A3B8' }}>{getAgencyDomainDisplay(agency.subdomain)}</div>
             </div>
           </div>
           <span style={{ ...statusColors[agency.status], padding: '3px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
@@ -1035,7 +1064,7 @@ function AgencyDashboardView({ agency, onBack, onToggleSuspend }: {
               Restore Agency
             </button>
           ) : null}
-          <a href={`http://${agency.subdomain}.rankflow.app`} target="_blank" rel="noreferrer"
+          <a href={getAgencyUrl(agency.subdomain)} target="_blank" rel="noreferrer"
             style={{ padding: '7px 14px', borderRadius: 9, background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', fontSize: 12, fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5 }}>
             <ExternalLink size={12} /> Open Live Site
           </a>
@@ -1147,7 +1176,7 @@ function AgencyDashboardView({ agency, onBack, onToggleSuspend }: {
               {[
                 { label: 'Agency Name', value: agency.name },
                 { label: 'Subdomain Prefix', value: agency.subdomain },
-                { label: 'Portal Address', value: `${agency.subdomain}.rankflow.app` },
+                { label: 'Portal Address', value: getAgencyDomainDisplay(agency.subdomain) },
                 { label: 'Contact Name', value: agency.contactName || '—' },
                 { label: 'Contact Email', value: agency.email || '—' },
                 { label: 'Account Created', value: agency.joined },
@@ -1387,6 +1416,49 @@ export default function SuperAdminDashboard() {
   // Data state
   const [agencies, setAgencies] = useState<Agency[]>(initialAgencies);
   const [users, setUsers] = useState<PlatformUser[]>(initialUsers);
+  const [adminStats, setAdminStats] = useState<any>(null);
+  const [allClients, setAllClients] = useState<any[]>([]);
+  const [allReports, setAllReports] = useState<any[]>([]);
+  const [allMessages, setAllMessages] = useState<any[]>([]);
+  const [activityFeed, setActivityFeed] = useState<any[]>([]);
+  const [selectedReportPreview, setSelectedReportPreview] = useState<any>(null);
+
+  // Fetch live system data from API
+  const fetchLiveData = useCallback(() => {
+    setIsRefreshing(true);
+    Promise.all([
+      fetch('/api/admin/stats').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/agencies').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/users').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/clients').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/reports').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/messages').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/activity').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/notifications').then(r => r.ok ? r.json() : null),
+    ]).then(([statsData, agenciesData, usersData, clientsData, reportsData, messagesData, activityData, notificationsData]) => {
+      if (statsData) setAdminStats(statsData);
+      if (agenciesData && Array.isArray(agenciesData) && agenciesData.length > 0) {
+        setAgencies(agenciesData);
+      }
+      if (usersData && Array.isArray(usersData) && usersData.length > 0) {
+        setUsers(usersData);
+      }
+      if (clientsData && Array.isArray(clientsData)) setAllClients(clientsData);
+      if (reportsData && Array.isArray(reportsData)) setAllReports(reportsData);
+      if (messagesData && Array.isArray(messagesData)) setAllMessages(messagesData);
+      if (activityData && Array.isArray(activityData)) setActivityFeed(activityData);
+      if (notificationsData && Array.isArray(notificationsData) && notificationsData.length > 0) {
+        setNotifications(notificationsData);
+      }
+    }).catch(err => console.error('Error fetching admin live data:', err))
+      .finally(() => setIsRefreshing(false));
+  }, []);
+
+  useEffect(() => {
+    fetchLiveData();
+    const interval = setInterval(fetchLiveData, 15000);
+    return () => clearInterval(interval);
+  }, [fetchLiveData]);
 
   // Broadcasts state
   const [broadcasts, setBroadcasts] = useState([
@@ -1450,9 +1522,22 @@ export default function SuperAdminDashboard() {
     }, 1500);
   };
 
-  const handleMarkAllRead = () => {
+  const handleMarkAllRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    fetch('/api/admin/notifications', { method: 'POST' }).catch(() => null);
     showToast('All notifications marked as read.');
+  };
+
+  const handleNotificationClick = async (n: any) => {
+    setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, read: true } : item));
+    if (n.id && !n.id.startsWith('mock')) {
+      fetch(`/api/admin/notifications/${n.id}`, { method: 'PATCH' }).catch(() => null);
+    }
+    setShowNotifications(false);
+    if (n.navTab) {
+      setActiveTab(n.navTab as Tab);
+    }
+    showToast(`Opened notification: ${n.title}`);
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -1593,193 +1678,214 @@ export default function SuperAdminDashboard() {
         }
       `}</style>
       
-      <div style={{ minHeight: '100vh', background: '#F4F6FB', fontFamily: 'Inter, sans-serif' }}>
-        {/* ── Top Navigation ── */}
-        <header style={{
-          background: '#1A1A2E', borderBottom: '1px solid rgba(255,255,255,0.07)',
-          padding: '0 28px', height: 60,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          position: 'sticky', top: 0, zIndex: 100,
+      <div style={{ display: 'flex', minHeight: '100vh', background: '#F4F6FB', fontFamily: 'Inter, sans-serif' }}>
+
+        {/* ── LEFT SIDEBAR NAVIGATION ── */}
+        <aside style={{
+          width: 250,
+          position: 'fixed',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          background: 'linear-gradient(175deg, #1A1A2E 0%, #16213E 60%, #0F3460 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 100,
+          borderRight: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '4px 0 20px rgba(0,0,0,0.15)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {/* Logo & Header */}
+          <div style={{
+            padding: '20px 20px 16px',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12
+          }}>
             <div style={{
-              width: 36, height: 36, borderRadius: 10,
+              width: 38, height: 38, borderRadius: 10,
               background: 'linear-gradient(135deg, #4F8EF7 0%, #2563EB 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, fontWeight: 800, color: 'white',
-              boxShadow: '0 4px 12px rgba(79,142,247,0.45)',
+              fontSize: 15, fontWeight: 900, color: 'white',
+              boxShadow: '0 4px 14px rgba(79,142,247,0.45)', flexShrink: 0
             }}>RF</div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF' }}>RankFlow</div>
-              <div style={{ fontSize: 10, color: '#6B7CA8', marginTop: 1, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Super Admin Console</div>
-            </div>
-            <div style={{ marginLeft: 12, padding: '3px 10px', borderRadius: 20, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', fontSize: 10, color: '#FCA5A5', fontWeight: 700 }}>
-              <Shield size={10} style={{ display: 'inline', marginRight: 4 }} />ADMIN
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.3px' }}>RankFlow</div>
+              <div style={{ fontSize: 10, color: '#6B7CA8', marginTop: 1, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Super Admin</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
-            <button 
-              onClick={() => { setShowNotifications(prev => !prev); setShowProfileMenu(false); }} 
-              className="header-icon-btn" 
-              style={{ width: 34, height: 34, position: 'relative' }}
-            >
-              <Bell size={14} />
-              {unreadCount > 0 && (
-                <span style={{ position: 'absolute', top: 2, right: 2, width: 8, height: 8, background: '#EF4444', borderRadius: '50%', border: '1.5px solid #1A1A2E' }} />
-              )}
-            </button>
-            
-            {/* ── Notifications Dropdown ── */}
-            {showNotifications && (
-              <div 
-                style={{ 
-                  position: 'absolute', top: 46, right: 180, width: 320, 
-                  background: 'white', border: '1px solid #E4E9F2', borderRadius: 12, 
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.15)', zIndex: 1000, overflow: 'hidden',
-                  animation: 'modalIn 0.18s ease'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1A2E' }}>Notifications</span>
-                  {unreadCount > 0 && (
-                    <button 
-                      onClick={handleMarkAllRead} 
-                      style={{ border: 'none', background: 'none', color: '#4F8EF7', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div style={{ maxHeight: 280, overflowY: 'auto' }}>
-                  {notifications.length === 0 ? (
-                    <div style={{ padding: 24, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>No alerts found</div>
-                  ) : (
-                    notifications.map(n => (
-                      <div 
-                        key={n.id} 
-                        onClick={() => {
-                          setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, read: true } : item));
-                          setShowNotifications(false);
-                          showToast(`Opened notification: ${n.title}`);
-                        }}
-                        style={{ 
-                          padding: '12px 16px', borderBottom: '1px solid #F8FAFC', cursor: 'pointer',
-                          background: n.read ? 'white' : 'rgba(79,142,247,0.04)',
-                          transition: 'background 0.15s'
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-                        onMouseLeave={e => e.currentTarget.style.background = n.read ? 'white' : 'rgba(79,142,247,0.04)'}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 3 }}>
-                          <span style={{ fontSize: 12, fontWeight: n.read ? 600 : 800, color: '#1A1A2E' }}>{n.title}</span>
-                          <span style={{ fontSize: 10, color: '#94A3B8' }}>{n.time}</span>
-                        </div>
-                        <div style={{ fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>{n.desc}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
 
-            <div 
-              onClick={() => { setShowProfileMenu(prev => !prev); setShowNotifications(false); }}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 12px', borderRadius: 10, background: showProfileMenu ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', transition: 'background 0.2s' }}
-            >
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #4F8EF7, #2563EB)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: 'white' }}>SA</div>
-              <div style={{ userSelect: 'none' }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#E2E8F0' }}>Super Admin</div>
-                <div style={{ fontSize: 10, color: '#6B7CA8' }}>superadmin@rankflow.app</div>
+          {/* Section Menu List */}
+          <div style={{ flex: 1, padding: '16px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Group 1: Platform Data */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1, padding: '0 10px 8px' }}>
+                Platform Overview
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {[
+                  { id: 'overview', label: 'Overview', icon: <BarChart2 size={16} /> },
+                  { id: 'agencies', label: 'Agencies', icon: <Building2 size={16} /> },
+                  { id: 'clients', label: 'All Clients', icon: <Globe size={16} /> },
+                  { id: 'reports', label: 'All Reports', icon: <FileText size={16} /> },
+                  { id: 'messages', label: 'Client Messages', icon: <Mail size={16} /> },
+                  { id: 'activity', label: 'Activity Log', icon: <Activity size={16} /> },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as Tab)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                      border: 'none', background: activeTab === tab.id ? 'rgba(79,142,247,0.2)' : 'transparent',
+                      color: activeTab === tab.id ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                      borderLeft: activeTab === tab.id ? '3px solid #4F8EF7' : '3px solid transparent',
+                      cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                    onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    {tab.icon} {tab.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* ── Profile Menu Dropdown ── */}
-            {showProfileMenu && (
-              <div 
-                style={{ 
-                  position: 'absolute', top: 46, right: 0, width: 200, 
-                  background: 'white', border: '1px solid #E4E9F2', borderRadius: 12, 
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.15)', zIndex: 1000, overflow: 'hidden',
-                  animation: 'modalIn 0.18s ease'
-                }}
+            {/* Group 2: Operations */}
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 1, padding: '0 10px 8px' }}>
+                Management & System
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {[
+                  { id: 'users', label: 'Users', icon: <Users size={16} /> },
+                  { id: 'system', label: 'System Health', icon: <Server size={16} /> },
+                  { id: 'billing', label: 'Billing', icon: <DollarSign size={16} /> },
+                  { id: 'broadcast', label: 'Broadcasts', icon: <Megaphone size={16} /> },
+                  { id: 'feature-flags', label: 'Feature Flags', icon: <SlidersHorizontal size={16} /> },
+                  { id: 'integrations', label: 'Integrations', icon: <Zap size={16} /> },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as Tab)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '10px 14px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                      border: 'none', background: activeTab === tab.id ? 'rgba(79,142,247,0.2)' : 'transparent',
+                      color: activeTab === tab.id ? '#FFFFFF' : 'rgba(255,255,255,0.65)',
+                      borderLeft: activeTab === tab.id ? '3px solid #4F8EF7' : '3px solid transparent',
+                      cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={e => { if (activeTab !== tab.id) e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                    onMouseLeave={e => { if (activeTab !== tab.id) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    {tab.icon} {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom User Card */}
+          <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #4F8EF7, #2563EB)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: 'white', flexShrink: 0 }}>SA</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#E2E8F0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Super Admin</div>
+              <div style={{ fontSize: 10, color: '#6B7CA8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>superadmin@rankflow.app</div>
+            </div>
+            <button onClick={async () => await signOut({ callbackUrl: '/login' })} style={{ background: 'none', border: 'none', color: '#FCA5A5', cursor: 'pointer', padding: 4 }} title="Sign Out">
+              <LogOut size={14} />
+            </button>
+          </div>
+        </aside>
+
+        {/* ── MAIN CONTENT AREA ── */}
+        <main style={{ flex: 1, marginLeft: 250, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          {/* Sticky Top Header Bar */}
+          <header style={{
+            height: 60, background: '#FFFFFF', borderBottom: '1px solid #E4E9F2',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 28px', position: 'sticky', top: 0, zIndex: 90,
+            boxShadow: '0 1px 4px rgba(26,26,46,0.04)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#94A3B8' }}>
+              <span style={{ fontWeight: 600 }}>Super Admin Console</span>
+              <ChevronRight size={14} />
+              <span style={{ color: '#1A1A2E', fontWeight: 800 }}>
+                {activeTab.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, position: 'relative' }}>
+              <button 
+                onClick={() => { setShowNotifications(prev => !prev); setShowProfileMenu(false); }} 
+                style={{ width: 34, height: 34, borderRadius: 9, background: showNotifications ? '#EBF2FF' : '#F8FAFC', border: '1px solid #E4E9F2', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative', color: showNotifications ? '#4F8EF7' : '#64748B', transition: 'all 0.15s' }}
               >
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: '#1A1A2E' }}>System Operator</div>
-                  <div style={{ fontSize: 10, color: '#94A3B8', marginTop: 1 }}>Level: Global Root</div>
-                </div>
-                <div style={{ padding: '6px 0' }}>
-                  {[
-                    { label: 'Security & Keys', action: () => { setActiveSystemModal('security'); setShowProfileMenu(false); } },
-                    { label: 'System Settings', action: () => { setActiveSystemModal('settings'); setShowProfileMenu(false); } },
-                    { label: 'Audit Logs', action: () => { setActiveSystemModal('audit'); setShowProfileMenu(false); } },
-                  ].map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={item.action}
-                      style={{ 
-                        width: '100%', padding: '10px 16px', border: 'none', background: 'none',
-                        textAlign: 'left', fontSize: 12, color: '#475569', fontWeight: 600,
-                        cursor: 'pointer', display: 'block', transition: 'background 0.15s'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#F1F5F9'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
-                  <div style={{ borderTop: '1px solid #F1F5F9', marginTop: 6, paddingTop: 6 }}>
-                    <button
-                      onClick={async () => {
-                        setShowProfileMenu(false);
-                        await signOut({ callbackUrl: '/login' });
-                      }}
-                      style={{ 
-                        width: '100%', padding: '10px 16px', border: 'none', background: 'none',
-                        textAlign: 'left', fontSize: 12, color: '#EF4444', fontWeight: 700,
-                        cursor: 'pointer', display: 'block'
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
-                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
-                    >
-                      Sign Out
-                    </button>
+                <Bell size={15} />
+                {unreadCount > 0 && (
+                  <span style={{ position: 'absolute', top: 3, right: 3, width: 8, height: 8, background: '#EF4444', borderRadius: '50%' }} />
+                )}
+              </button>
+
+              {/* ── Notifications Dropdown ── */}
+              {showNotifications && (
+                <div 
+                  style={{ 
+                    position: 'absolute', top: 44, right: 0, width: 330, 
+                    background: 'white', border: '1px solid #E4E9F2', borderRadius: 12, 
+                    boxShadow: '0 12px 36px rgba(0,0,0,0.15)', zIndex: 1000, overflow: 'hidden',
+                    animation: 'modalIn 0.18s ease'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1A2E' }}>Notifications</span>
+                      {unreadCount > 0 && (
+                        <span style={{ background: '#EF4444', color: 'white', fontSize: 10, fontWeight: 800, padding: '1px 6px', borderRadius: 10 }}>
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button 
+                        onClick={handleMarkAllRead} 
+                        style={{ border: 'none', background: 'none', color: '#4F8EF7', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        Mark all read
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ maxHeight: 320, overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: 24, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>No alerts found</div>
+                    ) : (
+                      notifications.map((n: any) => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => handleNotificationClick(n)}
+                          style={{ 
+                            padding: '12px 16px', borderBottom: '1px solid #F8FAFC', cursor: 'pointer',
+                            background: n.read ? 'white' : 'rgba(79,142,247,0.05)',
+                            transition: 'background 0.15s'
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+                          onMouseLeave={e => e.currentTarget.style.background = n.read ? 'white' : 'rgba(79,142,247,0.05)'}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 3 }}>
+                            <span style={{ fontSize: 12, fontWeight: n.read ? 600 : 800, color: '#1A1A2E' }}>{n.title}</span>
+                            <span style={{ fontSize: 10, color: '#94A3B8' }}>{n.time}</span>
+                          </div>
+                          <div style={{ fontSize: 11, color: '#64748B', lineHeight: 1.4 }}>{n.desc}</div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </header>
+              )}
+            </div>
+          </header>
 
-        {/* ── Tab Navigation ── */}
-        <div style={{ background: 'white', borderBottom: '1px solid #E4E9F2', padding: '0 28px', display: 'flex', gap: 0 }}>
-          {([
-            { id: 'overview', label: 'Overview', icon: <BarChart2 size={14} /> },
-            { id: 'agencies', label: 'Agencies', icon: <Building2 size={14} /> },
-            { id: 'users', label: 'Users', icon: <Users size={14} /> },
-            { id: 'system', label: 'System Health', icon: <Server size={14} /> },
-            { id: 'billing', label: 'Billing', icon: <DollarSign size={14} /> },
-            { id: 'broadcast', label: 'Broadcasts', icon: <Megaphone size={14} /> },
-            { id: 'feature-flags', label: 'Feature Flags', icon: <SlidersHorizontal size={14} /> },
-            { id: 'integrations', label: 'Integrations', icon: <Zap size={14} /> },
-          ] as { id: Tab; label: string; icon: React.ReactNode }[]).map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '14px 18px', fontSize: 13, fontWeight: 600,
-                border: 'none', background: 'none', cursor: 'pointer',
-                borderBottom: activeTab === tab.id ? '2px solid #4F8EF7' : '2px solid transparent',
-                color: activeTab === tab.id ? '#4F8EF7' : '#6B7CA8',
-                marginBottom: -1, transition: 'all 0.15s',
-              }}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{ padding: '28px', maxWidth: 1400, margin: '0 auto' }}>
+          <div style={{ padding: '28px', maxWidth: 1400, margin: '0 auto', width: '100%' }}>
 
           {/* ═══ AGENCY DASHBOARD VIEW ═══ */}
           {agencyDashView ? (
@@ -2074,6 +2180,232 @@ export default function SuperAdminDashboard() {
                   <span>{filteredAgencies.length} of {agencies.length} agencies</span>
                   <span>Total MRR from filtered: <strong style={{ color: '#2563EB' }}>${filteredAgencies.reduce((s, a) => s + a.mrr, 0).toLocaleString()}/mo</strong></span>
                 </div>
+              </div>
+            </>
+          )}
+
+          {/* ═══ CLIENTS TAB (INTERCONNECTED TRANSPARENCY) ═══ */}
+          {activeTab === 'clients' && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>All Clients Across Agencies</h1>
+                  <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>
+                    Real-time list of all client websites and accounts managed on RankFlow
+                  </p>
+                </div>
+                <div style={{ padding: '8px 16px', background: '#EBF2FF', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#2563EB' }}>
+                  Total Clients: {allClients.length}
+                </div>
+              </div>
+
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E4E9F2' }}>
+                      {['Client Name', 'Domain', 'Managing Agency', 'Contact', 'Reports', 'Messages', 'SERanking Status', 'Added Date'].map(h => (
+                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94A3B8' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allClients.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+                          No clients registered in the platform database yet.
+                        </td>
+                      </tr>
+                    ) : allClients.map(c => (
+                      <tr key={c.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '14px 16px', fontWeight: 800, color: '#1A1A2E', fontSize: 14 }}>{c.name}</td>
+                        <td style={{ padding: '14px 16px', color: '#2563EB', fontWeight: 600, fontSize: 13 }}>
+                          <a href={`https://${c.domain}`} target="_blank" rel="noreferrer" style={{ color: '#2563EB', textDecoration: 'none' }}>
+                            {c.domain} ↗
+                          </a>
+                        </td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <span style={{ padding: '4px 10px', background: '#F1F5F9', borderRadius: 6, fontSize: 12, fontWeight: 700, color: '#1A1A2E' }}>
+                            {c.agencyName}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 12, color: '#475569' }}>
+                          <div>{c.contactName}</div>
+                          <div style={{ fontSize: 11, color: '#94A3B8' }}>{c.contactEmail}</div>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 700, color: '#10B981' }}>{c.reportsCount}</td>
+                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 700, color: '#4F8EF7' }}>{c.messagesCount}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          {c.serankingLinked ? (
+                            <span style={{ padding: '3px 9px', borderRadius: 20, background: '#ECFDF5', color: '#059669', fontSize: 11, fontWeight: 700 }}>Linked</span>
+                          ) : (
+                            <span style={{ padding: '3px 9px', borderRadius: 20, background: '#FFFBEB', color: '#D97706', fontSize: 11, fontWeight: 700 }}>Manual / Unlinked</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 12, color: '#94A3B8' }}>{c.joined}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {/* ═══ REPORTS TAB (TRANSPARENT OVERSIGHT) ═══ */}
+          {activeTab === 'reports' && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>All Platform Reports</h1>
+                  <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>
+                    Audit, preview, and track engagement for all SEO reports generated across the platform
+                  </p>
+                </div>
+                <div style={{ padding: '8px 16px', background: '#ECFDF5', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#059669' }}>
+                  Total Generated: {allReports.length}
+                </div>
+              </div>
+
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E4E9F2' }}>
+                      {['Report Period', 'Client', 'Agency', 'Status', 'Client Views', 'Generated Date', 'Actions'].map(h => (
+                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94A3B8' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allReports.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+                          No reports generated in the platform database yet.
+                        </td>
+                      </tr>
+                    ) : allReports.map(r => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '14px 16px', fontWeight: 800, color: '#1A1A2E', fontSize: 13 }}>{r.period}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <div style={{ fontWeight: 700, color: '#1A1A2E', fontSize: 13 }}>{r.clientName}</div>
+                          <div style={{ fontSize: 11, color: '#94A3B8' }}>{r.clientDomain}</div>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 12, fontWeight: 700, color: '#475569' }}>{r.agencyName}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: r.status === 'done' ? '#ECFDF5' : '#FFFBEB', color: r.status === 'done' ? '#059669' : '#D97706' }}>
+                            {r.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 800, color: '#2563EB' }}>
+                          👁️ {r.viewCount} views
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 12, color: '#94A3B8' }}>{r.generatedAt}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <button
+                            onClick={() => setSelectedReportPreview({ id: r.id, title: `${r.period} Report`, client: r.clientName, created: r.generatedAt, type: 'Full Audit', views: r.viewCount })}
+                            style={{ padding: '6px 12px', background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+                            <Eye size={12} /> Preview
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {/* ═══ MESSAGES TAB (COMMUNICATION OVERVIEW) ═══ */}
+          {activeTab === 'messages' && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Client Communication Threads</h1>
+                  <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>
+                    Full transparency oversight of all message exchanges between Clients and Agencies
+                  </p>
+                </div>
+                <div style={{ padding: '8px 16px', background: '#F5F3FF', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#8B5CF6' }}>
+                  Total Threads: {allMessages.length}
+                </div>
+              </div>
+
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: '#F8FAFC', borderBottom: '1px solid #E4E9F2' }}>
+                      {['Date & Time', 'Sender', 'Direction', 'Client', 'Agency', 'Subject & Message'].map(h => (
+                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#94A3B8' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allMessages.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+                          No client messages recorded in the database yet.
+                        </td>
+                      </tr>
+                    ) : allMessages.map(m => (
+                      <tr key={m.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '14px 16px', fontSize: 12, color: '#64748B', whiteSpace: 'nowrap' }}>{m.formattedTime}</td>
+                        <td style={{ padding: '14px 16px', fontWeight: 800, color: '#1A1A2E', fontSize: 13 }}>{m.senderName}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: m.isFromAgency ? '#EBF2FF' : '#FEF3C7', color: m.isFromAgency ? '#2563EB' : '#D97706' }}>
+                            {m.isFromAgency ? 'Agency → Client' : 'Client → Agency'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 700, color: '#1A1A2E' }}>{m.clientName}</td>
+                        <td style={{ padding: '14px 16px', fontSize: 13, color: '#475569' }}>{m.agencyName}</td>
+                        <td style={{ padding: '14px 16px' }}>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: '#1A1A2E', marginBottom: 2 }}>{m.subject}</div>
+                          <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.4 }}>{m.body}</div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {/* ═══ SYSTEM ACTIVITY STREAM TAB ═══ */}
+          {activeTab === 'activity' && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <div>
+                  <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1A2E' }}>Real-Time System Activity Feed</h1>
+                  <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>
+                    Live audit logs of agency, client, report, and message events across RankFlow
+                  </p>
+                </div>
+                <button onClick={fetchLiveData} style={btnSecondary}>
+                  <RefreshCw size={13} className={isRefreshing ? 'spinner' : ''} /> Refresh Stream
+                </button>
+              </div>
+
+              <div style={{ background: 'white', border: '1px solid #E4E9F2', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(26,26,46,0.06)' }}>
+                {activityFeed.length === 0 ? (
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+                    No activity logs recorded yet.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {activityFeed.map((item) => (
+                      <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '12px 16px', background: '#F8FAFC', borderRadius: 10, border: '1px solid #E4E9F2' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 9, background: '#EBF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563EB', fontWeight: 800, fontSize: 14 }}>
+                          ⚡
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A1A2E' }}>{item.title}</span>
+                            <span style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>{item.time}</span>
+                          </div>
+                          <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.4 }}>{item.detail}</div>
+                          <div style={{ fontSize: 11, color: '#2563EB', fontWeight: 700, marginTop: 4 }}>Agency: {item.agency}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -2650,10 +2982,12 @@ export default function SuperAdminDashboard() {
 
           </>)}
         </div>
-      </div>
+      </main>
+    </div>
 
       {/* ─── Modals ─── */}
       {viewAgency && <AgencyDetailModal agency={viewAgency} onClose={() => setViewAgency(null)} onVisitDashboard={() => { setAgencyDashView(viewAgency); setActiveTab('agencies'); }} />}
+      {selectedReportPreview && <ReportPreviewModal report={selectedReportPreview} agencyName="RankFlow Platform" onClose={() => setSelectedReportPreview(null)} />}
       {showInvite && <InviteAgencyModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
       {showCreateUser && (
         <CreateUserModal
