@@ -21,11 +21,7 @@ const COLOR_PRESETS = [
   { name: 'Orange', value: '#F97316' }, { name: 'Navy', value: '#1A3A5C' },
 ];
 
-const DEMO_TEAM = [
-  { name: 'Alex Morgan',    email: 'demo@rankflow.app',            role: 'Admin',   status: 'Active',  lastSeen: '2 min ago', avatar: 'AM' },
-  { name: 'Sarah Reynolds', email: 'sarah@digital-horizons.com',   role: 'Manager', status: 'Active',  lastSeen: '1 hr ago',  avatar: 'SR' },
-  { name: 'James Walker',   email: 'james@digital-horizons.com',   role: 'Analyst', status: 'Invited', lastSeen: '—',         avatar: 'JW' },
-];
+
 
 const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }> = {
   Admin:   { bg: 'rgba(239,68,68,0.06)',   color: '#DC2626', border: 'rgba(239,68,68,0.15)' },

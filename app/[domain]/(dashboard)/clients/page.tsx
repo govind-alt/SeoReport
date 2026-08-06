@@ -29,15 +29,7 @@ const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').to
 const getColor = (name: string) => NAV_COLORS[name.charCodeAt(0) % NAV_COLORS.length];
 const fmtDate = (d?: string) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
-/* ─── Demo Clients ─── */
-const DEMO_CLIENTS: Client[] = [
-  { id: 'd1', name: 'Acme Corporation', domain: 'acme.com', industry: 'Technology', healthScore: 92, top10Count: 237, trafficEst: 84200, lastReportDate: '2024-06-20', status: 'active' },
-  { id: 'd2', name: 'TechVision Inc', domain: 'techvision.io', industry: 'Technology', healthScore: 84, top10Count: 189, trafficEst: 61000, lastReportDate: '2024-06-18', status: 'active' },
-  { id: 'd3', name: 'GrowthLabs', domain: 'growthlabs.co', industry: 'Marketing Agency', healthScore: 63, top10Count: 74, trafficEst: 28400, lastReportDate: '2024-06-15', status: 'active' },
-  { id: 'd4', name: 'NexaRetail', domain: 'nexaretail.com', industry: 'E-commerce', healthScore: 78, top10Count: 156, trafficEst: 53200, lastReportDate: '2024-06-22', status: 'active' },
-  { id: 'd5', name: 'BloomAgency', domain: 'bloomagency.co', industry: 'Marketing Agency', healthScore: 88, top10Count: 211, trafficEst: 71400, lastReportDate: '2024-06-19', status: 'active' },
-  { id: 'd6', name: 'HealthPlus', domain: 'healthplus.io', industry: 'Healthcare', healthScore: 55, top10Count: 42, trafficEst: 18900, lastReportDate: '2024-06-10', status: 'paused' },
-];
+
 
 /* ─── Add Client Modal ─── */
 function AddClientModal({ open, onClose, onSuccess }: { open: boolean; onClose: () => void; onSuccess: (c: Client) => void }) {
@@ -154,9 +146,9 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
       .then(r => r.ok ? r.json() : [])
       .then(data => {
         if (Array.isArray(data) && data.length > 0) setClients(data);
-        else setClients(DEMO_CLIENTS);
+        else setClients([]);
       })
-      .catch(() => setClients(DEMO_CLIENTS))
+      .catch(() => setClients([]))
       .finally(() => setLoading(false));
   }, []);
 

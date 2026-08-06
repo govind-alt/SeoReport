@@ -14,17 +14,7 @@ import {
   Activity, Zap, CheckCircle2, AlertCircle, Circle
 } from 'lucide-react';
 
-/* ─── Chart data (static baseline for visual continuity) ─── */
-const demoTraffic = [
-  { month: 'Jan', sessions: 48200 }, { month: 'Feb', sessions: 53400 },
-  { month: 'Mar', sessions: 61000 }, { month: 'Apr', sessions: 58700 },
-  { month: 'May', sessions: 69800 }, { month: 'Jun', sessions: 84200 },
-];
-const demoKeywords = [
-  { month: 'Jan', top3: 38, top10: 142 }, { month: 'Feb', top3: 42, top10: 158 },
-  { month: 'Mar', top3: 49, top10: 174 }, { month: 'Apr', top3: 53, top10: 189 },
-  { month: 'May', top3: 61, top10: 211 }, { month: 'Jun', top3: 68, top10: 237 },
-];
+
 
 interface Summary {
   totalClients: number;
@@ -111,12 +101,14 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
     }
   };
 
+  const isNewAgency = summary !== null && summary.totalClients === 0;
+
   const kpis = [
     {
       label: 'Active Clients',
-      value: summary?.totalClients ?? 12,
-      trend: '+2 this month',
-      dir: 'up',
+      value: summary?.totalClients ?? '—',
+      trend: summary?.totalClients === 0 ? 'Add your first client' : '+2 this month',
+      dir: summary?.totalClients === 0 ? 'neutral' : 'up',
       icon: <Users size={20} />,
       color: 'var(--primary)',
       bg: 'var(--primary-light)',
@@ -124,9 +116,9 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
     },
     {
       label: 'Reports Generated',
-      value: summary?.totalReports ?? 48,
-      trend: `${summary?.reportsThisMonth ?? 8} this month`,
-      dir: 'up',
+      value: summary?.totalReports ?? '—',
+      trend: summary?.reportsThisMonth !== undefined ? `${summary.reportsThisMonth} this month` : 'No reports yet',
+      dir: (summary?.reportsThisMonth ?? 0) > 0 ? 'up' : 'neutral',
       icon: <FileText size={20} />,
       color: '#10B981',
       bg: '#ECFDF5',
@@ -134,9 +126,9 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
     },
     {
       label: 'Avg Health Score',
-      value: `${summary?.avgHealthScore ?? 79}%`,
-      trend: '+4pts since last month',
-      dir: 'up',
+      value: summary?.avgHealthScore ? `${summary.avgHealthScore}%` : '—',
+      trend: summary?.avgHealthScore ? '+4pts since last month' : 'Connect a client to track',
+      dir: summary?.avgHealthScore ? 'up' : 'neutral',
       icon: <TrendingUp size={20} />,
       color: 'var(--primary)',
       bg: 'var(--primary-light)',
@@ -144,9 +136,9 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
     },
     {
       label: 'Pending Reports',
-      value: summary?.pendingReports ?? 3,
-      trend: '2 due this week',
-      dir: 'neutral',
+      value: summary?.pendingReports ?? '—',
+      trend: (summary?.pendingReports ?? 0) > 0 ? `${summary!.pendingReports} due this week` : 'All caught up',
+      dir: (summary?.pendingReports ?? 0) > 0 ? 'neutral' : 'up',
       icon: <Clock size={20} />,
       color: '#F59E0B',
       bg: '#FFFBEB',
@@ -208,20 +200,20 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
             </div>
             <div className="hero-stats">
               <div>
-                <div className="hero-stat-val">{summary?.totalClients ?? 12}</div>
+                <div className="hero-stat-val">{summary?.totalClients ?? '—'}</div>
                 <div className="hero-stat-lbl">Active Clients</div>
               </div>
               <div>
-                <div className="hero-stat-val">{summary?.reportsThisMonth ?? 8}</div>
+                <div className="hero-stat-val">{summary?.reportsThisMonth ?? '—'}</div>
                 <div className="hero-stat-lbl">Reports This Month</div>
               </div>
               <div>
-                <div className="hero-stat-val">{summary?.avgHealthScore ?? 79}%</div>
+                <div className="hero-stat-val">{summary?.avgHealthScore ? `${summary.avgHealthScore}%` : '—'}</div>
                 <div className="hero-stat-lbl">Avg Health Score</div>
               </div>
               <div>
-                <div className="hero-stat-val">+24%</div>
-                <div className="hero-stat-lbl">Traffic Growth</div>
+                <div className="hero-stat-val">{summary?.totalReports ?? '—'}</div>
+                <div className="hero-stat-lbl">Total Reports</div>
               </div>
             </div>
           </div>
@@ -249,7 +241,39 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
           ))}
         </div>
 
-        {/* ── Charts Row ── */}
+        {/* ── Onboarding Banner for new agencies ── */}
+        {isNewAgency && (
+          <div style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)', borderRadius: 16, padding: '28px 32px', marginBottom: 20, border: '1px solid rgba(79,142,247,0.25)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 11, color: '#4F8EF7', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>🚀 Getting Started</div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, color: 'white', margin: '0 0 8px' }}>Set up your agency workspace</h2>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.6 }}>Complete these steps to get the most out of RankFlow</p>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 24 }}>
+              {[
+                { step: '1', title: 'Add your first client', desc: 'Connect a client website to start tracking SEO performance', href: `${basePath}/clients`, icon: '👤', done: false },
+                { step: '2', title: 'Configure agency branding', desc: 'Set your logo, brand colors, and white-label domain', href: `${basePath}/settings`, icon: '🎨', done: false },
+                { step: '3', title: 'Connect SE Ranking', desc: 'Link your SE Ranking account to sync keyword data', href: `${basePath}/settings`, icon: '📊', done: false },
+                { step: '4', title: 'Generate your first report', desc: 'Create a professional SEO report for your client', href: `${basePath}/reports`, icon: '📄', done: false },
+              ].map((item, i) => (
+                <Link key={i} href={item.href} style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '16px 18px', display: 'block', textDecoration: 'none', transition: 'all 0.2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(79,142,247,0.2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.07)')}
+                >
+                  <div style={{ fontSize: 22, marginBottom: 8 }}>{item.icon}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'white', marginBottom: 4 }}>Step {item.step}: {item.title}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{item.desc}</div>
+                  <div style={{ marginTop: 10, fontSize: 11, color: '#4F8EF7', fontWeight: 700 }}>Get started →</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Charts Row — only show when there is real data ── */}
+        {!isNewAgency && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
           {/* Traffic Chart */}
           <div className="chart-card">
@@ -258,30 +282,12 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <div className="chart-title">Organic Traffic</div>
                 <div className="chart-subtitle">Total sessions across all clients</div>
               </div>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 6,
-                padding: '4px 10px', borderRadius: 20,
-                background: '#ECFDF5', color: '#059669',
-                fontSize: 11, fontWeight: 700,
-              }}>
-                <ArrowUpRight size={12} /> +24.3%
-              </div>
             </div>
-            <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={demoTraffic} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="trafficGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4F8EF7" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="#4F8EF7" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E4E9F2" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="sessions" name="Sessions" stroke="#4F8EF7" strokeWidth={2.5} fill="url(#trafficGrad)" dot={false} activeDot={{ r: 5, fill: '#4F8EF7', stroke: 'white', strokeWidth: 2 }} />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              <Activity size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
+              <div style={{ fontWeight: 600 }}>Traffic data will appear here</div>
+              <div style={{ fontSize: 12, marginTop: 4 }}>Add clients and connect SE Ranking to see real data</div>
+            </div>
           </div>
 
           {/* Keywords Chart */}
@@ -291,23 +297,15 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <div className="chart-title">Keyword Rankings</div>
                 <div className="chart-subtitle">Top 3 &amp; Top 10 positions tracked</div>
               </div>
-              <div className="chart-legend">
-                <div className="legend-item"><div className="legend-dot" style={{ background: '#1A1A2E' }}></div> Top 3</div>
-                <div className="legend-item"><div className="legend-dot" style={{ background: '#4F8EF7' }}></div> Top 10</div>
-              </div>
             </div>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={demoKeywords} margin={{ top: 4, right: 4, left: -16, bottom: 0 }} barGap={4}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E4E9F2" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="top3" name="Top 3" fill="#1A1A2E" radius={[4, 4, 0, 0]} maxBarSize={20} />
-                <Bar dataKey="top10" name="Top 10" fill="#4F8EF7" radius={[4, 4, 0, 0]} maxBarSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              <TrendingUp size={32} style={{ marginBottom: 12, opacity: 0.3 }} />
+              <div style={{ fontWeight: 600 }}>Rankings will appear here</div>
+              <div style={{ fontSize: 12, marginTop: 4 }}>Connect SE Ranking to start tracking keyword positions</div>
+            </div>
           </div>
         </div>
+        )}
 
         {/* ── Bottom Row: Activity + Client Health ── */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20 }}>
