@@ -1413,9 +1413,10 @@ export default function SuperAdminDashboard() {
     { id: '4', title: 'API Threshold Exceeded', desc: 'Nexus SEO reached 80% keyword request limit.', time: '1 day ago', read: true },
   ]);
 
-  // Data state
-  const [agencies, setAgencies] = useState<Agency[]>(initialAgencies);
-  const [users, setUsers] = useState<PlatformUser[]>(initialUsers);
+  // Data state — start empty, real data loaded from API
+  const [agencies, setAgencies] = useState<Agency[]>([]);
+  const [users, setUsers] = useState<PlatformUser[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [adminStats, setAdminStats] = useState<any>(null);
   const [allClients, setAllClients] = useState<any[]>([]);
   const [allReports, setAllReports] = useState<any[]>([]);
@@ -1424,7 +1425,8 @@ export default function SuperAdminDashboard() {
   const [selectedReportPreview, setSelectedReportPreview] = useState<any>(null);
 
   // Fetch live system data from API
-  const fetchLiveData = useCallback(() => {
+  const fetchLiveData = useCallback((showLoading = false) => {
+    if (showLoading) setIsLoading(true);
     setIsRefreshing(true);
     Promise.all([
       fetch('/api/admin/stats').then(r => r.ok ? r.json() : null),
@@ -1437,12 +1439,9 @@ export default function SuperAdminDashboard() {
       fetch('/api/admin/notifications').then(r => r.ok ? r.json() : null),
     ]).then(([statsData, agenciesData, usersData, clientsData, reportsData, messagesData, activityData, notificationsData]) => {
       if (statsData) setAdminStats(statsData);
-      if (agenciesData && Array.isArray(agenciesData) && agenciesData.length > 0) {
-        setAgencies(agenciesData);
-      }
-      if (usersData && Array.isArray(usersData) && usersData.length > 0) {
-        setUsers(usersData);
-      }
+      // Always replace with real data (even empty array clears stale state)
+      if (agenciesData && Array.isArray(agenciesData)) setAgencies(agenciesData);
+      if (usersData && Array.isArray(usersData)) setUsers(usersData);
       if (clientsData && Array.isArray(clientsData)) setAllClients(clientsData);
       if (reportsData && Array.isArray(reportsData)) setAllReports(reportsData);
       if (messagesData && Array.isArray(messagesData)) setAllMessages(messagesData);
@@ -1451,12 +1450,12 @@ export default function SuperAdminDashboard() {
         setNotifications(notificationsData);
       }
     }).catch(err => console.error('Error fetching admin live data:', err))
-      .finally(() => setIsRefreshing(false));
+      .finally(() => { setIsRefreshing(false); setIsLoading(false); });
   }, []);
 
   useEffect(() => {
-    fetchLiveData();
-    const interval = setInterval(fetchLiveData, 15000);
+    fetchLiveData(true); // true = show loading spinner on first load
+    const interval = setInterval(() => fetchLiveData(false), 30000);
     return () => clearInterval(interval);
   }, [fetchLiveData]);
 
@@ -2103,10 +2102,20 @@ export default function SuperAdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAgencies.length === 0 ? (
+                    {isLoading ? (
+                      Array.from({ length: 3 }).map((_, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                          {Array.from({ length: 9 }).map((_, j) => (
+                            <td key={j} style={{ padding: '13px 16px' }}>
+                              <div style={{ height: 14, background: '#F1F5F9', borderRadius: 6, width: j === 0 ? 140 : j === 8 ? 100 : 60, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                            </td>
+                          ))}
+                        </tr>
+                      ))
+                    ) : filteredAgencies.length === 0 ? (
                       <tr>
                         <td colSpan={9} style={{ padding: '40px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
-                          No agencies match your filters.
+                          No agencies found.
                         </td>
                       </tr>
                     ) : filteredAgencies.map(a => (
