@@ -24,16 +24,20 @@ export async function PATCH(request: Request) {
 
     const client = invitation.client;
 
-    if (client.reportSchedule) {
-      await prisma.reportSchedule.update({
-        where: { clientId: client.id },
-        data: {
-          ...(dayOfMonth !== undefined ? { dayOfMonth: Number(dayOfMonth) } : {}),
-          ...(autoSend !== undefined ? { autoSend: Boolean(autoSend) } : {}),
-        },
-      });
-    }
-    // If no schedule exists yet, it will be created by the agency admin
+    const data = {
+      ...(dayOfMonth !== undefined ? { dayOfMonth: Number(dayOfMonth) } : {}),
+      ...(autoSend !== undefined ? { autoSend: Boolean(autoSend) } : {}),
+    };
+
+    await prisma.reportSchedule.upsert({
+      where: { clientId: client.id },
+      update: data,
+      create: {
+        clientId: client.id,
+        agencyId: client.agencyId,
+        ...data,
+      },
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {

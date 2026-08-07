@@ -33,24 +33,25 @@ export async function GET(request: Request) {
       });
 
       if (!existingReport) {
-        // Generate new report record
+        // Generate new report record with 'generating' status
         const report = await prisma.report.create({
           data: {
             clientId: client.id,
             periodStart: firstOfMonth,
             periodEnd: lastOfMonth,
-            status: 'done',
+            status: 'generating',
             sectionsJson: JSON.stringify({ keywords: true, backlinks: true, audit: true, analytics: true }),
           }
         });
 
-        // Simulate sending the email
-        if (client.contactEmail) {
-          const currentMonth = now.toLocaleString('default', { month: 'long', year: 'numeric' });
-          await sendReportReadyEmail(client.contactEmail, client.name, `${currentMonth} SEO Report`, report.id, client.agency.name);
-        }
+        // Trigger the actual processing pipeline
+        const processUrl = new URL(`/api/reports/${report.id}/process`, request.url);
+        // We fire and forget the fetch request. In a robust setup, use Inngest/Queue here.
+        fetch(processUrl.toString(), { method: 'POST' }).catch(err => {
+          console.error(`[CRON] Failed to trigger process for report ${report.id}:`, err);
+        });
 
-        results.push({ clientId: client.id, status: 'created', reportId: report.id });
+        results.push({ clientId: client.id, status: 'triggered', reportId: report.id });
       } else {
         results.push({ clientId: client.id, status: 'skipped (already exists)' });
       }

@@ -193,9 +193,23 @@ export async function POST(
         generatedAt: today,
       },
       include: {
-        client: { select: { id: true, name: true, domain: true } },
+        client: { select: { id: true, name: true, domain: true, contactEmail: true, agency: { select: { name: true } }, reportSchedule: true } },
       },
     });
+
+    if (updatedReport.client.reportSchedule?.autoSend && updatedReport.client.contactEmail) {
+      const { sendReportReadyEmail } = await import('@/lib/email');
+      const periodString = new Date(report.periodStart).toLocaleString('default', { month: 'long', year: 'numeric' });
+      await sendReportReadyEmail(
+        updatedReport.client.contactEmail,
+        updatedReport.client.name,
+        `${periodString} SEO Report`,
+        id,
+        updatedReport.client.agency.name
+      ).catch(err => {
+        console.error('[PROCESS] Failed to send report ready email:', err);
+      });
+    }
 
     console.log(`[PROCESS] Report ${id} marked as done.`);
     return NextResponse.json({ status: 'done', report: updatedReport });

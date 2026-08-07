@@ -82,8 +82,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send invite email when Resend is configured (sendWelcomeEmail)
+    // Send invite email using Resend
+    const { sendWelcomeEmail } = await import('@/lib/email');
+    const agency = await prisma.agency.findUnique({
+      where: { id: session.user.agencyId as string },
+      select: { name: true, slug: true, subdomain: true },
+    });
 
+    if (agency) {
+      const slug = agency.slug || agency.subdomain || 'demo';
+      const dashboardUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${slug}/login`;
+      await sendWelcomeEmail(email, name, agency.name, dashboardUrl).catch(err => {
+        console.error('[AGENCY_TEAM_POST] Email send failed:', err);
+      });
+    }
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: unknown) {
     console.error('[AGENCY_TEAM_POST]', error);
