@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendAgencyReplyEmail } from '@/lib/email';
 
 export async function GET(req: NextRequest) {
   try {
@@ -78,29 +79,17 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Send email notification to client
+    // Send real email notification to the client (fire-and-forget)
     const client = await prisma.client.findUnique({ where: { id: clientId } });
-    if (client && client.contactEmail) {
-      console.log(`
-==================================================
-[SIMULATED EMAIL DISPATCH TO CLIENT]
-To: ${client.contactEmail}
-From: support@${user.agency?.slug}.com
-Subject: New response to your inquiry: ${subject || 'Reply from support'}
-
-Hello ${client.contactName || 'Client'},
-
-Your SEO agency has replied to your inquiry:
-
---------------------------------------------------
-Message:
-${body}
---------------------------------------------------
-
-Please log in to your secure client portal to view the full conversation:
-http://localhost:3000/client/login
-==================================================
-      `);
+    if (client?.contactEmail) {
+      const portalUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/client/dashboard#messages`;
+      sendAgencyReplyEmail(
+        client.contactEmail,
+        client.contactName || client.name,
+        body,
+        user.agency?.name || 'Your SEO Agency',
+        portalUrl
+      ).catch(err => console.error('[Email reply to client] Failed:', err));
     }
 
     return NextResponse.json(message);

@@ -199,6 +199,33 @@ export async function sendClientMessageNotificationEmail(
   });
 }
 
+/** Agency reply notification to client */
+export async function sendAgencyReplyEmail(
+  clientEmail: string,
+  clientName: string,
+  messageBody: string,
+  agencyName: string,
+  portalUrl: string
+) {
+  const html = baseTemplate(`
+    <h2>New reply from ${agencyName} 💬</h2>
+    <p>Hi ${clientName},</p>
+    <p>Your SEO agency <strong>${agencyName}</strong> has responded to your inquiry in the client portal:</p>
+    <div style="background:#1e293b;border-left:4px solid #dc2626;padding:16px 20px;border-radius:0 8px 8px 0;margin:20px 0">
+      <div style="font-size:12px;color:#dc2626;font-weight:700;margin-bottom:8px;text-transform:uppercase">Agency Reply</div>
+      <p style="margin:0;color:#e2e8f0;white-space:pre-wrap">${messageBody}</p>
+    </div>
+    <a href="${portalUrl}" class="btn">View Full Conversation →</a>
+    <div class="muted">You received this because you are a client of <strong>${agencyName}</strong>. Log in to your portal to reply.</div>
+  `, agencyName);
+
+  return sendEmail({
+    to: clientEmail,
+    subject: `New reply from ${agencyName} — SEO Agency Update`,
+    html,
+  });
+}
+
 /** Support ticket notification */
 export async function sendSupportTicketEmail(
   adminEmail: string,

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendClientMessageNotificationEmail } from '@/lib/email';
+
 
 export async function GET() {
   try {
@@ -94,20 +96,28 @@ export async function POST(request: Request) {
       }
     }).catch(() => null);
 
-    // Send email notification to agency/support team email
-    const { sendClientMessageNotificationEmail } = require('@/lib/email');
+    // Send email notification to ALL agency admin users (fire-and-forget)
     const agency = await prisma.agency.findUnique({
       where: { id: resolvedClient.agencyId },
-      include: { users: { where: { role: 'admin' }, take: 1 } }
+      include: { users: { where: { role: 'admin' } } }
     });
-    const targetEmail = agency?.billingEmail || agency?.users[0]?.email || 'support@rankflow.app';
-    await sendClientMessageNotificationEmail(
-      targetEmail,
-      resolvedClient.name,
-      subject || 'New Client Message',
-      body,
-      agency?.name || 'Agency'
-    );
+
+    const adminEmails = (agency?.users ?? []).map(u => u.email).filter(Boolean) as string[];
+    const targetEmails = adminEmails.length > 0
+      ? adminEmails
+      : [agency?.billingEmail || 'support@rankflow.app'];
+
+    Promise.all(
+      targetEmails.map(email =>
+        sendClientMessageNotificationEmail(
+          email,
+          resolvedClient.name,
+          subject || 'New Client Message',
+          body,
+          agency?.name || 'Agency'
+        )
+      )
+    ).catch(err => console.error('[Email notify agency] Failed:', err));
 
     return NextResponse.json({ success: true, message });
   } catch (error) {
