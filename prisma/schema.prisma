@@ -21,6 +21,7 @@ model Agency {
   subdomain       String?  @unique
   plan            String   @default("starter") // starter, pro, agency
   billingEmail    String?
+  notificationEmail String? // Dedicated email for client message/query alerts
   customDomain    String?
   serankingApiKey String?  // AES-256 encrypted
   brandingJson    String?  // { primaryColor, logoUrl, accentColor }

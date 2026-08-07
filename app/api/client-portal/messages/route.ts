@@ -96,17 +96,25 @@ export async function POST(request: Request) {
       }
     }).catch(() => null);
 
-    // Send email notification to ALL agency admin users (fire-and-forget)
+    // Send email notification — priority: notificationEmail > admin users > billingEmail
     const agency = await prisma.agency.findUnique({
       where: { id: resolvedClient.agencyId },
       include: { users: { where: { role: 'admin' } } }
     });
 
-    const adminEmails = (agency?.users ?? []).map(u => u.email).filter(Boolean) as string[];
-    const targetEmails = adminEmails.length > 0
-      ? adminEmails
-      : [agency?.billingEmail || 'support@rankflow.app'];
+    let targetEmails: string[];
+    if (agency?.notificationEmail) {
+      // Agency has set a dedicated notification email — use it
+      targetEmails = [agency.notificationEmail];
+    } else {
+      // Fall back to all admin users, then billing email
+      const adminEmails = (agency?.users ?? []).map(u => u.email).filter(Boolean) as string[];
+      targetEmails = adminEmails.length > 0
+        ? adminEmails
+        : [agency?.billingEmail || 'support@rankflow.app'];
+    }
 
+    // Fire-and-forget — never let email failure block the response
     Promise.all(
       targetEmails.map(email =>
         sendClientMessageNotificationEmail(

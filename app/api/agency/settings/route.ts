@@ -7,6 +7,7 @@ import { encrypt } from '@/lib/encryption';
 const SettingsSchema = z.object({
   name: z.string().min(2).optional(),
   billingEmail: z.string().email().optional(),
+  notificationEmail: z.string().email().optional(),
   customDomain: z.string().optional(),
   serankingApiKey: z.string().optional(),
   brandingJson: z.string().optional(),
@@ -24,7 +25,7 @@ export async function GET() {
       where: { id: session.user.agencyId as string },
       select: {
         id: true, name: true, slug: true, subdomain: true,
-        plan: true, billingEmail: true, customDomain: true, brandingJson: true,
+        plan: true, billingEmail: true, notificationEmail: true, customDomain: true, brandingJson: true,
         serankingApiKey: true,
         createdAt: true,
       },
@@ -76,7 +77,7 @@ export async function PATCH(request: Request) {
       data: updateData,
       select: {
         id: true, name: true, slug: true, plan: true,
-        billingEmail: true, customDomain: true, brandingJson: true,
+        billingEmail: true, notificationEmail: true, customDomain: true, brandingJson: true,
         serankingApiKey: true,
       },
     });

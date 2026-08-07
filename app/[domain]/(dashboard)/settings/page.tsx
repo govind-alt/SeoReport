@@ -133,9 +133,10 @@ function SettingsContent() {
   };
 
   // Profile
-  const [agencyName, setAgencyName]       = useState('Digital Horizons Agency');
-  const [billingEmail, setBillingEmail]   = useState('billing@digital-horizons.com');
-  const [subdomain, setSubdomain]         = useState('digital-horizons');
+  const [agencyName, setAgencyName]               = useState('Digital Horizons Agency');
+  const [billingEmail, setBillingEmail]           = useState('billing@digital-horizons.com');
+  const [notificationEmail, setNotificationEmail] = useState('');
+  const [subdomain, setSubdomain]                 = useState('digital-horizons');
   const [customDomain, setCustomDomain]   = useState('');
   const [timezone, setTimezone]           = useState('UTC+05:30 (IST)');
   const [locale, setLocale]               = useState('en-US (English - US)');
@@ -176,10 +177,11 @@ function SettingsContent() {
       .then(data => {
         if (!data) return;
         if (data.plan) setPlan(data.plan);
-        if (data.name)         setAgencyName(data.name);
-        if (data.subdomain)    setSubdomain(data.subdomain);
-        if (data.billingEmail) setBillingEmail(data.billingEmail);
-        if (data.customDomain) setCustomDomain(data.customDomain);
+        if (data.name)              setAgencyName(data.name);
+        if (data.subdomain)         setSubdomain(data.subdomain);
+        if (data.billingEmail)      setBillingEmail(data.billingEmail);
+        if (data.notificationEmail) setNotificationEmail(data.notificationEmail);
+        if (data.customDomain)      setCustomDomain(data.customDomain);
         if (data.hasSerankingApiKey) setHasKey(true);
         if (data.brandingJson) {
           try {
@@ -207,7 +209,7 @@ function SettingsContent() {
       const res = await fetch('/api/agency/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: agencyName, billingEmail, customDomain }),
+        body: JSON.stringify({ name: agencyName, billingEmail, notificationEmail, customDomain }),
       });
       if (res.ok) { triggerSaved('profile'); toast.success('Agency profile saved successfully.'); }
       else { const d = await res.json(); toast.error(d.error ?? 'Failed to save profile'); }
@@ -371,6 +373,20 @@ function SettingsContent() {
                     </SettingRow>
                     <SettingRow label="Billing Email" hint="Receives invoices and billing alerts.">
                       <input className="form-input" type="email" value={billingEmail} onChange={e => setBillingEmail(e.target.value)} placeholder="billing@youragency.com" />
+                    </SettingRow>
+                    <SettingRow label="🔔 Notification Email" hint="Receives instant email alerts whenever a client sends you a message or raises a query via the portal.">
+                      <input
+                        className="form-input"
+                        type="email"
+                        value={notificationEmail}
+                        onChange={e => setNotificationEmail(e.target.value)}
+                        placeholder="alerts@youragency.com"
+                      />
+                      {notificationEmail && (
+                        <div style={{ fontSize: 11, color: 'var(--success)', marginTop: 6, display: 'flex', alignItems: 'center', gap: 5, fontWeight: 600 }}>
+                          ✅ Client query alerts will be sent to {notificationEmail}
+                        </div>
+                      )}
                     </SettingRow>
                   </div>
 
