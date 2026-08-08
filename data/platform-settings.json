@@ -1,0 +1,10 @@
+{
+  "platformName": "RankFlow Test",
+  "supportEmail": "support@rankflow.app",
+  "publicSignups": true,
+  "enforceEmailVerification": true,
+  "fromEmail": "onboarding@resend.dev",
+  "resendApiKey": "re_9KnztFK1_5ZHtQu1hMjMpNH4P5iRHRNc5",
+  "maintenanceMode": false,
+  "systemDomain": "localhost:3000"
+}
