@@ -13,9 +13,9 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-/** Minimum 8 chars */
+/** Minimum 6 chars for passwords */
 function isValidPassword(password: string): boolean {
-  return typeof password === "string" && password.length >= 8;
+  return typeof password === "string" && password.length >= 6;
 }
 
 // ── NextAuth Config ──────────────────────────────────────────────────────────

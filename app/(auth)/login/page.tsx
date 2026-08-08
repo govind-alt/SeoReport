@@ -75,8 +75,9 @@ function LoginFormContent() {
     setLoginError('');
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
       const res = await signIn('credentials', {
-        email: email.trim().toLowerCase(),
+        email: cleanEmail,
         password,
         redirect: false,
       });
@@ -90,7 +91,6 @@ function LoginFormContent() {
         }
         setLoading(false);
       } else {
-        // Route via the smart /auth-success page
         window.location.href = '/auth-success';
       }
     } catch (error: any) {
@@ -316,12 +316,16 @@ function LoginFormContent() {
               <div style={{ marginTop: 18, background: 'linear-gradient(135deg, #EBF2FF, #F0F6FF)', border: '1px solid rgba(79,142,247,0.25)', borderRadius: 12, padding: '14px 16px' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: '#4F8EF7', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: 10 }}>🔑 Demo Credentials</div>
                 {[
-                  { role: '🛡 Super Admin', email: 'superadmin@rankflow.app', pass: 'admin@123', color: '#DC2626' },
-                  { role: '🏢 Agency Admin', email: 'demo@rankflow.app', pass: 'demo123', color: '#2563EB' },
-                  { role: '👤 Client (Acme)', email: 'client@acme.com', pass: 'client123', color: '#059669' },
+                  { role: '🛡 Super Admin', email: 'superadmin@rankflow.app', pass: 'admin@123', color: '#DC2626', tab: 'admin' },
+                  { role: '🏢 Agency Admin', email: 'demo@rankflow.app', pass: 'demo123', color: '#2563EB', tab: 'agency' },
+                  { role: '👤 Client (Acme)', email: 'client@acme.com', pass: 'client123', color: '#059669', tab: 'client' },
                 ].map((c, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', borderBottom: i < 2 ? '1px solid rgba(79,142,247,0.12)' : 'none', gap: 10, cursor: 'pointer' }}
-                    onClick={() => { setEmail(c.email); setPassword(c.pass); }}>
+                    onClick={() => {
+                      setEmail(c.email);
+                      setPassword(c.pass);
+                      setSelectedRole(c.tab);
+                    }}>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#1A1A2E' }}>{c.role}</div>
                       <div style={{ fontSize: 11, color: '#64748B', marginTop: 1 }}>{c.email}</div>
