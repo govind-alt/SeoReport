@@ -1,109 +1,166 @@
 <div align="center">
-  <h1>🚀 RankFlow — SEO Report Automation SaaS</h1>
+  <h1>🚀 RankFlow — Multi-Tenant SEO Report Automation SaaS</h1>
   <p>
-    <strong>A multi-tenant white-label SaaS platform automating monthly SEO report generation, client portals, keyword research, and billing for digital agencies.</strong>
+    <strong>A complete white-label SaaS platform automating monthly SEO reports, client portals, keyword rank tracking, and platform management for digital marketing agencies.</strong>
   </p>
   <p>
-    <img src="https://img.shields.io/badge/Next.js-16+-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+    <img src="https://img.shields.io/badge/Next.js-16%20Turbopack-black?style=for-the-badge&logo=next.js" alt="Next.js" />
     <img src="https://img.shields.io/badge/TypeScript-5.0-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
     <img src="https://img.shields.io/badge/Prisma-7+-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" />
-    <img src="https://img.shields.io/badge/jsPDF-2.5-red?style=for-the-badge" alt="jsPDF" />
+    <img src="https://img.shields.io/badge/SQLite-Dev.db-003B57?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite" />
+    <img src="https://img.shields.io/badge/NextAuth.js-v5-purple?style=for-the-badge" alt="NextAuth" />
+    <img src="https://img.shields.io/badge/Resend-Mailer-blue?style=for-the-badge" alt="Resend" />
   </p>
 </div>
 
 ---
 
-## 🌟 Latest Major Upgrades & Features
+## 🌟 Platform Highlights & Capabilities
 
-RankFlow has been expanded with full **Super Admin Control Capabilities**, **3 Agency Operational Feature Suites**, a **Fully Functional Billing Suite**, and an **Executive High-Resolution Vector PDF Generator**.
-
----
-
-### 💳 1. Fully Functional Plan & Billing Suite (`/settings?tab=billing`)
-- **Interactive Subscription Plan Upgrades**: Switch between `Starter ($49/mo)`, `Pro ($149/mo)`, and `Agency ($299/mo)` tiers with real-time quota expansions (`maxClients` up to Unlimited).
-- **Payment Method Management**: Dynamic card updating modal with live card brand recognition (Visa, Mastercard, Amex).
-- **Stripe Billing Customer Portal Modal**: Subscription account summary displaying renewal dates, invoice history, and recipient dispatches.
-- **Cancellation & Retention Workflow**: Retention offer workflow featuring a 50% discount claim or scheduled end-of-cycle cancellation.
+RankFlow provides a complete three-tier architecture: **Super Admin Platform Management**, **Multi-Tenant Agency Workspaces**, and **White-Label Client Portals**.
 
 ---
 
-### 📄 2. Executive High-Resolution Vector PDF Invoice Generator (`lib/invoicePdfGenerator.ts`)
-- **High-DPI Vector Canvas Rendering**: Built a 2.5× scale `html2canvas` + `jsPDF` render engine producing crisp, printable A4 PDF documents.
-- **Forced `.pdf` Filename Download**: Forced DOM download link attribute execution ensuring files save directly as `RankFlow_Invoice_INV-2026-06.pdf` across Windows, Mac, iOS, and Android.
-- **Executive Invoice Preview Modal**: Live HTML modal preview on screen with single-click **Download PDF File** and **Print Invoice** options.
+### 🛡️ 1. Super Admin Platform Console (`/admin`)
+- **Persistent Platform Settings (`/admin?tab=settings`)**:
+  - **Platform Branding**: Custom platform brand name, support email (`hrishitavinherkar1234@gmail.com`), and system domain configuration.
+  - **Access & Registration**: Interactive toggles for public self-serve registration and mandatory email verification before workspace activation.
+  - **Email Delivery (Resend API Gateway)**: Configurable Resend API Key with show/hide toggle, sender address (`onboarding@resend.dev`), dedicated test recipient email field, and live delivery diagnostic modal with sandbox verification.
+  - **Super Admin Credentials**: Master credential manager with bcrypt verification and SQLite database updates.
+  - **System & Maintenance**: Global maintenance mode switch with real-time banner display and one-click binary SQLite `dev.db` database snapshot download (`/api/admin/settings/backup`).
+- **Agency & Tenant Management**: Monitor active agencies, manage subscription quotas, assign team members, and inspect tenant usage.
+- **Top Action Bar**: Instant toast feedback and persistent disk storage in `data/platform-settings.json`.
 
 ---
 
-### 🎯 3. New Agency Operational Feature Suites
-- **Keyword Research & Opportunity Explorer (`/keyword-explorer`)**: Analyze SERP search volumes, Keyword Difficulty (KD 0-100%), Intent categories, and 1-click tracking for client campaigns.
-- **Automated Report Scheduler & Dispatcher (`/schedules`)**: Hero Automation Control Hub, background engine status indicator (`● ENGINE ACTIVE`), batch execution triggers, and live dispatch logs.
-- **SEO Action Task Manager (`/tasks`)**: Hero Campaign Milestone Tracker banner with progress bars, technical audit checklists, priority filters, and client assignment.
+### 🏢 2. Multi-Tenant Agency Workspace (`/:subdomain`)
+- **Executive Agency Dashboard (`/digital-horizons`)**:
+  - Real-time KPI summaries: Active Clients (5), Total Reports (31), Health Scores, and Monthly Dispatch metrics.
+  - Live activity feed and client health score monitoring.
+- **Client Management (`/digital-horizons/clients`)**:
+  - Dedicated client profiles (Acme Corp, BlueSky Marketing, GreenLeaf Organics, RetailPro Ltd, TechStart.io).
+  - Domain oversight, target keywords, crawl health audit metrics, and competitor benchmarks.
+- **Automated Report Engine (`/digital-horizons/reports`)**:
+  - High-DPI Vector PDF report generator (`lib/invoicePdfGenerator.ts`) and interactive web report viewer.
+  - White-labeled PDF branding with custom agency logos, brand colors, and executive summaries.
+- **Keyword Research & SERP Tracking (`/digital-horizons/keyword-explorer`)**:
+  - Search volume analysis, Keyword Difficulty (KD%), search intent categorization, and ranking trajectories.
+- **Automated Cron Scheduler (`/digital-horizons/schedules`)**:
+  - Automated recurring report scheduler with batch execution engine and dispatch logs.
+- **Agency Settings & Custom Branding (`/digital-horizons/settings`)**:
+  - Custom subdomain & CNAME domain mapping, notification email recipient settings, SE Ranking API credentials, and billing management.
 
 ---
 
-### 🛠️ 4. Super Admin Control Panel (`/admin`)
-- **Platform Broadcasts Center**: Compose global agency alerts, filter target audiences, and archive broadcast history.
-- **Feature Flags & Tier Limits Configurator**: System Toggles for feature rollouts and tier limits manager (`Starter`, `Pro`, `Agency`).
-- **Integration Gateways Monitor**: Live status dashboard and webhook log console for SE Ranking, OpenAI, Resend, and Stripe.
-- **User & Agency Account Modals**: Full modals for user creation, agency edits, role assignments, and password resets.
+### 👤 3. White-Label Client Portal (`/:subdomain/client`)
+- **Client Self-Service Dashboard (`/digital-horizons/client`)**:
+  - Dedicated portal for agency clients (e.g. Acme Corp) to review their monthly organic search performance.
+  - Interactive keyword position rankings, technical audit health status, backlink summaries, and one-click PDF report downloads.
 
 ---
 
-## 🏗️ Project Architecture
+### 🔐 4. Authentication & Security (`lib/auth.ts`)
+- **NextAuth.js Multi-Role Credentials Provider**:
+  - Secure bcrypt password comparison supporting standard 6+ character passwords.
+  - Brute-force rate limiting per email with automatic temporary account lockouts.
+- **Google OAuth 2.0 PKCE**: Seamless single sign-on with automatic agency workspace provisioning.
+- **Smart Workspace Router (`/auth-success`)**:
+  - Super Admins auto-redirected to `/admin`.
+  - Agency Admins auto-redirected to `/${agency.slug}` (e.g. `/digital-horizons`).
+  - Clients auto-redirected to `/${agency.slug}/client`.
+
+---
+
+## 🔑 Demo Credentials
+
+| Role | Email | Password | Destination Workspace |
+| :--- | :--- | :--- | :--- |
+| 🛡️ **Super Admin** | `superadmin@rankflow.app` | `admin@123` | [http://localhost:3000/admin](http://localhost:3000/admin) |
+| 🏢 **Agency Admin** | `demo@rankflow.app` | `demo123` | [http://localhost:3000/digital-horizons](http://localhost:3000/digital-horizons) |
+| 👤 **Client (Acme)** | `client@acme.com` | `client123` | [http://localhost:3000/digital-horizons/client](http://localhost:3000/digital-horizons/client) |
+
+*Clicking any row on the demo login card automatically selects the role tab and fills the credentials.*
+
+---
+
+## 🏗️ Project Directory Structure
 
 ```text
-SEOReport-main/
+SeoReport-main/
 ├── app/
-│   ├── [domain]/                ← Multi-tenant Agency Dashboard & Client Portal
-│   │   └── (dashboard)/
-│   │       ├── clients/         ← Client workspaces & detailed audit views
-│   │       ├── keyword-explorer/← Keyword research & volume explorer
-│   │       ├── reports/         ← PDF report generator & preview workspace
-│   │       ├── schedules/       ← Automated PDF report scheduler & cron engine
-│   │       ├── settings/        ← Agency branding, CNAME domain & Billing suite
-│   │       └── tasks/           ← Agency SEO checklist & campaign milestone tracker
-│   ├── admin/                   ← Super Admin Platform Control Panel
-│   ├── api/
-│   │   ├── agency/settings/     ← Agency profile & encrypted API keys
-│   │   ├── billing/invoice-pdf/ ← PDF Invoice generation API endpoint
-│   │   ├── clients/             ← Clients CRUD API
-│   │   ├── dashboard/summary/   ← Global KPIs aggregation
-│   │   └── seranking/           ← SE Ranking API proxy adapters
-│   ├── globals.css              ← Glassmorphism & executive dark slate theme
-│   └── providers.tsx            ← Notification & auth context providers
+│   ├── (auth)/
+│   │   ├── login/                  ← Unified multi-role authentication page
+│   │   └── auth-success/           ← Smart session-based workspace router
+│   ├── [domain]/                   ← Multi-tenant Agency Dashboard & Client Portal
+│   │   ├── (dashboard)/
+│   │   │   ├── clients/            ← Client workspaces & detailed audit views
+│   │   │   ├── keyword-explorer/   ← Keyword research & SERP volume explorer
+│   │   │   ├── reports/            ← PDF report generator & preview workspace
+│   │   │   ├── schedules/          ← Automated report scheduler & cron engine
+│   │   │   ├── settings/           ← Agency branding, CNAME domain & notification settings
+│   │   │   └── tasks/              ← SEO checklist & campaign milestone tracker
+│   │   └── client/                 ← White-labeled client portal interface
+│   ├── admin/                      ← Super Admin Platform Management & Settings console
+│   └── api/
+│       ├── admin/settings/         ← Persistent platform settings JSON storage
+│       │   ├── test-email/         ← Resend test email dispatcher & diagnostics
+│       │   ├── backup/             ← SQLite dev.db binary snapshot streaming
+│       │   └── password/           ← Super Admin bcrypt credential updater
+│       ├── seranking/              ← SE Ranking data synchronization adapters
+│       └── client-portal/          ← Client portal data endpoints
+├── data/
+│   └── platform-settings.json      ← Persistent disk storage for Super Admin settings
 ├── lib/
-│   ├── invoicePdfGenerator.ts   ← High-res vector PDF rendering engine (html2canvas + jsPDF)
-│   ├── seranking.ts             ← SE Ranking API client wrapper
-│   └── prisma.ts                ← Prisma ORM client instance
-└── prisma/                      ← DB schema defining multi-tenant database models
+│   ├── auth.ts                     ← NextAuth credentials & Google OAuth configuration
+│   ├── prisma.ts                   ← Prisma ORM client instance
+│   ├── rate-limit.ts               ← Login brute-force rate limiter
+│   └── invoicePdfGenerator.ts      ← Vector PDF rendering engine (html2canvas + jsPDF)
+├── prisma/
+│   └── schema.prisma               ← SQLite database models (User, Agency, Client, Report, Task)
+└── proxy.ts                        ← Multi-tenant hostname & subdomain router middleware
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Getting Started
 
-### 1. Install Dependencies
-```bash
-pnpm install
-```
+### 1. Prerequisites
+- **Node.js**: v18.0.0 or later
+- **pnpm** / **npm** / **yarn**
 
-### 2. Configure Environment Variables
+### 2. Environment Configuration
 Create a `.env` file in the root directory:
 ```env
 DATABASE_URL="file:./dev.db"
-NEXTAUTH_SECRET="super-secret-key-vault-phrase-12345"
+NEXTAUTH_SECRET="your-secure-random-secret-key-32-chars-min"
+AUTH_SECRET="your-secure-random-secret-key-32-chars-min"
+AUTH_TRUST_HOST=true
 NEXTAUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_ROOT_DOMAIN="localhost:3000"
+
+# Transactional Email (Resend)
+RESEND_API_KEY="re_..."
+FROM_EMAIL="onboarding@resend.dev"
+
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-client-secret"
 ```
 
-### 3. Run Migrations & Launch Server
+### 3. Database Migration & Seeding
 ```bash
-pnpm exec prisma migrate dev --name init
-pnpm run dev
+# Push database schema
+npx prisma db push
+
+# (Optional) Seed demo agencies, clients, and reports
+npx prisma db seed
 ```
 
-### 🔑 Credentials & Links
-- **Agency Dashboard:** [http://localhost:3000/digital-horizons](http://localhost:3000/digital-horizons)
-- **Plan & Billing Settings:** [http://localhost:3000/digital-horizons/settings?tab=billing](http://localhost:3000/digital-horizons/settings?tab=billing)
-- **Super Admin Panel:** [http://localhost:3000/admin](http://localhost:3000/admin)
-- **Login Email:** `demo@rankflow.app` | **Password:** `demo123`
+### 4. Run the Development Server
+```bash
+npm run dev
+# or
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
