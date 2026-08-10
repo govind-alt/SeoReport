@@ -12,6 +12,7 @@ const SettingsSchema = z.object({
   serankingApiKey: z.string().optional(),
   brandingJson: z.string().optional(),
   plan: z.enum(['starter', 'pro', 'agency']).optional(),
+  googleRefreshToken: z.string().nullable().optional(),
 });
 
 /** GET /api/agency/settings */
@@ -28,6 +29,7 @@ export async function GET() {
         id: true, name: true, slug: true, subdomain: true,
         plan: true, billingEmail: true, notificationEmail: true, customDomain: true, brandingJson: true,
         serankingApiKey: true,
+        googleRefreshToken: true,
         createdAt: true,
       },
     });
@@ -39,8 +41,10 @@ export async function GET() {
     return NextResponse.json({
       ...agency,
       hasSerankingApiKey: Boolean(agency.serankingApiKey),
+      hasGsc: Boolean(agency.googleRefreshToken),
       // Never expose the raw encrypted value
       serankingApiKey: agency.serankingApiKey ? `sk-${'•'.repeat(30)}xyz` : null,
+      googleRefreshToken: undefined, // Never expose to client
     });
   } catch (error: unknown) {
     console.error('[AGENCY_SETTINGS_GET]', error);
@@ -80,13 +84,16 @@ export async function PATCH(request: Request) {
         id: true, name: true, slug: true, plan: true,
         billingEmail: true, notificationEmail: true, customDomain: true, brandingJson: true,
         serankingApiKey: true,
+        googleRefreshToken: true,
       },
     });
 
     return NextResponse.json({
       ...agency,
       hasSerankingApiKey: Boolean(agency.serankingApiKey),
+      hasGsc: Boolean(agency.googleRefreshToken),
       serankingApiKey: agency.serankingApiKey ? `sk-${'•'.repeat(30)}xyz` : null,
+      googleRefreshToken: undefined,
     });
   } catch (error: unknown) {
     console.error('[AGENCY_SETTINGS_PATCH]', error);

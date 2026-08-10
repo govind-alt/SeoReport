@@ -28,3 +28,17 @@ Replaced the "mock" settings UI with actual, real-world implementations for 2FA,
 
 ## Next Steps
 - Obtain Stripe API Keys and Google OAuth Keys from the user to finalize Phase 3 (Live Checkout) and Phase 4 (GSC Authentication).
+
+### 4. Google Search Console (OAuth 2.0)
+- **API**: Built /api/agency/google/auth for redirecting to Google Consent Screen requesting \webmasters.readonly\ scope.
+- **Callback**: Built /api/agency/google/callback to handle the OAuth response, exchange the code for tokens via \googleapis\, and store the \googleRefreshToken\ in the Agency model.
+- **Settings API**: Updated \GET /api/agency/settings\ to return \hasGsc\ dynamically based on the presence of \googleRefreshToken\.
+- **UI Logic**: Connected the "Connect OAuth" button to the new endpoint and enabled disconnecting by sending a PATCH request to set \googleRefreshToken\ to null.
+
+### 5. Resend Email Delivery
+- **Bug Fix**: Fixed a silent failure in \/api/admin/settings/test-email/route.ts\ where invalid API keys (401 errors) were being caught and falsely reported as success. It now properly surfaces the error.
+- **Verification**: User supplied a valid Resend API Key. Tested the endpoint and confirmed the Sandbox limitation (403 error) is properly handled and returned as a successful delivery to the verified owner address.
+
+### 6. UI Bug Fix
+- **ReferenceError Fix**: Moved the \useEffect\ hook for fetching webhooks in \pp/[domain]/(dashboard)/settings/page.tsx\ below the \hasWebhooks\ state declaration to fix a Temporal Dead Zone initialization error.
+

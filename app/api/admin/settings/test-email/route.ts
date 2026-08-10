@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         console.warn('[TEST_EMAIL_RESEND_WARNING]', result.error);
         
         // Handle Resend sandbox restriction specifically with clear explanation
-        if (result.error.statusCode === 403 || result.error.name === 'validation_error') {
+        if (result.error.statusCode === 403) {
           return NextResponse.json({
             success: true,
             delivered: true,
@@ -64,6 +64,11 @@ export async function POST(req: Request) {
             message: `Test email successfully dispatched for ${recipient}. (Note: Free Resend sandbox mode delivered via dev pipeline. Add a custom domain at resend.com/domains for external inbox routing).`,
           });
         }
+
+        // Real error (e.g. 401 API key invalid, 422 Unprocessable Entity, etc.)
+        return NextResponse.json({
+          error: `Resend Error: ${result.error.message || 'Failed to send'}`
+        }, { status: 400 });
 
         return NextResponse.json({
           success: true,

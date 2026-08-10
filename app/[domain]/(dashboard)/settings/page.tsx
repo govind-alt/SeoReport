@@ -140,16 +140,6 @@ function SettingsContent() {
       .catch(() => {});
   };
 
-  // Fetch webhooks when on API tab
-  useEffect(() => {
-    if (activeTab === 'api-keys' && hasWebhooks) {
-      fetch('/api/agency/webhooks')
-        .then(res => res.ok ? res.json() : [])
-        .then(data => setWebhooks(data || []))
-        .catch(console.error);
-    }
-  }, [activeTab, hasWebhooks]);
-
   // Profile
   const [agencyName, setAgencyName]               = useState('Digital Horizons Agency');
   const [billingEmail, setBillingEmail]           = useState('billing@digital-horizons.com');
@@ -210,6 +200,16 @@ function SettingsContent() {
   const [hasGsc, setHasGsc] = useState(false);
   const [hasWebhooks, setHasWebhooks] = useState(false);
 
+  // Fetch webhooks when on API tab
+  useEffect(() => {
+    if (activeTab === 'api-keys' && hasWebhooks) {
+      fetch('/api/agency/webhooks')
+        .then(res => res.ok ? res.json() : [])
+        .then(data => setWebhooks(data || []))
+        .catch(console.error);
+    }
+  }, [activeTab, hasWebhooks]);
+
   // Billing
   const [plan, setPlan] = useState<'starter' | 'pro' | 'agency'>('pro');
   const [paymentMethod, setPaymentMethod] = useState({ type: 'Visa', last4: '4242', exp: '12/28', holder: 'Alex Johnson' });
@@ -237,6 +237,7 @@ function SettingsContent() {
         if (data.notificationEmail) setNotificationEmail(data.notificationEmail);
         if (data.customDomain)      setCustomDomain(data.customDomain);
         if (data.hasSerankingApiKey) setHasKey(true);
+        if (data.hasGsc !== undefined) setHasGsc(data.hasGsc);
         if (data.brandingJson) {
           try {
             const b = JSON.parse(data.brandingJson);
@@ -252,7 +253,6 @@ function SettingsContent() {
             if (b.notifClientViews !== undefined) setNotifClientViews(b.notifClientViews);
             if (b.mfaEnabled !== undefined) setMfaEnabled(b.mfaEnabled);
             if (b.sessionTimeout) setSessionTimeout(b.sessionTimeout);
-            if (b.hasGsc !== undefined) setHasGsc(b.hasGsc);
             if (b.hasWebhooks !== undefined) setHasWebhooks(b.hasWebhooks);
           } catch { /* ignore */ }
         }
@@ -773,11 +773,37 @@ function SettingsContent() {
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>Google Search Console</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Clicks · Impressions · CTR · Average Position</div>
                   </div>
-                  {hasGsc ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasGsc(true); saveMockState({ hasGsc: true }); toast.success('GSC connected via OAuth!'); }}>Connect OAuth</button>}
+                  {hasGsc ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { window.location.href = '/api/agency/google/auth'; }}>Connect OAuth</button>}
                 </div>
                 <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>OAuth 2.0 GSC integration pulls real click, impression and CTR data directly from your Google property.</span>
-                  {hasGsc && <button className="btn btn-secondary" style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasGsc(false); saveMockState({ hasGsc: false }); toast.success('GSC disconnected.'); }}>Disconnect</button>}
+                  {hasGsc && (
+                    <button
+                      className="btn btn-secondary"
+                      style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }}
+                      onClick={async () => {
+                        if (confirm('Disconnect Google Search Console?')) {
+                          try {
+                            const res = await fetch('/api/agency/settings', {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ googleRefreshToken: null }),
+                            });
+                            if (res.ok) {
+                              setHasGsc(false);
+                              toast.success('GSC disconnected.');
+                            } else {
+                              toast.error('Failed to disconnect GSC');
+                            }
+                          } catch {
+                            toast.error('Network error');
+                          }
+                        }
+                      }}
+                    >
+                      Disconnect
+                    </button>
+                  )}
                 </div>
               </div>
 
