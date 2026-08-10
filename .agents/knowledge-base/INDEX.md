@@ -21,7 +21,8 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 | [auth.md](./auth.md) | NextAuth v5, roles, credentials, sessions | 2026-07-27 |
 | [database.md](./database.md) | Prisma schema, SQLite dev.db, migrations | 2026-07-27 |
 | [api.md](./api.md) | API routes, server actions, cron jobs | 2026-07-27 |
-| [frontend.md](./frontend.md) | React components, pages, Tailwind v4, routing | 2026-07-27 |
+| [frontend.md](./frontend.md) | React components, pages, Tailwind v4, routing | 2026-08-10 |
+| [settings-integration-2026-08-10.md](./settings-integration-2026-08-10.md) | Details on 2FA, Webhooks, and Stripe integrations | 2026-08-10 |
 | [billing.md](./billing.md) | Plan tiers, Stripe modal, invoice PDF | 2026-07-27 |
 | [pdf-reports.md](./pdf-reports.md) | PDF generation engine, puppeteer, jsPDF | 2026-07-27 |
 | [multi-tenancy.md](./multi-tenancy.md) | Domain routing, middleware, agency separation | 2026-07-27 |
@@ -34,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-10 | Settings Real-World Integrations | frontend | Converted 2FA, Webhooks, and Stripe Customer Portal into real API-backed implementations |
 | 2026-08-10 | Settings Module Full Persistence Fix | frontend | Stored all remaining mock UI states (Notifications, 2FA, GSC) in brandingJson for frontend persistence |
 | 2026-07-27 | Initial Knowledge Base Bootstrap | architecture | Full project seeded from README, package.json, and codebase exploration |
 | 2026-07-27 | Node.js Environment Discovery | devops | Found node.exe inside Cursor's bundled helpers; npm/pnpm not in PATH |
