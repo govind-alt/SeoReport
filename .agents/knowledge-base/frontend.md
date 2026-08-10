@@ -90,3 +90,26 @@ User wants every knowledge base update to be version-controlled and synced to re
 - `git` IS available in PATH on this machine (confirmed earlier via `where.exe git`).
 
 ---
+
+## 2026-08-10 — Settings Module Full Persistence Fix
+
+**Task:** Make all remaining mock UI settings (Notifications, Security, Integrations, Billing) fully functional and persistent  
+**Files Changed:**
+- `app/[domain]/(dashboard)/settings/page.tsx` — modified
+
+**What Was Done:**
+- Cleaned up duplicate modals in the Billing tab (removed static "Upgrade Plan Modal").
+- Converted all local-only React state UI components (Notification toggles, 2FA toggle, Session Timeout select, Integrations connect buttons for GSC and Webhooks) into persistent functional mocks.
+- Used the `brandingJson` object field on the Agency database model as a generic JSON data store to save all these disparate mock settings.
+- Renamed `saveBillingState` to `saveMockState` which performs a `PATCH /api/agency/settings` pushing all UI settings into the `brandingJson` blob.
+
+**Why:**
+The user wanted the Settings page to feel "fully functional" and not lose state on page refresh. Since adding 15 new columns to Prisma for demo features is overkill, storing them in `brandingJson` provides real persistence for the frontend without database migrations.
+
+**How It Works:**
+When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency object. The `brandingJson` is parsed, and any keys matching `notif*`, `mfaEnabled`, `hasGsc`, `paymentMethod`, etc. are loaded into local React state. When the user interacts with any UI element, `saveMockState({ key: newValue })` patches the entire JSON object back to the database.
+
+**Gotchas / Watch Out For:**
+- The `brandingJson` blob is now being used for settings far beyond just branding (e.g., security, billing, notifications). If the backend is ever moved to production, these should be migrated to proper database columns or a dedicated `settingsJson` field.
+
+---

@@ -34,6 +34,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-10 | Settings Module Full Persistence Fix | frontend | Stored all remaining mock UI states (Notifications, 2FA, GSC) in brandingJson for frontend persistence |
 | 2026-07-27 | Initial Knowledge Base Bootstrap | architecture | Full project seeded from README, package.json, and codebase exploration |
 | 2026-07-27 | Node.js Environment Discovery | devops | Found node.exe inside Cursor's bundled helpers; npm/pnpm not in PATH |
 | 2026-07-27 | Dev Server Launch | devops | Next.js 16.2.10 launched on port 3000 using Cursor's bundled node.exe |
