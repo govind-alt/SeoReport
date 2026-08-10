@@ -121,3 +121,30 @@ session.user = {
 - To verify custom domain: Resend dashboard â†’ Domains â†’ Add domain
 
 ---
+
+## [2026-08-10] Strict Role Routing & NextAuth v5 Error Handling
+
+**Task:** Ensure the login page UI role tab strictly matches the user's actual database role, and properly block automatic account creation on Google login.
+**Files Changed:**
+- `lib/auth.ts` — modified
+- `app/(auth)/login/page.tsx` — modified
+
+**What Was Done:**
+- Added `roleTab` to the `Credentials` provider payload to validate the selected UI tab against `user.role` from the database.
+- Used Auth.js (NextAuth v5) `CredentialsSignin` class to throw auth errors (like role mismatches or 2FA checks) so that the error message makes it to the frontend without being masked as "Configuration".
+- Added a `signIn` callback to check if an account exists for the email provided via Google OAuth; if not, it redirects the user to `/login?error=NoAccount` rather than auto-creating an agency.
+- Updated the Login page UI to listen for `error=NoAccount` (switches to Register tab with a clear error) and `error=Configuration` (shows a descriptive server error instead of the raw keyword). Changed default tab to `Client`.
+
+**Why:**
+The user wanted strict security where a Client logging in via the Agency tab gets a direct error message telling them to switch tabs. They also did not want random users signing up via Google and automatically getting dummy agency accounts created.
+
+**How It Works:**
+When `Credentials` `authorize` is called, it checks `roleTab === 'agency' && user.role === 'client'`. If true, it throws `new CredentialsSignin()` with `.code` set to the message. NextAuth captures `.code` and forwards it to the client as `res.error`. The UI captures `res.error` and updates the `loginError` state to display the specific message in a red banner.
+
+**Gotchas / Watch Out For:**
+- Auth.js (NextAuth v5) aggressively masks unhandled `Error` objects as "Configuration". Any custom authentication failure logic MUST throw a subclass of `CredentialsSignin` and use the `.code` property for the custom message.
+
+**Open Questions:**
+None.
+
+---
