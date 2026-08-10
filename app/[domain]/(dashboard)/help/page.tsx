@@ -124,7 +124,7 @@ export default function HelpPage() {
         </div>
       </div>
 
-      <div style={{ padding: '24px 0', maxWidth: 1200, margin: '0 auto' }}>
+      <div style={{ padding: '8px 0', width: '100%' }}>
         
         {/* Sleek Hero Banner */}
         <div style={{

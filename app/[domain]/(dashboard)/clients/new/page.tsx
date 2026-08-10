@@ -77,7 +77,7 @@ export default function AddClientPage({ params }: { params: Promise<{ domain: st
         </div>
       </div>
 
-      <div style={{maxWidth: '680px', margin: '0 auto'}}>
+      <div style={{width: '100%'}}>
         {success && (
           <div className="alert alert-success" style={{marginBottom: '14px'}}>
             ✅ Client saved! Redirecting to overview...

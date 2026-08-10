@@ -11,6 +11,7 @@ const SettingsSchema = z.object({
   customDomain: z.string().optional(),
   serankingApiKey: z.string().optional(),
   brandingJson: z.string().optional(),
+  plan: z.enum(['starter', 'pro', 'agency']).optional(),
 });
 
 /** GET /api/agency/settings */
@@ -67,9 +68,9 @@ export async function PATCH(request: Request) {
     const { serankingApiKey, ...rest } = parsed.data;
     const updateData: Record<string, unknown> = { ...rest };
 
-    // Encrypt the API key before saving
-    if (serankingApiKey) {
-      updateData.serankingApiKey = encrypt(serankingApiKey);
+    // Encrypt the API key before saving (or set null if empty)
+    if (serankingApiKey !== undefined) {
+      updateData.serankingApiKey = serankingApiKey ? encrypt(serankingApiKey) : null;
     }
 
     const agency = await prisma.agency.update({

@@ -155,7 +155,7 @@ export default function GuidePage({ params }: { params: Promise<{ domain: string
         </div>
       </div>
 
-      <div style={{ maxWidth: 760, margin: '0 auto' }}>
+      <div style={{ width: '100%', padding: '8px 0' }}>
         {/* Header card */}
         <div style={{
           background: `linear-gradient(135deg, ${guide.color}12 0%, ${guide.color}05 100%)`,

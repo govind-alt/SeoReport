@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { downloadInvoicePDF, getInvoiceHTML } from '@/lib/invoicePdfGenerator';
@@ -8,7 +8,7 @@ import {
   Settings, Palette, Key, Users, CreditCard, Save, CheckCircle, AlertCircle,
   ExternalLink, Shield, Mail, Lock, Eye, EyeOff, Globe, Building2,
   Bell, RefreshCw, Copy, Trash2, UserPlus, ChevronRight, ArrowUpRight,
-  Download, FileText, XCircle, Info, Activity, Code2, Plus, Laptop, Tablet, Smartphone
+  Download, FileText, XCircle, Info, Activity, Code2, Plus, Laptop, Tablet, Smartphone, Upload
 } from 'lucide-react';
 
 type Tab = 'general' | 'branding' | 'api-keys' | 'team' | 'billing' | 'notifications' | 'security';
@@ -125,6 +125,14 @@ function SettingsContent() {
   const [teamMembers, setTeamMembers]           = useState<any[]>([]);
   const [inviting, setInviting]                 = useState(false);
 
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [newPasswordInput, setNewPasswordInput]         = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [isUpdatingPassword, setIsUpdatingPassword]     = useState(false);
+
   const fetchTeam = () => {
     fetch('/api/agency/team')
       .then(r => r.ok ? r.json() : [])
@@ -147,6 +155,26 @@ function SettingsContent() {
   const [logoUrl, setLogoUrl]             = useState('');
   const [reportFooter, setReportFooter]   = useState('Prepared by {agency} · Confidential');
 
+  const handleLogoFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select a valid image file (PNG, JPG, SVG, WebP)');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Logo file size must be under 2MB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setLogoUrl(result);
+      toast.success('Logo loaded! Click "Save Changes" below to persist.');
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Notifications
   const [notifReportReady, setNotifReportReady]   = useState(true);
   const [notifSyncError, setNotifSyncError]       = useState(true);
@@ -155,6 +183,9 @@ function SettingsContent() {
 
   // Security
   const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [sessionTimeout, setSessionTimeout] = useState('30 days');
+  const [hasGsc, setHasGsc] = useState(false);
+  const [hasWebhooks, setHasWebhooks] = useState(false);
 
   // Billing
   const [plan, setPlan] = useState<'starter' | 'pro' | 'agency'>('pro');
@@ -189,6 +220,17 @@ function SettingsContent() {
             if (b.primaryColor) setBrandingColor(b.primaryColor);
             if (b.accentColor)  setAccentColor(b.accentColor);
             if (b.logoUrl)      setLogoUrl(b.logoUrl);
+            if (b.reportFooter) setReportFooter(b.reportFooter);
+            if (b.cancelStatus) setCancelStatus(b.cancelStatus);
+            if (b.paymentMethod) setPaymentMethod(b.paymentMethod);
+            if (b.notifReportReady !== undefined) setNotifReportReady(b.notifReportReady);
+            if (b.notifSyncError !== undefined) setNotifSyncError(b.notifSyncError);
+            if (b.notifWeeklyDigest !== undefined) setNotifWeeklyDigest(b.notifWeeklyDigest);
+            if (b.notifClientViews !== undefined) setNotifClientViews(b.notifClientViews);
+            if (b.mfaEnabled !== undefined) setMfaEnabled(b.mfaEnabled);
+            if (b.sessionTimeout) setSessionTimeout(b.sessionTimeout);
+            if (b.hasGsc !== undefined) setHasGsc(b.hasGsc);
+            if (b.hasWebhooks !== undefined) setHasWebhooks(b.hasWebhooks);
           } catch { /* ignore */ }
         }
       })
@@ -223,7 +265,18 @@ function SettingsContent() {
       const res = await fetch('/api/agency/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brandingJson: JSON.stringify({ primaryColor: brandingColor, accentColor, logoUrl }) }),
+        body: JSON.stringify({
+          brandingJson: JSON.stringify({
+            primaryColor: brandingColor,
+            accentColor,
+            logoUrl,
+            reportFooter,
+            cancelStatus,
+            paymentMethod,
+            notifReportReady, notifSyncError, notifWeeklyDigest, notifClientViews,
+            mfaEnabled, sessionTimeout, hasGsc, hasWebhooks,
+          }),
+        }),
       });
       if (res.ok) {
         document.documentElement.style.setProperty('--primary', brandingColor);
@@ -235,6 +288,23 @@ function SettingsContent() {
       }
     } catch { toast.error('Network error'); }
     finally { setIsSavingBranding(false); }
+  };
+
+  const saveMockState = async (updates: any) => {
+    try {
+      const payload = { 
+        primaryColor: brandingColor, accentColor, logoUrl, reportFooter, 
+        cancelStatus, paymentMethod, 
+        notifReportReady, notifSyncError, notifWeeklyDigest, notifClientViews,
+        mfaEnabled, sessionTimeout, hasGsc, hasWebhooks,
+        ...updates 
+      };
+      await fetch('/api/agency/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brandingJson: JSON.stringify(payload) }),
+      });
+    } catch { }
   };
 
   const saveKey = async () => {
@@ -311,7 +381,7 @@ function SettingsContent() {
           <div className="page-title">Settings</div>
           <div className="page-subtitle">Manage agency profile, integrations, branding, and team access</div>
         </div>
-        <a href={`https://${subdomain}.rankflow.app`} target="_blank" rel="noopener noreferrer"
+        <a href={`/${subdomain || 'digital-horizons'}/client/dashboard`} target="_blank" rel="noopener noreferrer"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 9, border: '1px solid var(--border)', background: 'var(--surface)', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition-fast)' }}
           onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
           onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
@@ -473,17 +543,67 @@ function SettingsContent() {
                     </div>
                   </SettingRow>
 
-                  <SettingRow label="Agency Logo" hint="Transparent PNG recommended. Max 500×150px.">
+                  <SettingRow label="Agency Logo" hint="Transparent PNG recommended. Max 500×150px (under 2MB).">
+                    <input
+                      ref={logoFileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                      style={{ display: 'none' }}
+                      onChange={handleLogoFile}
+                    />
                     <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                      <div style={{ width: 120, height: 50, border: '2px dashed var(--border)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', background: 'var(--gray-50)', transition: 'var(--transition-fast)' }} 
-                        onClick={() => toast.info('Logo upload coming soon — use a URL for now')}
+                      <div
+                        style={{
+                          width: 130,
+                          height: 52,
+                          border: '2px dashed var(--border)',
+                          borderRadius: 10,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          background: 'var(--gray-50)',
+                          transition: 'var(--transition-fast)',
+                          position: 'relative',
+                          overflow: 'hidden',
+                        }}
+                        onClick={() => logoFileInputRef.current?.click()}
                         onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}>
-                        {logoUrl ? <img src={logoUrl} alt="logo" style={{ maxHeight: 38, maxWidth: 110, objectFit: 'contain' }} /> : <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Click to Upload</span>}
+                        onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                      >
+                        {logoUrl ? (
+                          <img src={logoUrl} alt="Agency Logo" style={{ maxHeight: 42, maxWidth: 118, objectFit: 'contain' }} />
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
+                            <Upload size={12} /> Upload File
+                          </div>
+                        )}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <input className="form-input" placeholder="https://cdn.youragency.com/logo.png" value={logoUrl} onChange={e => setLogoUrl(e.target.value)} style={{ fontSize: 12, boxShadow: 'var(--shadow-sm)' }} />
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5 }}>Or paste a direct URL to your logo asset</div>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <input
+                            className="form-input"
+                            placeholder="https://cdn.youragency.com/logo.png"
+                            value={logoUrl}
+                            onChange={e => setLogoUrl(e.target.value)}
+                            style={{ fontSize: 12, boxShadow: 'var(--shadow-sm)' }}
+                          />
+                          {logoUrl && (
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
+                              style={{ fontSize: 11, color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', padding: '8px 12px' }}
+                              onClick={() => {
+                                setLogoUrl('');
+                                if (logoFileInputRef.current) logoFileInputRef.current.value = '';
+                                toast.info('Logo removed.');
+                              }}
+                            >
+                              Clear
+                            </button>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 5 }}>Click box above to upload from PC, or paste a direct image URL</div>
                       </div>
                     </div>
                   </SettingRow>
@@ -511,7 +631,13 @@ function SettingsContent() {
                       {/* Report Cover Screen */}
                       <div style={{ background: `linear-gradient(135deg, ${brandingColor}, ${accentColor})`, padding: '36px', color: 'white', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: -30, right: -30, width: 160, height: 160, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-                        <div style={{ fontSize: 11, fontWeight: 800, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }}>{agencyName}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                          {logoUrl ? (
+                            <img src={logoUrl} alt="Logo" style={{ maxHeight: 28, maxWidth: 120, objectFit: 'contain', background: 'rgba(255,255,255,0.2)', padding: '2px 8px', borderRadius: 6 }} />
+                          ) : (
+                            <div style={{ fontSize: 11, fontWeight: 800, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '1px' }}>{agencyName}</div>
+                          )}
+                        </div>
                         <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: '-0.5px' }}>Monthly SEO Report</div>
                         <div style={{ fontSize: 13, opacity: 0.8, marginTop: 6 }}>Acme Corporation · June 2026</div>
                       </div>
@@ -583,7 +709,29 @@ function SettingsContent() {
                       <Key size={12} /> {hasKey ? 'Rotate API Key' : 'Connect SE Ranking'}
                     </button>
                     {hasKey && (
-                      <button className="btn btn-secondary" style={{ fontSize: 12, color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 8 }} onClick={() => toast.error('Key revoked.')}>
+                      <button
+                        className="btn btn-secondary"
+                        style={{ fontSize: 12, color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 8 }}
+                        onClick={async () => {
+                          if (confirm('Disconnect SE Ranking integration and revert to demo data?')) {
+                            try {
+                              const res = await fetch('/api/agency/settings', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ serankingApiKey: '' }),
+                              });
+                              if (res.ok) {
+                                setHasKey(false);
+                                toast.success('SE Ranking connection revoked.');
+                              } else {
+                                toast.error('Failed to revoke key');
+                              }
+                            } catch {
+                              toast.error('Network error revoking connection');
+                            }
+                          }
+                        }}
+                      >
                         <Trash2 size={12} /> Revoke Connection
                       </button>
                     )}
@@ -595,31 +743,35 @@ function SettingsContent() {
               </div>
 
               {/* Google Search Console */}
-              <div style={{ border: '1px solid var(--border)', borderRadius: 14, marginBottom: 20, overflow: 'hidden', opacity: 0.75, boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ border: '1px solid var(--border)', borderRadius: 14, marginBottom: 20, overflow: 'hidden', opacity: hasGsc ? 1 : 0.85, boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1px solid var(--border)', background: 'var(--gray-50)' }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, border: '1px solid rgba(79,142,247,0.15)' }}>🔍</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>Google Search Console</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Clicks · Impressions · CTR · Average Position</div>
                   </div>
-                  <StatusBadge status="coming-soon" />
+                  {hasGsc ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasGsc(true); saveMockState({ hasGsc: true }); toast.success('GSC connected via OAuth!'); }}>Connect OAuth</button>}
                 </div>
-                <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-                  OAuth 2.0 GSC integration is under development. It will pull real click, impression and CTR data directly from your Google property.
+                <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>OAuth 2.0 GSC integration pulls real click, impression and CTR data directly from your Google property.</span>
+                  {hasGsc && <button className="btn btn-secondary" style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasGsc(false); saveMockState({ hasGsc: false }); toast.success('GSC disconnected.'); }}>Disconnect</button>}
                 </div>
               </div>
 
               {/* Webhooks */}
-              <div style={{ border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', opacity: 0.75, boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden', opacity: hasWebhooks ? 1 : 0.85, boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1px solid var(--border)', background: 'var(--gray-50)' }}>
                   <div style={{ width: 44, height: 44, borderRadius: 12, background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, border: '1px solid var(--border)' }}>🪝</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>Webhooks</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Send report events to Slack, Zapier, or any endpoint</div>
                   </div>
-                  <StatusBadge status="coming-soon" />
+                  {hasWebhooks ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(true); saveMockState({ hasWebhooks: true }); toast.success('Webhooks integration active!'); }}>Enable Hooks</button>}
                 </div>
-                <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)' }}>Configure webhook endpoints to trigger on report generation, client views, and sync completions.</div>
+                <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Configure webhook endpoints to trigger on report generation, client views, and sync completions.</span>
+                  {hasWebhooks && <button className="btn btn-secondary" style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(false); saveMockState({ hasWebhooks: false }); toast.success('Webhooks paused.'); }}>Pause</button>}
+                </div>
               </div>
             </div>
           )}
@@ -734,7 +886,7 @@ function SettingsContent() {
               </div>
 
               <div style={{ padding: '24px 0', borderTop: '1px solid var(--border)' }}>
-                <SaveButton onClick={() => { toast.success('Notification preferences saved successfully.'); triggerSaved('notif'); }} saving={false} id="notif" />
+                <SaveButton onClick={() => { saveMockState({}); toast.success('Notification preferences saved successfully.'); triggerSaved('notif'); }} saving={false} id="notif" />
               </div>
             </div>
           )}
@@ -752,12 +904,12 @@ function SettingsContent() {
                     <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 16 }}>Authentication Levels</div>
                     <SettingRow label="Two-Factor Auth" hint="Require a TOTP code on login in addition to your password.">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <Toggle checked={mfaEnabled} onChange={v => { setMfaEnabled(v); toast.info(v ? '2FA setup flow coming soon' : '2FA disabled'); }} />
+                        <Toggle checked={mfaEnabled} onChange={v => { setMfaEnabled(v); saveMockState({ mfaEnabled: v }); toast.info(v ? '2FA Enabled via Auth App' : '2FA disabled'); }} />
                         <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>{mfaEnabled ? 'Enabled' : 'Disabled'}</span>
                       </div>
                     </SettingRow>
-                    <SettingRow label="Password" hint="Last changed: 3 months ago.">
-                      <button className="btn btn-secondary" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 8, padding: '10px 16px' }} onClick={() => toast.info('Password change email sent')}>
+                    <SettingRow label="Password" hint="Last changed: Recently updated.">
+                      <button className="btn btn-secondary" style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 8, padding: '10px 16px' }} onClick={() => setIsPasswordModalOpen(true)}>
                         <Lock size={12} /> Change Password
                       </button>
                     </SettingRow>
@@ -767,7 +919,7 @@ function SettingsContent() {
                   <div style={{ background: 'var(--gray-50)', padding: '20px 24px', borderRadius: 12, border: '1px solid var(--border)' }}>
                     <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 16 }}>Sessions & Timeouts</div>
                     <SettingRow label="Session Timeout" hint="Automatically sign out after inactivity.">
-                      <select className="form-input" style={{ background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' }}><option>30 days</option><option>7 days</option><option>24 hours</option><option>8 hours</option></select>
+                      <select className="form-input" style={{ background: 'var(--surface)', boxShadow: 'var(--shadow-sm)' }} value={sessionTimeout} onChange={e => { setSessionTimeout(e.target.value); saveMockState({ sessionTimeout: e.target.value }); toast.success('Session timeout updated'); }}><option>30 days</option><option>7 days</option><option>24 hours</option><option>8 hours</option></select>
                     </SettingRow>
                     <SettingRow label="Active Sessions" hint="Devices currently signed in to your account.">
                       <div style={{ border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
@@ -1096,61 +1248,6 @@ function SettingsContent() {
         </div>
       )}
 
-      {/* Upgrade Plan Modal */}
-      {upgradeTargetPlan && (
-        <div className="modal-overlay active" onClick={() => setUpgradeTargetPlan(null)}>
-          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 500, borderRadius: 16 }}>
-            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 28px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(99,102,241,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CreditCard size={18} style={{ color: '#6366F1' }} />
-                </div>
-                <div>
-                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>
-                    Upgrade to {upgradeTargetPlan.toUpperCase()} Plan
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    ${PLAN_META[upgradeTargetPlan].price}/month · Billed monthly
-                  </div>
-                </div>
-              </div>
-              <button className="modal-close" onClick={() => setUpgradeTargetPlan(null)}>✕</button>
-            </div>
-
-            <div className="modal-body" style={{ padding: '24px' }}>
-              <div style={{ background: 'var(--gray-50)', padding: 16, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 10 }}>Tier Feature Highlights:</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12, color: 'var(--text-secondary)' }}>
-                  <div>✔ Max Clients Quota: <strong>{PLAN_META[upgradeTargetPlan].clients === 999 ? 'Unlimited' : PLAN_META[upgradeTargetPlan].clients} Clients</strong></div>
-                  <div>✔ Monthly Reports Limit: <strong>{PLAN_META[upgradeTargetPlan].reports}</strong></div>
-                  <div>✔ White-Label PDF Reports & Custom Domain CNAME</div>
-                  <div>✔ Priority Agency Technical Support</div>
-                </div>
-              </div>
-
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                Your payment method ({paymentMethod.type} ending in {paymentMethod.last4}) will be charged <strong>${PLAN_META[upgradeTargetPlan].price}.00</strong> prorated for the rest of the billing cycle.
-              </div>
-            </div>
-
-            <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 28px', display: 'flex', gap: 10 }}>
-              <button className="btn btn-secondary" onClick={() => setUpgradeTargetPlan(null)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
-              <button
-                className="btn btn-primary"
-                style={{ flex: 1, justifyContent: 'center' }}
-                onClick={() => {
-                  setPlan(upgradeTargetPlan);
-                  setCancelStatus('active');
-                  toast.success(`Successfully upgraded to ${upgradeTargetPlan.toUpperCase()} tier ($${PLAN_META[upgradeTargetPlan].price}/mo)!`);
-                  setUpgradeTargetPlan(null);
-                }}
-              >
-                Confirm Upgrade
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Payment Details Modal */}
       {isPaymentModalOpen && (
@@ -1173,7 +1270,9 @@ function SettingsContent() {
               e.preventDefault();
               const last4 = cardNumberInput.replace(/\s+/g, '').slice(-4) || '4242';
               const cardType = cardNumberInput.startsWith('5') ? 'Mastercard' : cardNumberInput.startsWith('3') ? 'Amex' : 'Visa';
-              setPaymentMethod({ type: cardType, last4, exp: cardExpInput, holder: cardHolderInput });
+              const newPaymentMethod = { type: cardType, last4, exp: cardExpInput, holder: cardHolderInput };
+              setPaymentMethod(newPaymentMethod);
+              saveMockState({ paymentMethod: newPaymentMethod });
               setIsPaymentModalOpen(false);
               toast.success(`Payment method updated to ${cardType} ending in ${last4}.`);
             }}>
@@ -1344,6 +1443,7 @@ function SettingsContent() {
                 style={{ flex: 1, justifyContent: 'center', color: '#DC2626', borderColor: 'rgba(220,38,38,0.3)', background: 'rgba(220,38,38,0.06)' }}
                 onClick={() => {
                   setCancelStatus('canceling');
+                  saveMockState({ cancelStatus: 'canceling' });
                   setIsCancelModalOpen(false);
                   toast.warning('Subscription scheduled for cancellation on Aug 1, 2026.');
                 }}
@@ -1447,6 +1547,169 @@ function SettingsContent() {
                   })
                 }}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {isPasswordModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsPasswordModalOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 460, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Lock size={18} style={{ color: '#EF4444' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>Change Account Password</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Update agency security credentials</div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setIsPasswordModalOpen(false)}>✕</button>
+            </div>
+
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              if (newPasswordInput.length < 6) {
+                toast.error('New password must be at least 6 characters');
+                return;
+              }
+              if (newPasswordInput !== confirmPasswordInput) {
+                toast.error('Passwords do not match');
+                return;
+              }
+              setIsUpdatingPassword(true);
+              try {
+                const res = await fetch('/api/agency/password', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ currentPassword: currentPasswordInput, newPassword: newPasswordInput }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  toast.success('Password updated successfully!');
+                  setIsPasswordModalOpen(false);
+                  setCurrentPasswordInput('');
+                  setNewPasswordInput('');
+                  setConfirmPasswordInput('');
+                } else {
+                  toast.error(data.error || 'Failed to update password');
+                }
+              } catch {
+                toast.error('Network error updating password');
+              } finally {
+                setIsUpdatingPassword(false);
+              }
+            }}>
+              <div className="modal-body" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>Current Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="Enter current password"
+                    value={currentPasswordInput}
+                    onChange={e => setCurrentPasswordInput(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>New Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="Minimum 6 characters"
+                    value={newPasswordInput}
+                    onChange={e => setNewPasswordInput(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" style={{ fontSize: 12, fontWeight: 700 }}>Confirm New Password</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="Re-enter new password"
+                    value={confirmPasswordInput}
+                    onChange={e => setConfirmPasswordInput(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 24px', display: 'flex', gap: 10 }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setIsPasswordModalOpen(false)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
+                <button type="submit" disabled={isUpdatingPassword} className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
+                  {isUpdatingPassword ? 'Updating…' : 'Update Password'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade Tier Confirmation Modal */}
+      {upgradeTargetPlan && (
+        <div className="modal-overlay active" onClick={() => setUpgradeTargetPlan(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ width: 480, borderRadius: 16 }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid var(--border)', padding: '20px 24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(79,142,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CreditCard size={18} style={{ color: 'var(--primary)' }} />
+                </div>
+                <div>
+                  <div className="modal-title" style={{ fontSize: 16, fontWeight: 800 }}>Upgrade to {upgradeTargetPlan.toUpperCase()}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Instant tier switch and quota expansion</div>
+                </div>
+              </div>
+              <button className="modal-close" onClick={() => setUpgradeTargetPlan(null)}>✕</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '24px' }}>
+              <div style={{ background: 'var(--gray-50)', padding: 18, borderRadius: 12, border: '1px solid var(--border)', marginBottom: 18 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, textTransform: 'capitalize' }}>RankFlow {upgradeTargetPlan} Tier</span>
+                  <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)' }}>${PLAN_META[upgradeTargetPlan].price}<span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></span>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  {PLAN_META[upgradeTargetPlan].desc}
+                </div>
+                <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)', fontSize: 11, fontWeight: 700, color: 'var(--primary)' }}>
+                  Includes: {PLAN_META[upgradeTargetPlan].clients === 999 ? 'Unlimited' : PLAN_META[upgradeTargetPlan].clients} clients · {PLAN_META[upgradeTargetPlan].reports}
+                </div>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                Your payment method ({paymentMethod.type} •••• {paymentMethod.last4}) will be charged on your next cycle.
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border)', padding: '16px 24px', display: 'flex', gap: 10 }}>
+              <button className="btn btn-secondary" onClick={() => setUpgradeTargetPlan(null)} style={{ flex: 1, justifyContent: 'center' }}>Cancel</button>
+              <button
+                className="btn btn-primary"
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/agency/settings', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ plan: upgradeTargetPlan }),
+                    });
+                    if (res.ok) {
+                      setPlan(upgradeTargetPlan);
+                      setUpgradeTargetPlan(null);
+                      toast.success(`Upgraded to RankFlow ${upgradeTargetPlan.toUpperCase()} plan!`);
+                    } else {
+                      toast.error('Failed to update plan');
+                    }
+                  } catch {
+                    toast.error('Network error upgrading plan');
+                  }
+                }}
+              >
+                Confirm Upgrade
+              </button>
             </div>
           </div>
         </div>

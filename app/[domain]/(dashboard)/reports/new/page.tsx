@@ -64,7 +64,7 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
   };
 
   return (
-    <div style={{maxWidth: '720px', margin: '0 auto', paddingBottom: '40px'}}>
+    <div style={{width: '100%', paddingBottom: '40px'}}>
       
       {/* Header */}
       <div className="page-header" style={{marginBottom: '24px'}}>
