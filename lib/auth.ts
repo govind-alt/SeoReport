@@ -58,6 +58,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        totpCode: { label: "2FA Code", type: "text" },
       },
       async authorize(credentials) {
         const email    = (credentials?.email    as string | undefined)?.trim().toLowerCase();
@@ -88,6 +89,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             role: true,
             agencyId: true,
             image: true,
+            twoFactorEnabled: true,
+            twoFactorSecret: true,
           },
         });
 
@@ -112,6 +115,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("Too many failed attempts. Account temporarily locked for 15 minutes.");
           }
           return null; // Wrong password — generic error
+        }
+
+        // ── 4.5. 2FA Check ───────────────────────────────────────────────
+        if (user.twoFactorEnabled && user.twoFactorSecret) {
+          const totpCode = (credentials?.totpCode as string | undefined)?.trim();
+          
+          if (!totpCode) {
+            throw new Error("2FA_REQUIRED"); // Special string we check in the frontend
+          }
+
+          // We need to dynamically import speakeasy or require it since NextAuth runs on Node
+          const speakeasy = require('speakeasy');
+          const verified = speakeasy.totp.verify({
+            secret: user.twoFactorSecret,
+            encoding: 'base32',
+            token: totpCode,
+            window: 1,
+          });
+
+          if (!verified) {
+            throw new Error("Invalid 2FA code. Please try again.");
+          }
         }
 
         // ── 5. Success — clear rate-limit ─────────────────────────────────

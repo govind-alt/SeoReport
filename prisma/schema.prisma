@@ -24,6 +24,10 @@ model Agency {
   notificationEmail String? // Dedicated email for client message/query alerts
   customDomain    String?
   serankingApiKey String?  // AES-256 encrypted
+  googleRefreshToken String? // OAuth 2.0 refresh token for GSC
+  stripeCustomerId String?
+  stripeSubscriptionId String?
+  stripePriceId String?
   brandingJson    String?  // { primaryColor, logoUrl, accentColor }
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -34,6 +38,7 @@ model Agency {
   invitations     Invitation[]
   notifications   Notification[]
   messages        Message[]
+  webhooks        WebhookEndpoint[]
 }
 
 model User {
@@ -43,6 +48,8 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
   role          String    @default("member") // superadmin | admin | member | client
   agencyId      String?
   agency        Agency?   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
@@ -267,6 +274,23 @@ model Invitation {
   createdAt   DateTime  @default(now())
 
   @@index([email])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WEBHOOKS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model WebhookEndpoint {
+  id        String   @id @default(cuid())
+  agencyId  String
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  url       String
+  events    String   // JSON array of events like ["report.generated", "sync.failed"]
+  secret    String?  // HMAC signature secret
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([agencyId])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

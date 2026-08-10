@@ -140,6 +140,16 @@ function SettingsContent() {
       .catch(() => {});
   };
 
+  // Fetch webhooks when on API tab
+  useEffect(() => {
+    if (activeTab === 'api-keys' && hasWebhooks) {
+      fetch('/api/agency/webhooks')
+        .then(res => res.ok ? res.json() : [])
+        .then(data => setWebhooks(data || []))
+        .catch(console.error);
+    }
+  }, [activeTab, hasWebhooks]);
+
   // Profile
   const [agencyName, setAgencyName]               = useState('Digital Horizons Agency');
   const [billingEmail, setBillingEmail]           = useState('billing@digital-horizons.com');
@@ -181,9 +191,22 @@ function SettingsContent() {
   const [notifWeeklyDigest, setNotifWeeklyDigest] = useState(false);
   const [notifClientViews, setNotifClientViews]   = useState(true);
 
-  // Security
+  // Security — Real 2FA
   const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [mfaLoading, setMfaLoading] = useState(false);
+  const [mfaSetupOpen, setMfaSetupOpen] = useState(false);
+  const [mfaDisableOpen, setMfaDisableOpen] = useState(false);
+  const [mfaQrCode, setMfaQrCode] = useState<string | null>(null);
+  const [mfaTempSecret, setMfaTempSecret] = useState<string | null>(null);
+  const [mfaTokenInput, setMfaTokenInput] = useState('');
   const [sessionTimeout, setSessionTimeout] = useState('30 days');
+
+  // Integrations — Real Webhooks
+  const [webhooks, setWebhooks] = useState<any[]>([]);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [webhookEvents, setWebhookEvents] = useState<string[]>(['report.generated']);
+  const [webhookSecret, setWebhookSecret] = useState('');
+  const [isSavingWebhook, setIsSavingWebhook] = useState(false);
   const [hasGsc, setHasGsc] = useState(false);
   const [hasWebhooks, setHasWebhooks] = useState(false);
 
@@ -766,12 +789,91 @@ function SettingsContent() {
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>Webhooks</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Send report events to Slack, Zapier, or any endpoint</div>
                   </div>
-                  {hasWebhooks ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(true); saveMockState({ hasWebhooks: true }); toast.success('Webhooks integration active!'); }}>Enable Hooks</button>}
+                  {hasWebhooks ? (
+                    <button className="btn btn-secondary" style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(false); saveMockState({ hasWebhooks: false }); toast.success('Webhooks paused.'); }}>Pause</button>
+                  ) : (
+                    <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(true); saveMockState({ hasWebhooks: true }); toast.success('Webhooks integration active!'); }}>Enable Hooks</button>
+                  )}
                 </div>
-                <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Configure webhook endpoints to trigger on report generation, client views, and sync completions.</span>
-                  {hasWebhooks && <button className="btn btn-secondary" style={{ color: '#DC2626', borderColor: 'rgba(220,38,38,0.2)', fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { setHasWebhooks(false); saveMockState({ hasWebhooks: false }); toast.success('Webhooks paused.'); }}>Pause</button>}
-                </div>
+                
+                {hasWebhooks && (
+                  <div style={{ padding: '24px' }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Active Endpoints</div>
+                    {webhooks.length === 0 ? (
+                      <div style={{ padding: '20px', background: 'var(--gray-50)', borderRadius: 8, fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 20 }}>
+                        No webhooks configured yet.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                        {webhooks.map((wh) => (
+                          <div key={wh.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{wh.url}</div>
+                              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+                                Events: {JSON.parse(wh.events || '[]').join(', ')}
+                              </div>
+                            </div>
+                            <button
+                              style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: 6 }}
+                              onClick={async () => {
+                                if (confirm('Delete this webhook endpoint?')) {
+                                  await fetch(`/api/agency/webhooks?id=${wh.id}`, { method: 'DELETE' });
+                                  setWebhooks(webhooks.filter(w => w.id !== wh.id));
+                                  toast.success('Webhook deleted');
+                                }
+                              }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div style={{ background: 'var(--gray-50)', padding: 20, borderRadius: 12, border: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Add New Webhook</div>
+                      <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!webhookUrl) return;
+                        setIsSavingWebhook(true);
+                        try {
+                          const res = await fetch('/api/agency/webhooks', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: webhookUrl, events: webhookEvents, secret: webhookSecret }),
+                          });
+                          if (res.ok) {
+                            const newHook = await res.json();
+                            setWebhooks([newHook, ...webhooks]);
+                            setWebhookUrl('');
+                            setWebhookSecret('');
+                            toast.success('Webhook added');
+                          } else {
+                            toast.error('Failed to add webhook');
+                          }
+                        } catch {
+                          toast.error('Network error');
+                        } finally {
+                          setIsSavingWebhook(false);
+                        }
+                      }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+                          <div>
+                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>Payload URL</label>
+                            <input type="url" required value={webhookUrl} onChange={e => setWebhookUrl(e.target.value)} placeholder="https://api.example.com/webhook" className="form-input" style={{ width: '100%', marginTop: 4, background: 'var(--surface)' }} />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>Secret (Optional)</label>
+                            <input type="text" value={webhookSecret} onChange={e => setWebhookSecret(e.target.value)} placeholder="Secret for HMAC-SHA256 signing" className="form-input" style={{ width: '100%', marginTop: 4, background: 'var(--surface)' }} />
+                          </div>
+                        </div>
+                        <button type="submit" disabled={isSavingWebhook} className="btn btn-primary" style={{ fontSize: 12, padding: '8px 16px', borderRadius: 8 }}>
+                          {isSavingWebhook ? 'Saving...' : 'Add Endpoint'}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -904,8 +1006,33 @@ function SettingsContent() {
                     <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 16 }}>Authentication Levels</div>
                     <SettingRow label="Two-Factor Auth" hint="Require a TOTP code on login in addition to your password.">
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <Toggle checked={mfaEnabled} onChange={v => { setMfaEnabled(v); saveMockState({ mfaEnabled: v }); toast.info(v ? '2FA Enabled via Auth App' : '2FA disabled'); }} />
-                        <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>{mfaEnabled ? 'Enabled' : 'Disabled'}</span>
+                        <Toggle checked={mfaEnabled} onChange={async (v) => {
+                          if (v && !mfaEnabled) {
+                            // User wants to enable 2FA -> Generate Secret
+                            setMfaLoading(true);
+                            try {
+                              const res = await fetch('/api/agency/2fa/generate');
+                              const data = await res.json();
+                              if (res.ok) {
+                                setMfaQrCode(data.qrCode);
+                                setMfaTempSecret(data.secret);
+                                setMfaSetupOpen(true);
+                              } else {
+                                toast.error(data.error || 'Failed to start 2FA setup');
+                              }
+                            } catch (e) {
+                              toast.error('Network error during 2FA setup');
+                            } finally {
+                              setMfaLoading(false);
+                            }
+                          } else if (!v && mfaEnabled) {
+                            // User wants to disable 2FA
+                            setMfaDisableOpen(true);
+                          }
+                        }} />
+                        <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>
+                          {mfaLoading ? 'Loading...' : mfaEnabled ? 'Enabled' : 'Disabled'}
+                        </span>
                       </div>
                     </SettingRow>
                     <SettingRow label="Password" hint="Last changed: Recently updated.">
@@ -1066,7 +1193,25 @@ function SettingsContent() {
                 <button
                   className="btn btn-secondary"
                   style={{ fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 18px', borderRadius: 8 }}
-                  onClick={() => setIsPortalModalOpen(true)}
+                  onClick={async () => {
+                    toast.loading('Opening Stripe Portal...');
+                    try {
+                      const res = await fetch('/api/agency/stripe/create-portal');
+                      const data = await res.json();
+                      toast.dismiss();
+                      if (res.ok && data.url) {
+                        window.location.href = data.url;
+                      } else {
+                        // Fallback to mock portal if Stripe keys are missing
+                        toast.error(data.error || 'Failed to open real Stripe portal');
+                        setIsPortalModalOpen(true);
+                      }
+                    } catch (e) {
+                      toast.dismiss();
+                      toast.error('Network error');
+                      setIsPortalModalOpen(true);
+                    }
+                  }}
                 >
                   <ExternalLink size={12} /> Manage Billing Portal
                 </button>

@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { decrypt } from '@/lib/encryption';
 import { SERankingClient } from '@/lib/seranking/client';
+import { dispatchWebhooks } from '@/lib/webhook-dispatcher';
 
 /**
  * POST /api/reports/[id]/process
@@ -212,6 +213,20 @@ export async function POST(
     }
 
     console.log(`[PROCESS] Report ${id} marked as done.`);
+
+    // Fire webhooks in background (do not await — non-blocking)
+    const agencyId = updatedReport.client.agency?.name ? (
+      await prisma.agency.findFirst({ where: { clients: { some: { id: updatedReport.client.id } } }, select: { id: true } })
+    )?.id : null;
+    if (agencyId) {
+      dispatchWebhooks(agencyId, 'report.generated', {
+        reportId: id,
+        clientId: updatedReport.client.id,
+        clientName: updatedReport.client.name,
+        domain: updatedReport.client.domain,
+      }).catch(console.error);
+    }
+
     return NextResponse.json({ status: 'done', report: updatedReport });
 
   } catch (error: unknown) {
@@ -219,10 +234,19 @@ export async function POST(
 
     // Mark report as failed on uncaught error
     try {
-      await prisma.report.update({
+      const failedReport = await prisma.report.update({
         where: { id },
         data: { status: 'failed' },
+        include: { client: { select: { id: true, name: true, domain: true, agencyId: true } } },
       });
+      // Fire webhook for failure
+      dispatchWebhooks(failedReport.client.agencyId, 'report.failed', {
+        reportId: id,
+        clientId: failedReport.client.id,
+        clientName: failedReport.client.name,
+        domain: failedReport.client.domain,
+        reason: String(error),
+      }).catch(console.error);
     } catch { /* ignore */ }
 
     return NextResponse.json({ error: 'Processing failed' }, { status: 500 });

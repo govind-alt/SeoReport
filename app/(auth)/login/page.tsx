@@ -21,9 +21,10 @@ function LoginFormContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
   
-  // Login State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [require2FA, setRequire2FA] = useState(false);
+  const [totpCode, setTotpCode] = useState('');
   const [loginError, setLoginError] = useState(''); // empty string = no error
   const [loading, setLoading] = useState(false);
 
@@ -76,18 +77,26 @@ function LoginFormContent() {
 
     try {
       const cleanEmail = email.trim().toLowerCase();
-      const res = await signIn('credentials', {
+      const payload: any = {
         email: cleanEmail,
         password,
         redirect: false,
-      });
+      };
+
+      if (require2FA) {
+        payload.totpCode = totpCode;
+      }
+
+      const res = await signIn('credentials', payload);
 
       if (res?.error) {
-        // Surface rate-limit or credential error
-        if (res.error.includes('Too many')) {
+        if (res.error === '2FA_REQUIRED') {
+          setRequire2FA(true);
+          setLoginError('');
+        } else if (res.error.includes('Too many')) {
           setLoginError(res.error);
         } else {
-          setLoginError('Invalid email or password. Please try again.');
+          setLoginError(res.error || 'Invalid email or password. Please try again.');
         }
         setLoading(false);
       } else {
@@ -283,32 +292,42 @@ function LoginFormContent() {
               )}
 
               <form id="loginForm" onSubmit={handleLogin}>
-                <div className="role-selector" id="loginRoleSelector">
-                  <div className={`role-option ${selectedRole === 'agency' ? 'active' : ''}`} onClick={() => setSelectedRole('agency')}>🏢 Agency</div>
-                  <div className={`role-option ${selectedRole === 'client' ? 'active' : ''}`} onClick={() => setSelectedRole('client')}>👤 Client</div>
-                  <div className={`role-option ${selectedRole === 'admin' ? 'active' : ''}`} onClick={() => setSelectedRole('admin')}>🛡️ Admin</div>
-                </div>
+                {!require2FA ? (
+                  <>
+                    <div className="role-selector" id="loginRoleSelector">
+                      <div className={`role-option ${selectedRole === 'agency' ? 'active' : ''}`} onClick={() => setSelectedRole('agency')}>🏢 Agency</div>
+                      <div className={`role-option ${selectedRole === 'client' ? 'active' : ''}`} onClick={() => setSelectedRole('client')}>👤 Client</div>
+                      <div className={`role-option ${selectedRole === 'admin' ? 'active' : ''}`} onClick={() => setSelectedRole('admin')}>🛡️ Admin</div>
+                    </div>
 
-                <div className="form-group">
-                  <label className="form-label" htmlFor="loginEmail">Email Address</label>
-                  <input className="form-input" id="loginEmail" type="email" placeholder="john@agency.com" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="loginPassword">
-                    Password
-                    <a className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}} onClick={() => setActiveTab('forgot')}>Forgot password?</a>
-                  </label>
-                  <div className="input-with-icon">
-                    <input className="form-input" id="loginPassword" type={showPassword ? "text" : "password"} placeholder="••••••••••" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
-                    <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "🙈" : "👁"}</button>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="loginEmail">Email Address</label>
+                      <input className="form-input" id="loginEmail" type="email" placeholder="john@agency.com" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="loginPassword">
+                        Password
+                        <a className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}} onClick={() => setActiveTab('forgot')}>Forgot password?</a>
+                      </label>
+                      <div className="input-with-icon">
+                        <input className="form-input" id="loginPassword" type={showPassword ? "text" : "password"} placeholder="••••••••••" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />
+                        <button type="button" className="input-icon-btn" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "🙈" : "👁"}</button>
+                      </div>
+                    </div>
+                    <div className="checkbox-row mb-4">
+                      <input type="checkbox" id="rememberMe" defaultChecked/>
+                      <label htmlFor="rememberMe">Remember me for 30 days</label>
+                    </div>
+                  </>
+                ) : (
+                  <div className="form-group mb-4" style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>Enter the 6-digit code from your authenticator app.</div>
+                    <input className="form-input" id="totpCode" type="text" placeholder="123456" maxLength={6} required value={totpCode} onChange={e => setTotpCode(e.target.value)} style={{ fontSize: 24, letterSpacing: 8, textAlign: 'center', padding: '12px 16px', fontWeight: 800 }} />
+                    <button type="button" className="link btn-ghost mt-4" style={{ fontSize: 12 }} onClick={() => setRequire2FA(false)}>← Back to login</button>
                   </div>
-                </div>
-                <div className="checkbox-row mb-4">
-                  <input type="checkbox" id="rememberMe" defaultChecked/>
-                  <label htmlFor="rememberMe">Remember me for 30 days</label>
-                </div>
-                <button type="submit" className="btn btn-primary" id="loginBtn" disabled={loading}>
-                  <span>{loading ? "Signing in..." : "Sign In"}</span>
+                )}
+                <button type="submit" className="btn btn-primary" id="loginBtn" disabled={loading || (require2FA && totpCode.length !== 6)}>
+                  <span>{loading ? "Signing in..." : (require2FA ? "Verify 2FA" : "Sign In")}</span>
                 </button>
               </form>
 
