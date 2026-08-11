@@ -51,3 +51,27 @@ NEXT_PUBLIC_ROOT_DOMAIN="localhost:3000"
 - If you change the port, update both `NEXTAUTH_URL` and `NEXT_PUBLIC_ROOT_DOMAIN`.
 
 ---
+
+## 2026-08-11 — External Repo Merge & Work Sync to hrishita-work
+
+**Task:** Clone/checkout repository, create branch `hrishita-work`, pull external work from `https://github.com/hrishitas2409336202-bit/SEOreport`, and purge stale files from `main` branch.  
+**Files Changed:**
+- All repository files synced to match latest `hrishita-work` commit history (`5c14117`)
+- Purged stale/deprecated files present in previous `main` branch state
+
+**What Was Done:**
+Cloned `https://github.com/govind-alt/SeoReport.git` into workspace, created and checked out `hrishita-work` branch, fetched commits & working tree changes from local/remote repository `SEOreport`, reset `hrishita-work` to `5c14117`, synced working tree modifications, and updated `main` branch to match `hrishita-work` to eliminate stale files.
+
+**Why:**
+To consolidate all development work and complete history from `hrishitas2409336202-bit/SEOreport` into the unified `hrishita-work` and `main` branches cleanly.
+
+**How It Works:**
+Git branch `hrishita-work` was reset to `FETCH_HEAD` (`5c14117`), uncommitted active working tree changes were copied over, and `main` branch was reset to `hrishita-work` (`git reset --hard hrishita-work`) to remove obsolete files across both branches.
+
+**Gotchas / Watch Out For:**
+- Standard `git merge` between `govind-alt/SeoReport` and `hrishitas2409336202-bit/SEOreport` triggers unrelated histories conflict; reset to `FETCH_HEAD` cleanly aligns the commit graph.
+
+**Open Questions:** None
+
+---
+

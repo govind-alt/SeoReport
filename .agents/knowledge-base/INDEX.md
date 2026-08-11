@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-11 | External Repo Sync & Stale File Cleanup | devops | Synced all commits from external repo to hrishita-work & updated main branch cleanly |
 | 2026-08-10 | Strict Role Routing & NextAuth v5 Error Handling | auth | Enforced strict UI tab to DB role matching, blocked Google auto-signup, and fixed NextAuth masking errors as 'Configuration' |
 | 2026-08-10 | Settings Real-World Integrations | frontend | Converted 2FA, Webhooks, and Stripe Customer Portal into real API-backed implementations |
 | 2026-08-10 | Settings Module Full Persistence Fix | frontend | Stored all remaining mock UI states (Notifications, 2FA, GSC) in brandingJson for frontend persistence |
