@@ -1,7 +1,7 @@
 'use client';
 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname, useParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -303,8 +303,8 @@ export function Sidebar() {
               transition: 'var(--transition-fast)',
               background: isUserMenuOpen ? 'var(--sidebar-hover)' : 'transparent',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--sidebar-hover)')}
-            onMouseLeave={e => (e.currentTarget.style.background = isUserMenuOpen ? 'var(--sidebar-hover)' : 'transparent')}
+            onMouseEnter={e => ((e.currentTarget as HTMLDivElement).style.background = 'var(--sidebar-hover)')}
+            onMouseLeave={e => ((e.currentTarget as HTMLDivElement).style.background = isUserMenuOpen ? 'var(--sidebar-hover)' : 'transparent')}
           >
             <div className="sidebar-avatar">{userInitials}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
