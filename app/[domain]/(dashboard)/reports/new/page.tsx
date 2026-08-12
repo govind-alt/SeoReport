@@ -26,7 +26,7 @@ export default function ReportWizardPage({ params }: { params: Promise<{ domain:
   const [newReportId, setNewReportId] = useState<string | null>(null);
 
   // Base path for navigation
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   useEffect(() => {
     async function load() {

@@ -10,7 +10,7 @@ export default async function ClientDashboardLayout({
 }) {
   const resolvedParams = await params;
   const domain = resolvedParams.domain;
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   
   const session = await auth();
 

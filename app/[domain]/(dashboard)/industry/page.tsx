@@ -5,7 +5,7 @@ import ExportButton from './ExportButton';
 export default async function IndustryPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = await params;
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   
   const industries = await getIndustryData(domain);
 

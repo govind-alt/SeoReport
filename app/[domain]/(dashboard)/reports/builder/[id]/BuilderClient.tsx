@@ -22,7 +22,7 @@ const AVAILABLE_MODULES = [
 ];
 
 export default function BuilderClient({ reportId, clientName, initialModules, domain }: { reportId: string, clientName: string, initialModules: string[], domain: string }) {
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   const [activeModules, setActiveModules] = useState<{ id: string; type: string }[]>(() =>
     initialModules.map(m => ({ id: `${m}-${nextModuleId()}`, type: m }))
   );

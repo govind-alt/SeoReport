@@ -13,7 +13,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
   
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   useEffect(() => {
     setLoading(true);

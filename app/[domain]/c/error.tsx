@@ -12,7 +12,7 @@ export default function ClientPortalError({
 }) {
   const params = useParams();
   const domain = (params?.domain as string) || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   return (
     <div

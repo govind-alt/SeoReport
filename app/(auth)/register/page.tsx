@@ -56,6 +56,20 @@ export default function RegisterPage() {
   const [subdomainStatus, setSubdomainStatus] = useState<"idle"|"checking"|"available"|"taken">("idle");
   const [showToS, setShowToS] = useState(false);
 
+  useEffect(() => {
+    // Override browser password manager autofill pass
+    const timer = setTimeout(() => {
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setAgencyName("");
+      setSubdomain("");
+      setPassword("");
+      setConfirmPassword("");
+    }, 150);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Debounced subdomain check
   useEffect(() => {
     if (!subdomain || subdomain.length < 3) {

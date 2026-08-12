@@ -16,7 +16,7 @@ export default function ReportDetailPage({
   params: Promise<{ domain: string; reportId: string }>;
 }) {
   const { domain, reportId } = use(params);
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   const [report, setReport] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);

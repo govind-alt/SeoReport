@@ -34,6 +34,15 @@ export default function Login() {
   const [forgotSent, setForgotSent] = useState(false);
 
   useEffect(() => {
+    // Override browser password manager autofill pass
+    const timer = setTimeout(() => {
+      setEmail('');
+      setPassword('');
+      setRegEmail('');
+      setRegPassword('');
+      setRegConfirm('');
+    }, 150);
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const errorParam = params.get('error');
@@ -45,6 +54,7 @@ export default function Login() {
         }
       }
     }
+    return () => clearTimeout(timer);
   }, []);
 
   /**
@@ -228,11 +238,25 @@ export default function Login() {
           <div className="auth-tabs" id="authTabs">
             <div
               className={`auth-tab ${activeTab === 'signin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('signin')}
+              onClick={() => {
+                setActiveTab('signin');
+                setLoginError('');
+                setRegError('');
+                setPassword('');
+                setRegPassword('');
+                setRegConfirm('');
+              }}
             >Sign In</div>
             <div
               className={`auth-tab ${activeTab === 'register' ? 'active' : ''}`}
-              onClick={() => setActiveTab('register')}
+              onClick={() => {
+                setActiveTab('register');
+                setLoginError('');
+                setRegError('');
+                setPassword('');
+                setRegPassword('');
+                setRegConfirm('');
+              }}
             >Create Account</div>
           </div>
 
@@ -312,10 +336,11 @@ export default function Login() {
                     <input
                       className="form-input"
                       id="loginPassword"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••••"
-                      autoComplete="current-password"
+                      name="agency_secret_field"
+                      type="text"
+                      style={{ WebkitTextSecurity: showPassword ? 'none' : 'disc' } as any}
+                      placeholder="Enter your password"
+                      autoComplete="off"
                       required
                       value={password}
                       onChange={e => setPassword(e.target.value)}
@@ -489,10 +514,11 @@ export default function Login() {
                   <input
                     className="form-input"
                     id="confirmPwd"
-                    name="confirmPwd"
-                    type="password"
-                    placeholder="••••••••••"
-                    autoComplete="new-password"
+                    name="confirm_password_no_autofill"
+                    type="text"
+                    style={{ WebkitTextSecurity: 'disc' } as any}
+                    placeholder="Re-enter password"
+                    autoComplete="off"
                     required
                     value={regConfirm}
                     onChange={e => setRegConfirm(e.target.value)}

@@ -9,7 +9,7 @@ import './help.css';
 export default function HelpPage({ params }: { params: Promise<{ domain: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = `/${domain}`;
 
   const [search, setSearch] = useState('');
   const [issueType, setIssueType] = useState('Technical Support');

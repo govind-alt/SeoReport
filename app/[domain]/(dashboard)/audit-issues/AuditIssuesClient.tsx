@@ -151,7 +151,7 @@ export default function AuditIssuesClient({ domain }: { domain: string }) {
   const [search, setSearch] = useState('');
   const [activeGuideModal, setActiveGuideModal] = useState<AuditIssue | null>(null);
 
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   // Filtered issues
   const filteredIssues = useMemo(() => {

@@ -19,7 +19,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function PublicReportView({ params }: { params: Promise<{ domain: string, slug: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   const slug = resolvedParams.slug;
 
   const [report, setReport] = useState<any>(null);

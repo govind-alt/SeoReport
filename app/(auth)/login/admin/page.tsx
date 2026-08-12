@@ -20,6 +20,12 @@ export default function AdminLogin() {
   const [forgotSent, setForgotSent] = useState(false);
 
   useEffect(() => {
+    // Override browser password manager autofill pass
+    const timer = setTimeout(() => {
+      setEmail('');
+      setPassword('');
+    }, 150);
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const errorParam = params.get('error');
@@ -33,6 +39,7 @@ export default function AdminLogin() {
         }
       }
     }
+    return () => clearTimeout(timer);
   }, []);
 
 
@@ -196,10 +203,11 @@ export default function AdminLogin() {
                     <input
                       className="form-input"
                       id="adminPassword"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••••"
-                      autoComplete="current-password"
+                      name="admin_secret_field"
+                      type="text"
+                      style={{ WebkitTextSecurity: showPassword ? 'none' : 'disc' } as any}
+                      placeholder="Enter your password"
+                      autoComplete="off"
                       required
                       value={password}
                       onChange={e => setPassword(e.target.value)}

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 export default function GuidePage({ params }: { params: Promise<{ domain: string, id: string }> }) {
   const { domain, id } = use(params);
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = `/${domain}`;
 
   const [rated, setRated] = useState<'yes' | 'no' | null>(null);
 

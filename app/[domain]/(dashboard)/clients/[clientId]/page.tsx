@@ -14,7 +14,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function ClientDetailPage({ params }: { params: Promise<{ domain: string; clientId: string }> }) {
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
   const clientId = resolvedParams.clientId;
 
   const [activeTab, setActiveTab] = useState<'overview' | 'keywords' | 'traffic' | 'backlinks' | 'audit' | 'competitors' | 'reports'>('overview');

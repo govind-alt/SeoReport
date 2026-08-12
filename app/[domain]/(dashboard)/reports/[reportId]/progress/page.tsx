@@ -17,7 +17,7 @@ export default function ReportProgressPage({ params }: { params: Promise<{ domai
   const router = useRouter();
   const resolvedParams = use(params);
   const { domain, reportId } = resolvedParams;
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   const [currentStage, setCurrentStage] = useState(0);
   const [progress, setProgress] = useState(0);

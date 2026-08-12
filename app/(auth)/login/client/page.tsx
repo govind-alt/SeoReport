@@ -27,6 +27,15 @@ export default function ClientLogin() {
   const [reqSent, setReqSent] = useState(false);
 
   useEffect(() => {
+    // Override browser password manager autofill pass
+    const timer = setTimeout(() => {
+      setEmail('');
+      setPassword('');
+      setReqEmail('');
+      setReqName('');
+      setReqCompany('');
+    }, 150);
+
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const errorParam = params.get('error');
@@ -40,6 +49,7 @@ export default function ClientLogin() {
         }
       }
     }
+    return () => clearTimeout(timer);
   }, []);
 
 
@@ -280,10 +290,11 @@ export default function ClientLogin() {
                     <input
                       className="form-input"
                       id="clientPassword"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••••"
-                      autoComplete="current-password"
+                      name="client_secret_field"
+                      type="text"
+                      style={{ WebkitTextSecurity: showPassword ? 'none' : 'disc' } as any}
+                      placeholder="Enter your password"
+                      autoComplete="off"
                       required
                       value={password}
                       onChange={e => setPassword(e.target.value)}

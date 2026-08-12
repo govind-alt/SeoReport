@@ -18,7 +18,7 @@ export default function ClientsPage({ params }: { params: Promise<{ domain: stri
 
   const resolvedParams = use(params);
   const domain = resolvedParams.domain || 'localhost';
-  const basePath = domain === 'localhost' ? '/localhost' : '';
+  const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
   const fetchClients = async () => {
     try {

@@ -16,6 +16,12 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Override browser password manager autofill pass
+    const timer = setTimeout(() => {
+      setEmail('');
+      setPassword('');
+    }, 150);
+
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search);
       const err = p.get('error');
@@ -27,6 +33,7 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
         }
       }
     }
+    return () => clearTimeout(timer);
   }, []);
 
 
@@ -177,7 +184,7 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
                     type="password"
                     required
                     className="form-input"
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     autoComplete="current-password"
