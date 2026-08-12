@@ -59,7 +59,51 @@ export async function POST(req: Request) {
       payload,
       results
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Alert dispatch error' }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Alert dispatch error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+/**
+ * PUT /api/webhooks/alerts
+ * Saves Slack / Teams webhook URLs to the agency record.
+ */
+export async function PUT(req: Request) {
+  try {
+    const body = await req.json();
+    const { agencyId, slackWebhookUrl, teamsWebhookUrl } = body;
+
+    if (!agencyId) {
+      return NextResponse.json({ error: 'agencyId is required' }, { status: 400 });
+    }
+
+    const updateData: Record<string, string> = {};
+    if (slackWebhookUrl !== undefined) updateData.slackWebhookUrl = slackWebhookUrl.trim();
+    if (teamsWebhookUrl !== undefined) updateData.teamsWebhookUrl = teamsWebhookUrl.trim();
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'No webhook URL provided' }, { status: 400 });
+    }
+
+    await prisma.agency.update({
+      where: { id: agencyId },
+      data: updateData as any,
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        agencyId,
+        action: `Webhook URL updated: ${Object.keys(updateData).join(', ')}`,
+        userName: 'Agency Settings',
+        userInitials: 'AS',
+      }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to save webhook URL';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+

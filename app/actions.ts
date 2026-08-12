@@ -834,11 +834,18 @@ export async function getClientPortalData(domain: string) {
     const session = await auth();
     let client = null;
 
+    // On localhost (local dev), domain may be 'localhost' and won't match any agency slug.
+    // In that case, fall back to the first agency so the portal renders meaningful data.
+    const isLocalhost = domain === 'localhost' || domain === '127.0.0.1';
+    const agencyWhere = isLocalhost
+      ? {} // match any agency
+      : { OR: [{ slug: domain }, { subdomain: domain }] };
+
     if (session?.user?.role === 'client' && session.user.email) {
       client = await prisma.client.findFirst({
         where: {
           contactEmail: session.user.email,
-          agency: { OR: [{ slug: domain }, { subdomain: domain }] }
+          ...(isLocalhost ? {} : { agency: agencyWhere }),
         },
         include: {
           agency: true,
@@ -853,7 +860,7 @@ export async function getClientPortalData(domain: string) {
 
     if (!client) {
       client = await prisma.client.findFirst({
-        where: { agency: { OR: [{ slug: domain }, { subdomain: domain }] } },
+        where: isLocalhost ? {} : { agency: agencyWhere },
         include: {
           agency: true,
           keywordSnapshots: { orderBy: { date: 'asc' } },

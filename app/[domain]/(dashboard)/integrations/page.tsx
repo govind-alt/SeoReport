@@ -20,11 +20,14 @@ export default async function IntegrationsPage({ params }: { params: Promise<{ d
     return <div>Agency not found</div>;
   }
 
-  // Mocking integration status for the wireframe
   const integrations = {
     seranking: !!agency.serankingApiKey,
-    gsc: false, // Google Search Console
-    slack: false // Slack Notifications
+    gsc: false, // Google Search Console — set true when GSC tokens stored
+    slack: !!(agency as any).slackWebhookUrl,
+    teams: !!(agency as any).teamsWebhookUrl,
+    slackWebhookUrl: (agency as any).slackWebhookUrl || '',
+    teamsWebhookUrl: (agency as any).teamsWebhookUrl || '',
+    agencyId: agency.id,
   };
 
   return <IntegrationsClient integrations={integrations} domain={domain} />;

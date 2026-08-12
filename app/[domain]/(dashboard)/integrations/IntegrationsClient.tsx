@@ -4,10 +4,30 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function IntegrationsClient({ integrations, domain }: { integrations: any, domain: string }) {
+interface IntegrationProps {
+  integrations: {
+    seranking: boolean;
+    gsc: boolean;
+    slack: boolean;
+    teams: boolean;
+    slackWebhookUrl: string;
+    teamsWebhookUrl: string;
+    agencyId: string;
+  };
+  domain: string;
+}
+
+export default function IntegrationsClient({ integrations, domain }: IntegrationProps) {
   const [isConnectingGSC, setIsConnectingGSC] = useState(false);
-  const [isConnectingSlack, setIsConnectingSlack] = useState(false);
   const [selectedGscClient, setSelectedGscClient] = useState('');
+
+  // Slack/Teams webhook state — initialized from DB values
+  const [slackUrl, setSlackUrl] = useState(integrations.slackWebhookUrl);
+  const [teamsUrl, setTeamsUrl] = useState(integrations.teamsWebhookUrl);
+  const [savingSlack, setSavingSlack] = useState(false);
+  const [savingTeams, setSavingTeams] = useState(false);
+  const [testingSlack, setTestingSlack] = useState(false);
+  const [testingTeams, setTestingTeams] = useState(false);
 
   const basePath = domain === 'localhost' ? '/localhost' : `/${domain}`;
 
@@ -16,13 +36,104 @@ export default function IntegrationsClient({ integrations, domain }: { integrati
     window.location.href = `/api/integrations/gsc/connect?domain=${domain}`;
   };
 
-  const handleConnectSlack = () => {
-    setIsConnectingSlack(true);
-    const t = toast.loading('Redirecting to Slack...');
-    setTimeout(() => {
-      toast.error('Slack integration requires a Slack App configuration. See documentation.', { id: t });
-      setIsConnectingSlack(false);
-    }, 1200);
+  // ── Save Slack Webhook URL ───────────────────────────────────────────────────
+  const handleSaveSlack = async () => {
+    if (!slackUrl.trim()) { toast.error('Please enter a Slack webhook URL'); return; }
+    if (!slackUrl.startsWith('https://hooks.slack.com/')) {
+      toast.error('Slack webhook URL must start with https://hooks.slack.com/');
+      return;
+    }
+    setSavingSlack(true);
+    const t = toast.loading('Saving Slack webhook...');
+    try {
+      const res = await fetch('/api/webhooks/alerts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agencyId: integrations.agencyId, slackWebhookUrl: slackUrl }),
+      });
+      if (res.ok) {
+        toast.success('✅ Slack webhook saved successfully!', { id: t });
+      } else {
+        const d = await res.json();
+        toast.error(d.error || 'Failed to save', { id: t });
+      }
+    } catch {
+      toast.error('Failed to save Slack webhook', { id: t });
+    }
+    setSavingSlack(false);
+  };
+
+  // ── Test Slack Webhook ───────────────────────────────────────────────────────
+  const handleTestSlack = async () => {
+    if (!slackUrl) { toast.error('Save a Slack webhook URL first'); return; }
+    setTestingSlack(true);
+    const t = toast.loading('Sending test Slack alert...');
+    try {
+      const res = await fetch('/api/webhooks/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agencyId: integrations.agencyId, type: 'Test Alert from RankFlow' }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        toast.success('✅ Test alert sent! Check your Slack channel.', { id: t });
+      } else {
+        toast.error(d.message || 'Test failed', { id: t });
+      }
+    } catch {
+      toast.error('Failed to send test alert', { id: t });
+    }
+    setTestingSlack(false);
+  };
+
+  // ── Save Teams Webhook URL ───────────────────────────────────────────────────
+  const handleSaveTeams = async () => {
+    if (!teamsUrl.trim()) { toast.error('Please enter a Teams webhook URL'); return; }
+    if (!teamsUrl.startsWith('https://') || !teamsUrl.includes('webhook')) {
+      toast.error('Enter a valid Microsoft Teams incoming webhook URL');
+      return;
+    }
+    setSavingTeams(true);
+    const t = toast.loading('Saving Teams webhook...');
+    try {
+      const res = await fetch('/api/webhooks/alerts', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agencyId: integrations.agencyId, teamsWebhookUrl: teamsUrl }),
+      });
+      if (res.ok) {
+        toast.success('✅ Teams webhook saved successfully!', { id: t });
+      } else {
+        const d = await res.json();
+        toast.error(d.error || 'Failed to save', { id: t });
+      }
+    } catch {
+      toast.error('Failed to save Teams webhook', { id: t });
+    }
+    setSavingTeams(false);
+  };
+
+  // ── Test Teams Webhook ───────────────────────────────────────────────────────
+  const handleTestTeams = async () => {
+    if (!teamsUrl) { toast.error('Save a Teams webhook URL first'); return; }
+    setTestingTeams(true);
+    const t = toast.loading('Sending test Teams alert...');
+    try {
+      const res = await fetch('/api/webhooks/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agencyId: integrations.agencyId, type: 'Test Alert from RankFlow (Teams)' }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        toast.success('✅ Test alert sent! Check your Teams channel.', { id: t });
+      } else {
+        toast.error(d.message || 'Test failed', { id: t });
+      }
+    } catch {
+      toast.error('Failed to send test alert', { id: t });
+    }
+    setTestingTeams(false);
   };
 
   return (
@@ -46,19 +157,17 @@ export default function IntegrationsClient({ integrations, domain }: { integrati
             8,400 / 10,000 Credits Left
           </div>
         </div>
-
-        {/* Progress Bar */}
         <div style={{ width: '100%', height: '8px', background: 'var(--border)', borderRadius: '4px', overflow: 'hidden' }}>
           <div style={{ width: '84%', height: '100%', background: 'linear-gradient(90deg, #10B981, #6366F1)', borderRadius: '4px' }}></div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
-        
-        {/* SE Ranking */}
+
+        {/* ── SE Ranking ──────────────────────────────────────────────────── */}
         <div className="card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-            <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: 'white', fontWeight: 800 }}>
+            <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'linear-gradient(135deg, #10B981, #059669)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', color: 'white', fontWeight: 800 }}>
               SE
             </div>
             <div>
@@ -80,11 +189,11 @@ export default function IntegrationsClient({ integrations, domain }: { integrati
           </Link>
         </div>
 
-        {/* Google Search Console */}
+        {/* ── Google Search Console ───────────────────────────────────────── */}
         <div className="card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
             <div style={{ width: 48, height: 48, borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -93,7 +202,7 @@ export default function IntegrationsClient({ integrations, domain }: { integrati
             </div>
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Google Search Console</h3>
-              <div style={{ fontSize: '13px', color: '#10B981', fontWeight: 600 }}>✓ OAuth Ready</div>
+              <div style={{ fontSize: '13px', color: '#F59E0B', fontWeight: 600 }}>⚙️ OAuth Ready</div>
             </div>
           </div>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.5', flex: 1, marginBottom: '16px' }}>
@@ -120,35 +229,121 @@ export default function IntegrationsClient({ integrations, domain }: { integrati
           <button
             className="btn btn-primary"
             style={{ width: '100%' }}
-            onClick={() => {
-              if (!selectedGscClient) {
-                toast.info('Selecting client mapping for GSC OAuth flow...');
-              }
-              handleConnectGSC();
-            }}
+            onClick={handleConnectGSC}
             disabled={isConnectingGSC}
           >
-            {isConnectingGSC ? '⏳ Connecting GSC...' : '🔑 Connect GSC Property'}
+            {isConnectingGSC ? '⏳ Connecting...' : '🔑 Connect GSC Property'}
           </button>
         </div>
 
-        {/* Slack Notifications */}
-        <div className="card" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+        {/* ── Slack Notifications ─────────────────────────────────────────── */}
+        <div className="card" style={{ background: 'var(--surface)', border: `1px solid ${slackUrl ? '#10B981' : 'var(--border)'}`, borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
             <div style={{ width: 48, height: 48, borderRadius: '12px', background: '#4A154B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: 'white', fontWeight: 800 }}>
               #
             </div>
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Slack Notifications</h3>
-              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Optional</div>
+              <div style={{ fontSize: '13px', color: slackUrl ? '#10B981' : 'var(--text-muted)', fontWeight: 600 }}>
+                {slackUrl ? '✓ Webhook Configured' : 'Not Connected'}
+              </div>
             </div>
           </div>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.5', flex: 1, marginBottom: '24px' }}>
-            Receive real-time Slack alerts when monthly PDF reports finish generating or when clients view their portal.
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
+            Receive real-time Slack alerts when monthly PDF reports finish generating, site audits drop below 80%, or clients view their portal.
           </p>
-          <button className="btn btn-secondary" style={{ width: '100%' }} onClick={handleConnectSlack} disabled={isConnectingSlack}>
-            {isConnectingSlack ? 'Redirecting...' : 'Add to Slack'}
-          </button>
+
+          {/* Webhook URL Input */}
+          <div className="form-group" style={{ margin: '0 0 12px 0' }}>
+            <label className="form-label" style={{ fontSize: '11px' }}>Incoming Webhook URL</label>
+            <input
+              className="form-input"
+              type="url"
+              placeholder="https://hooks.slack.com/services/..."
+              value={slackUrl}
+              onChange={e => setSlackUrl(e.target.value)}
+              style={{ fontFamily: 'monospace', fontSize: '11px' }}
+            />
+            <div className="form-hint">
+              Get your webhook URL from Slack Apps → Incoming Webhooks
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              className="btn btn-primary"
+              style={{ flex: 1 }}
+              onClick={handleSaveSlack}
+              disabled={savingSlack}
+            >
+              {savingSlack ? '⏳ Saving...' : '💾 Save Webhook'}
+            </button>
+            {slackUrl && (
+              <button
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+                onClick={handleTestSlack}
+                disabled={testingSlack}
+              >
+                {testingSlack ? '⏳ Testing...' : '🧪 Send Test'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Microsoft Teams Notifications ──────────────────────────────── */}
+        <div className="card" style={{ background: 'var(--surface)', border: `1px solid ${teamsUrl ? '#10B981' : 'var(--border)'}`, borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ width: 48, height: 48, borderRadius: '12px', background: '#5059C9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', color: 'white', fontWeight: 800 }}>
+              T
+            </div>
+            <div>
+              <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Microsoft Teams</h3>
+              <div style={{ fontSize: '13px', color: teamsUrl ? '#10B981' : 'var(--text-muted)', fontWeight: 600 }}>
+                {teamsUrl ? '✓ Webhook Configured' : 'Not Connected'}
+              </div>
+            </div>
+          </div>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '16px' }}>
+            Send RankFlow alert cards directly to your Microsoft Teams channels when audit scores drop or reports are generated.
+          </p>
+
+          {/* Teams Webhook URL Input */}
+          <div className="form-group" style={{ margin: '0 0 12px 0' }}>
+            <label className="form-label" style={{ fontSize: '11px' }}>Incoming Webhook URL</label>
+            <input
+              className="form-input"
+              type="url"
+              placeholder="https://outlook.office.com/webhook/..."
+              value={teamsUrl}
+              onChange={e => setTeamsUrl(e.target.value)}
+              style={{ fontFamily: 'monospace', fontSize: '11px' }}
+            />
+            <div className="form-hint">
+              Create via Teams → Channel Settings → Connectors → Incoming Webhook
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              className="btn btn-primary"
+              style={{ flex: 1 }}
+              onClick={handleSaveTeams}
+              disabled={savingTeams}
+            >
+              {savingTeams ? '⏳ Saving...' : '💾 Save Webhook'}
+            </button>
+            {teamsUrl && (
+              <button
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+                onClick={handleTestTeams}
+                disabled={testingTeams}
+              >
+                {testingTeams ? '⏳ Testing...' : '🧪 Send Test'}
+              </button>
+            )}
+          </div>
         </div>
 
       </div>
