@@ -171,15 +171,15 @@ function AdminAccountSettingsForm() {
 
       <div className="form-group" style={{ marginBottom: '10px' }}>
         <label className="form-label">Old Password</label>
-        <input className="form-input" type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
+        <input className="form-input" type="password" autoComplete="current-password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
       </div>
       <div className="form-group" style={{ marginBottom: '10px' }}>
         <label className="form-label">New Password</label>
-        <input className="form-input" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
+        <input className="form-input" type="password" autoComplete="new-password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
       </div>
       <div className="form-group" style={{ marginBottom: '20px' }}>
         <label className="form-label">Confirm New Password</label>
-        <input className="form-input" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
+        <input className="form-input" type="password" autoComplete="new-password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%' }} />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

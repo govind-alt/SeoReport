@@ -35,7 +35,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   const [usrEmail, setUsrEmail] = useState('');
   const [usrRole, setUsrRole] = useState('admin');
   const [usrAgencyId, setUsrAgencyId] = useState('');
-  const [usrPassword, setUsrPassword] = useState('Password123!');
+  const [usrPassword, setUsrPassword] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
 
   const handleExportUsersCsv = () => {

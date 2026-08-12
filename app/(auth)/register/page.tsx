@@ -218,7 +218,7 @@ export default function RegisterPage() {
           {/* Email */}
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#cbd5e1", marginBottom: "6px" }}>Work Email *</label>
-            <input type="email" placeholder="john@youragency.com" required value={email}
+            <input type="email" placeholder="john@youragency.com" required value={email} autoComplete="off"
               onChange={e => setEmail(e.target.value)}
               style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#f1f5f9", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
           </div>
@@ -226,7 +226,7 @@ export default function RegisterPage() {
           {/* Agency Name */}
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#cbd5e1", marginBottom: "6px" }}>Agency Name *</label>
-            <input type="text" placeholder="Digital Horizons Agency" required value={agencyName}
+            <input type="text" placeholder="Digital Horizons Agency" required value={agencyName} autoComplete="organization"
               onChange={e => handleAgencyNameChange(e.target.value)}
               style={{ width: "100%", padding: "10px 14px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#f1f5f9", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
             <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>Shown on all client reports</div>
@@ -236,7 +236,7 @@ export default function RegisterPage() {
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#cbd5e1", marginBottom: "6px" }}>Agency Subdomain *</label>
             <div style={{ display: "flex", gap: "0" }}>
-              <input type="text" placeholder="digital-horizons" required value={subdomain}
+              <input type="text" placeholder="digital-horizons" required value={subdomain} autoComplete="off"
                 onChange={e => setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
                 style={{ flex: 1, padding: "10px 14px", background: "rgba(255,255,255,0.08)", border: `1px solid ${subdomainStatus === "available" ? "#16a34a" : subdomainStatus === "taken" ? "#ef4444" : "rgba(255,255,255,0.15)"}`, borderRadius: "8px 0 0 8px", color: "#f1f5f9", fontSize: "14px", outline: "none" }} />
               <div style={{ padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderLeft: "none", borderRadius: "0 8px 8px 0", color: "#94a3b8", fontSize: "13px", whiteSpace: "nowrap" }}>.rankflow.app</div>
@@ -248,7 +248,7 @@ export default function RegisterPage() {
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#cbd5e1", marginBottom: "6px" }}>Password *</label>
             <div style={{ position: "relative" }}>
-              <input type={showPassword ? "text" : "password"} placeholder="Min. 8 characters" required value={password}
+              <input type={showPassword ? "text" : "password"} placeholder="Min. 8 characters" required value={password} autoComplete="new-password"
                 onChange={e => setPassword(e.target.value)}
                 style={{ width: "100%", padding: "10px 44px 10px 14px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "8px", color: "#f1f5f9", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
               <button type="button" onClick={() => setShowPassword(!showPassword)}
@@ -263,7 +263,7 @@ export default function RegisterPage() {
           <div style={{ marginBottom: "20px" }}>
             <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "#cbd5e1", marginBottom: "6px" }}>Confirm Password *</label>
             <div style={{ position: "relative" }}>
-              <input type={showConfirm ? "text" : "password"} placeholder="••••••••" required value={confirmPassword}
+              <input type={showConfirm ? "text" : "password"} placeholder="••••••••" required value={confirmPassword} autoComplete="new-password"
                 onChange={e => setConfirmPassword(e.target.value)}
                 style={{ width: "100%", padding: "10px 44px 10px 14px", background: "rgba(255,255,255,0.08)", border: `1px solid ${confirmPassword && confirmPassword !== password ? "#ef4444" : "rgba(255,255,255,0.15)"}`, borderRadius: "8px", color: "#f1f5f9", fontSize: "14px", outline: "none", boxSizing: "border-box" }} />
               <button type="button" onClick={() => setShowConfirm(!showConfirm)}
@@ -271,6 +271,7 @@ export default function RegisterPage() {
                 {showConfirm ? "🙈" : "👁"}
               </button>
             </div>
+
             {confirmPassword && confirmPassword !== password && (
               <div style={{ fontSize: "11px", color: "#ef4444", marginTop: "4px" }}>⚠ Passwords do not match</div>
             )}
