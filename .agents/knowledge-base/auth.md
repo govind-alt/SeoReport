@@ -15,6 +15,14 @@
 
 ---
 
+## Portal Isolation & Entry Points
+1. **Agency Admin Login (`/login`)**: Primary sign-in + agency registration. Auto-redirects admins to `/[slug]` or `/superadmin`.
+2. **Client Login (`/login/client`)**: Client-specific portal login. Has a "Request Access" flow (not agency registration). Redirects to `/[domain]/c/dashboard` or `/c/dashboard`.
+3. **Superadmin Login (`/login/admin`)**: Restricted platform admin login. Self-registration disabled. Post-login role check enforces `superadmin` role.
+4. **Client Subdomain Login (`/[domain]/c/login`)**: Direct client portal login for custom agency domains. Handles path-based `/localhost` routing and subdomain routing.
+
+---
+
 ## 1-Click Test Credentials Matrix
 
 | Role | Portal URL | Email | Password |
