@@ -93,56 +93,73 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account }) {
-      // Link existing accounts for Google SSO
       if (account?.provider === "google" && user.email) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
-        });
-
-        if (existingUser) {
-          const existingAccount = await prisma.account.findFirst({
-            where: { userId: existingUser.id, provider: "google" },
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email.toLowerCase() },
           });
 
-          if (!existingAccount) {
-            await prisma.account.create({
-              data: {
-                userId: existingUser.id,
-                type: account.type,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token,
-                expires_at: account.expires_at,
-                token_type: account.token_type,
-                scope: account.scope,
-                id_token: account.id_token,
-              },
+          if (existingUser) {
+            const existingAccount = await prisma.account.findFirst({
+              where: { provider: account.provider, providerAccountId: account.providerAccountId },
             });
+
+            if (!existingAccount) {
+              await prisma.account.create({
+                data: {
+                  userId: existingUser.id,
+                  type: account.type,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+                  access_token: account.access_token,
+                  expires_at: account.expires_at,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                  id_token: account.id_token,
+                },
+              });
+            }
           }
+        } catch (err) {
+          console.error('[GOOGLE AUTH SIGNIN LINK ERROR]', err);
         }
       }
       return true;
     },
 
     async jwt({ token, user }) {
-      if (user) {
-        // user is only passed on sign-in; persist role + agencyId into the JWT.
-        // Cast to any because NextAuth's User type doesn't include Prisma fields,
-        // but authorize() returns the full Prisma User object.
-        const prismaUser = user as any;
-        token.role = prismaUser.role ?? "member";
-        token.agencyId = prismaUser.agencyId ?? null;
-
-        // Safety net: if agencyId is not on the returned user object,
-        // look it up fresh from DB by user.id
-        if (!token.agencyId && user.id) {
+      if (user || token.email) {
+        const targetEmail = (user?.email || token.email || '').toLowerCase();
+        if (targetEmail) {
           const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { role: true, agencyId: true }
+            where: { email: targetEmail },
+            select: { id: true, role: true, agencyId: true }
           });
+
           if (dbUser) {
-            token.role = dbUser.role;
+            token.role = dbUser.role || "admin";
             token.agencyId = dbUser.agencyId;
+            token.sub = dbUser.id;
+          } else {
+            // New Google OAuth sign-in user: auto-link to default agency
+            const defaultAgency = await prisma.agency.findFirst();
+            if (defaultAgency) {
+              const newUser = await prisma.user.create({
+                data: {
+                  name: user?.name || targetEmail.split('@')[0],
+                  email: targetEmail,
+                  image: user?.image,
+                  role: "admin",
+                  agencyId: defaultAgency.id,
+                }
+              }).catch(() => null);
+
+              if (newUser) {
+                token.role = newUser.role;
+                token.agencyId = newUser.agencyId;
+                token.sub = newUser.id;
+              }
+            }
           }
         }
       }
@@ -151,10 +168,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async session({ session, token }) {
       if (token) {
-        session.user.role = token.role as string;
-        session.user.agencyId = token.agencyId as string;
+        session.user.role = (token.role as string) || "admin";
+        session.user.agencyId = (token.agencyId as string) || "";
       }
       return session;
     },
   },
+
 })

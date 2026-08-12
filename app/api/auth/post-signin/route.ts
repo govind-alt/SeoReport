@@ -50,6 +50,19 @@ export async function GET(request: Request) {
     }
   }
 
-  // Fallback
+  // Fallback for new users without agencyId: link to first available agency
+  const defaultAgency = await prisma.agency.findFirst({ select: { id: true, slug: true } });
+  if (defaultAgency) {
+    if (session.user.id) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: { agencyId: defaultAgency.id, role: 'admin' }
+      }).catch(() => {});
+    }
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    return NextResponse.redirect(new URL(isLocalhost ? `/${defaultAgency.slug}` : '/', origin));
+  }
+
   return NextResponse.redirect(new URL('/login', origin));
 }
+

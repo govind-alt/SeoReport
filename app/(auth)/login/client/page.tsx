@@ -1,7 +1,7 @@
 "use client";
 
 import '../login.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -25,6 +25,23 @@ export default function ClientLogin() {
   const [reqEmail, setReqEmail] = useState('');
   const [reqCompany, setReqCompany] = useState('');
   const [reqSent, setReqSent] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const errorParam = params.get('error');
+      if (errorParam) {
+        if (errorParam === 'OAuthSignin' || errorParam === 'OAuthCallback' || errorParam === 'OAuthCreateAccount') {
+          setLoginError('Google OAuth Error: Please check GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in .env and ensure Authorized Redirect URIs match http://localhost:3000/api/auth/callback/google');
+        } else if (errorParam === 'CredentialsSignin') {
+          setLoginError('Invalid client credentials. Please try again.');
+        } else if (errorParam === 'AccessDenied') {
+          setLoginError('Access denied. Your account does not have permission to view this portal.');
+        }
+      }
+    }
+  }, []);
+
 
   // ── Resolve the correct redirect URL for client dashboard ──────────────────
   const buildClientDashboardUrl = (): string => {

@@ -1,7 +1,7 @@
 "use client";
 
 import '../login.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -18,6 +18,23 @@ export default function AdminLogin() {
   // Forgot password state
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSent, setForgotSent] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const errorParam = params.get('error');
+      if (errorParam) {
+        if (errorParam === 'OAuthSignin' || errorParam === 'OAuthCallback' || errorParam === 'OAuthCreateAccount') {
+          setLoginError('Google OAuth Error: Please verify GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in .env and ensure http://localhost:3000/api/auth/callback/google is registered in Google Cloud Console.');
+        } else if (errorParam === 'CredentialsSignin') {
+          setLoginError('Invalid superadmin credentials. Access denied.');
+        } else if (errorParam === 'AccessDenied') {
+          setLoginError('Access denied. Superadmin role required.');
+        }
+      }
+    }
+  }, []);
+
 
   // ── Sign In ────────────────────────────────────────────────────────────────
   const handleLogin = async (e: React.FormEvent) => {

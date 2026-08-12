@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, useEffect, use } from 'react';
 import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
 
@@ -14,6 +14,21 @@ export default function ClientLoginPage({ params }: { params: Promise<{ domain: 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const p = new URLSearchParams(window.location.search);
+      const err = p.get('error');
+      if (err) {
+        if (err === 'OAuthSignin' || err === 'OAuthCallback') {
+          setError('Google OAuth Error: Please check GOOGLE_CLIENT_ID in .env and redirect URIs in Google Cloud Console.');
+        } else if (err === 'CredentialsSignin') {
+          setError('Invalid email or password.');
+        }
+      }
+    }
+  }, []);
+
 
   /**
    * Build the correct client dashboard URL after successful login.
