@@ -100,6 +100,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (existingUser) {
+            // Keep Google profile photo & name synced with website User record
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                name: user.name || existingUser.name,
+                image: user.image || existingUser.image,
+              }
+            }).catch(() => null);
+
             const existingAccount = await prisma.account.findFirst({
               where: { provider: account.provider, providerAccountId: account.providerAccountId },
             });
@@ -128,18 +137,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async jwt({ token, user }) {
+      if (user?.image) {
+        token.picture = user.image;
+      }
       if (user || token.email) {
         const targetEmail = (user?.email || token.email || '').toLowerCase();
         if (targetEmail) {
           const dbUser = await prisma.user.findUnique({
             where: { email: targetEmail },
-            select: { id: true, role: true, agencyId: true }
+            select: { id: true, role: true, agencyId: true, image: true }
           });
 
           if (dbUser) {
             token.role = dbUser.role || "admin";
             token.agencyId = dbUser.agencyId;
             token.sub = dbUser.id;
+            if (dbUser.image) token.picture = dbUser.image;
           } else {
             // New Google OAuth sign-in user: auto-link to default agency
             const defaultAgency = await prisma.agency.findFirst();
@@ -158,6 +171,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 token.role = newUser.role;
                 token.agencyId = newUser.agencyId;
                 token.sub = newUser.id;
+                if (newUser.image) token.picture = newUser.image;
               }
             }
           }
@@ -170,6 +184,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token) {
         session.user.role = (token.role as string) || "admin";
         session.user.agencyId = (token.agencyId as string) || "";
+        if (token.sub) session.user.id = token.sub as string;
+        if (token.picture) session.user.image = token.picture as string;
       }
       return session;
     },
