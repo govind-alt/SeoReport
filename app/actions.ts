@@ -1204,13 +1204,34 @@ export async function logoutAction() {
 }
 
 export async function getUserAgencySlug(): Promise<string | null> {
-  const session = await auth();
-  if (!session?.user?.agencyId) return null;
-  const agency = await prisma.agency.findUnique({
-    where: { id: session.user.agencyId },
-    select: { slug: true }
-  });
-  return agency?.slug ?? null;
+  try {
+    const session = await auth();
+    if (!session?.user) return null;
+
+    if (session.user.role === 'superadmin') return null;
+
+    if (session.user.agencyId) {
+      const agency = await prisma.agency.findUnique({
+        where: { id: session.user.agencyId },
+        select: { slug: true }
+      });
+      if (agency?.slug) return agency.slug;
+    }
+
+    if (session.user.email) {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email.toLowerCase() },
+        include: { agency: true }
+      });
+      if (user?.agency?.slug) return user.agency.slug;
+    }
+
+    const firstAgency = await prisma.agency.findFirst({ select: { slug: true } });
+    return firstAgency?.slug || 'digital-horizons';
+  } catch (error) {
+    console.error('Error fetching user agency slug:', error);
+    return 'digital-horizons';
+  }
 }
 
 export async function getReports(domain: string) {
@@ -1664,4 +1685,5 @@ export async function respondToTicketSuperadmin(logId: string, replyText: string
 
   return { success: true };
 }
+
 
