@@ -86,3 +86,56 @@ import { getServerSession } from "next-auth"
 ```
 
 ---
+
+## 2026-08-12 — Topbar.tsx Entire File Red (Missing React Import)
+
+**Severity:** 🔴 High (all JSX in file flagged as errors)
+
+**Problem:** `Topbar.tsx` used `React.ReactNode` and `React.MouseEvent` without importing React. With the new JSX transform, you don't need React for JSX syntax, but **you still need it for namespace types like `React.ReactNode` and `React.MouseEvent`**. This caused the entire file to show cascading red errors in VS Code.
+
+**Fix:** Add `import React from 'react'` at the top of the file.
+
+**Files affected:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\components\ui\Topbar.tsx`
+
+---
+
+## 2026-08-12 — Array Index Access Undefined Type Error (Sidebar/Topbar)
+
+**Severity:** 🟡 Medium
+
+**Problem:** TypeScript strict mode flags `array[0]` as `string | undefined`. Using it directly in `.includes()` or ternary without narrowing causes a type error. Both `Topbar.tsx` and `Sidebar.tsx` had this pattern with `pathSegments[0]` / `segments[0]`.
+
+**Fix:** Use `?? ''` fallback and `.length > 0` guard:
+```typescript
+// ❌ Wrong
+const firstSeg = pathSegments[0];
+const isDomain = firstSeg && !['...'].includes(firstSeg);
+
+// ✅ Correct
+const firstSeg = pathSegments[0] ?? '';
+const isDomain = firstSeg.length > 0 && !['...'].includes(firstSeg);
+```
+
+**Files affected:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\components\ui\Topbar.tsx` (2 occurrences)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\components\ui\Sidebar.tsx` (1 occurrence)
+
+---
+
+## 2026-08-12 — Dev Server Must Run from Downloads Folder (Turbopack Symlink Bug)
+
+**Severity:** 🔴 Critical (dev server won't start from workspace)
+
+**Problem:** The workspace at `c:\Users\hrish\OneDrive\Desktop\SeoReport` has no `node_modules`. The actual `node_modules` are in `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\`. Turbopack (Next.js 16 default) crashes with `Symlink [project]/node_modules is invalid` when a Windows junction is used. `--no-turbopack` flag does not exist in Next.js 16.
+
+**Workaround:** Always run the dev server from the Downloads folder, NOT the workspace:
+```powershell
+& "C:\Users\hrish\AppData\Local\Programs\cursor\resources\app\resources\helpers\node.exe" "node_modules\next\dist\bin\next" dev
+# CWD: c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main
+```
+
+After editing files in the workspace (`OneDrive\Desktop\SeoReport`), sync changed files with:
+```powershell
+Copy-Item "c:\Users\hrish\OneDrive\Desktop\SeoReport\components\ui\Topbar.tsx" "c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\components\ui\Topbar.tsx" -Force
+```
