@@ -75,3 +75,29 @@ Git branch `hrishita-work` was reset to `FETCH_HEAD` (`5c14117`), uncommitted ac
 
 ---
 
+## 2026-08-12 — Fixed next.config.ts TypeScript Error & package.json Warnings
+
+**Task:** Fix TypeScript error in next.config.ts and package.json warning indicator.  
+**Files Changed:**
+- `next.config.ts` — modified (removed invalid `bundler: "webpack"` property)
+- `package.json` — modified (updated package name from `next-temp` to `rankflow`, moved `@types/nodemailer` to `devDependencies`)
+
+**What Was Done:**
+1. Identified invalid `bundler: "webpack"` property in `next.config.ts` which was causing TypeScript error TS2353. Removed `bundler: "webpack"` from `nextConfig`.
+2. Updated package name in `package.json` to `rankflow` and moved `@types/nodemailer` into `devDependencies`.
+3. Ran `prisma generate` via Node CLI to regenerate Prisma Client types.
+4. Verified TypeScript compilation with `tsc --noEmit`, which passed with zero errors.
+
+**Why:**
+The user requested to fix the error and warning indicators on `next.config.ts` (red 1) and `package.json` (yellow 1).
+
+**How It Works:**
+`NextConfig` type in Next.js does not accept a top-level `bundler` key. Standard config uses `{}` when no custom plugins/webpack functions are specified. Moving type declaration packages to `devDependencies` keeps `dependencies` focused on runtime modules.
+
+**Gotchas / Watch Out For:**
+Always use Node entrypoint directly (`node_modules\prisma\build\index.js` or `node_modules\typescript\lib\tsc.js`) when running commands on this environment as `npm`/`npx` are not in system PATH.
+
+**Open Questions:** None
+
+---
+

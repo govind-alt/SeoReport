@@ -1,8 +1,8 @@
 # RankFlow Project Knowledge Base — Master Index
 
-> **Last updated:** 2026-07-27  
+> **Last updated:** 2026-08-12  
 > **Project:** RankFlow — SEO Report Automation SaaS  
-> **Root:** `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`
+> **Root:** `c:\Users\hrish\OneDrive\Desktop\SeoReport`
 
 ---
 
@@ -16,7 +16,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | File | What It Covers | Last Updated |
 |------|---------------|--------------|
-| [PROJECT_SNAPSHOT.md](./PROJECT_SNAPSHOT.md) | Current project state, working environment, critical facts | 2026-07-27 |
+| [PROJECT_SNAPSHOT.md](./PROJECT_SNAPSHOT.md) | Current project state, working environment, critical facts | 2026-08-12 |
 | [architecture.md](./architecture.md) | High-level design, multi-tenancy, routing patterns | 2026-07-27 |
 | [auth.md](./auth.md) | NextAuth v5, roles, credentials, sessions | 2026-07-27 |
 | [database.md](./database.md) | Prisma schema, SQLite dev.db, migrations | 2026-07-27 |
@@ -26,7 +26,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 | [billing.md](./billing.md) | Plan tiers, Stripe modal, invoice PDF | 2026-07-27 |
 | [pdf-reports.md](./pdf-reports.md) | PDF generation engine, puppeteer, jsPDF | 2026-07-27 |
 | [multi-tenancy.md](./multi-tenancy.md) | Domain routing, middleware, agency separation | 2026-07-27 |
-| [devops.md](./devops.md) | Node.js path, launch commands, env vars, ports | 2026-07-27 |
+| [devops.md](./devops.md) | Node.js path, launch commands, env vars, ports | 2026-08-12 |
 | [bugs-and-gotchas.md](./bugs-and-gotchas.md) | Known issues, workarounds, fragile code | 2026-07-27 |
 
 ---
@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-12 | Fixed next.config.ts TypeScript Error & package.json Warnings | devops | Removed invalid bundler prop in next.config.ts, renamed package to rankflow, moved @types to devDeps, tsc verified |
 | 2026-08-11 | External Repo Sync & Stale File Cleanup | devops | Synced all commits from external repo to hrishita-work & updated main branch cleanly |
 | 2026-08-10 | Strict Role Routing & NextAuth v5 Error Handling | auth | Enforced strict UI tab to DB role matching, blocked Google auto-signup, and fixed NextAuth masking errors as 'Configuration' |
 | 2026-08-10 | Settings Real-World Integrations | frontend | Converted 2FA, Webhooks, and Stripe Customer Portal into real API-backed implementations |

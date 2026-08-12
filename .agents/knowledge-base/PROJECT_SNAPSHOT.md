@@ -27,7 +27,7 @@
 ## 🗂 Project Root
 
 ```
-c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main
+c:\Users\hrish\OneDrive\Desktop\SeoReport
 ```
 
 ---
