@@ -126,3 +126,25 @@ When running Next.js dev server on Windows with pnpm `node_modules`, run `next d
 
 ---
 
+## 2026-08-12 — Removed Deprecated middleware.ts
+
+**Task:** Clean up and git commit project changes.  
+**Files Changed:**
+- `middleware.ts` — deleted (replaced by `proxy.ts` in Next.js 16)
+- `next.config.ts` — cleaned up unused imports
+
+**What Was Done:**
+Removed deprecated `middleware.ts` file to adhere to Next.js 16 convention requiring `proxy.ts` for domain routing, and committed all changes to `main` branch.
+
+**Why:**
+User requested a git commit of the recent changes.
+
+**How It Works:**
+Next.js 16 uses `proxy.ts` for edge request proxying and middleware routing. Removing `middleware.ts` resolves the Next.js 16 startup conflict warning.
+
+**Gotchas / Watch Out For:** None
+
+**Open Questions:** None
+
+---
+
