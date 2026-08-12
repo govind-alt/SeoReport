@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { useSession } from 'next-auth/react';
 import { usePathname, useParams } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
@@ -46,8 +48,9 @@ function Breadcrumb() {
   const paramDomain = params?.domain as string | undefined;
 
   const segments = pathname.split('/').filter(Boolean);
-  const isDomainSeg = segments[0] && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(segments[0]);
-  const domain = paramDomain || (isDomainSeg ? segments[0] : null) || 'digital-horizons';
+  const seg0 = segments[0] ?? '';
+  const isDomainSeg = seg0.length > 0 && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(seg0);
+  const domain = paramDomain || (isDomainSeg ? seg0 : null) || 'digital-horizons';
   const basePath = `/${domain}`;
 
   const displaySegments = segments.filter(s => s !== domain && !s.includes('.') && s.length < 30);
@@ -93,6 +96,7 @@ export function Topbar() {
 
   // ── Fetch notifications from API ─────────────────────────────────────────
   const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
     try {
       const res = await fetch('/api/notifications', { cache: 'no-store' });
       if (!res.ok) return;
@@ -100,6 +104,8 @@ export function Topbar() {
       setNotifications(data.notifications ?? []);
     } catch {
       // silently fail — don't break the UI
+    } finally {
+      setNotifLoading(false);
     }
   }, []);
 
@@ -177,8 +183,8 @@ export function Topbar() {
   const params = useParams();
   const paramDomain = params?.domain as string | undefined;
   const pathSegments = pathname.split('/').filter(Boolean);
-  const firstSeg = pathSegments[0];
-  const isDomainSeg = firstSeg && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(firstSeg);
+  const firstSeg = pathSegments[0] ?? '';
+  const isDomainSeg = firstSeg.length > 0 && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin'].includes(firstSeg);
   const domain = paramDomain || (isDomainSeg ? firstSeg : null) || 'digital-horizons';
   const base = `/${domain}`;
 
@@ -361,9 +367,8 @@ export function Topbar() {
                   </div>
                 ) : notifications.map((n, idx) => {
                   const meta = notifMeta(n.type);
-                  const content = (
+                  const inner = (
                     <div
-                      key={n.id}
                       style={{
                         padding: '12px 16px',
                         display: 'flex', alignItems: 'flex-start', gap: 11,
@@ -417,12 +422,14 @@ export function Topbar() {
                     </div>
                   );
 
-                  // If it has a link, wrap in Link
+                  // If it has a link, wrap in Link — key always on outermost element
                   return n.link ? (
                     <Link key={n.id} href={n.link} style={{ textDecoration: 'none', display: 'block' }} onClick={() => setNotifOpen(false)}>
-                      {content}
+                      {inner}
                     </Link>
-                  ) : content;
+                  ) : (
+                    <div key={n.id}>{inner}</div>
+                  );
                 })}
               </div>
 

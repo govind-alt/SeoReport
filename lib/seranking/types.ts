@@ -54,6 +54,8 @@ export interface SERankingBacklinkSummary {
   referring_domains: number;
   dofollow_links: number;
   nofollow_links: number;
+  new_backlinks?: number;
+  lost_backlinks?: number;
   gov_links?: number;
   edu_links?: number;
 }

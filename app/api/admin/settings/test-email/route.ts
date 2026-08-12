@@ -53,7 +53,8 @@ export async function POST(req: Request) {
         console.warn('[TEST_EMAIL_RESEND_WARNING]', result.error);
         
         // Handle Resend sandbox restriction specifically with clear explanation
-        if (result.error.statusCode === 403) {
+        const errCode = (result.error as any).statusCode ?? (result.error as any).status;
+        if (errCode === 403) {
           return NextResponse.json({
             success: true,
             delivered: true,
@@ -69,13 +70,6 @@ export async function POST(req: Request) {
         return NextResponse.json({
           error: `Resend Error: ${result.error.message || 'Failed to send'}`
         }, { status: 400 });
-
-        return NextResponse.json({
-          success: true,
-          delivered: true,
-          recipient,
-          message: `Test email dispatched to ${recipient}. Resend status: ${result.error.message || 'Completed'}`,
-        });
       }
 
       return NextResponse.json({

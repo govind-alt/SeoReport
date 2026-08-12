@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-06-20',
+  apiVersion: '2026-07-29.dahlia',
 });
 
 /**
@@ -37,8 +37,8 @@ export async function GET(req: Request) {
       const customer = await stripe.customers.create({
         email: user?.email || '',
         metadata: {
-          userId: session.user.id,
-          agencyId: session.user.agencyId,
+          userId: session.user.id ?? null,
+          agencyId: session.user.agencyId ?? null,
         },
       });
       customerId = customer.id;
@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 
     // Create a Customer Portal session
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customerId,
+      customer: customerId ?? '',
       return_url: returnUrl,
     });
 

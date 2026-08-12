@@ -52,6 +52,7 @@ model User {
   twoFactorSecret  String?
   role          String    @default("member") // superadmin | admin | member | client
   agencyId      String?
+  stripeCustomerId String?
   agency        Agency?   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   accounts      Account[]
   sessions      Session[]

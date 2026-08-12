@@ -5,7 +5,7 @@
  */
 
 import crypto from 'crypto';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 type WebhookEvent =
   | 'report.generated'
@@ -110,7 +110,7 @@ export async function dispatchWebhooks(
 
   // Fire all endpoints in parallel
   await Promise.allSettled(
-    endpoints.map((endpoint) => {
+    endpoints.map((endpoint: { url: string; events: string; secret: string | null }) => {
       // Parse events array and check if this endpoint listens for this event
       let listenedEvents: string[] = [];
       try {

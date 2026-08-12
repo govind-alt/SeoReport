@@ -53,8 +53,9 @@ export function Sidebar() {
   const paramDomain = params?.domain as string | undefined;
 
   const pathSegments = pathname.split('/').filter(Boolean);
-  const firstSegment = pathSegments[0];
-  const isDomainSegment = firstSegment && !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin', 'keyword-explorer', 'schedules', 'tasks'].includes(firstSegment);
+  const firstSegment = pathSegments[0] ?? '';
+  const isDomainSegment = firstSegment.length > 0 &&
+    !['clients', 'reports', 'settings', 'help', 'login', 'register', 'admin', 'keyword-explorer', 'schedules', 'tasks'].includes(firstSegment);
 
   const domain = paramDomain || (isDomainSegment ? firstSegment : null) || 'digital-horizons';
   const basePath = `/${domain}`;

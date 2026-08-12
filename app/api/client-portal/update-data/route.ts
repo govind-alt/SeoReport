@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       include: { client: true }
     });
 
-    let client = invitation?.client;
+    let client: Awaited<ReturnType<typeof prisma.client.findFirst>> = invitation?.client ?? null;
     if (!client) {
       client = await prisma.client.findFirst({
         where: { contactEmail: email }

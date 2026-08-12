@@ -13,11 +13,21 @@ function LoginFormContent() {
   useEffect(() => {
     const tabParam = searchParams.get('tab');
     const modeParam = searchParams.get('mode');
-    if (tabParam === 'register' || modeParam === 'signup') {
+    const errorParam = searchParams.get('error');
+
+    if (tabParam === 'register' || modeParam === 'signup' || errorParam === 'NoAccount') {
       setActiveTab('register');
     }
+    
+    if (errorParam === 'NoAccount') {
+      setRegError("You don't have an account. Please create one below.");
+    } else if (errorParam === 'Configuration') {
+      setLoginError("Server configuration error. Please check your database connection or environment variables.");
+    } else if (errorParam && errorParam !== 'NoAccount') {
+      setLoginError("Authentication failed. Please try again.");
+    }
   }, [searchParams]);
-  const [selectedRole, setSelectedRole] = useState('agency');
+  const [selectedRole, setSelectedRole] = useState('client');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
   
@@ -80,6 +90,7 @@ function LoginFormContent() {
       const payload: any = {
         email: cleanEmail,
         password,
+        roleTab: selectedRole,
         redirect: false,
       };
 
@@ -87,16 +98,33 @@ function LoginFormContent() {
         payload.totpCode = totpCode;
       }
 
-      const res = await signIn('credentials', payload);
+      const res = await signIn('credentials', payload) as { error?: string; url?: string; ok?: boolean; status?: number } | undefined;
 
       if (res?.error) {
-        if (res.error === '2FA_REQUIRED') {
+        let actualError = res.error;
+        
+        // NextAuth v5 sends our custom error string via the redirect URL when access is denied
+        if (res.error === 'AccessDenied' && res.url && res.url.includes('?error=')) {
+           try {
+             // Extract error from relative URL (e.g., "/login?error=RoleMismatch...")
+             const customError = new URL(res.url, window.location.origin).searchParams.get('error');
+             if (customError) actualError = customError;
+           } catch (e) {}
+        }
+
+        if (actualError === '2FA_REQUIRED') {
           setRequire2FA(true);
           setLoginError('');
-        } else if (res.error.includes('Too many')) {
-          setLoginError(res.error);
+        } else if (actualError.includes('Too many')) {
+          setLoginError(actualError);
+        } else if (actualError.includes('RoleMismatch')) {
+          setLoginError(actualError.replace('RoleMismatch: ', ''));
+        } else if (actualError === 'Configuration') {
+          setLoginError('Server configuration error. Please check your database connection or environment variables.');
+        } else if (actualError === 'CredentialsSignin' || actualError === 'AccessDenied') {
+          setLoginError('Invalid email or password. Please try again.');
         } else {
-          setLoginError(res.error || 'Invalid email or password. Please try again.');
+          setLoginError(actualError || 'Invalid email or password. Please try again.');
         }
         setLoading(false);
       } else {
