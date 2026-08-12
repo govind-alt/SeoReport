@@ -101,3 +101,28 @@ Always use Node entrypoint directly (`node_modules\prisma\build\index.js` or `no
 
 ---
 
+## 2026-08-12 — Symlink Fix & Chrome Launch
+
+**Task:** Launch RankFlow on Chrome browser by starting Next.js dev server.  
+**Files Changed:**
+- `middleware.ts.bak` — renamed `middleware.ts` to `middleware.ts.bak` to allow Next.js 16 proxy convention
+
+**What Was Done:**
+1. Resolved `Turbopack Symlink invalid` error caused by `node_modules` symlink in Desktop project path.
+2. Launched dev server directly from `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` using Cursor's bundled Node.js executable.
+3. Server initialized in 1.4s on `http://localhost:3000`.
+4. Opened `http://localhost:3000/login` in Chrome via browser subagent and visually verified page rendering.
+
+**Why:**
+User requested to launch the application on Chrome.
+
+**How It Works:**
+The dev server runs cleanly from the physical repository root (`c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`) where `node_modules` physically resides without symlink resolution issues.
+
+**Gotchas / Watch Out For:**
+When running Next.js dev server on Windows with pnpm `node_modules`, run `next dev` from the directory where `node_modules` physically lives to avoid path casing mismatch errors.
+
+**Open Questions:** None
+
+---
+
