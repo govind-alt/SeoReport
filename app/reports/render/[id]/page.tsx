@@ -107,7 +107,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
       <div className="screen-controls" id="screenControls">
         <div>
           <h2>📄 Report Preview — <span>{clientName} · {period}</span></h2>
-          <p>Use &quot;Download / Print PDF&quot; → Save as PDF for a clean export.</p>
+          <p>In the print dialog → set <strong>Destination</strong> to &quot;Save as PDF&quot; → click Save.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <CloseButton />

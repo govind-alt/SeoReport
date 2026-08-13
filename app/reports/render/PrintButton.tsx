@@ -2,196 +2,51 @@
 
 import { useState } from 'react';
 
-const A4_W_MM = 210;
-const A4_H_MM = 297;
-const SCALE = 3; // higher scale = crisper text in PDF
-const A4_W_PX = 794; // A4 at 96dpi
-
 interface PrintButtonProps {
   filename?: string;
 }
 
 export default function PrintButton({ filename }: PrintButtonProps) {
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [status, setStatus] = useState<'idle' | 'loading'>('idle');
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setStatus('loading');
-    const toolbar = document.getElementById('screenControls');
 
-    try {
-      await Promise.all([
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'),
-      ]);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const html2canvas = (window as any).html2canvas;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { jsPDF } = (window as any).jspdf;
-
-      // Hide toolbar so it doesn't appear in PDF
-      if (toolbar) toolbar.style.visibility = 'hidden';
-
-      const origScrollY = window.scrollY;
-      window.scrollTo(0, 0);
-      await delay(150);
-
-      const reportPage = document.querySelector('.report-page') as HTMLElement;
-      if (!reportPage) {
-        if (toolbar) toolbar.style.visibility = '';
-        window.print();
-        window.scrollTo(0, origScrollY);
-        return;
+    // Build a clean human-readable filename from the page content or the prop
+    let cleanName = filename;
+    if (!cleanName) {
+      const clientElem = document.querySelector<HTMLElement>('.cover-client-name');
+      const periodElem = document.querySelector<HTMLElement>('.cover-period');
+      const clientStr = clientElem?.textContent?.trim().replace(/[^a-zA-Z0-9 ]/g, '').trim() || '';
+      const periodStr = periodElem?.textContent?.split('·')[0]?.trim().replace(/[^a-zA-Z0-9 ]/g, '').trim() || '';
+      if (clientStr && periodStr) {
+        cleanName = `${clientStr} SEO Report ${periodStr}`;
+      } else if (clientStr) {
+        cleanName = `${clientStr} SEO Report`;
+      } else {
+        cleanName = 'SEO Performance Report';
       }
-
-      // Force A4 width, remove decorative styles that would distort layout
-      const origStyle = reportPage.getAttribute('style') || '';
-      reportPage.style.cssText = `
-        width: ${A4_W_PX}px !important;
-        max-width: ${A4_W_PX}px !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        margin: 0 auto !important;
-        overflow: visible !important;
-      `;
-      await delay(200);
-
-      // Measure section bottom edges for smart page breaks
-      const sections = Array.from(
-        reportPage.querySelectorAll('.cover, .report-section, .report-footer')
-      ) as HTMLElement[];
-      const pageTopPx = reportPage.getBoundingClientRect().top + window.scrollY;
-
-      // Render full report to a single canvas at 3× scale for crisp text
-      const fullCanvas = await html2canvas(reportPage, {
-        scale: SCALE,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: A4_W_PX,
-        height: reportPage.scrollHeight,
-        windowWidth: A4_W_PX,
-        scrollX: 0,
-        scrollY: 0,
-        logging: false,
-        foreignObjectRendering: false,
-        onclone: (doc: Document) => {
-          // Ensure print-color-adjust on cloned doc
-          const style = doc.createElement('style');
-          style.textContent = '* { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }';
-          doc.head.appendChild(style);
-        },
-      });
-
-      // Build page-break candidates at section boundaries
-      const breaks: number[] = [0];
-      for (const s of sections) {
-        const rect = s.getBoundingClientRect();
-        const sBot = Math.round((rect.top + window.scrollY - pageTopPx + rect.height) * SCALE);
-        if (sBot > 0 && sBot < fullCanvas.height) breaks.push(sBot);
-      }
-      breaks.push(fullCanvas.height);
-
-      // Restore styles
-      reportPage.setAttribute('style', origStyle);
-      if (toolbar) toolbar.style.visibility = '';
-      window.scrollTo(0, origScrollY);
-
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true,
-      });
-
-      // Conversion: A4_W_PX * SCALE canvas pixels = A4_W_MM mm
-      const mmPerCanvasPx = A4_W_MM / (A4_W_PX * SCALE);
-      // How many canvas px fit in one A4 page height
-      const pageHpx = Math.round(A4_H_MM / mmPerCanvasPx);
-
-      let sliceStart = 0;
-      let pageNum = 0;
-
-      while (sliceStart < fullCanvas.height) {
-        // Find a good natural break close to one A4 page height
-        const idealEnd = sliceStart + pageHpx;
-        const sliceEnd = findBestBreak(breaks, idealEnd, fullCanvas.height);
-        const sliceH = sliceEnd - sliceStart;
-
-        // Draw this slice into a temporary canvas formatted to full A4 page height
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width = fullCanvas.width;
-        sliceCanvas.height = pageHpx;
-        const ctx = sliceCanvas.getContext('2d')!;
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-        ctx.drawImage(
-          fullCanvas,
-          0, sliceStart, fullCanvas.width, sliceH,
-          0, 0, fullCanvas.width, sliceH
-        );
-
-        if (pageNum > 0) pdf.addPage([A4_W_MM, A4_H_MM], 'portrait');
-        pdf.addImage(
-          sliceCanvas.toDataURL('image/jpeg', 0.96),
-          'JPEG',
-          0, 0,
-          A4_W_MM,
-          A4_H_MM,
-        );
-
-        sliceStart = sliceEnd;
-        pageNum++;
-      }
-
-      // Derive clean human-readable filename
-      let cleanName = filename;
-      if (!cleanName) {
-        const clientElem = document.querySelector('.cover-client-name');
-        const periodElem = document.querySelector('.cover-period');
-        const clientStr = clientElem?.textContent?.trim().replace(/[^a-zA-Z0-9]/g, '_') || '';
-        const periodStr = periodElem?.textContent?.split('·')[0]?.trim().replace(/[^a-zA-Z0-9]/g, '_') || '';
-
-        if (clientStr && periodStr) {
-          cleanName = `${clientStr}_SEO_Report_${periodStr}`;
-        } else if (clientStr) {
-          cleanName = `${clientStr}_SEO_Report`;
-        } else {
-          cleanName = 'SEO_Performance_Report';
-        }
-      }
-
-      cleanName = cleanName.replace(/_+/g, '_').replace(/^_|_$/g, '');
-      if (!cleanName.toLowerCase().endsWith('.pdf')) cleanName += '.pdf';
-
-      // Export explicit application/pdf Blob so OS and browser recognize it as a real PDF document
-      const arrayBuffer = pdf.output('arraybuffer');
-      const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-      const blobUrl = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = cleanName;
-      link.type = 'application/pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-
-      setStatus('done');
-      setTimeout(() => setStatus('idle'), 3000);
-
-    } catch (err) {
-      console.error('PDF generation failed:', err);
-      if (toolbar) toolbar.style.visibility = '';
-      window.print();
-      setStatus('idle');
     }
+    // Strip trailing .pdf if present (browser adds it)
+    cleanName = cleanName.replace(/\.pdf$/i, '').trim();
+
+    // Save original title, set it to our clean filename so Chrome uses it as PDF name
+    const origTitle = document.title;
+    document.title = cleanName;
+
+    // Small delay so the title change is registered, then trigger print
+    setTimeout(() => {
+      window.print();
+      // Restore the title after the print dialog opens (200ms is enough)
+      setTimeout(() => {
+        document.title = origTitle;
+        setStatus('idle');
+      }, 500);
+    }, 80);
   };
 
   const label =
-    status === 'loading' ? '⏳ Building PDF…' :
-    status === 'done'    ? '✅ Downloaded!'   :
-                           'Download PDF';
+    status === 'loading' ? '⏳ Opening Print…' : 'Download PDF';
 
   return (
     <button
@@ -208,29 +63,4 @@ export default function PrintButton({ filename }: PrintButtonProps) {
       {label}
     </button>
   );
-}
-
-// Find the nearest section boundary that is at or before targetY
-function findBestBreak(breaks: number[], targetY: number, maxY: number): number {
-  const below = breaks.filter(b => b <= targetY && b > 0);
-  if (below.length === 0) return Math.min(targetY, maxY);
-  // If the best break is too far back (less than 60% of page), just cut at targetY
-  const best = below[below.length - 1];
-  if (best < targetY * 0.6) return Math.min(targetY, maxY);
-  return Math.min(best, maxY);
-}
-
-function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`Failed: ${src}`));
-    document.head.appendChild(s);
-  });
-}
-
-function delay(ms: number) {
-  return new Promise(r => setTimeout(r, ms));
 }
