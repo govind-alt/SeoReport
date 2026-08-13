@@ -26,6 +26,12 @@ export default function proxy(req: NextRequest) {
     path.startsWith('/api/') || 
     path.startsWith('/api/auth/') ||
     path.includes('/api/auth') ||
+    path.startsWith('/login') ||
+    path.startsWith('/register') ||
+    path.startsWith('/forgot-password') ||
+    path.startsWith('/admin') ||
+    path.startsWith('/superadmin') ||
+    path.startsWith('/auth-success') ||
     path.startsWith('/reports/render/') || 
     path.startsWith('/report/')
   ) {
@@ -59,6 +65,9 @@ export default function proxy(req: NextRequest) {
   // Root domain — serve as-is
   const isRootDomain =
     normalizedHostname === 'localhost:3000' ||
+    normalizedHostname === 'localhost' ||
+    normalizedHostname === '127.0.0.1:3000' ||
+    normalizedHostname === '127.0.0.1' ||
     normalizedHostname === rootDomain ||
     normalizedHostname === 'rankflow.app';
 
@@ -69,9 +78,10 @@ export default function proxy(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // For the marketing landing page, pass through as-is
+    // Redirect root URL to /login
     if (path === '/') {
-      return NextResponse.next();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
     }
 
     // Client portal paths: /client/... → rewrite to /localhost/client/...

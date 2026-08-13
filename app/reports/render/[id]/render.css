@@ -9,11 +9,13 @@
 
 html, body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #EAEEF4;
+  background: #ffffff;
   color: #1A1A2E;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
   color-adjust: exact !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* ── Screen preview toolbar (hidden on print) ── */
@@ -57,16 +59,18 @@ html, body {
   text-decoration: none !important;
 }
 
-/* ── A4 Report wrapper ── */
+/* ── Report wrapper — full-width on screen, A4 for print ── */
 .report-page {
-  width: 794px; /* A4 at 96dpi */
-  margin: 32px auto;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
   background: #ffffff;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
-  border-radius: 6px;
+  box-shadow: none;
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }
+
 
 /* ══════════════════════════════════════
    COVER PAGE

@@ -2,6 +2,13 @@ import './render.css';
 import PrintButton from '../PrintButton';
 import CloseButton from '../CloseButton';
 import { prisma } from '@/lib/prisma';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+});
 
 export default async function ReportRenderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -95,7 +102,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
   ];
 
   return (
-    <>
+    <div className={inter.className}>
       {/* ── Screen Controls (hidden in print) ── */}
       <div className="screen-controls" id="screenControls">
         <div>
@@ -395,6 +402,6 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
 
       </div>{/* /report-page */}
 
-    </>
+    </div>
   );
 }
