@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import speakeasy from 'speakeasy';
+let speakeasy: any = null;
+try {
+  const req = eval('require');
+  speakeasy = req('speakeasy');
+} catch {
+  // Module fallback
+}
 import QRCode from 'qrcode';
 
 /**
@@ -27,6 +33,10 @@ export async function GET() {
 
     if (user.twoFactorEnabled) {
       return NextResponse.json({ error: '2FA is already enabled' }, { status: 400 });
+    }
+
+    if (!speakeasy) {
+      return NextResponse.json({ error: '2FA generator module unavailable' }, { status: 500 });
     }
 
     // Generate a new TOTP secret

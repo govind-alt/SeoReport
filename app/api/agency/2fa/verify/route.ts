@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import speakeasy from 'speakeasy';
+let speakeasy: any = null;
+try {
+  const req = eval('require');
+  speakeasy = req('speakeasy');
+} catch {
+  // Module fallback
+}
 
 /**
  * POST /api/agency/2fa/verify
@@ -19,6 +25,10 @@ export async function POST(req: Request) {
 
     if (!secret || !token) {
       return NextResponse.json({ error: 'secret and token are required' }, { status: 400 });
+    }
+
+    if (!speakeasy) {
+      return NextResponse.json({ error: '2FA verification module unavailable' }, { status: 500 });
     }
 
     // Verify the token against the secret

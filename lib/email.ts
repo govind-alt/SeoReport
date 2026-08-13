@@ -8,7 +8,8 @@
 
 let ResendClass: any = null;
 try {
-  ResendClass = require('resend').Resend;
+  const req = eval('require');
+  ResendClass = req('resend').Resend;
 } catch {
   // Module optional fallback when resend package is not present in node_modules
 }

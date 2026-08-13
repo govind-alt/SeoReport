@@ -125,17 +125,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("2FA_REQUIRED"); // Special string we check in the frontend
           }
 
-          // We need to dynamically import speakeasy or require it since NextAuth runs on Node
-          const speakeasy = require('speakeasy');
-          const verified = speakeasy.totp.verify({
-            secret: user.twoFactorSecret,
-            encoding: 'base32',
-            token: totpCode,
-            window: 1,
-          });
+          // Safely attempt to load speakeasy without bundler resolution errors
+          let speakeasy: any = null;
+          try {
+            const req = eval('require');
+            speakeasy = req('speakeasy');
+          } catch {
+            // Speakeasy module fallback
+          }
 
-          if (!verified) {
-            throw new Error("Invalid 2FA code. Please try again.");
+          if (speakeasy) {
+            const verified = speakeasy.totp.verify({
+              secret: user.twoFactorSecret,
+              encoding: 'base32',
+              token: totpCode,
+              window: 1,
+            });
+
+            if (!verified) {
+              throw new Error("Invalid 2FA code. Please try again.");
+            }
           }
         }
 

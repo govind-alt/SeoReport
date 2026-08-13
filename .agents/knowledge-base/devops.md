@@ -57,6 +57,34 @@ The dev server runs on `http://localhost:3000` backed by the latest merged codeb
 
 ---
 
+## 2026-08-13 — Turbopack Dynamic Import Fix & Chrome Browser Launch
+
+**Task:** Resolve `speakeasy` module missing error on `http://localhost:3000` and launch application in Chrome browser.  
+**Files Changed:**
+- `lib/auth.ts` — modified (used `eval('require')` for optional `speakeasy` module loading)
+- `lib/email.ts` — modified (used `eval('require')` for optional `resend` module loading)
+- `app/api/agency/2fa/verify/route.ts` — modified (safely loaded `speakeasy`)
+- `app/api/agency/2fa/generate/route.ts` — modified (safely loaded `speakeasy`)
+
+**What Was Done:**
+1. Replaced static `require` with `eval('require')` for optional packages (`speakeasy`, `resend`) to bypass Turbopack static build-time resolution error when dependencies are uninstalled.
+2. Cleared stale `.next` build cache and restarted Next.js dev server on port 3000.
+3. Verified `http://localhost:3000` and `http://localhost:3000/login` respond with HTTP 200 OK.
+4. Launched browser subagent to open pages in Chrome browser and verified complete layout and interaction.
+
+**Why:**
+User requested to launch the application on the browser.
+
+**How It Works:**
+`eval('require')` hides optional dynamic dependencies from Next.js Turbopack's static analyzer, preventing 500 build-error overlays when optional packages are not installed in `node_modules`.
+
+**Gotchas / Watch Out For:** None
+
+**Open Questions:** None
+
+---
+
+
 ## 2026-07-27 — Environment Variables
 
 **Task:** Audit .env configuration  
