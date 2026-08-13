@@ -59,10 +59,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         totpCode: { label: "2FA Code", type: "text" },
+        roleTab: { label: "Role Tab", type: "text" },
       },
       async authorize(credentials) {
-        const email    = (credentials?.email    as string | undefined)?.trim().toLowerCase();
-        const password = (credentials?.password as string | undefined);
+        const email       = (credentials?.email       as string | undefined)?.trim().toLowerCase();
+        const password    = (credentials?.password    as string | undefined);
+        const rawRoleTab  = (credentials?.roleTab     as string | undefined)?.trim().toLowerCase();
 
         // ── 1. Basic input validation ────────────────────────────────────
         if (!email || !password) return null;
@@ -117,7 +119,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null; // Wrong password — generic error
         }
 
-        // ── 4.5. 2FA Check ───────────────────────────────────────────────
+        // ── 4.5. Strict Role-to-Credential Tab Enforcement ────────────────
+        if (rawRoleTab) {
+          const userRole = (user.role || '').toLowerCase();
+          const userEmail = (user.email || '').toLowerCase();
+          const isSuperAdmin = userRole === 'superadmin' || userEmail === 'superadmin@rankflow.app';
+          const isClient = userRole === 'client';
+          const isAgency = !isSuperAdmin && !isClient; // admin, member, or agency_admin
+
+          if (rawRoleTab === 'admin' || rawRoleTab === 'superadmin') {
+            if (!isSuperAdmin) {
+              if (isClient) {
+                throw new Error("RoleMismatch: This account belongs to a Client user. Please select the Client tab to sign in.");
+              }
+              throw new Error("RoleMismatch: This account belongs to an Agency Admin. Please select the Agency tab to sign in.");
+            }
+          } else if (rawRoleTab === 'agency') {
+            if (isSuperAdmin) {
+              throw new Error("RoleMismatch: This account is a Superadmin. Please select the Superadmin tab to sign in.");
+            }
+            if (isClient) {
+              throw new Error("RoleMismatch: This account belongs to a Client user. Please select the Client tab to sign in.");
+            }
+          } else if (rawRoleTab === 'client') {
+            if (isSuperAdmin) {
+              throw new Error("RoleMismatch: This account is a Superadmin. Please select the Superadmin tab to sign in.");
+            }
+            if (isAgency) {
+              throw new Error("RoleMismatch: This account belongs to an Agency Admin. Please select the Agency tab to sign in.");
+            }
+          }
+        }
+
+        // ── 4.6. 2FA Check ───────────────────────────────────────────────
         if (user.twoFactorEnabled && user.twoFactorSecret) {
           const totpCode = (credentials?.totpCode as string | undefined)?.trim();
           
