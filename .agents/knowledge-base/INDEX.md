@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-13 | Chrome Launch & Dev Server Start | devops | Launched Next.js dev server on http://localhost:3000 from physical root & verified rendering in Chrome |
 | 2026-08-13 | Comprehensive Feature Mapping of PDF Generation | pdf-reports | Mapped all features, APIs, rendering engines, and UI components using PDF generation |
 | 2026-08-12 | hrishita-work Branch Commit Verification | devops | Verified all 20 of today's commits exist on hrishita-work and are 100% in sync with main & origin remote |
 | 2026-08-12 | Removed Deprecated middleware.ts | devops | Removed deprecated middleware.ts in favor of Next 16 proxy.ts convention & committed to main |

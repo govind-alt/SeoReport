@@ -170,3 +170,24 @@ User asked to check if all of today's commits were added to `hrishita-work`.
 
 ---
 
+## 2026-08-13 — Chrome Launch & Dev Server Start
+
+**Task:** Launch the application on Chrome browser.  
+**Files Changed:** None
+
+**What Was Done:**
+1. Started the Next.js 16 dev server on http://localhost:3000 using Cursor's bundled Node.js executable from the physical repository root (`c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`).
+2. Opened http://localhost:3000/login in Chrome via browser subagent and verified visual rendering of the login page UI (title, login form tabs, credentials helper).
+
+**Why:**
+User requested "launch on chrome".
+
+**How It Works:**
+The dev server runs from the physical root directory to bypass Turbopack's symlink error on Windows junctions. The browser subagent navigated to http://localhost:3000/login and verified DOM elements and screenshot.
+
+**Gotchas / Watch Out For:**
+Always start the dev server from `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` when invoking `node_modules\next\dist\bin\next dev` to avoid `Turbopack Symlink invalid` junction errors.
+
+**Open Questions:** None
+
+
