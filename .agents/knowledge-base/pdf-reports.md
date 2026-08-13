@@ -9,14 +9,35 @@
 - **jsPDF** — PDF creation library
 - **html2canvas** — HTML → canvas → PDF pipeline
 
-### Report Generator
-- API: `app/api/billing/invoice-pdf/` (invoice PDFs)
-- Monthly report cron: `app/api/cron/monthly-reports/route.ts`
-- Report pages: `app/[domain]/(dashboard)/reports/`
-
-### Executive PDF Details
-- 2.5× scale rendering for high DPI
-- A4 format
-- Forces `.pdf` filename download via DOM link trick
-
 ---
+
+## [2026-08-13] Comprehensive Feature Mapping of PDF Generation
+
+**Task:** Analyzed all features, UI components, API endpoints, and libraries where PDF generation is used across the codebase.
+
+**Where PDF Generation Is Used:**
+
+1. **SEO Report PDF Compilation (Server-Side Puppeteer)**
+   - **Engine:** Puppeteer v25 (Headless Chrome/Edge executable discovery on Windows)
+   - **Implementation:** `lib/report-compiler.ts` (`compileReportPdf`)
+   - **API Endpoints:**
+     - `GET /api/reports/[id]/pdf` (triggers background compilation via `after()`)
+     - `POST /api/reports/[id]/regenerate` (resets status and recompiles PDF)
+     - `POST /api/reports/generate` (streams binary PDF buffer directly)
+   - **UI Entrypoints:** Agency Dashboard (`/reports`), Client Portal (`/c/reports`), Public Share Page (`/report/[shareSlug]`).
+
+2. **Client-Side Canvas PDF Export (jsPDF + html2canvas)**
+   - **Engine:** jsPDF v2.5.1 + html2canvas v1.4.1 (dynamic CDN loading)
+   - **Implementation:** `app/reports/render/PrintButton.tsx` (`<PrintButton />`)
+   - **UI Entrypoint:** Printable Report View (`/reports/render/[id]`). Captures DOM at 3× resolution for crisp text and triggers immediate browser download.
+
+3. **Billing Invoice PDF Generation (Dual Engine)**
+   - **Engine:** jsPDF + html2canvas (client side) & Puppeteer (server side)
+   - **Implementation:** `lib/invoicePdfGenerator.ts` (`downloadInvoicePDF`) & `app/api/billing/invoice-pdf/route.ts`
+   - **UI Entrypoints:** Agency Dashboard Settings Billing Tab (`/[domain]/(dashboard)/settings?tab=billing`) & Super Admin Billing (`/admin`).
+
+4. **Automated Scheduled Report Delivery (Cron & Webhooks)**
+   - **Engine:** Puppeteer + Resend/Email service
+   - **Implementation:** `app/api/cron/email-reports/route.ts` & `app/api/webhooks/monthly-reports/route.ts`
+   - **Behavior:** Background job generates report PDFs for active clients and dispatches email notifications with PDF URLs.
+
