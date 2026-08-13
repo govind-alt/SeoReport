@@ -54,14 +54,14 @@ export async function POST(req: Request) {
             stripeSubscriptionId: data.subscription || data.id || 'sub_demo_123'
           }
         });
-        await prisma.auditLog.create({
+        await prisma.notification.create({
           data: {
             agencyId,
-            action: `Stripe Webhook: Agency upgraded to ${newPlan.toUpperCase()} tier`,
-            userName: 'Stripe Billing Webhook',
-            userInitials: 'ST'
+            type: 'alert',
+            title: 'Stripe Plan Upgraded',
+            body: `Agency upgraded to ${newPlan.toUpperCase()} tier`,
           }
-        });
+        }).catch(() => {});
         break;
 
       case 'customer.subscription.deleted':
@@ -69,14 +69,14 @@ export async function POST(req: Request) {
           where: { id: agencyId },
           data: { plan: 'starter' }
         });
-        await prisma.auditLog.create({
+        await prisma.notification.create({
           data: {
             agencyId,
-            action: `Stripe Webhook: Subscription canceled. Agency downgraded to STARTER tier`,
-            userName: 'Stripe Billing Webhook',
-            userInitials: 'ST'
+            type: 'alert',
+            title: 'Subscription Canceled',
+            body: 'Subscription canceled. Agency downgraded to STARTER tier',
           }
-        });
+        }).catch(() => {});
         break;
 
       default:

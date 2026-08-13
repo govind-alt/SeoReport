@@ -216,7 +216,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
       const { impersonateAgencyAction } = await import('@/app/actions');
       const res = await impersonateAgencyAction(agencySlug);
       toast.success(`Impersonating ${agencyName}`, { id: t });
-      window.location.href = res.redirectUrl;
+      window.location.href = `/${res.slug || agencySlug}/`;
     } catch (e: any) {
       toast.error(e?.message || 'Failed to initialize impersonation', { id: t });
     }

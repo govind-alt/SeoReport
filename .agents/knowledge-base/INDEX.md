@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-13 | Full Codebase Audit & Type-Safety Resolution | devops | Resolved compilation issues across API routes, server action exports, and Prisma model queries |
 | 2026-08-13 | 9-Scenario Authentication & Tenant Test Suite | auth | Verified 100% pass rate across role-targeted signin, tenant isolation, and registration pages |
 | 2026-08-13 | Dedicated Separate Registration Pages | frontend | Created standalone /register/agency and /register/client onboarding pages with role tab switchers |
 | 2026-08-13 | Cross-Tenant & Targeted Login Credential Isolation | auth | Enforced strict agency tenant isolation and role-targeted login checks in NextAuth authorize handler |

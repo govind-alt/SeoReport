@@ -30,25 +30,27 @@ export async function getAgencyBranding(domain: string): Promise<AgencyBranding>
       where: { OR: [{ slug: domain }, { subdomain: domain }] },
       select: {
         name: true,
-        brandingColor: true,
-        brandingAccentColor: true,
-        brandingFont: true,
-        brandingLogo: true,
-        whiteLabelEnabled: true,
-        reportFooterText: true,
+        brandingJson: true,
       }
     });
 
     if (!agency) return DEFAULTS;
 
+    let parsed: any = {};
+    if (agency.brandingJson) {
+      try {
+        parsed = JSON.parse(agency.brandingJson);
+      } catch (e) {}
+    }
+
     return {
       name: agency.name || DEFAULTS.name,
-      primaryColor: agency.brandingColor || DEFAULTS.primaryColor,
-      accentColor: agency.brandingAccentColor || DEFAULTS.accentColor,
-      font: agency.brandingFont ? `'${agency.brandingFont}', sans-serif` : DEFAULTS.font,
-      logoUrl: agency.brandingLogo || null,
-      whiteLabelEnabled: agency.whiteLabelEnabled ?? false,
-      reportFooterText: agency.reportFooterText || DEFAULTS.reportFooterText,
+      primaryColor: parsed.primaryColor || parsed.brandingColor || DEFAULTS.primaryColor,
+      accentColor: parsed.accentColor || parsed.brandingAccentColor || DEFAULTS.accentColor,
+      font: parsed.font || parsed.brandingFont ? `'${parsed.font || parsed.brandingFont}', sans-serif` : DEFAULTS.font,
+      logoUrl: parsed.logoUrl || parsed.brandingLogo || null,
+      whiteLabelEnabled: parsed.whiteLabelEnabled ?? false,
+      reportFooterText: parsed.reportFooterText || DEFAULTS.reportFooterText,
     };
   } catch {
     return DEFAULTS;

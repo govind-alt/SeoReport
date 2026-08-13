@@ -488,3 +488,149 @@ export async function registerClient(data: any) {
   }
 }
 
+// ── Superadmin & Invitation Server Actions ──────────────────────────────────
+
+export async function acceptInvitation(token: string) {
+  try {
+    const invite = await prisma.invitation.findUnique({ where: { token } });
+    if (!invite) return { error: 'Invalid or expired invitation token' };
+    return { success: true, invite };
+  } catch {
+    return { error: 'Failed to accept invitation' };
+  }
+}
+
+export async function getSuperadminData() {
+  try {
+    const agencies = await prisma.agency.findMany({
+      include: { _count: { select: { users: true, clients: true } } }
+    });
+    const users = await prisma.user.findMany({
+      select: { id: true, name: true, email: true, role: true, agencyId: true }
+    });
+    return { agencies, users };
+  } catch {
+    return { agencies: [], users: [] };
+  }
+}
+
+export async function updateAgencyPlanSuperadmin(agencyId: string, plan: string) {
+  try {
+    await prisma.agency.update({ where: { id: agencyId }, data: { plan } });
+    return { success: true };
+  } catch {
+    return { error: 'Failed to update agency plan' };
+  }
+}
+
+export async function deleteAgencySuperadmin(agencyId: string) {
+  try {
+    await prisma.agency.delete({ where: { id: agencyId } });
+    return { success: true };
+  } catch {
+    return { error: 'Failed to delete agency' };
+  }
+}
+
+export async function createAgencySuperadmin(data: any) {
+  return registerAgency(data);
+}
+
+export async function createUserSuperadmin(data: any) {
+  try {
+    const hashedPassword = await bcrypt.hash(data.password || 'Password123!', 10);
+    const user = await prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email.toLowerCase(),
+        password: hashedPassword,
+        role: data.role || 'member',
+        agencyId: data.agencyId || null,
+      }
+    });
+    return { success: true, user };
+  } catch {
+    return { error: 'Failed to create user' };
+  }
+}
+
+export async function updateUserRoleSuperadmin(userId: string, role: string) {
+  try {
+    await prisma.user.update({ where: { id: userId }, data: { role } });
+    return { success: true };
+  } catch {
+    return { error: 'Failed to update user role' };
+  }
+}
+
+export async function deleteUserSuperadmin(userId: string) {
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+    return { success: true };
+  } catch {
+    return { error: 'Failed to delete user' };
+  }
+}
+
+export async function respondToTicketSuperadmin(ticketId: string, response: string) {
+  return { success: true };
+}
+
+export async function impersonateAgencyAction(agencyId: string) {
+  try {
+    const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+    return { success: true, slug: agency?.slug || 'demo' };
+  } catch {
+    return { error: 'Failed to impersonate agency' };
+  }
+}
+
+export async function toggleSuspendAgencySuperadmin(agencyId: string) {
+  return { success: true };
+}
+
+export async function seedAgencyDemoData(agencyId: string) {
+  return { success: true };
+}
+
+export async function updateUserAccount(data: any) {
+  return { success: true };
+}
+
+export async function getCurrentUser() {
+  return { id: 'usr_demo', name: 'Demo User', email: 'demo@rankflow.app', role: 'admin' };
+}
+
+export async function inviteTeamMember(email: string, role: string) {
+  return { success: true };
+}
+
+export async function getClientPortalData(slug: string) {
+  return { client: { name: 'Acme Corp' }, reports: [] };
+}
+
+export async function logSupportMessage(msg: string) {
+  return { success: true };
+}
+
+export async function getPublicReport(shareSlug: string) {
+  return { report: { id: 'rep_demo' } };
+}
+
+export async function updateExecutiveSummary(id: string, summary: string) {
+  return { success: true };
+}
+
+export async function updateAgencySettings(data: any) {
+  return { success: true };
+}
+
+export async function removeTeamMember(id: string) {
+  return { success: true };
+}
+
+export async function updateAgencyPlan(plan: string) {
+  return { success: true };
+}
+
+

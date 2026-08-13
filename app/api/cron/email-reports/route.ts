@@ -50,14 +50,17 @@ export async function GET(req: Request) {
 
     for (const schedule of schedules) {
       const client = schedule.client;
-      const recipientEmail = client.contactEmail || client.agency.contactEmail || 'client@example.com';
+      const recipientEmail = client.contactEmail || client.agency.billingEmail || client.agency.notificationEmail || 'client@example.com';
       const reportTitle = `${client.name} — Monthly SEO Audit & Performance Report (${today.toLocaleString('default', { month: 'long', year: 'numeric' })})`;
 
       // Create new Report entry
+      const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
       const report = await prisma.report.create({
         data: {
           clientId: client.id,
-          title: reportTitle,
+          periodStart: firstOfMonth,
+          periodEnd: lastOfMonth,
           status: 'generated',
           pdfUrl: `/api/reports/generate?clientId=${client.id}`
         }
@@ -96,7 +99,7 @@ export async function GET(req: Request) {
       // Dispatch email (swallows network errors in offline test environment while logging status)
       try {
         await transporter.sendMail({
-          from: `"${client.agency.emailFromName || client.agency.name}" <${client.agency.emailFromAddress || 'reports@rankflow.app'}>`,
+          from: `"${client.agency.name}" <${client.agency.notificationEmail || 'reports@rankflow.app'}>`,
           to: recipientEmail,
           subject: reportTitle,
           html: htmlBody
@@ -106,15 +109,15 @@ export async function GET(req: Request) {
         dispatchLog.push({ clientId: client.id, clientName: client.name, email: recipientEmail, status: `simulated: ${err.message}` });
       }
 
-      // Log in audit log
-      await prisma.auditLog.create({
+      // Log in notifications
+      await prisma.notification.create({
         data: {
           agencyId: client.agency.id,
-          action: `Cron Dispatched: Monthly Report generated & emailed to ${recipientEmail} for ${client.name}`,
-          userName: 'Automated Cron Engine',
-          userInitials: 'CR'
+          type: 'alert',
+          title: 'Monthly Report Dispatched',
+          body: `Report generated & emailed to ${recipientEmail} for ${client.name}`,
         }
-      });
+      }).catch(() => {});
     }
 
     return NextResponse.json({

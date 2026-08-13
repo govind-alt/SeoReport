@@ -44,30 +44,27 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Agency not found' }, { status: 404 });
     }
 
-    // Save or update Google Credentials
-    const cred = await prisma.googleCredential.create({
+    // Save or update Google OAuth Refresh Token on Agency
+    await prisma.agency.update({
+      where: { id: agency.id },
       data: {
-        agencyId: agency.id,
-        email: googleEmail || 'marketing@agency.com',
-        accessToken: 'enc_google_access_token_demo',
-        refreshToken: 'enc_google_refresh_token_demo',
-        expiresAt: new Date(Date.now() + 3600 * 1000)
+        googleRefreshToken: 'enc_google_refresh_token_demo',
       }
     });
 
-    await prisma.auditLog.create({
+    await prisma.notification.create({
       data: {
         agencyId: agency.id,
-        action: `Google OAuth Connected: ${cred.email} (Search Console & GA4)`,
-        userName: 'Google API Integration',
-        userInitials: 'GO'
+        type: 'alert',
+        title: 'Google OAuth Connected',
+        body: `Google Search Console & GA4 connected for ${googleEmail || 'marketing@agency.com'}`,
       }
-    });
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
       message: 'Google Search Console & GA4 connected successfully',
-      credentialId: cred.id
+      credentialId: agency.id
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to save Google credentials' }, { status: 500 });
