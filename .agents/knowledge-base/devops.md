@@ -57,6 +57,34 @@ The dev server runs on `http://localhost:3000` backed by the latest merged codeb
 
 ---
 
+## 2026-08-13 — Dedicated Separate Registration Pages (`/register/agency` & `/register/client`)
+
+**Task:** Create dedicated, standalone registration pages for Agency Workspaces and Client Portals to close authentication gaps.  
+**Files Changed:**
+- `app/(auth)/register/agency/page.tsx` — created (dedicated Agency Admin onboarding form & subdomain setup)
+- `app/(auth)/register/client/page.tsx` — created (dedicated Client Portal onboarding form)
+- `app/(auth)/register/page.tsx` — modified (redirects to `/register/agency`)
+- `app/(auth)/signup/page.tsx` — modified (redirects to `/register/agency`)
+
+**What Was Done:**
+1. Built `/register/agency` with customized brand hero, subdomain configuration (`.rankflow.app`), agency feature list, server action integration (`registerAgency`), and auto-login redirection to `/[subdomain]/`.
+2. Built `/register/client` with dedicated client onboarding fields (Company Name, Website Domain), feature badges, server action integration (`registerClient`), and auto-login redirection to `/client/dashboard`.
+3. Added seamless role switchers on both registration pages for quick 1-click toggling between Agency and Client onboarding.
+4. Tested and verified HTTP 200 OK rendering on both pages via browser automation.
+
+**Why:**
+User requested dedicated separate signup pages to eliminate onboarding ambiguity between Agency Workspaces and Client Portals.
+
+**How It Works:**
+`/register/agency` and `/register/client` act as distinct, role-specialized entry points that handle input validation, workspace provisioning, and strict role credentials sign-in.
+
+**Gotchas / Watch Out For:** None
+
+**Open Questions:** None
+
+---
+
+
 ## 2026-08-13 — Turbopack Dynamic Import Fix & Chrome Browser Launch
 
 **Task:** Resolve `speakeasy` module missing error on `http://localhost:3000` and launch application in Chrome browser.  
