@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-13 | Full-Screen PDF Report Render & Local Font Fix | frontend | Made PDF report preview page full-width edge-to-edge & migrated to next/font/google |
 | 2026-08-13 | Chrome Launch & Webpack Dev Server | devops | Launched Next.js dev server on http://localhost:3000 using --webpack flag & opened in Chrome |
 | 2026-08-13 | Comprehensive Feature Mapping of PDF Generation | pdf-reports | Mapped all features, APIs, rendering engines, and UI components using PDF generation |
 | 2026-08-12 | hrishita-work Branch Commit Verification | devops | Verified all 20 of today's commits exist on hrishita-work and are 100% in sync with main & origin remote |

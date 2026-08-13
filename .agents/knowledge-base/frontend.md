@@ -112,4 +112,24 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 **Gotchas / Watch Out For:**
 - The `brandingJson` blob is now being used for settings far beyond just branding (e.g., security, billing, notifications). If the backend is ever moved to production, these should be migrated to proper database columns or a dedicated `settingsJson` field.
 
+## 2026-08-13 — PDF Report Render Full-Screen Layout & Self-Hosted Font Fix
+
+**Task:** Make the PDF report preview/render page (`/reports/render/[id]`) full-screen edge-to-edge on screen, and fix network font issues.  
+**Files Changed:**
+- `app/reports/render/[id]/render.css` — modified
+- `app/reports/render/[id]/page.tsx` — modified
+
+**What Was Done:**
+1. Updated `.report-page` CSS from fixed `794px` (A4) centered layout with box-shadows to `width: 100%; max-width: 100%; margin: 0;` for full-screen edge-to-edge display on desktop screens.
+2. Kept `@media print` rules intact so PDF exports and printing still enforce exact A4 dimensions and page-break handling.
+3. Removed Google Fonts `@import` from `render.css` and replaced it with Next.js built-in `next/font/google` (`Inter`) in `page.tsx`.
+
+**Why:**
+- The report rendered inside a small 794px container in the browser window, leaving huge grey sidebars. User asked to "make this full screen".
+- Google Fonts `@import` caused `wsarecv` / connection abort errors in local dev environment during network drops. Self-hosting via `next/font/google` bundles fonts at build time and serves them locally.
+
+**How It Works:**
+- `Inter` from `next/font/google` provides `inter.className` which is applied to the root container in `page.tsx`.
+- CSS in `render.css` uses `width: 100%` on screen, expanding the cover and report sections to the full viewport width while print media queries keep exact A4 dimensions.
+
 ---
