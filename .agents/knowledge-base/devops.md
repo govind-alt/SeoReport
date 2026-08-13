@@ -193,5 +193,30 @@ When running inside a directory containing symlinked `node_modules` on Windows, 
 
 **Open Questions:** None
 
+---
 
+## 2026-08-13 — Launch in Chrome & Host Domain Resolution
 
+**Task:** Launch application in Chrome browser and resolve host domain configuration  
+**Files Changed:**
+- `.env` — created/configured local dev environment variables
+- `lib/auth.ts` — updated `secret` to fallback to `NEXTAUTH_SECRET` or fallback string
+- `proxy.ts` — updated root domain checks to include `127.0.0.1`, `localhost`, and `127.0.0.1:3000`
+- `app/providers.tsx` — updated SessionProvider setup
+
+**What Was Done:**
+1. Started Next.js dev server (`next dev --webpack`) on `http://localhost:3000`.
+2. Resolved environment variable loading by initializing `.env` with `AUTH_SECRET`, `NEXTAUTH_SECRET`, and `DATABASE_URL`.
+3. Updated `proxy.ts` domain resolution logic to handle `127.0.0.1` and `localhost` ports cleanly.
+4. Opened Google Chrome and verified full screen rendering of the RankFlow login interface and agency dashboard portals.
+
+**Why:**
+User requested "launch in crome".
+
+**How It Works:**
+Running `next dev --webpack` via Cursor's bundled Node executable starts the app server. Navigating to `http://localhost:3000/login` or `http://127.0.0.1:3000/login` in Chrome loads the RankFlow agency interface.
+
+**Gotchas / Watch Out For:**
+Always ensure `.env` file exists and `AUTH_SECRET`/`NEXTAUTH_SECRET` is defined so NextAuth v5 session endpoints return valid responses.
+
+**Open Questions:** None
