@@ -122,6 +122,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
 
         {/* ── COVER PAGE ── */}
         <div className="cover">
+          <div className="cover-inner">
           <div className="cover-top-bar">
             <div className="cover-logo-text">Rank<span>Flow</span></div>
             <div className="cover-confidential">Confidential</div>
@@ -153,6 +154,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             <div className="cover-footer-agency">📊 {agencyName}</div>
             <div className="cover-footer-date">Generated: {generatedDate}</div>
           </div>
+          </div>{/* /cover-inner */}
         </div>
 
         {/* ── 01 EXECUTIVE SUMMARY ── */}
