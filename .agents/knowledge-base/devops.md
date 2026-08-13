@@ -27,6 +27,31 @@ This bypasses the need for npm/pnpm entirely. The server starts on port 3000 usi
 - To run Prisma: `& "...\node.exe" "node_modules\.bin\prisma" <command>`
 - To run tsx scripts: `& "...\node.exe" "node_modules\.bin\tsx" <script.ts>`
 - There is a `node.exe` in RStudio and one in Cursor. The Cursor one (v22.22.0) is more modern and works for Next.js.
+- Always ensure processes on port 3000 are freed before re-launching from the new repository directory.
+
+**Open Questions:** None
+
+---
+
+## 2026-08-13 — Synced `origin/main` Merged Work & Fixed Resend Email Module Fallback
+
+**Task:** Discard legacy local branch divergence, pull latest merged `origin/main` from `https://github.com/govind-alt/SeoReport.git`, fix `resend` module import fallback in `lib/email.ts`, and launch dev server on port 3000.  
+**Files Changed:**
+- `lib/email.ts` — modified (wrapped Resend class import in try-catch fallback for dev resilience)
+
+**What Was Done:**
+1. Hard-reset local repository `C:\Users\somna\OneDrive\Desktop\SEO TASK\SeoReport` to `origin/main` (`d09b24b`).
+2. Updated `lib/email.ts` with optional dynamic import of `resend` to prevent Next.js compilation failure when `resend` package is omitted from local `node_modules`.
+3. Regenerated Prisma Client v7.8.0.
+4. Launched Next.js dev server on port 3000 and verified `http://localhost:3000` and `http://localhost:3000/login`.
+
+**Why:**
+User requested to run yesterday's merged work from `https://github.com/govind-alt/SeoReport.git` on port 3000.
+
+**How It Works:**
+The dev server runs on `http://localhost:3000` backed by the latest merged codebase on `origin/main`.
+
+**Gotchas / Watch Out For:** None
 
 **Open Questions:** None
 

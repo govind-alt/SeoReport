@@ -6,9 +6,14 @@
  * so the app works in development without any email config.
  */
 
-import { Resend } from 'resend';
+let ResendClass: any = null;
+try {
+  ResendClass = require('resend').Resend;
+} catch {
+  // Module optional fallback when resend package is not present in node_modules
+}
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = (ResendClass && process.env.RESEND_API_KEY) ? new ResendClass(process.env.RESEND_API_KEY) : null;
 
 // From address — in Resend free tier, only "onboarding@resend.dev" works
 // until you verify a custom domain. Switch to your own domain once verified.
@@ -27,7 +32,7 @@ async function sendEmail(opts: {
   html: string;
   replyTo?: string;
 }) {
-  if (!process.env.RESEND_API_KEY) {
+  if (!resend || !process.env.RESEND_API_KEY) {
     // Dev fallback — print to console
     console.log('\n[EMAIL — no RESEND_API_KEY]\nTo:', opts.to, '\nSubject:', opts.subject, '\n');
     return true;
