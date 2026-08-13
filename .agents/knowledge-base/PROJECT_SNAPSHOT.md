@@ -130,5 +130,6 @@ wireframes/          ← HTML wireframes (static, no server needed)
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-13 | Launch on Chrome (Webpack dev server) | ✅ Next.js dev server started with --webpack on port 3000 & opened in Chrome |
 | 2026-07-27 | Launch dev server on Chrome | ✅ Server running on port 3000 via Cursor's bundled node.exe |
 | 2026-07-27 | Create Knowledge Curator system | ✅ Skill + knowledge base + global rules created |
