@@ -60,11 +60,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
         totpCode: { label: "2FA Code", type: "text" },
         roleTab: { label: "Role Tab", type: "text" },
+        agencySlug: { label: "Agency Slug", type: "text" },
       },
       async authorize(credentials) {
-        const email       = (credentials?.email       as string | undefined)?.trim().toLowerCase();
-        const password    = (credentials?.password    as string | undefined);
-        const rawRoleTab  = (credentials?.roleTab     as string | undefined)?.trim().toLowerCase();
+        const email          = (credentials?.email          as string | undefined)?.trim().toLowerCase();
+        const password       = (credentials?.password       as string | undefined);
+        const rawRoleTab     = (credentials?.roleTab        as string | undefined)?.trim().toLowerCase();
+        const rawAgencySlug  = (credentials?.agencySlug     as string | undefined)?.trim().toLowerCase();
 
         // ── 1. Basic input validation ────────────────────────────────────
         if (!email || !password) return null;
@@ -120,13 +122,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // ── 4.5. Strict Role-to-Credential Tab Enforcement ────────────────
-        if (rawRoleTab) {
-          const userRole = (user.role || '').toLowerCase();
-          const userEmail = (user.email || '').toLowerCase();
-          const isSuperAdmin = userRole === 'superadmin' || userEmail === 'superadmin@rankflow.app';
-          const isClient = userRole === 'client';
-          const isAgency = !isSuperAdmin && !isClient; // admin, member, or agency_admin
+        const userRole = (user.role || '').toLowerCase();
+        const userEmail = (user.email || '').toLowerCase();
+        const isSuperAdmin = userRole === 'superadmin' || userEmail === 'superadmin@rankflow.app';
+        const isClient = userRole === 'client';
+        const isAgency = !isSuperAdmin && !isClient; // admin, member, or agency_admin
 
+        if (rawRoleTab) {
           if (rawRoleTab === 'admin' || rawRoleTab === 'superadmin') {
             if (!isSuperAdmin) {
               if (isClient) {
@@ -148,6 +150,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (isAgency) {
               throw new Error("RoleMismatch: This account belongs to an Agency Admin. Please select the Agency tab to sign in.");
             }
+          }
+        }
+
+        // ── 4.6. Strict Agency Tenant Isolation ───────────────────────────
+        if (rawAgencySlug && !isSuperAdmin) {
+          const targetAgency = await prisma.agency.findFirst({
+            where: {
+              OR: [
+                { slug: rawAgencySlug },
+                { subdomain: rawAgencySlug }
+              ]
+            },
+            select: { id: true, name: true }
+          });
+
+          if (targetAgency && user.agencyId && user.agencyId !== targetAgency.id) {
+            throw new Error("RoleMismatch: These credentials belong to a different agency workspace. Access denied.");
           }
         }
 

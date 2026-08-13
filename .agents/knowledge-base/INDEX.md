@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-13 | Cross-Tenant & Targeted Login Credential Isolation | auth | Enforced strict agency tenant isolation and role-targeted login checks in NextAuth authorize handler |
 | 2026-08-13 | Strict Credential Role Tab Validation | auth | Implemented strict backend and frontend role-to-tab credential matching and explicit role mismatch error handling |
 | 2026-08-13 | Application Launch Verification & Browser Inspection | devops | Verified server on http://localhost:3000 and confirmed full visual rendering via browser automation |
 | 2026-08-12 | hrishita-work Branch Commit Verification | devops | Verified all 20 of today's commits exist on hrishita-work and are 100% in sync with main & origin remote |
