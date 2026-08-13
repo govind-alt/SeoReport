@@ -44,9 +44,13 @@ c:\Users\hrish\OneDrive\Desktop\SeoReport
 
 ### Launch Dev Server
 ```powershell
-& "C:\Users\hrish\AppData\Local\Programs\cursor\resources\app\resources\helpers\node.exe" "node_modules\next\dist\bin\next" dev
+# ALWAYS run from the PHYSICAL path (not Desktop symlink):
+& "C:\Users\hrish\AppData\Local\Programs\cursor\resources\app\resources\helpers\node.exe" "node_modules\next\dist\bin\next" dev --webpack
 ```
-Run from project root. Server starts on **http://localhost:3000**.
+Run from: `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`  
+Server starts on **http://localhost:3000**.
+
+> ⚠️ **CRITICAL**: Do NOT run from `c:\Users\hrish\OneDrive\Desktop\SeoReport` — the `node_modules` there is a Windows junction (symlink). Running from the symlink path causes Webpack to load two copies of React/Next.js → `invariant: layout router not mounted` crash.
 
 ### Run Prisma Commands
 ```powershell
@@ -123,6 +127,8 @@ wireframes/          ← HTML wireframes (static, no server needed)
 3. **Next.js 16.2.10** — This is a cutting-edge version; APIs may differ from training data. Check `node_modules/next/dist/docs/` for guidance
 4. **Prisma 7 + SQLite** — The libSQL adapter is configured but dev uses plain SQLite via `file:./dev.db`
 5. **NextAuth v5 beta** — The auth API differs from NextAuth v4; use `auth()` from `lib/auth.ts`, not `getServerSession()`
+6. **Desktop workspace node_modules is a symlink** — Running `next dev` from Desktop causes duplicate module loading crash. Always use the Downloads path.
+7. **Git branch rule (USER RULE)** — NEVER commit or push to `main` without explicit user permission. All work goes to `hrishita-work` only.
 
 ---
 
@@ -130,6 +136,7 @@ wireframes/          ← HTML wireframes (static, no server needed)
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-13 | Full session: app launch, routing, full-screen report, git hygiene | ✅ All 7 changed files committed to hrishita-work (b837cb4) |
 | 2026-08-13 | Launch on Chrome & Host Domain Resolution | ✅ Dev server started, .env & proxy configured, opened in Chrome |
 | 2026-07-27 | Launch dev server on Chrome | ✅ Server running on port 3000 via Cursor's bundled node.exe |
 | 2026-07-27 | Create Knowledge Curator system | ✅ Skill + knowledge base + global rules created |

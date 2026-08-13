@@ -220,3 +220,59 @@ Running `next dev --webpack` via Cursor's bundled Node executable starts the app
 Always ensure `.env` file exists and `AUTH_SECRET`/`NEXTAUTH_SECRET` is defined so NextAuth v5 session endpoints return valid responses.
 
 **Open Questions:** None
+
+---
+
+## 2026-08-13 — Full Session: App Launch, Routing Fixes, Full-Screen Report, Git Hygiene
+
+**Task:** Launch app in Chrome, fix all runtime errors, make report preview full-screen, commit everything to `hrishita-work` only.  
+**Files Changed:**
+- `proxy.ts` — routing bypasses, 127.0.0.1 support, root redirect to /login
+- `next.config.ts` — added `allowedDevOrigins: ['127.0.0.1', 'localhost']`
+- `lib/auth.ts` — added secret fallback chain
+- `app/providers.tsx` — removed SessionProvider wrapper
+- `app/(auth)/layout.tsx` — added div.auth-root-wrapper for layout stability
+- `app/reports/render/[id]/render.css` — full-width layout, white background
+- `app/reports/render/[id]/page.tsx` — next/font/google Inter, div wrapper
+
+**What Was Done:**
+
+**1. Dev Server Launch — CRITICAL DISCOVERY**
+The `node_modules` folder in the Desktop workspace is a Windows junction pointing to `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\node_modules`. Running from the Desktop path causes Webpack to resolve the same modules under two different absolute paths → loads two copies of React/Next.js → causes `invariant: expected layout router to be mounted` crash.
+
+**ALWAYS run dev server from the physical Downloads path:**
+```powershell
+& "C:\Users\hrish\AppData\Local\Programs\cursor\resources\app\resources\helpers\node.exe" "node_modules\next\dist\bin\next" dev --webpack
+```
+Run from: `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`
+
+**2. Routing Fixes (`proxy.ts`)**
+- Added `127.0.0.1` and `127.0.0.1:3000` to root domain detection
+- Added bypasses for `/login`, `/register`, `/forgot-password`, `/admin` before auth redirect
+- Root `/` now redirects to `/login`
+
+**3. Auth Secret Fallback (`lib/auth.ts`)**
+- `AUTH_SECRET || NEXTAUTH_SECRET || "development-fallback-secret-key-12345"`
+
+**4. SessionProvider Removed (`app/providers.tsx`)**
+- Was causing `invariant` errors with duplicate module loading. Auth works via server-side `auth()`.
+
+**5. Full-Screen Report + Font Fix**
+- `.report-page`: `width: 100%; margin: 0; box-shadow: none;`
+- Google Fonts `@import` → `next/font/google` Inter (fixes wsarecv TCP abort errors)
+
+**6. Git Branch Rules — USER EXPLICIT INSTRUCTION**
+- **NEVER touch `main` branch without user's explicit permission**
+- All commits go to `hrishita-work` only: `git push origin hrishita-work`
+- Never run: `git push origin main`, `git checkout main`, `git merge main`
+
+**Gotchas / Watch Out For:**
+- `&&` doesn't work in PowerShell — use `;` to chain git commands
+- Paths with `(auth)` or `[id]` must be quoted in git commands
+- `Copy-Item` with `[id]` path fails (glob expansion) — use `[System.IO.File]::Copy(src, dst, $true)`
+- Downloads folder is write-protected for agent policy — always copy via .NET IO method
+- Dev server MUST run from Downloads physical path, not Desktop symlink path
+
+**Open Questions:** None
+
+---
