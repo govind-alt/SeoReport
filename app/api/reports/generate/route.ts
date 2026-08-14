@@ -51,43 +51,24 @@ export async function GET(request: NextRequest) {
     // Go to the render page and wait for network to be idle
     await page.goto(reportUrl, { waitUntil: 'networkidle0' });
 
-    // Inject styles for print to ensure the PDF looks professional
-    await page.addStyleTag({
-      content: `
-        @media print {
-          /* Hide UI elements that shouldn't be in the PDF */
-          .btn, button, nav, .sidebar { display: none !important; }
-          
-          /* Prevent page breaks inside cards/charts */
-          .card, .recharts-wrapper { page-break-inside: avoid; }
-          
-          /* Add some breathing room */
-          body { padding: 20px; }
-          
-          /* Fix background colors for printing */
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-        }
-      `
-    });
-
-    // Generate PDF
+    // Generate PDF using exact render.css print rules
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' }
+      margin: { top: '8mm', right: '0', bottom: '8mm', left: '0' }
     });
 
     await browser.close();
 
-    // Return the PDF buffer
+    const rawFilename = searchParams.get('filename') || `SEO-Report-${id}`;
+    const cleanFilename = rawFilename.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_');
+
+    // Return the PDF buffer directly for browser download
     return new NextResponse(pdfBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="SEO-Report-${id}.pdf"`
+        'Content-Disposition': `attachment; filename="${cleanFilename}.pdf"`
       }
     });
   } catch (error) {

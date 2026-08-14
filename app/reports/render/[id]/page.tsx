@@ -107,11 +107,11 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
       <div className="screen-controls" id="screenControls">
         <div>
           <h2>📄 Report Preview — <span>{clientName} · {period}</span></h2>
-          <p>In the print dialog → set <strong>Destination</strong> to &quot;Save as PDF&quot; → click Save.</p>
+          <p>Click <strong>Download PDF</strong> to directly download this report in PDF format.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <CloseButton />
-          <PrintButton filename={`${clientName}_SEO_Report_${period}`} />
+          <PrintButton reportId={id} filename={`${clientName}_SEO_Report_${period}`} />
         </div>
       </div>
 

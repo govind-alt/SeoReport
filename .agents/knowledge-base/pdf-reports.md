@@ -36,8 +36,22 @@
    - **Implementation:** `lib/invoicePdfGenerator.ts` (`downloadInvoicePDF`) & `app/api/billing/invoice-pdf/route.ts`
    - **UI Entrypoints:** Agency Dashboard Settings Billing Tab (`/[domain]/(dashboard)/settings?tab=billing`) & Super Admin Billing (`/admin`).
 
-4. **Automated Scheduled Report Delivery (Cron & Webhooks)**
-   - **Engine:** Puppeteer + Resend/Email service
-   - **Implementation:** `app/api/cron/email-reports/route.ts` & `app/api/webhooks/monthly-reports/route.ts`
-   - **Behavior:** Background job generates report PDFs for active clients and dispatches email notifications with PDF URLs.
+---
+
+## 2026-08-14 — Direct PDF File Download Implementation
+
+**Task:** Enable one-click direct PDF file download when clicking "Download PDF" button without opening browser print prompt.  
+**Files Changed:**
+- `app/reports/render/PrintButton.tsx` — modified
+- `app/reports/render/[id]/page.tsx` — modified
+- `app/api/reports/generate/route.ts` — modified
+- `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` — synced
+
+**What Was Done:**
+1. Updated `PrintButton.tsx` to directly query `/api/reports/generate?id=${reportId}&filename=${cleanName}`.
+2. In `app/api/reports/generate/route.ts`, generated PDF using Puppeteer headless Chrome with exact `render.css` print rules and streamed the binary buffer with `Content-Type: application/pdf` and `Content-Disposition: attachment; filename="${cleanFilename}.pdf"`.
+3. In `PrintButton.tsx`, converted binary stream into a downloadable Blob URL (`a.href = blobUrl; a.download = ...; a.click()`) for direct file download into the user's Downloads folder, showing `⏳ Generating PDF…` → `✓ Downloaded!` with client print fallback.
+
+---
+
 

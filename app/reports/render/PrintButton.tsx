@@ -3,13 +3,14 @@
 import { useState } from 'react';
 
 interface PrintButtonProps {
+  reportId?: string;
   filename?: string;
 }
 
-export default function PrintButton({ filename }: PrintButtonProps) {
-  const [status, setStatus] = useState<'idle' | 'loading'>('idle');
+export default function PrintButton({ reportId, filename }: PrintButtonProps) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     setStatus('loading');
 
     // Build a clean human-readable filename from the page content or the prop
@@ -20,33 +21,58 @@ export default function PrintButton({ filename }: PrintButtonProps) {
       const clientStr = clientElem?.textContent?.trim().replace(/[^a-zA-Z0-9 ]/g, '').trim() || '';
       const periodStr = periodElem?.textContent?.split('·')[0]?.trim().replace(/[^a-zA-Z0-9 ]/g, '').trim() || '';
       if (clientStr && periodStr) {
-        cleanName = `${clientStr} SEO Report ${periodStr}`;
+        cleanName = `${clientStr}_SEO_Report_${periodStr}`;
       } else if (clientStr) {
-        cleanName = `${clientStr} SEO Report`;
+        cleanName = `${clientStr}_SEO_Report`;
       } else {
-        cleanName = 'SEO Performance Report';
+        cleanName = 'SEO_Performance_Report';
       }
     }
-    // Strip trailing .pdf if present (browser adds it)
-    cleanName = cleanName.replace(/\.pdf$/i, '').trim();
+    cleanName = cleanName.replace(/\.pdf$/i, '').trim().replace(/\s+/g, '_');
 
-    // Save original title, set it to our clean filename so Chrome uses it as PDF name
+    // Attempt direct server PDF stream download
+    if (reportId) {
+      try {
+        const downloadUrl = `/api/reports/generate?id=${encodeURIComponent(reportId)}&filename=${encodeURIComponent(cleanName)}`;
+        const res = await fetch(downloadUrl);
+        if (res.ok) {
+          const blob = await res.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = blobUrl;
+          a.download = `${cleanName}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(blobUrl);
+          a.remove();
+          setStatus('success');
+          setTimeout(() => setStatus('idle'), 2500);
+          return;
+        }
+      } catch (err) {
+        console.warn('Direct PDF download endpoint failed, falling back to window.print():', err);
+      }
+    }
+
+    // Direct client fallback
     const origTitle = document.title;
-    document.title = cleanName;
-
-    // Small delay so the title change is registered, then trigger print
+    document.title = cleanName.replace(/_/g, ' ');
     setTimeout(() => {
       window.print();
-      // Restore the title after the print dialog opens (200ms is enough)
       setTimeout(() => {
         document.title = origTitle;
         setStatus('idle');
-      }, 500);
-    }, 80);
+      }, 600);
+    }, 100);
   };
 
   const label =
-    status === 'loading' ? '⏳ Opening Print…' : 'Download PDF';
+    status === 'loading'
+      ? '⏳ Generating PDF…'
+      : status === 'success'
+      ? '✓ Downloaded!'
+      : 'Download PDF';
 
   return (
     <button
