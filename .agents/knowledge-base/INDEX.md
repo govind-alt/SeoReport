@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-14 | PDF Report Render Width Adjustment (900px) | frontend | Adjusted report container max-width to 900px with centered document margins & shadow |
 | 2026-08-14 | Dev Server Restart & Connection Refused Fix | devops | Resolved ERR_CONNECTION_REFUSED by restarting background dev server on port 3000 |
 | 2026-08-14 | PDF Report Render Visual & Theme Polish | frontend | Refined full-width report styling, recommendation badges, footer appearance, and typography hierarchy |
 | 2026-08-14 | globals.css CSS Cascade Leak Fix & Report Formatting | bugs-and-gotchas | Fixed red bar on KPI cards (globals.css pseudo-element bleed), cover page height, and footer text |

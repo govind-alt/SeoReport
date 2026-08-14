@@ -134,18 +134,19 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 ---
 
-## 2026-08-14 — PDF Report Render Visual & Theme Polish
+## 2026-08-14 — PDF Report Render Width Adjustment (900px Executive Container)
 
-**Task:** Refine full-width report styling, recommendation badges, footer appearance, and typography hierarchy.  
+**Task:** Decrease report preview width on screen from 1440px to standard 900px centered document layout.  
 **Files Changed:**
 - `app/reports/render/[id]/render.css` — modified
-- `app/reports/render/[id]/page.tsx` — modified
 
 **What Was Done:**
-1. Updated section headers, audit cards, and recommendation list styling for high-density readable data presentation.
-2. Refined impact badge tags (HIGH, MED, LOW) with CSS custom properties and crisp contrast.
-3. Enhanced cover page gradient styling and header contrast.
-4. Redesigned report footer with dark navy gradient backdrop, top accent border, and proper white space spacing for screen & print.
+1. Reduced `.report-page` `max-width` from `1440px` to `900px`.
+2. Added centered document container styling: `margin: 36px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 16px 60px rgba(11,20,55,0.16);`.
+3. Set page backdrop background to `#EAEFFC` for crisp document canvas contrast.
+4. Scaled cover padding (`48px 56px`), cover title (`54px`), and score badges (`42px`) to fit 900px layout cleanly.
+5. Retained `@media print` rules for 100% full-width A4 PDF exports.
 
 ---
+
 

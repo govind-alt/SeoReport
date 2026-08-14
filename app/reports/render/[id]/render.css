@@ -32,7 +32,7 @@
 
 html, body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #F0F4FF;
+  background: #EAEFFC;
   color: var(--text-1);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
@@ -91,15 +91,17 @@ html, body {
    ══════════════════════════════════════════════════════════════ */
 .report-page {
   width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
+  max-width: 900px;
+  margin: 36px auto;
   background: #ffffff;
-  box-shadow: 0 8px 80px rgba(11,20,55,0.15);
+  box-shadow: 0 16px 60px rgba(11,20,55,0.16);
+  border-radius: 12px;
+  overflow: hidden;
   position: relative;
 }
 
 .report-section { width: 100%; box-sizing: border-box; }
-.section-inner, .cover-inner { max-width: 1200px; margin: 0 auto; }
+.section-inner, .cover-inner { max-width: 100%; margin: 0 auto; }
 
 /* ══════════════════════════════════════════════════════════════
    COVER PAGE
@@ -109,7 +111,7 @@ html, body {
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
   color-adjust: exact !important;
-  min-height: 100vh;
+  min-height: 580px;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -121,7 +123,7 @@ html, body {
   content: '';
   position: absolute;
   top: -120px; right: -120px;
-  width: 500px; height: 500px;
+  width: 450px; height: 450px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(79,124,255,0.18) 0%, transparent 65%);
   pointer-events: none;
@@ -130,14 +132,14 @@ html, body {
   content: '';
   position: absolute;
   bottom: -80px; left: -80px;
-  width: 360px; height: 360px;
+  width: 320px; height: 320px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(0,212,170,0.12) 0%, transparent 65%);
   pointer-events: none;
 }
 
 .cover-inner {
-  padding: 56px 80px 56px;
+  padding: 48px 56px;
   position: relative;
   z-index: 2;
   flex: 1;
@@ -152,7 +154,7 @@ html, body {
   justify-content: space-between;
 }
 .cover-logo-text {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: -0.8px;
   color: #fff;
@@ -161,52 +163,52 @@ html, body {
 .cover-confidential {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: rgba(255,255,255,0.4);
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
-  padding: 6px 16px;
+  padding: 5px 14px;
   border-radius: 30px;
 }
 
-.cover-main { position: relative; z-index: 1; }
+.cover-main { position: relative; z-index: 1; margin: 32px 0; }
 
 .cover-accent-line {
-  width: 64px;
+  width: 56px;
   height: 4px;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
   border-radius: 4px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .cover-report-type {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 3.5px;
   text-transform: uppercase;
   color: rgba(255,255,255,0.45);
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 .cover-title {
-  font-size: 76px;
+  font-size: 54px;
   font-weight: 900;
-  letter-spacing: -3px;
-  line-height: 0.95;
-  margin-bottom: 24px;
+  letter-spacing: -2px;
+  line-height: 1.0;
+  margin-bottom: 18px;
   color: #ffffff;
 }
 .cover-client-name {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   letter-spacing: -0.5px;
 }
 .cover-period {
-  font-size: 16px;
+  font-size: 14.5px;
   color: rgba(255,255,255,0.45);
   font-weight: 400;
 }
@@ -216,16 +218,16 @@ html, body {
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
+  border-radius: 16px;
   overflow: hidden;
   background: rgba(255,255,255,0.03);
-  margin-bottom: 28px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 .cover-score-item {
-  padding: 32px 24px;
+  padding: 24px 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -241,20 +243,20 @@ html, body {
   background: rgba(255,255,255,0.08);
 }
 .cover-score-value {
-  font-size: 56px;
+  font-size: 42px;
   font-weight: 900;
   color: #ffffff;
   line-height: 1;
-  letter-spacing: -2px;
-  margin-bottom: 8px;
+  letter-spacing: -1.5px;
+  margin-bottom: 6px;
 }
 .cover-score-value.accent { color: var(--accent); }
 .cover-score-value.teal { color: var(--accent-2); }
 .cover-score-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: rgba(255,255,255,0.5);
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
 }
 
@@ -262,17 +264,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid rgba(255,255,255,0.08);
 }
-.cover-footer-agency { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.55); }
-.cover-footer-date { font-size: 13px; color: rgba(255,255,255,0.3); }
+.cover-footer-agency { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.55); }
+.cover-footer-date { font-size: 12px; color: rgba(255,255,255,0.3); }
 
 /* ══════════════════════════════════════════════════════════════
    SECTION LAYOUT
    ══════════════════════════════════════════════════════════════ */
 .report-section {
-  padding: 60px 80px;
+  padding: 44px 56px;
   border-bottom: 1px solid var(--border);
   page-break-inside: avoid;
   break-inside: avoid;
@@ -694,7 +696,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 80px;
+  padding: 24px 56px;
   background: linear-gradient(135deg, var(--navy) 0%, #112057 100%) !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
