@@ -27,14 +27,15 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 | [pdf-reports.md](./pdf-reports.md) | PDF generation engine, puppeteer, jsPDF | 2026-07-27 |
 | [multi-tenancy.md](./multi-tenancy.md) | Domain routing, middleware, agency separation | 2026-07-27 |
 | [devops.md](./devops.md) | Node.js path, launch commands, env vars, ports | 2026-08-14 |
-| [bugs-and-gotchas.md](./bugs-and-gotchas.md) | Known issues, workarounds, fragile code | 2026-07-27 |
+| [bugs-and-gotchas.md](./bugs-and-gotchas.md) | Known issues, workarounds, fragile code | 2026-08-14 |
 
 ---
 
 ## 📌 Recent Entries (Latest First)
 
 | Date | Title | Category | Summary |
-|------|-------|----------|---------|
+|------|-------|----------|---------| 
+| 2026-08-14 | globals.css CSS Cascade Leak Fix & Report Formatting | bugs-and-gotchas | Fixed red bar on KPI cards (globals.css pseudo-element bleed), cover page height, and footer text |
 | 2026-08-14 | Chrome Launch & Dev Server Verification | devops | Launched Next.js dev server on http://localhost:3000 & opened Chrome to login page |
 | 2026-08-13 | Full Session: Launch, Routing, Full-Screen Report, Git Rules | devops | Dev server symlink fix, proxy routing, auth fallback, report full-screen, git branch rules |
 | 2026-08-13 | Full-Screen PDF Report Render & Local Font Fix | frontend | Made PDF report preview page full-width edge-to-edge & migrated to next/font/google |
