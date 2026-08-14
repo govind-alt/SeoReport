@@ -134,19 +134,21 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 ---
 
-## 2026-08-14 — PDF Cover Page Split & Vertical Extra Space Fix
+## 2026-08-14 — PDF Section Pagination Gap Removal & Natural Content Flow
 
-**Task:** Remove extra vertical space on PDF cover page and prevent page break splitting the cover footer across pages.  
+**Task:** Remove large blank white space before Section 03 (Keyword Rankings) and allow sections to flow naturally without empty page bottoms.  
 **Files Changed:**
 - `app/reports/render/[id]/render.css` — modified
 - `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\reports\render\[id]\render.css` — synced
 
 **What Was Done:**
-1. Added `page-break-inside: avoid !important; break-inside: avoid !important; page-break-after: avoid !important; break-after: avoid !important;` to `.cover` to prevent browser print engine from splitting the cover page and pushing the footer onto Page 2.
-2. Scaled down `.cover-inner` padding (`24px 32px`), title (`38px`), score cards (`32px`), and highlight chips (`7px 4px`) so the entire cover block fits in ~330px height.
-3. Enabled Section 01 (*Executive Summary*) to flow cleanly onto Page 1 directly beneath the cover banner with zero orphan footers and zero blank spaces in PDF downloads.
+1. Replaced `page-break-inside: avoid` on `.report-section` with `page-break-inside: auto` in both base CSS and `@media print`.
+2. Applied `page-break-inside: avoid` strictly to atomic children (`.kpi-card`, `.ranking-strip-card`, `.audit-stat`, `.rec-item`, `.data-table tr`, `.metric-bar-row`) and added `page-break-after: avoid` to `.section-header`.
+3. Scaled down KPI card paddings (`18px 14px`), ranking strip card paddings (`16px 12px`), table cell paddings (`11px 14px`), and section paddings (`24px 32px`).
+4. This allows subsequent sections to begin immediately on the same page where previous sections end, eliminating large empty white gaps at the bottom of PDF pages.
 
 ---
+
 
 
 
