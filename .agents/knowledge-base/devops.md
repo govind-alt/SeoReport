@@ -276,3 +276,28 @@ Run from: `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`
 **Open Questions:** None
 
 ---
+
+## 2026-08-14 — Chrome Launch & Server Verification
+
+**Task:** Launch application on Chrome browser  
+**Files Changed:** None  
+
+**What Was Done:**
+1. Checked port 3000 — server was offline.
+2. Launched Next.js 16 dev server (`next dev --webpack`) from physical directory `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` using Cursor's bundled Node.js helper executable.
+3. Server initialized on `http://localhost:3000` (Ready in 3.9s).
+4. Opened Chrome browser on the user desktop to `http://localhost:3000/login`.
+5. Navigated and verified the RankFlow login interface via browser subagent (`rankflow_login_page_1786686475358.png`).
+
+**Why:**
+User requested "launch on chrome".
+
+**How It Works:**
+Running `next dev --webpack` from the physical path avoids symlink duplication issues and opens the live Next.js app on `http://localhost:3000`.
+
+**Gotchas / Watch Out For:** None
+
+**Open Questions:** None
+
+---
+

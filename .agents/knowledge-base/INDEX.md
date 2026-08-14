@@ -1,6 +1,6 @@
 # RankFlow Project Knowledge Base — Master Index
 
-> **Last updated:** 2026-08-13  
+> **Last updated:** 2026-08-14  
 > **Project:** RankFlow — SEO Report Automation SaaS  
 > **Root:** `c:\Users\hrish\OneDrive\Desktop\SeoReport`
 
@@ -16,7 +16,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | File | What It Covers | Last Updated |
 |------|---------------|--------------|
-| [PROJECT_SNAPSHOT.md](./PROJECT_SNAPSHOT.md) | Current project state, working environment, critical facts | 2026-08-12 |
+| [PROJECT_SNAPSHOT.md](./PROJECT_SNAPSHOT.md) | Current project state, working environment, critical facts | 2026-08-14 |
 | [architecture.md](./architecture.md) | High-level design, multi-tenancy, routing patterns | 2026-07-27 |
 | [auth.md](./auth.md) | NextAuth v5, roles, credentials, sessions | 2026-07-27 |
 | [database.md](./database.md) | Prisma schema, SQLite dev.db, migrations | 2026-07-27 |
@@ -26,7 +26,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 | [billing.md](./billing.md) | Plan tiers, Stripe modal, invoice PDF | 2026-07-27 |
 | [pdf-reports.md](./pdf-reports.md) | PDF generation engine, puppeteer, jsPDF | 2026-07-27 |
 | [multi-tenancy.md](./multi-tenancy.md) | Domain routing, middleware, agency separation | 2026-07-27 |
-| [devops.md](./devops.md) | Node.js path, launch commands, env vars, ports | 2026-08-12 |
+| [devops.md](./devops.md) | Node.js path, launch commands, env vars, ports | 2026-08-14 |
 | [bugs-and-gotchas.md](./bugs-and-gotchas.md) | Known issues, workarounds, fragile code | 2026-07-27 |
 
 ---
@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-14 | Chrome Launch & Dev Server Verification | devops | Launched Next.js dev server on http://localhost:3000 & opened Chrome to login page |
 | 2026-08-13 | Full Session: Launch, Routing, Full-Screen Report, Git Rules | devops | Dev server symlink fix, proxy routing, auth fallback, report full-screen, git branch rules |
 | 2026-08-13 | Full-Screen PDF Report Render & Local Font Fix | frontend | Made PDF report preview page full-width edge-to-edge & migrated to next/font/google |
 | 2026-08-13 | Chrome Launch & Webpack Dev Server | devops | Launched Next.js dev server on http://localhost:3000 using --webpack flag & opened in Chrome |

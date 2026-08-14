@@ -136,6 +136,7 @@ wireframes/          ← HTML wireframes (static, no server needed)
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-14 | Launch on Chrome | ✅ Next dev server started on http://localhost:3000 & opened Chrome to login page |
 | 2026-08-13 | Full session: app launch, routing, full-screen report, git hygiene | ✅ All 7 changed files committed to hrishita-work (b837cb4) |
 | 2026-08-13 | Launch on Chrome & Host Domain Resolution | ✅ Dev server started, .env & proxy configured, opened in Chrome |
 | 2026-07-27 | Launch dev server on Chrome | ✅ Server running on port 3000 via Cursor's bundled node.exe |
