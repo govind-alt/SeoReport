@@ -116,6 +116,10 @@ html, body {
   overflow: hidden;
   display: block;
   color: #fff;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  page-break-after: avoid !important;
+  break-after: avoid !important;
 }
 .cover::before {
   content: '';
@@ -137,12 +141,12 @@ html, body {
 }
 
 .cover-inner {
-  padding: 32px 36px;
+  padding: 24px 32px;
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .cover-top-bar {
@@ -151,61 +155,61 @@ html, body {
   justify-content: space-between;
 }
 .cover-logo-text {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 900;
   letter-spacing: -0.8px;
   color: #fff;
 }
 .cover-logo-text span { color: var(--accent); }
 .cover-confidential {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: rgba(255,255,255,0.4);
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.1);
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 30px;
 }
 
-.cover-main { position: relative; z-index: 1; margin: 12px 0 8px; }
+.cover-main { position: relative; z-index: 1; margin: 4px 0; }
 
 .cover-accent-line {
-  width: 48px;
-  height: 4px;
+  width: 42px;
+  height: 3px;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  border-radius: 4px;
-  margin-bottom: 18px;
+  border-radius: 3px;
+  margin-bottom: 12px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .cover-report-type {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   color: rgba(255,255,255,0.45);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 .cover-title {
-  font-size: 46px;
+  font-size: 38px;
   font-weight: 900;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
   line-height: 1.0;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   color: #ffffff;
 }
 .cover-client-name {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--accent);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   letter-spacing: -0.5px;
 }
 .cover-period {
-  font-size: 13.5px;
+  font-size: 13px;
   color: rgba(255,255,255,0.45);
   font-weight: 400;
 }
@@ -215,16 +219,16 @@ html, body {
   grid-template-columns: repeat(3, 1fr);
   gap: 0;
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   background: rgba(255,255,255,0.03);
-  margin-bottom: 4px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  margin-bottom: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 .cover-score-item {
-  padding: 20px 14px;
+  padding: 14px 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -240,33 +244,33 @@ html, body {
   background: rgba(255,255,255,0.08);
 }
 .cover-score-value {
-  font-size: 38px;
+  font-size: 32px;
   font-weight: 900;
   color: #ffffff;
   line-height: 1;
-  letter-spacing: -1.5px;
-  margin-bottom: 4px;
+  letter-spacing: -1px;
+  margin-bottom: 3px;
 }
 .cover-score-value.accent { color: var(--accent); }
 .cover-score-value.teal { color: var(--accent-2); }
 .cover-score-label {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   color: rgba(255,255,255,0.5);
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
 }
 
 .cover-highlights {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 .cover-chip {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 10px 8px;
+  border-radius: 8px;
+  padding: 7px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -275,15 +279,15 @@ html, body {
   print-color-adjust: exact !important;
 }
 .cover-chip .chip-label {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.45);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin-bottom: 3px;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
 }
 .cover-chip .chip-val {
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #ffffff;
 }
@@ -295,16 +299,16 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .scope-tag {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px 12px;
+  padding: 3px 10px;
   border-radius: 20px;
   letter-spacing: 0.3px;
   -webkit-print-color-adjust: exact !important;
@@ -315,17 +319,17 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 16px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255,255,255,0.08);
 }
-.cover-footer-agency { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.55); }
-.cover-footer-date { font-size: 11.5px; color: rgba(255,255,255,0.3); }
+.cover-footer-agency { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.55); }
+.cover-footer-date { font-size: 11px; color: rgba(255,255,255,0.3); }
 
 /* ══════════════════════════════════════════════════════════════
    SECTION LAYOUT
    ══════════════════════════════════════════════════════════════ */
 .report-section {
-  padding: 36px 44px;
+  padding: 30px 36px;
   border-bottom: 1px solid var(--border);
   page-break-inside: avoid;
   break-inside: avoid;

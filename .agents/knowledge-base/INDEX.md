@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-14 | PDF Cover Page Split & Vertical Extra Space Fix | frontend | Added break-inside avoid and tightened cover height (~330px) to prevent footer spilling to Page 2 |
 | 2026-08-14 | PDF Download / Print Mode Formatting Fix | frontend | Updated @media print rules to remove 100vh cover height, matching screen preview PDF format |
 | 2026-08-14 | Physical Directory File Sync & Zero Gap Verification | devops | Synced modified render files to physical Downloads path, eliminating stale build cache and verifying zero cover gap |
 | 2026-08-14 | Report Cover Gap Fix & 820px Tight Layout | frontend | Added cover metric chips & scope tags to eliminate gaps, tightened height/width to 820px |

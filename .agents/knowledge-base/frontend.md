@@ -134,21 +134,20 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 ---
 
-## 2026-08-14 — PDF Download / Print Mode Formatting Fix (Match Screen Preview)
+## 2026-08-14 — PDF Cover Page Split & Vertical Extra Space Fix
 
-**Task:** Fix PDF download / print mode where `@media print` was enforcing `min-height: 100vh !important` and `width: 100%`, causing the PDF output to display a massive blank blue gap on the cover page unlike the compact screen preview.  
+**Task:** Remove extra vertical space on PDF cover page and prevent page break splitting the cover footer across pages.  
 **Files Changed:**
 - `app/reports/render/[id]/render.css` — modified
 - `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\reports\render\[id]\render.css` — synced
 
 **What Was Done:**
-1. Updated `@media print` rules in `render.css`:
-   - Changed `.cover` in `@media print` from `min-height: 100vh !important; page-break-after: always !important;` to `min-height: auto !important; page-break-after: avoid !important;`.
-   - Set `.report-page` in `@media print` to `max-width: 820px !important; margin: 0 auto !important; border-radius: 12px !important;`.
-   - Set `@page` margin to `8mm 0` for clean A4 printing.
-2. Verified that PDF downloads and print dialog outputs now mirror the compact, zero-gap 820px layout of the screen preview.
+1. Added `page-break-inside: avoid !important; break-inside: avoid !important; page-break-after: avoid !important; break-after: avoid !important;` to `.cover` to prevent browser print engine from splitting the cover page and pushing the footer onto Page 2.
+2. Scaled down `.cover-inner` padding (`24px 32px`), title (`38px`), score cards (`32px`), and highlight chips (`7px 4px`) so the entire cover block fits in ~330px height.
+3. Enabled Section 01 (*Executive Summary*) to flow cleanly onto Page 1 directly beneath the cover banner with zero orphan footers and zero blank spaces in PDF downloads.
 
 ---
+
 
 
 
