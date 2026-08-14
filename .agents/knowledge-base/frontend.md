@@ -133,3 +133,19 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 - CSS in `render.css` uses `width: 100%` on screen, expanding the cover and report sections to the full viewport width while print media queries keep exact A4 dimensions.
 
 ---
+
+## 2026-08-14 — PDF Report Render Visual & Theme Polish
+
+**Task:** Refine full-width report styling, recommendation badges, footer appearance, and typography hierarchy.  
+**Files Changed:**
+- `app/reports/render/[id]/render.css` — modified
+- `app/reports/render/[id]/page.tsx` — modified
+
+**What Was Done:**
+1. Updated section headers, audit cards, and recommendation list styling for high-density readable data presentation.
+2. Refined impact badge tags (HIGH, MED, LOW) with CSS custom properties and crisp contrast.
+3. Enhanced cover page gradient styling and header contrast.
+4. Redesigned report footer with dark navy gradient backdrop, top accent border, and proper white space spacing for screen & print.
+
+---
+
