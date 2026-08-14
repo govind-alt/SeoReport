@@ -38,20 +38,21 @@
 
 ---
 
-## 2026-08-14 — Direct PDF File Download Implementation
+## 2026-08-14 — PDF Header & Footer Full-Bleed Edge Alignment Fix
 
-**Task:** Enable one-click direct PDF file download when clicking "Download PDF" button without opening browser print prompt.  
+**Task:** Fix the header and footer formatting in the exported PDF so they render cleanly edge-to-edge without background bleed, margins, or rounded corners floating in white/blue space.  
 **Files Changed:**
-- `app/reports/render/PrintButton.tsx` — modified
-- `app/reports/render/[id]/page.tsx` — modified
+- `app/reports/render/[id]/render.css` — modified
 - `app/api/reports/generate/route.ts` — modified
 - `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` — synced
 
 **What Was Done:**
-1. Updated `PrintButton.tsx` to directly query `/api/reports/generate?id=${reportId}&filename=${cleanName}`.
-2. In `app/api/reports/generate/route.ts`, generated PDF using Puppeteer headless Chrome with exact `render.css` print rules and streamed the binary buffer with `Content-Type: application/pdf` and `Content-Disposition: attachment; filename="${cleanFilename}.pdf"`.
-3. In `PrintButton.tsx`, converted binary stream into a downloadable Blob URL (`a.href = blobUrl; a.download = ...; a.click()`) for direct file download into the user's Downloads folder, showing `⏳ Generating PDF…` → `✓ Downloaded!` with client print fallback.
+1. Updated `@page` margin to `0` and set `html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }` in `@media print`.
+2. Changed `.report-page` in `@media print` to `width: 100% !important; max-width: 100% !important; border-radius: 0 !important; margin: 0 !important;`.
+3. Set `.cover` and `.report-footer` in `@media print` to `width: 100% !important; border-radius: 0 !important; margin: 0 !important; padding: 24px 48px !important;` so the cover header sits flush at the top of Page 1 and the footer sits flush at the bottom of the document.
+4. Set Puppeteer PDF generation margin to `{ top: '0', right: '0', bottom: '0', left: '0' }` in `app/api/reports/generate/route.ts` to eliminate artificial print margins.
 
 ---
+
 
 

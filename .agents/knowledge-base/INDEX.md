@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-14 | PDF Header & Footer Full-Bleed Edge Alignment Fix | pdf-reports | Configured 0 margins and edge-to-edge full bleed for cover header and footer in PDF export |
 | 2026-08-14 | Direct PDF File Download Implementation | pdf-reports | Wired Download PDF button to server-side Puppeteer stream for 1-click direct .pdf file downloads |
 | 2026-08-14 | PDF Section Pagination Gap Removal | frontend | Replaced section-level break-inside avoid with atomic card-level rules to eliminate empty page bottom gaps |
 | 2026-08-14 | PDF Cover Page Split & Vertical Extra Space Fix | frontend | Added break-inside avoid and tightened cover height (~330px) to prevent footer spilling to Page 2 |
