@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-14 | PDF Download / Print Mode Formatting Fix | frontend | Updated @media print rules to remove 100vh cover height, matching screen preview PDF format |
 | 2026-08-14 | Physical Directory File Sync & Zero Gap Verification | devops | Synced modified render files to physical Downloads path, eliminating stale build cache and verifying zero cover gap |
 | 2026-08-14 | Report Cover Gap Fix & 820px Tight Layout | frontend | Added cover metric chips & scope tags to eliminate gaps, tightened height/width to 820px |
 | 2026-08-14 | PDF Report Render Width Adjustment (900px) | frontend | Adjusted report container max-width to 900px with centered document margins & shadow |

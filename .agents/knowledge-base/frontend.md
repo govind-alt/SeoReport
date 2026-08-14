@@ -134,20 +134,22 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 ---
 
-## 2026-08-14 — PDF Report Cover Gap Removal & Tight Data Fit (820px Container)
+## 2026-08-14 — PDF Download / Print Mode Formatting Fix (Match Screen Preview)
 
-**Task:** Add related executive metrics/scope tags to cover page to eliminate empty gaps and tighten height/width to fit data tightly.  
+**Task:** Fix PDF download / print mode where `@media print` was enforcing `min-height: 100vh !important` and `width: 100%`, causing the PDF output to display a massive blank blue gap on the cover page unlike the compact screen preview.  
 **Files Changed:**
-- `app/reports/render/[id]/page.tsx` — modified
 - `app/reports/render/[id]/render.css` — modified
+- `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\reports\render\[id]\render.css` — synced
 
 **What Was Done:**
-1. Added `cover-highlights` (4-column metric chips: MoM Traffic, Top 3 Positions, Domain Authority, Total Backlinks) to the cover page.
-2. Added `cover-scope-bar` (5 audit scope tags: Technical Audit, Keyword Rankings, Traffic Analytics, Backlink Profile, AI Recommendations).
-3. Removed artificial `min-height: 580px` constraint from `.cover`, allowing the cover to shrink-wrap snugly around content without vertical gaps.
-4. Set `.report-page` `max-width` to `820px` and reduced section padding (`36px 44px`) so the document container fits tightly around all data content.
+1. Updated `@media print` rules in `render.css`:
+   - Changed `.cover` in `@media print` from `min-height: 100vh !important; page-break-after: always !important;` to `min-height: auto !important; page-break-after: avoid !important;`.
+   - Set `.report-page` in `@media print` to `max-width: 820px !important; margin: 0 auto !important; border-radius: 12px !important;`.
+   - Set `@page` margin to `8mm 0` for clean A4 printing.
+2. Verified that PDF downloads and print dialog outputs now mirror the compact, zero-gap 820px layout of the screen preview.
 
 ---
+
 
 
 

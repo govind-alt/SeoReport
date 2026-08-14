@@ -766,23 +766,45 @@ html, body {
 /* ══════════════════════════════════════════════════════════════
    PRINT
    ══════════════════════════════════════════════════════════════ */
-@page { size: A4 portrait; margin: 0; }
+@page { size: A4 portrait; margin: 8mm 0; }
 
 @media print {
   html, body {
-    margin: 0 !important; padding: 0 !important; background: #ffffff !important;
-    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #EAEFFC !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
   .screen-controls { display: none !important; }
-  .report-page { width: 100% !important; max-width: none !important; margin: 0 !important; box-shadow: none !important; }
-  .cover {
-    min-height: 100vh !important; page-break-after: always !important; break-after: page !important;
-    background: linear-gradient(135deg, #060D29 0%, #0B1437 35%, #112057 65%, #1B3FA0 100%) !important;
-    -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+  .report-page {
+    width: 100% !important;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+    box-shadow: none !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
   }
-  .report-section { page-break-inside: avoid !important; break-inside: avoid !important; }
+  .cover {
+    min-height: auto !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    background: linear-gradient(135deg, #060D29 0%, #0B1437 35%, #112057 65%, #1B3FA0 100%) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .cover-inner {
+    padding: 32px 36px !important;
+    gap: 16px !important;
+  }
+  .report-section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    padding: 32px 40px !important;
+  }
   .data-table tr, .kpi-card, .audit-stat, .rec-item { page-break-inside: avoid !important; break-inside: avoid !important; }
   .kpi-card.accent, .data-table thead tr, .ranking-strip-card::before, .audit-stat,
   .rec-item::before, .metric-bar-fill, .report-footer, .section-header::after,
-  .cover-accent-line, .cover-scores { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .cover-accent-line, .cover-scores, .cover-chip, .scope-tag { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 }
