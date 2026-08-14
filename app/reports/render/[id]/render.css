@@ -114,8 +114,7 @@ html, body {
   width: 100%;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  display: block;
   color: #fff;
 }
 .cover::before {
@@ -138,13 +137,12 @@ html, body {
 }
 
 .cover-inner {
-  padding: 36px 44px;
+  padding: 32px 36px;
   position: relative;
   z-index: 2;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .cover-top-bar {

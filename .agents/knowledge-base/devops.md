@@ -295,17 +295,25 @@ User requested "launch on chrome".
 **How It Works:**
 Running `next dev --webpack` from the physical path avoids symlink duplication issues and opens the live Next.js app on `http://localhost:3000`.
 
-## 2026-08-14 — Dev Server Restart & Connection Refused Fix
+---
 
-**Task:** Resolve connection refused error by restarting Next.js dev server  
-**Files Changed:** None  
+## 2026-08-14 — Desktop Workspace vs Downloads Physical Directory Sync
+
+**Task:** Resolve issue where Next.js dev server was serving stale cached pages despite code edits.  
+**Files Changed:**
+- `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\reports\render\[id]\page.tsx` — synced from Desktop
+- `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\reports\render\[id]\render.css` — synced from Desktop
 
 **What Was Done:**
-1. Detected `ERR_CONNECTION_REFUSED` in Chrome screenshot due to stopped background dev server.
-2. Restarted Next.js dev server (`next dev --webpack`) from physical root directory `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` as a daemon task.
-3. Verified server readiness on `http://localhost:3000` (Ready in 1.6s).
-4. Reloaded and rendered `/reports/render/cmsrfdnov0001g0ixwwouyic2` page in Chrome.
+1. Discovered that editing files in Desktop workspace (`c:\Users\hrish\OneDrive\Desktop\SeoReport`) was writing to the Desktop folder, while Next.js dev server runs from the physical location (`c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main`).
+2. Synced modified `page.tsx` and `render.css` to the physical Downloads folder using PowerShell `Copy-Item -LiteralPath`.
+3. Restarted Next.js dev server and verified clean zero-gap rendering in Chrome.
+
+**Gotchas / Watch Out For:**
+- When modifying route files, ensure changes are synced to `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` if Next.js hot-reload doesn't reflect edits.
+- Use `Copy-Item -LiteralPath` in PowerShell to avoid glob expansion errors on bracket paths like `[id]`.
 
 ---
+
 
 
