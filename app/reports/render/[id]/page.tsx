@@ -151,6 +151,33 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             </div>
           </div>
 
+          <div className="cover-highlights">
+            <div className="cover-chip">
+              <span className="chip-label">MoM Traffic</span>
+              <span className="chip-val positive">{sessionChange}</span>
+            </div>
+            <div className="cover-chip">
+              <span className="chip-label">Top 3 Positions</span>
+              <span className="chip-val">{top3Count} Keywords</span>
+            </div>
+            <div className="cover-chip">
+              <span className="chip-label">Domain Authority</span>
+              <span className="chip-val">{domainAuthority} / 100</span>
+            </div>
+            <div className="cover-chip">
+              <span className="chip-label">Total Backlinks</span>
+              <span className="chip-val">{backlinkCount.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="cover-scope-bar">
+            <span className="scope-tag">Technical Audit</span>
+            <span className="scope-tag">Keyword Rankings</span>
+            <span className="scope-tag">Traffic Analytics</span>
+            <span className="scope-tag">Backlink Profile</span>
+            <span className="scope-tag">AI Recommendations</span>
+          </div>
+
           <div className="cover-footer">
             <div className="cover-footer-agency">📊 {agencyName}</div>
             <div className="cover-footer-date">Generated: {generatedDate}</div>

@@ -134,19 +134,20 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 ---
 
-## 2026-08-14 — PDF Report Render Width Adjustment (900px Executive Container)
+## 2026-08-14 — PDF Report Cover Gap Removal & Tight Data Fit (820px Container)
 
-**Task:** Decrease report preview width on screen from 1440px to standard 900px centered document layout.  
+**Task:** Add related executive metrics/scope tags to cover page to eliminate empty gaps and tighten height/width to fit data tightly.  
 **Files Changed:**
+- `app/reports/render/[id]/page.tsx` — modified
 - `app/reports/render/[id]/render.css` — modified
 
 **What Was Done:**
-1. Reduced `.report-page` `max-width` from `1440px` to `900px`.
-2. Added centered document container styling: `margin: 36px auto; border-radius: 12px; overflow: hidden; box-shadow: 0 16px 60px rgba(11,20,55,0.16);`.
-3. Set page backdrop background to `#EAEFFC` for crisp document canvas contrast.
-4. Scaled cover padding (`48px 56px`), cover title (`54px`), and score badges (`42px`) to fit 900px layout cleanly.
-5. Retained `@media print` rules for 100% full-width A4 PDF exports.
+1. Added `cover-highlights` (4-column metric chips: MoM Traffic, Top 3 Positions, Domain Authority, Total Backlinks) to the cover page.
+2. Added `cover-scope-bar` (5 audit scope tags: Technical Audit, Keyword Rankings, Traffic Analytics, Backlink Profile, AI Recommendations).
+3. Removed artificial `min-height: 580px` constraint from `.cover`, allowing the cover to shrink-wrap snugly around content without vertical gaps.
+4. Set `.report-page` `max-width` to `820px` and reduced section padding (`36px 44px`) so the document container fits tightly around all data content.
 
 ---
+
 
 
