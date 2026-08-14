@@ -129,6 +129,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
           </div>
 
           <div className="cover-main">
+            <div className="cover-accent-line"></div>
             <div className="cover-report-type">Monthly Performance Report</div>
             <div className="cover-title">SEO Report</div>
             <div className="cover-client-name">{clientName}</div>
@@ -141,12 +142,12 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
               <div className="cover-score-label">Health Score</div>
             </div>
             <div className="cover-score-item">
-              <div className="cover-score-value">{sessionsFormatted}</div>
-              <div className="cover-score-label">Sessions</div>
+              <div className="cover-score-value accent">{sessionsFormatted}</div>
+              <div className="cover-score-label">Organic Sessions</div>
             </div>
             <div className="cover-score-item">
-              <div className="cover-score-value">{top10Count}</div>
-              <div className="cover-score-label">Top 10 KWs</div>
+              <div className="cover-score-value teal">{top10Count}</div>
+              <div className="cover-score-label">Top 10 Keywords</div>
             </div>
           </div>
 
@@ -191,7 +192,6 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
 
           <div className="kpi-grid-3">
             <div className="kpi-card accent">
-              <div className="kpi-card-top-bar"></div>
               <div className="kpi-value" style={{ color: '#059669' }}>{sessionsFormatted}</div>
               <div className="kpi-label">Organic Sessions</div>
               <span className={`kpi-change ${sessionChangePct >= 0 ? 'up' : 'dn'}`}>{sessionChange} MoM</span>
@@ -315,7 +315,6 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
               <span className="kpi-change up">+128 this month</span>
             </div>
             <div className="kpi-card accent">
-              <div className="kpi-card-top-bar"></div>
               <div className="kpi-value">{domainAuthority}</div>
               <div className="kpi-label">Domain Authority</div>
               <span className="kpi-change up">+2 pts</span>
@@ -363,7 +362,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             <div className="section-rule"></div>
           </div>
 
-          <div className="rec-item">
+          <div className="rec-item rec-critical">
             <div className="rec-icon critical">🔴</div>
             <div>
               <div className="rec-title">Fix Core Web Vitals — LCP &gt; 4s on Mobile</div>
@@ -372,7 +371,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             </div>
           </div>
 
-          <div className="rec-item">
+          <div className="rec-item rec-warning">
             <div className="rec-icon warning">🟡</div>
             <div>
               <div className="rec-title">Resolve 23 Missing Meta Descriptions</div>
@@ -381,7 +380,7 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             </div>
           </div>
 
-          <div className="rec-item">
+          <div className="rec-item rec-opportunity">
             <div className="rec-icon opportunity">🔵</div>
             <div>
               <div className="rec-title">Target 8 High-Volume, Low-Difficulty Keywords</div>
@@ -398,7 +397,8 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
             <div className="footer-note">Prepared exclusively for {clientName} · {period} · Confidential</div>
           </div>
           <div className="footer-right">
-            Powered by RankFlow<br />rankflow.app
+            <div className="footer-brand">Powered by RankFlow</div>
+            <span className="footer-url">rankflow.app</span>
           </div>
         </div>
 
