@@ -38,21 +38,20 @@
 
 ---
 
-## 2026-08-14 — PDF Header & Footer Full-Bleed Edge Alignment Fix
+## 2026-08-14 — PDF Footer Square Edge Alignment & Border Elimination Fix
 
-**Task:** Fix the header and footer formatting in the exported PDF so they render cleanly edge-to-edge without background bleed, margins, or rounded corners floating in white/blue space.  
+**Task:** Fix the footer formatting so it renders with clean square straight edges (`border-radius: 0 !important`) without curved bottom corners or floating borders in PDF export and screen preview.  
 **Files Changed:**
 - `app/reports/render/[id]/render.css` — modified
-- `app/api/reports/generate/route.ts` — modified
 - `c:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main` — synced
 
 **What Was Done:**
-1. Updated `@page` margin to `0` and set `html, body { background: #ffffff !important; margin: 0 !important; padding: 0 !important; }` in `@media print`.
-2. Changed `.report-page` in `@media print` to `width: 100% !important; max-width: 100% !important; border-radius: 0 !important; margin: 0 !important;`.
-3. Set `.cover` and `.report-footer` in `@media print` to `width: 100% !important; border-radius: 0 !important; margin: 0 !important; padding: 24px 48px !important;` so the cover header sits flush at the top of Page 1 and the footer sits flush at the bottom of the document.
-4. Set Puppeteer PDF generation margin to `{ top: '0', right: '0', bottom: '0', left: '0' }` in `app/api/reports/generate/route.ts` to eliminate artificial print margins.
+1. Removed `border-radius: 0 0 12px 12px` from `.report-footer` across screen and `@media print` rules.
+2. Set `.report-footer` to solid `#0B1437` background with a subtle `2px solid var(--accent)` top accent line and `border-radius: 0 !important;`.
+3. Ensured the footer sits flush edge-to-edge as a clean, full-width document ending block.
 
 ---
+
 
 
 
