@@ -45,3 +45,46 @@ All SE Ranking mock data on the frontend has been replaced with live API calls t
 - Tab data in client details is fetched on-demand (when the tab becomes active) to avoid slow page loads.
 
 ---
+
+## 2026-08-16 — Superadmin Server Actions Implementation (Cross-Admin Connectivity)
+
+**Task:** Implement all missing superadmin server actions that were being called in the UI but never defined, enabling real cross-admin data visibility and all CRUD operations.
+
+**Files Changed:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\actions.ts` — modified (appended 10 new server actions)
+
+**What Was Done:**
+Added the following 10 server actions to `app/actions.ts` (all were called by `SuperadminClient.tsx` and `app/admin/page.tsx` but were missing from the file):
+
+1. `getSuperadminData()` — reads live DB in parallel: agencies (with `_count`), users (with agency), reports (with client+agency), messages. Computes KPIs (MRR, totalClients, planStats), chart data (6-month MRR trend, agency growth), formats support tickets from messages, and returns everything as one object.
+2. `createUserSuperadmin(data)` — creates a User with bcrypt-hashed password, linked to optional `agencyId`.
+3. `updateUserRoleSuperadmin(userId, role)` — updates user role in DB.
+4. `deleteUserSuperadmin(userId)` — deletes user; guards against deleting superadmin accounts.
+5. `updateAgencyPlanSuperadmin(agencyId, plan)` — updates agency plan field.
+6. `deleteAgencySuperadmin(agencyId)` — deletes agency (Prisma cascade deletes all related data).
+7. `createAgencySuperadmin(data)` — creates new Agency row, checks slug/subdomain uniqueness.
+8. `toggleSuspendAgencySuperadmin(agencyId)` — toggles plan between `'suspended'` and `'starter'`.
+9. `impersonateAgencyAction(agencySlug)` — looks up the agency, returns a redirect URL using `NEXTAUTH_URL` + subdomain routing pattern.
+10. `respondToTicketSuperadmin(ticketId, replyText)` — updates the `Message.body` to append ` | Response: "{reply}" [RESOLVED]` and sets `isRead: true`.
+
+**Why:**
+The superadmin page (`/superadmin` → `SuperadminClient.tsx`) and admin page (`/admin/page.tsx`) were importing and calling these server actions but the functions were completely absent from `actions.ts`. This caused silent failures on all CRUD buttons (Create User, Edit Role, Deactivate, etc.). The `getSuperadminData()` absence meant the superadmin page loaded with empty/stale props on every render.
+
+**How It Works:**
+- All actions use `prisma` client imported at top of `actions.ts`.
+- All actions call `revalidatePath('/superadmin')` after mutations so Next.js ISR cache is busted.
+- `getSuperadminData()` uses `Promise.all([...])` to run all DB queries concurrently.
+- Support tickets are derived from `Message` rows where `isFromAgency === false` (client-to-agency messages).
+- Reports are formatted with `toLocaleDateString` for display.
+- MRR is calculated as: enterprise=249, pro/professional=99, suspended=0, else=49 per agency.
+
+**Gotchas / Watch Out For:**
+- The `@react-email/render` warning from `resend` module is pre-existing and harmless — it does not block compilation.
+- `getSuperadminData()` returns `formattedReports` under the key `reports` — this is what `SuperadminClient.tsx` expects as `data.reports`.
+- Support tickets sourced from `Message` model — if no messages exist in the DB, the tickets tab will be empty (correct behavior, not a bug).
+- `deleteUserSuperadmin` uses `prisma.user.delete` which will also cascade-delete their sessions/accounts.
+
+**Open Questions:**
+- Impersonation (`impersonateAgencyAction`) currently returns a URL — there is no actual session-swap/cookie mechanism. The redirect just takes the superadmin to the agency subdomain where they'll be prompted to log in as that agency.
+
+---

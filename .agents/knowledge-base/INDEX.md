@@ -1,6 +1,6 @@
 # RankFlow Project Knowledge Base — Master Index
 
-> **Last updated:** 2026-08-14  
+> **Last updated:** 2026-08-16  
 > **Project:** RankFlow — SEO Report Automation SaaS  
 > **Root:** `c:\Users\hrish\OneDrive\Desktop\SeoReport`
 
@@ -20,8 +20,8 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 | [architecture.md](./architecture.md) | High-level design, multi-tenancy, routing patterns | 2026-07-27 |
 | [auth.md](./auth.md) | NextAuth v5, roles, credentials, sessions | 2026-07-27 |
 | [database.md](./database.md) | Prisma schema, SQLite dev.db, migrations | 2026-07-27 |
-| [api.md](./api.md) | API routes, server actions, cron jobs | 2026-07-27 |
-| [frontend.md](./frontend.md) | React components, pages, Tailwind v4, routing | 2026-08-10 |
+| [api.md](./api.md) | API routes, server actions, cron jobs | 2026-08-16 |
+| [frontend.md](./frontend.md) | React components, pages, Tailwind v4, routing | 2026-08-16 |
 | [settings-integration-2026-08-10.md](./settings-integration-2026-08-10.md) | Details on 2FA, Webhooks, and Stripe integrations | 2026-08-10 |
 | [billing.md](./billing.md) | Plan tiers, Stripe modal, invoice PDF | 2026-07-27 |
 | [pdf-reports.md](./pdf-reports.md) | PDF generation engine, puppeteer, jsPDF | 2026-07-27 |
@@ -35,6 +35,8 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-16 | Admin Reports Download PDF Button + Superadmin Reports Tab | frontend | Added Download PDF button to /admin reports table; added Reports tab to SuperadminClient with search, status badges, PDF download with correct filename |
+| 2026-08-16 | Superadmin Server Actions Implementation (Cross-Admin Connectivity) | api | Added 10 missing server actions to actions.ts: getSuperadminData, createUserSuperadmin, updateUserRoleSuperadmin, deleteUserSuperadmin, updateAgencyPlanSuperadmin, deleteAgencySuperadmin, createAgencySuperadmin, toggleSuspendAgencySuperadmin, impersonateAgencyAction, respondToTicketSuperadmin |
 | 2026-08-14 | PDF Footer Square Edge Alignment & Border Fix | pdf-reports | Removed bottom border radius and aligned footer with clean edge-to-edge square styling |
 | 2026-08-14 | PDF Header & Footer Full-Bleed Edge Alignment Fix | pdf-reports | Configured 0 margins and edge-to-edge full bleed for cover header and footer in PDF export |
 | 2026-08-14 | Direct PDF File Download Implementation | pdf-reports | Wired Download PDF button to server-side Puppeteer stream for 1-click direct .pdf file downloads |

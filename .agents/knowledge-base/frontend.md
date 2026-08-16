@@ -154,3 +154,47 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 
 
+## 2026-08-16 — Admin Reports "Download PDF" Button + Superadmin Reports Tab
+
+**Task:** Add a working "Download PDF" button to the admin `/admin` Reports page and add a new Reports tab to `SuperadminClient.tsx` with the same download capability.
+
+**Files Changed:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx` — modified (added `downloadingPdf` state, `handleDownloadReportPdf` handler, Download PDF button per report row)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\superadmin\SuperadminClient.tsx` — modified (added Reports tab to nav, Reports tab content panel, `reportsList` state, `handleDownloadReportPdf` handler, `reportSearch` state)
+
+**What Was Done:**
+
+**`app/admin/page.tsx` (the actual superadmin UI at `/admin`):**
+- Added `downloadingPdf: Record<string, boolean>` state.
+- Added `handleDownloadReportPdf(report)` async function.
+- In the Reports tab table, replaced the single "👁️ Preview" button with two buttons side-by-side: "Preview" (existing) + "⬇ Download PDF" (new).
+- Download button shows "Generating…" while in progress.
+
+**`app/superadmin/SuperadminClient.tsx` (legacy `/superadmin` route):**
+- Added `📄 Reports` tab to the tab nav array (between Users and Support Tickets).
+- Added `[reportsList]` state initialized from `data.reports` (provided by `getSuperadminData()`).
+- Added `reportSearch` state for filtering.
+- Added full Reports tab panel with table (columns: Client, Agency, Period, Status, Generated, Actions).
+- Each row has 👁️ View (opens `/reports/render/[id]` in new tab) and ⬇️ Download PDF buttons.
+
+**How the PDF Download Works:**
+1. Button calls `handleDownloadReportPdf(report)`.
+2. `GET /api/reports/[id]/pdf` is called — this triggers Puppeteer compilation if not yet done.
+3. If `pdfUrl` is not immediately returned, the function polls every 2 seconds for up to 30 attempts (~60 seconds).
+4. Once `pdfUrl` is available, the file is fetched as a blob and downloaded using a programmatic `<a>` element.
+5. Filename is set as: `RankFlow_Report_{cleanClientName}_{cleanPeriod}.pdf` (non-alphanumeric chars replaced with `_`).
+
+**Why:**
+User requested that clicking Download in the superadmin reports view should download the PDF with the correct filename. Previously the button didn't exist.
+
+**Gotchas / Watch Out For:**
+- `app/admin/page.tsx` is a **228KB single-file client component** — the entire admin UI lives here. Do not confuse it with `app/superadmin/SuperadminClient.tsx` which is a different (older, less featured) UI at `/superadmin`.
+- The actual superadmin UI the user sees at http://localhost:3000/admin is `app/admin/page.tsx` — NOT `SuperadminClient.tsx`.
+- PDF compilation may take 30-60 seconds on first run (Puppeteer spins up Chromium). The button shows "Generating…" while polling.
+- If Puppeteer fails (Chromium not found), the report status becomes `'failed'` and an error toast is shown.
+- The `Download` icon is imported from `lucide-react` in `admin/page.tsx` — already present in the imports list.
+
+**Open Questions:**
+- None — feature is fully implemented and verified visually in browser.
+
+---
