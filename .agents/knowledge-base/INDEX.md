@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-17 | Supabase Architecture & Prisma 7 Models | database | Built lib/supabase.ts Storage client, added AuditLog, GoogleCredential & Competitor models, synced dev.db |
 | 2026-08-13 | End-to-End System & Browser Verification | devops | Verified database bindings, NextAuth authorization handlers, and Chrome browser rendering |
 | 2026-08-13 | Full Codebase Audit & Type-Safety Resolution | devops | Resolved compilation issues across API routes, server action exports, and Prisma model queries |
 | 2026-08-13 | 9-Scenario Authentication & Tenant Test Suite | auth | Verified 100% pass rate across role-targeted signin, tenant isolation, and registration pages |

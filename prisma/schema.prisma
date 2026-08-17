@@ -39,6 +39,8 @@ model Agency {
   notifications   Notification[]
   messages        Message[]
   webhooks        WebhookEndpoint[]
+  auditLogs       AuditLog[]
+  googleCredentials GoogleCredential[]
 }
 
 model User {
@@ -119,6 +121,7 @@ model Client {
   reportSchedule     ReportSchedule?
   invitations        Invitation[]
   messages           Message[]
+  competitors        Competitor[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -336,3 +339,54 @@ model Message {
   @@index([agencyId, createdAt])
   @@index([clientId, createdAt])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIT LOGS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  agencyId     String
+  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  action       String
+  userName     String?
+  userInitials String?
+  createdAt    DateTime @default(now())
+
+  @@index([agencyId, createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GOOGLE CREDENTIALS (GSC & GA4 OAuth)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model GoogleCredential {
+  id           String   @id @default(cuid())
+  email        String
+  accessToken  String
+  refreshToken String?
+  expiresAt    DateTime
+  agencyId     String
+  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([agencyId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPETITORS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Competitor {
+  id                 String   @id @default(cuid())
+  name               String
+  domain             String
+  serankingProjectId Int?
+  clientId           String
+  client             Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
+
+  @@index([clientId])
+}
+

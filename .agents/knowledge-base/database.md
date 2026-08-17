@@ -35,3 +35,25 @@ import prisma from "@/lib/prisma"
 | client@acme.com | CLIENT | client123 |
 
 ---
+
+## 2026-08-17 — Supabase-Ready Architecture & Prisma 7 Model Enhancements
+
+**Task:** Advance database architecture with Supabase compatibility, Supabase Storage client, and new schema models.  
+**Files Changed:**
+- `prisma/schema.prisma` — added `AuditLog`, `GoogleCredential`, and `Competitor` models
+- `lib/supabase.ts` — created Supabase Storage helper (`uploadToSupabaseStorage`, `getSupabasePublicUrl`)
+
+**What Was Done:**
+1. Built Supabase Storage helper (`lib/supabase.ts`) supporting upload & public URL generation for white-label agency logos, PDF report downloads, and branding assets.
+2. Added 3 new Prisma models (`AuditLog`, `GoogleCredential`, `Competitor`).
+3. Ran `prisma db push` to sync new models with SQLite `dev.db` while preserving existing seed data.
+4. Regenerated Prisma Client and verified 0-error TypeScript compilation.
+
+**Why:**
+User requested advancing database capabilities with Supabase PostgreSQL readiness.
+
+**How It Works:**
+`lib/supabase.ts` handles Supabase Storage bucket operations with local fallback, while Prisma 7 handles multi-tenant database operations with PostgreSQL compatibility.
+
+---
+
