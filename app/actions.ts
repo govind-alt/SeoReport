@@ -489,6 +489,213 @@ export async function registerClient(data: any) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// AGENCY SETTINGS & TEAM MANAGEMENT SERVER ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Updates general agency profile and branding settings.
+ */
+export async function updateAgencySettings(domain: string, data: any) {
+  const agency = await prisma.agency.findFirst({
+    where: { OR: [{ slug: domain }, { subdomain: domain }] }
+  });
+  if (!agency) throw new Error("Agency not found");
+
+  const updateData: any = {};
+  if (data.name !== undefined) updateData.name = data.name;
+  if (data.billingEmail !== undefined) updateData.billingEmail = data.billingEmail;
+  if (data.notificationEmail !== undefined) updateData.notificationEmail = data.notificationEmail;
+  if (data.customDomain !== undefined) updateData.customDomain = data.customDomain;
+  if (data.brandingJson !== undefined) {
+    updateData.brandingJson = typeof data.brandingJson === 'string' 
+      ? data.brandingJson 
+      : JSON.stringify(data.brandingJson);
+  }
+
+  await prisma.agency.update({
+    where: { id: agency.id },
+    data: updateData
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  return { success: true };
+}
+
+/**
+ * Updates an agency's subscription plan tier.
+ */
+export async function updateAgencyPlan(domain: string, plan: string) {
+  const agency = await prisma.agency.findFirst({
+    where: { OR: [{ slug: domain }, { subdomain: domain }] }
+  });
+  if (!agency) throw new Error("Agency not found");
+
+  await prisma.agency.update({
+    where: { id: agency.id },
+    data: { plan }
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  return { success: true };
+}
+
+/**
+ * Updates user account profile or password.
+ */
+export async function updateUserAccount(domain: string, data: any) {
+  const { userId, name, image, password } = data;
+  if (!userId) throw new Error("User ID is required");
+
+  const updateData: any = {};
+  if (name) updateData.name = name;
+  if (image) updateData.image = image;
+  if (password && password.length >= 8) {
+    updateData.password = await bcrypt.hash(password, 12);
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: updateData
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  return { success: true };
+}
+
+/**
+ * Invites a new team member to an agency and sends an invite email via Resend.
+ */
+export async function inviteTeamMember(domain: string, email: string, role: string) {
+  if (!email || !role) throw new Error("Email and role are required");
+
+  const agency = await prisma.agency.findFirst({
+    where: { OR: [{ slug: domain }, { subdomain: domain }] }
+  });
+  if (!agency) throw new Error("Agency not found");
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Create or refresh an invitation token in the database
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(24).toString('hex');
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  const existingInvitation = await prisma.invitation.findFirst({
+    where: { email: normalizedEmail, agencyId: agency.id }
+  });
+
+  let invitation;
+  if (existingInvitation) {
+    invitation = await prisma.invitation.update({
+      where: { id: existingInvitation.id },
+      data: { token, role, expiresAt, acceptedAt: null }
+    });
+  } else {
+    invitation = await prisma.invitation.create({
+      data: {
+        email: normalizedEmail,
+        token,
+        role,
+        agencyId: agency.id,
+        expiresAt
+      }
+    });
+  }
+
+  // Construct invite & dashboard URL
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const subdomain = agency.subdomain || agency.slug || domain;
+  const inviteUrl = baseUrl.includes('localhost')
+    ? `http://${subdomain}.localhost:3000/login?invite=${token}`
+    : `${baseUrl}/login?invite=${token}`;
+
+  // Send real email via Resend
+  await sendWelcomeEmail(
+    normalizedEmail,
+    normalizedEmail.split('@')[0],
+    agency.name,
+    inviteUrl
+  ).catch(err => {
+    console.error('[INVITE_TEAM_MEMBER] Resend email dispatch failed:', err);
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  revalidatePath('/[domain]/team', 'page');
+  return { success: true, invitation };
+}
+
+/**
+ * Resends an existing team invite and refreshes its token + expiration via Resend.
+ */
+export async function resendTeamInvite(domain: string, inviteId: string) {
+  if (!inviteId) throw new Error("Invite ID is required");
+
+  const invitation = await prisma.invitation.findUnique({
+    where: { id: inviteId },
+    include: { agency: true }
+  });
+  if (!invitation || !invitation.agency) throw new Error("Invitation not found");
+
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(24).toString('hex');
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  await prisma.invitation.update({
+    where: { id: inviteId },
+    data: { token, expiresAt }
+  });
+
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const subdomain = invitation.agency.subdomain || invitation.agency.slug || domain;
+  const inviteUrl = baseUrl.includes('localhost')
+    ? `http://${subdomain}.localhost:3000/login?invite=${token}`
+    : `${baseUrl}/login?invite=${token}`;
+
+  await sendWelcomeEmail(
+    invitation.email,
+    invitation.email.split('@')[0],
+    invitation.agency.name,
+    inviteUrl
+  ).catch(err => {
+    console.error('[RESEND_TEAM_INVITE] Resend email dispatch failed:', err);
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  revalidatePath('/[domain]/team', 'page');
+  return { success: true };
+}
+
+/**
+ * Cancels a pending team invitation.
+ */
+export async function cancelTeamInvite(domain: string, inviteId: string) {
+  if (!inviteId) throw new Error("Invite ID is required");
+
+  await prisma.invitation.deleteMany({
+    where: { id: inviteId }
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  revalidatePath('/[domain]/team', 'page');
+  return { success: true };
+}
+
+/**
+ * Removes an existing team member from an agency.
+ */
+export async function removeTeamMember(domain: string, userId: string) {
+  if (!userId) throw new Error("User ID is required");
+
+  await prisma.user.deleteMany({
+    where: { id: userId }
+  });
+
+  revalidatePath('/[domain]/settings', 'page');
+  revalidatePath('/[domain]/team', 'page');
+  return { success: true };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SUPERADMIN SERVER ACTIONS
 // ─────────────────────────────────────────────────────────────────────────────
 

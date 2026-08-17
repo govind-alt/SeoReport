@@ -6,7 +6,14 @@ import crypto from 'crypto';
 /** POST /api/auth/forgot-password — request a password reset link */
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON request' }, { status: 400 });
+    }
+
+    const { email } = body;
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -27,10 +34,8 @@ export async function POST(req: NextRequest) {
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
       // Store token in VerificationToken table (NextAuth's table)
-      await prisma.verificationToken.upsert({
-        where: { identifier_token: { identifier: normalizedEmail, token } },
-        update: { expires: expiresAt },
-        create: {
+      await prisma.verificationToken.create({
+        data: {
           identifier: normalizedEmail,
           token,
           expires: expiresAt,
@@ -39,7 +44,9 @@ export async function POST(req: NextRequest) {
 
       const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
 
-      await sendPasswordResetEmail(normalizedEmail, resetUrl, user.name ?? undefined);
+      await sendPasswordResetEmail(normalizedEmail, resetUrl, user.name ?? undefined).catch(err => {
+        console.error('[FORGOT_PASSWORD] Email send failed:', err);
+      });
     }
 
     // Always return success — never reveal if email exists

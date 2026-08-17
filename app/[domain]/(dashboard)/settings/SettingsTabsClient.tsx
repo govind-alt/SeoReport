@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { saveApiKey, updateAgencySettings, inviteTeamMember, removeTeamMember, updateAgencyPlan, updateUserAccount } from '@/app/actions';
+import { saveApiKey, updateAgencySettings, inviteTeamMember, removeTeamMember, resendTeamInvite, cancelTeamInvite, updateAgencyPlan, updateUserAccount } from '@/app/actions';
 
 type Tab = 'general' | 'branding' | 'api-keys' | 'team' | 'billing' | 'scheduling' | 'audit-log' | 'account';
 
@@ -711,7 +711,38 @@ export default function SettingsTabsClient({ domain, initialAgency }: { domain: 
                         <td><span className="badge badge-secondary" style={{ textTransform: 'capitalize' }}>{inv.role}</span></td>
                         <td style={{ fontSize: '11px', color: 'var(--text-muted)' }} suppressHydrationWarning>{new Date(inv.createdAt).toLocaleDateString()}</td>
                         <td style={{ fontSize: '11px', color: 'var(--text-muted)' }} suppressHydrationWarning>{new Date(inv.expiresAt).toLocaleDateString()}</td>
-                        <td><div style={{ display: 'flex', gap: '6px' }}><button className="btn btn-secondary btn-sm">🔄 Resend</button><button className="btn btn-ghost btn-sm" style={{ color: 'var(--danger)' }}>Cancel</button></div></td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={async () => {
+                                const t = toast.loading('Resending invitation email...');
+                                try {
+                                  await resendTeamInvite(domain, inv.id);
+                                  toast.success(`Invite resent to ${inv.email}!`, { id: t });
+                                } catch (err: any) {
+                                  toast.error(err.message || 'Failed to resend invite', { id: t });
+                                }
+                              }}
+                            >
+                              🔄 Resend
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              style={{ color: 'var(--danger)' }}
+                              onClick={async () => {
+                                try {
+                                  await cancelTeamInvite(domain, inv.id);
+                                  toast.success('Invitation cancelled');
+                                } catch (err: any) {
+                                  toast.error(err.message || 'Failed to cancel invite');
+                                }
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { inviteTeamMember } from '@/app/actions';
+import { inviteTeamMember, removeTeamMember, cancelTeamInvite } from '@/app/actions';
 
 export default function TeamClient({ initialData, domain, currentUserId }: { initialData: any[], domain: string, currentUserId: string }) {
   const [members, setMembers] = useState(initialData);
@@ -136,7 +136,24 @@ export default function TeamClient({ initialData, domain, currentUserId }: { ini
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                         <button className="btn btn-ghost btn-sm" style={{ padding: '4px 10px', fontSize: '11px', border: '1px solid var(--border)' }}>Edit</button>
                         {member.id !== currentUserId && (
-                          <button className="btn btn-ghost btn-sm" style={{ color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '4px 10px', fontSize: '11px' }}>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            style={{ color: '#EF4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '4px 10px', fontSize: '11px' }}
+                            onClick={async () => {
+                              try {
+                                if (member.status === 'Pending') {
+                                  await cancelTeamInvite(domain, member.id);
+                                  toast.success('Invitation revoked');
+                                } else {
+                                  await removeTeamMember(domain, member.id);
+                                  toast.success('Member removed');
+                                }
+                                setMembers(prev => prev.filter(m => m.id !== member.id));
+                              } catch (err: any) {
+                                toast.error(err.message || 'Action failed');
+                              }
+                            }}
+                          >
                             {member.status === 'Pending' ? 'Revoke' : 'Remove'}
                           </button>
                         )}
