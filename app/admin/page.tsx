@@ -1421,19 +1421,63 @@ export default function SuperAdminDashboard() {
   const [allClients, setAllClients] = useState<any[]>([]);
   const [allReports, setAllReports] = useState<any[]>([]);
   const [selectedReportPreview, setSelectedReportPreview] = useState<any>(null);
+  const [downloadingPdf, setDownloadingPdf] = useState<Record<string, boolean>>({});
+
+  const handleDownloadReportPdf = async (report: any) => {
+    console.log('[Download PDF] Clicked for report:', report.id);
+    if (downloadingPdf[report.id]) return;
+    console.log('[Download PDF] Setting state to downloading');
+    setDownloadingPdf(prev => ({ ...prev, [report.id]: true }));
+    try {
+      console.log('[Download PDF] Fetching PDF URL for:', report.id);
+      const res = await fetch(`/api/reports/${report.id}/pdf`);
+      const json = await res.json();
+      console.log('[Download PDF] Initial response:', json);
+      if (json.status === 'failed') { alert('PDF generation failed.'); return; }
+
+      let pdfUrl = json.pdfUrl;
+      if (!pdfUrl) {
+        let attempts = 0;
+        while (attempts < 30) {
+          await new Promise(r => setTimeout(r, 2000));
+          const poll = await fetch(`/api/reports/${report.id}/pdf`);
+          const pollJson = await poll.json();
+          if (pollJson.status === 'generated' && pollJson.pdfUrl) { pdfUrl = pollJson.pdfUrl; break; }
+          if (pollJson.status === 'failed') { alert('PDF generation failed.'); return; }
+          attempts++;
+        }
+      }
+      if (!pdfUrl) { alert('PDF took too long. Please try again.'); return; }
+
+      const cleanClient = (report.clientName || 'Client').replace(/[^a-z0-9]/gi, '_');
+      const cleanPeriod = (report.period || 'Report').replace(/[^a-z0-9]/gi, '_');
+      const filename = `RankFlow_Report_${cleanClient}_${cleanPeriod}.pdf`;
+      const fileRes = await fetch(pdfUrl);
+      const blob = await fileRes.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (err: any) {
+      alert(err.message || 'Failed to download PDF');
+    } finally {
+      setDownloadingPdf(prev => ({ ...prev, [report.id]: false }));
+    }
+  };
 
   // Fetch live system data from API
   const fetchLiveData = useCallback((showLoading = false) => {
     if (showLoading) setIsLoading(true);
     setIsRefreshing(true);
     Promise.all([
-      fetch('/api/admin/stats').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/agencies').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/users').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/clients').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/reports').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/notifications').then(r => r.ok ? r.json() : null),
-      fetch('/api/admin/settings').then(r => r.ok ? r.json() : null),
+      fetch('/api/admin/stats').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/agencies').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/users').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/clients').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/reports').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/notifications').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('/api/admin/settings').then(r => r.ok ? r.json() : null).catch(() => null),
     ]).then(([statsData, agenciesData, usersData, clientsData, reportsData, notificationsData, settingsData]) => {
       if (statsData) setAdminStats(statsData);
       // Always replace with real data (even empty array clears stale state)
@@ -2430,32 +2474,53 @@ export default function SuperAdminDashboard() {
                           No reports generated in the platform database yet.
                         </td>
                       </tr>
-                    ) : allReports.map(r => (
-                      <tr key={r.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                        <td style={{ padding: '14px 16px', fontWeight: 800, color: '#1A1A2E', fontSize: 13 }}>{r.period}</td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <div style={{ fontWeight: 700, color: '#1A1A2E', fontSize: 13 }}>{r.clientName}</div>
-                          <div style={{ fontSize: 11, color: '#94A3B8' }}>{r.clientDomain}</div>
+                    ) : allReports.map(r => {
+                      const getStatusStyle = (status: string) => {
+                        const s = (status || '').toLowerCase();
+                        if (s === 'failed') return { bg: '#FEF2F2', color: '#DC2626', border: '#FCA5A5' };
+                        if (s === 'generated') return { bg: '#F0FDF4', color: '#16A34A', border: '#BBF7D0' };
+                        if (s === 'done') return { bg: '#EFF6FF', color: '#2563EB', border: '#BFDBFE' };
+                        return { bg: '#F8FAFC', color: '#64748B', border: '#E2E8F0' };
+                      };
+                      const statusStyle = getStatusStyle(r.status);
+                      
+                      return (
+                      <tr key={r.id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.2s', background: 'white' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F8FAFC'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
+                        <td style={{ padding: '16px', fontWeight: 600, color: '#1E3A8A', fontSize: 13 }}>{r.period}</td>
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ fontWeight: 600, color: '#1E3A8A', fontSize: 13 }}>{r.clientName}</div>
+                          <div style={{ fontSize: 12, color: '#64748B', marginTop: 2 }}>{r.clientDomain}</div>
                         </td>
-                        <td style={{ padding: '14px 16px', fontSize: 12, fontWeight: 700, color: '#475569' }}>{r.agencyName}</td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <span style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: r.status === 'done' ? '#ECFDF5' : '#FFFBEB', color: r.status === 'done' ? '#059669' : '#D97706' }}>
+                        <td style={{ padding: '16px', fontSize: 13, fontWeight: 500, color: '#475569' }}>{r.agencyName}</td>
+                        <td style={{ padding: '16px' }}>
+                          <span style={{ padding: '4px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, background: statusStyle.bg, color: statusStyle.color, border: `1px solid ${statusStyle.border}`, display: 'inline-flex', alignItems: 'center', letterSpacing: '0.3px' }}>
                             {r.status.toUpperCase()}
                           </span>
                         </td>
-                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 800, color: '#2563EB' }}>
-                          👁️ {r.viewCount} views
+                        <td style={{ padding: '16px', fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Eye size={14} color="#94A3B8" /> {r.viewCount} views
+                          </div>
                         </td>
-                        <td style={{ padding: '14px 16px', fontSize: 12, color: '#94A3B8' }}>{r.generatedAt}</td>
-                        <td style={{ padding: '14px 16px' }}>
-                          <button
-                            onClick={() => setSelectedReportPreview({ id: r.id, title: `${r.period} Report`, client: r.clientName, created: r.generatedAt, type: 'Full Audit', views: r.viewCount })}
-                            style={{ padding: '6px 12px', background: '#EBF2FF', color: '#2563EB', border: '1px solid #BFDBFE', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
-                            <Eye size={12} /> Preview
-                          </button>
+                        <td style={{ padding: '16px', fontSize: 13, color: '#64748B' }}>{r.generatedAt}</td>
+                        <td style={{ padding: '16px' }}>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button
+                              onClick={() => setSelectedReportPreview({ id: r.id, title: `${r.period} Report`, client: r.clientName, created: r.generatedAt, type: 'Full Audit', views: r.viewCount })}
+                              style={{ padding: '6px 12px', background: 'white', color: '#1E3A8A', border: '1px solid #1E3A8A', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+                              <Eye size={14} /> Preview
+                            </button>
+                            <button
+                              onClick={() => handleDownloadReportPdf(r)}
+                              disabled={!!downloadingPdf[r.id]}
+                              title={`Download: RankFlow_Report_${(r.clientName||'').replace(/[^a-z0-9]/gi,'_')}_${(r.period||'').replace(/[^a-z0-9]/gi,'_')}.pdf`}
+                              style={{ padding: '6px 12px', background: downloadingPdf[r.id] ? '#F1F5F9' : '#1E3A8A', color: downloadingPdf[r.id] ? '#94A3B8' : 'white', border: `1px solid ${downloadingPdf[r.id] ? '#E2E8F0' : '#1E3A8A'}`, borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: downloadingPdf[r.id] ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: downloadingPdf[r.id] ? 'none' : '0 1px 3px rgba(0,0,0,0.1)', opacity: downloadingPdf[r.id] ? 0.7 : 1 }}>
+                              <Download size={14} /> {downloadingPdf[r.id] ? 'Generating…' : 'Download PDF'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
-                    ))}
+                    )})}
                   </tbody>
                 </table>
               </div>
