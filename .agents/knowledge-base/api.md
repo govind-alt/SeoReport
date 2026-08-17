@@ -88,3 +88,33 @@ The superadmin page (`/superadmin` → `SuperadminClient.tsx`) and admin page (`
 - Impersonation (`impersonateAgencyAction`) currently returns a URL — there is no actual session-swap/cookie mechanism. The redirect just takes the superadmin to the agency subdomain where they'll be prompted to log in as that agency.
 
 ---
+
+## [2026-08-17] Admin Agencies Tab Backend Integration
+
+**Task:** Connect the Super Admin "Agencies" tab actions to persistent API endpoints and the database instead of modifying local state.
+**Files Changed:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\prisma\schema.prisma` — modified
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\api\admin\agencies\route.ts` — modified
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\api\admin\agencies\[id]\route.ts` — created
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx` — modified
+
+**What Was Done:**
+- Added the `status` field to the `Agency` model in `schema.prisma`.
+- Created `POST /api/admin/agencies` to handle agency invitations (creates Agency + User).
+- Created `PATCH /api/admin/agencies/[id]` to update agency details (Plan, Name, Subdomain, Status).
+- Updated the React UI handlers (`handleInvite`, `toggleSuspend`, and `EditAgencyModal.onSave`) to execute API calls instead of just updating local React state.
+
+**Why:**
+The previous implementation of the Agencies tab was a mock UI; any actions (Invite, Edit, Suspend) were stored in temporary React state and vanished on reload. Full functionality required connecting them to the database.
+
+**How It Works:**
+The UI continues to use optimistic state updates (e.g. `setAgencies(prev => ...)`) for immediate visual feedback, but it now immediately fires the corresponding `POST` or `PATCH` request. The `GET /api/admin/agencies` route now retrieves the correct `status` directly from the database instead of a hardcoded value.
+
+**Gotchas / Watch Out For:**
+- The dev database is seeded with demo data. Running `prisma migrate dev` wipes it. Always use `prisma db push` when updating the schema locally.
+- Subdomain is tied to `slug` for uniqueness; when creating an agency, `slug` is set to the same value as `subdomain`.
+
+**Open Questions:**
+None.
+
+---

@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-17 | Admin Agencies Tab Backend Integration | api | Connected the Super Admin Agencies tab to persistent DB endpoints by adding status to Prisma Agency model and implementing POST/PATCH API routes. |
 | 2026-08-17 | Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling | frontend | Fixed dev overlay fetch error by catching network failures in fetchLiveData. Upgraded Reports table styling to premium design with sleek badges and dark buttons. |
 | 2026-08-16 | Admin Reports Download PDF Button + Superadmin Reports Tab | frontend | Added Download PDF button to /admin reports table; added Reports tab to SuperadminClient with search, status badges, PDF download with correct filename |
 | 2026-08-16 | Superadmin Server Actions Implementation (Cross-Admin Connectivity) | api | Added 10 missing server actions to actions.ts: getSuperadminData, createUserSuperadmin, updateUserRoleSuperadmin, deleteUserSuperadmin, updateAgencyPlanSuperadmin, deleteAgencySuperadmin, createAgencySuperadmin, toggleSuspendAgencySuperadmin, impersonateAgencyAction, respondToTicketSuperadmin |
