@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { updateAgencyPlanSuperadmin, deleteAgencySuperadmin, createAgencySuperadmin } from '@/app/actions';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, AreaChart, Area, CartesianGrid } from 'recharts';
+import { PLANS, ACTIVE_PLAN_IDS, getPlanMRR, getPlanColor, getPlanDisplayName, getPlanBadge, isCanceled } from '@/lib/plans';
 
 export default function SuperadminClient({ initialData }: { initialData: any }) {
   const [data, setData] = useState(initialData);
@@ -20,6 +21,15 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   const [newEmail, setNewEmail] = useState('');
   const [newPlan, setNewPlan] = useState('starter');
   const [creating, setCreating] = useState(false);
+
+  // Manage Plan Modal State
+  const [managePlanAgency, setManagePlanAgency] = useState<any | null>(null);
+  const [managePlanValue, setManagePlanValue] = useState('starter');
+  const [managePlanLoading, setManagePlanLoading] = useState(false);
+  const [cancelConfirmId, setCancelConfirmId] = useState<string | null>(null);
+  const [cancelConfirmName, setCancelConfirmName] = useState('');
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [reactivatePlan, setReactivatePlan] = useState('starter');
 
   // Support Tickets Tracking & Response State
   const { supportTickets: initialTickets } = data;
@@ -177,36 +187,83 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
     try {
       await updateAgencyPlanSuperadmin(agencyId, newPlan);
       toast.success('Agency plan updated successfully!', { id: t });
-      
-      // Update local state
       setData((prev: any) => {
-        const updatedAgencies = prev.agencies.map((a: any) => {
-          if (a.id === agencyId) return { ...a, plan: newPlan };
-          return a;
-        });
-        
-        // Recompute stats
-        const newMrr = updatedAgencies.reduce((sum: number, a: any) => {
-          if (a.plan === 'enterprise') return sum + 249;
-          if (a.plan === 'professional') return sum + 99;
-          return sum + 49;
-        }, 0);
-
+        const updatedAgencies = prev.agencies.map((a: any) => a.id === agencyId ? { ...a, plan: newPlan } : a);
+        const newMrr = updatedAgencies.reduce((sum: number, a: any) => sum + getPlanMRR(a.plan || 'starter'), 0);
         const newPlanStats = {
           enterprise: updatedAgencies.filter((a: any) => a.plan === 'enterprise').length,
-          professional: updatedAgencies.filter((a: any) => a.plan === 'professional').length,
-          starter: updatedAgencies.filter((a: any) => a.plan === 'starter' || !a.plan).length
+          professional: updatedAgencies.filter((a: any) => a.plan === 'pro' || a.plan === 'professional').length,
+          starter: updatedAgencies.filter((a: any) => a.plan === 'starter' || !a.plan).length,
         };
-
-        return {
-          ...prev,
-          agencies: updatedAgencies,
-          mrr: newMrr,
-          planStats: newPlanStats
-        };
+        return { ...prev, agencies: updatedAgencies, mrr: newMrr, planStats: newPlanStats };
       });
     } catch (err: any) {
       toast.error(err.message || 'Failed to update plan', { id: t });
+    }
+  };
+
+  const handleOpenManagePlan = (agency: any) => {
+    setManagePlanAgency(agency);
+    setManagePlanValue(isCanceled(agency.plan) ? 'starter' : (agency.plan || 'starter'));
+    setReactivatePlan('starter');
+  };
+
+  const handleSaveManagePlan = async () => {
+    if (!managePlanAgency) return;
+    setManagePlanLoading(true);
+    const t = toast.loading(`Updating ${managePlanAgency.name}'s plan to ${getPlanDisplayName(managePlanValue)}...`);
+    try {
+      await updateAgencyPlanSuperadmin(managePlanAgency.id, managePlanValue);
+      toast.success(`Plan updated to ${getPlanDisplayName(managePlanValue)}!`, { id: t });
+      setData((prev: any) => ({
+        ...prev,
+        agencies: prev.agencies.map((a: any) => a.id === managePlanAgency.id ? { ...a, plan: managePlanValue } : a),
+        mrr: prev.agencies.reduce((sum: number, a: any) => sum + getPlanMRR(a.id === managePlanAgency.id ? managePlanValue : (a.plan || 'starter')), 0),
+      }));
+      setManagePlanAgency(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update plan', { id: t });
+    } finally {
+      setManagePlanLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!cancelConfirmId) return;
+    setCancelLoading(true);
+    const t = toast.loading(`Canceling subscription for ${cancelConfirmName}...`);
+    try {
+      const { cancelAgencySubscriptionSuperadmin } = await import('@/app/actions');
+      await cancelAgencySubscriptionSuperadmin(cancelConfirmId);
+      toast.success(`Subscription for ${cancelConfirmName} has been canceled.`, { id: t });
+      setData((prev: any) => ({
+        ...prev,
+        agencies: prev.agencies.map((a: any) => a.id === cancelConfirmId ? { ...a, plan: 'canceled' } : a),
+        mrr: prev.agencies.reduce((sum: number, a: any) => a.id === cancelConfirmId ? sum : sum + getPlanMRR(a.plan || 'starter'), 0),
+      }));
+      setCancelConfirmId(null);
+      setManagePlanAgency(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to cancel subscription', { id: t });
+    } finally {
+      setCancelLoading(false);
+    }
+  };
+
+  const handleReactivateSubscription = async (agencyId: string, agencyName: string, plan: string) => {
+    const t = toast.loading(`Reactivating ${agencyName} on ${getPlanDisplayName(plan)}...`);
+    try {
+      const { reactivateAgencySubscriptionSuperadmin } = await import('@/app/actions');
+      await reactivateAgencySubscriptionSuperadmin(agencyId, plan);
+      toast.success(`${agencyName} reactivated on ${getPlanDisplayName(plan)}!`, { id: t });
+      setData((prev: any) => ({
+        ...prev,
+        agencies: prev.agencies.map((a: any) => a.id === agencyId ? { ...a, plan } : a),
+        mrr: prev.agencies.reduce((sum: number, a: any) => sum + getPlanMRR(a.id === agencyId ? plan : (a.plan || 'starter')), 0),
+      }));
+      setManagePlanAgency(null);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reactivate subscription', { id: t });
     }
   };
 
@@ -691,38 +748,52 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                             {agency.slug}
                           </Link>
                         </td>
-                        <td style={{ textTransform: 'capitalize', color: agency.plan === 'enterprise' ? '#10B981' : agency.plan === 'professional' ? '#3B82F6' : 'rgba(255,255,255,0.5)', fontWeight: 600 }}>
-                          {agency.plan === 'professional' ? 'Pro' : agency.plan}
+                        <td>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 700, fontSize: '12px', padding: '3px 10px', borderRadius: '20px', background: isCanceled(agency.plan) ? 'rgba(239,68,68,0.1)' : `${getPlanColor(agency.plan || 'starter')}18`, color: isCanceled(agency.plan) ? '#EF4444' : getPlanColor(agency.plan || 'starter'), border: `1px solid ${isCanceled(agency.plan) ? 'rgba(239,68,68,0.3)' : getPlanColor(agency.plan || 'starter') + '44'}` }}>
+                            {getPlanBadge(agency.plan || 'starter')} {getPlanDisplayName(agency.plan || 'starter')}
+                          </span>
                         </td>
                         <td><strong style={{ color: 'white' }}>{agency._count.clients}</strong></td>
                         <td><strong style={{ color: 'white' }}>{agency._count.clients * 4}</strong></td>
-                        <td style={{ color: '#6366F1', fontWeight: 700 }}>${agency.plan === 'enterprise' ? 249 : agency.plan === 'professional' ? 99 : 49}/mo</td>
+                        <td style={{ color: isCanceled(agency.plan) ? 'rgba(255,255,255,0.25)' : '#6366F1', fontWeight: 700, textDecoration: isCanceled(agency.plan) ? 'line-through' : 'none' }}>
+                          {isCanceled(agency.plan) ? '—' : `$${getPlanMRR(agency.plan || 'starter')}/mo`}
+                        </td>
                         <td style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }} suppressHydrationWarning>{new Date(agency.createdAt).toLocaleDateString('en-US', {month: 'short', year: 'numeric'})}</td>
                         <td>
-                          {agency.plan === 'suspended' ? (
-                            <span className="status-badge" style={{ color: '#EF4444', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 600, fontSize: '11px' }}>Suspended</span>
+                          {isCanceled(agency.plan) ? (
+                            <span style={{ color: '#EF4444', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 700, fontSize: '11px', display: 'inline-block' }}>🚫 Canceled</span>
+                          ) : agency.plan === 'suspended' ? (
+                            <span style={{ color: '#F59E0B', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 600, fontSize: '11px', display: 'inline-block' }}>⚠️ Suspended</span>
                           ) : (
-                            <span className="status-badge" style={{ color: '#10B981', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 600, fontSize: '11px' }}>Active</span>
+                            <span style={{ color: '#10B981', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 600, fontSize: '11px', display: 'inline-block' }}>✅ Active</span>
                           )}
                         </td>
                         <td style={{ textAlign: 'right' }}>
-                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                            <Link href={`/${agency.slug}`} target="_blank" className="btn btn-ghost btn-sm" style={{ padding: '6px 12px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none' }}>👁️ View</Link>
+                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                            <Link href={`/${agency.slug}`} target="_blank" className="btn btn-ghost btn-sm" style={{ padding: '5px 10px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none' }}>👁️ View</Link>
                             <button
                               className="btn btn-ghost btn-sm"
-                              style={{ padding: '6px 12px', fontSize: '11px', border: '1px solid rgba(99,102,241,0.4)', color: '#818CF8', background: 'rgba(99,102,241,0.1)' }}
+                              style={{ padding: '5px 10px', fontSize: '11px', border: '1px solid rgba(99,102,241,0.4)', color: '#818CF8', background: 'rgba(99,102,241,0.1)' }}
                               onClick={() => handleImpersonateAgency(agency.slug, agency.name)}
-                              title="Log in with full Administrator access to this agency"
                             >
                               🎭 Impersonate
                             </button>
                             <button
                               className="btn btn-ghost btn-sm"
-                              style={{ color: agency.plan === 'suspended' ? '#10B981' : '#EF4444', border: agency.plan === 'suspended' ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239, 68, 68, 0.2)', padding: '6px 12px', fontSize: '11px' }}
-                              onClick={() => handleToggleSuspendAgency(agency.id, agency.name, agency.plan === 'suspended')}
+                              style={{ padding: '5px 10px', fontSize: '11px', border: '1px solid rgba(79,142,247,0.4)', color: '#60A5FA', background: 'rgba(59,130,246,0.1)', fontWeight: 700 }}
+                              onClick={() => handleOpenManagePlan(agency)}
                             >
-                              {agency.plan === 'suspended' ? '🟢 Reactivate' : '🚫 Suspend'}
+                              📦 Manage Plan
                             </button>
+                            {!isCanceled(agency.plan) && (
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                style={{ color: '#EF4444', border: '1px solid rgba(239,68,68,0.2)', padding: '5px 10px', fontSize: '11px' }}
+                                onClick={() => { setCancelConfirmId(agency.id); setCancelConfirmName(agency.name); }}
+                              >
+                                🚫 Cancel
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -736,8 +807,8 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                 </table>
               </div>
               <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
-                <div>{filteredAgencies.length} of {totalAgencies} agencies</div>
-                <div>Total MRR from filtered: <span style={{ color: '#6366F1', fontWeight: 700 }}>${filteredAgencies.reduce((s: number, a: any) => s + (a.plan === 'enterprise' ? 249 : a.plan === 'professional' ? 99 : 49), 0).toLocaleString()}/mo</span></div>
+                <div>{filteredAgencies.length} of {totalAgencies} agencies ({filteredAgencies.filter((a: any) => isCanceled(a.plan)).length} canceled)</div>
+                <div>Active MRR from filtered: <span style={{ color: '#6366F1', fontWeight: 700 }}>${filteredAgencies.filter((a: any) => !isCanceled(a.plan)).reduce((s: number, a: any) => s + getPlanMRR(a.plan || 'starter'), 0).toLocaleString()}/mo</span></div>
               </div>
             </div>
           </div>
@@ -1510,6 +1581,145 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
               <button type="button" className="btn btn-secondary" onClick={() => setDeactivateModalUser(null)}>Cancel</button>
               <button type="button" className="btn btn-danger" onClick={handleConfirmDeactivateSubmit} disabled={updatingUser}>
                 {updatingUser ? 'Deactivating...' : '🚫 Confirm Deactivate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Manage Plan Modal ────────────────────────────────────────── */}
+      {managePlanAgency && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,15,28,0.9)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: '#14161A', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '540px', boxShadow: '0 30px 80px rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#F4F4F6' }}>📦 Manage Subscription</div>
+                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', marginTop: '4px' }}>{managePlanAgency.name} · {managePlanAgency.slug}</div>
+              </div>
+              <button onClick={() => setManagePlanAgency(null)} style={{ fontSize: '20px', color: 'rgba(255,255,255,0.4)', border: 'none', background: 'none', cursor: 'pointer' }}>✕</button>
+            </div>
+
+            {/* Current Status Banner */}
+            <div style={{ background: isCanceled(managePlanAgency.plan) ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.08)', border: `1px solid ${isCanceled(managePlanAgency.plan) ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.2)'}`, borderRadius: '12px', padding: '14px 18px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Current Plan</div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: isCanceled(managePlanAgency.plan) ? '#EF4444' : getPlanColor(managePlanAgency.plan || 'starter') }}>
+                  {getPlanBadge(managePlanAgency.plan || 'starter')} {getPlanDisplayName(managePlanAgency.plan || 'starter')}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '4px' }}>Monthly Value</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: isCanceled(managePlanAgency.plan) ? 'rgba(255,255,255,0.25)' : '#6366F1', textDecoration: isCanceled(managePlanAgency.plan) ? 'line-through' : 'none' }}>
+                  {isCanceled(managePlanAgency.plan) ? '—' : `$${getPlanMRR(managePlanAgency.plan || 'starter')}/mo`}
+                </div>
+              </div>
+            </div>
+
+            {/* Canceled Agency: Reactivate Section */}
+            {isCanceled(managePlanAgency.plan) ? (
+              <div>
+                <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '16px', marginBottom: '24px', color: '#FCA5A5', fontSize: '13px', lineHeight: '1.6' }}>
+                  ⚠️ This agency&apos;s subscription has been <strong>canceled</strong>. All paid features are locked. Select a plan below to reactivate their account.
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '8px' }}>Reactivate on Plan</label>
+                  <select
+                    value={reactivatePlan}
+                    onChange={e => setReactivatePlan(e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', background: '#1E2026', color: '#F4F4F6', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', fontSize: '14px', fontWeight: 600 }}
+                  >
+                    {ACTIVE_PLAN_IDS.map(pid => (
+                      <option key={pid} value={pid}>{getPlanBadge(pid)} {getPlanDisplayName(pid)} — ${PLANS[pid].price}/mo</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  style={{ width: '100%', padding: '14px', background: 'linear-gradient(135deg, #10B981, #059669)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '15px', cursor: 'pointer' }}
+                  onClick={() => handleReactivateSubscription(managePlanAgency.id, managePlanAgency.name, reactivatePlan)}
+                >
+                  🟢 Reactivate Subscription
+                </button>
+              </div>
+            ) : (
+              <div>
+                {/* Plan Selector Grid */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '12px' }}>Change Plan To</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    {ACTIVE_PLAN_IDS.map(pid => {
+                      const plan = PLANS[pid];
+                      const isSelected = managePlanValue === pid;
+                      const isCurrent = (managePlanAgency.plan || 'starter') === pid;
+                      return (
+                        <button
+                          key={pid}
+                          onClick={() => setManagePlanValue(pid)}
+                          style={{ padding: '14px', background: isSelected ? `${plan.color}18` : 'rgba(255,255,255,0.03)', border: `2px solid ${isSelected ? plan.color : 'rgba(255,255,255,0.08)'}`, borderRadius: '12px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '14px', fontWeight: 800, color: isSelected ? plan.color : '#F4F4F6' }}>{plan.badge} {plan.displayName}</span>
+                            {isCurrent && <span style={{ fontSize: '10px', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>CURRENT</span>}
+                          </div>
+                          <div style={{ fontSize: '16px', fontWeight: 900, color: isSelected ? plan.color : 'rgba(255,255,255,0.7)' }}>${plan.price}<span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.4)' }}>/mo</span></div>
+                          <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '4px' }}>
+                            {plan.limits.clients === -1 ? 'Unlimited' : plan.limits.clients} clients · {plan.limits.keywordsPerClient === -1 ? 'Unlimited' : plan.limits.keywordsPerClient} kw/client
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={handleSaveManagePlan}
+                    disabled={managePlanLoading || managePlanValue === (managePlanAgency.plan || 'starter')}
+                    style={{ flex: 1, padding: '13px', background: managePlanValue === (managePlanAgency.plan || 'starter') ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${getPlanColor(managePlanValue)}, ${getPlanColor(managePlanValue)}cc)`, color: managePlanValue === (managePlanAgency.plan || 'starter') ? 'rgba(255,255,255,0.3)' : 'white', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '14px', cursor: managePlanValue === (managePlanAgency.plan || 'starter') ? 'not-allowed' : 'pointer' }}
+                  >
+                    {managePlanLoading ? 'Saving...' : `💾 Update to ${getPlanDisplayName(managePlanValue)}`}
+                  </button>
+                  <button
+                    onClick={() => { setCancelConfirmId(managePlanAgency.id); setCancelConfirmName(managePlanAgency.name); }}
+                    style={{ padding: '13px 16px', background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                  >
+                    🚫 Cancel Sub
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Cancel Subscription Confirm Modal ──────────────────────── */}
+      {cancelConfirmId && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200 }}>
+          <div style={{ background: '#14161A', borderRadius: '20px', padding: '36px', width: '100%', maxWidth: '460px', boxShadow: '0 30px 80px rgba(0,0,0,0.8)', border: '1px solid rgba(239,68,68,0.35)' }}>
+            <div style={{ fontSize: '48px', textAlign: 'center', marginBottom: '16px' }}>⚠️</div>
+            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#FF1E42', textAlign: 'center', marginBottom: '12px' }}>Cancel Subscription?</h3>
+            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.65)', textAlign: 'center', lineHeight: '1.6', marginBottom: '20px' }}>
+              You are about to cancel the subscription for <strong style={{ color: '#F4F4F6' }}>{cancelConfirmName}</strong>.
+              This will immediately revoke all paid features and lock the agency dashboard.
+            </p>
+            <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '12px 16px', color: '#FCA5A5', fontSize: '12px', marginBottom: '24px', lineHeight: '1.6' }}>
+              🚫 <strong>This action will:</strong> Disable client portal access · Stop all scheduled reports · Revoke white-label & API features.
+              You can reactivate from the Agencies table at any time.
+            </div>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => { setCancelConfirmId(null); setCancelConfirmName(''); }}
+                style={{ flex: 1, padding: '13px', background: 'rgba(255,255,255,0.06)', color: '#F4F4F6', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}
+              >
+                Keep Active
+              </button>
+              <button
+                onClick={handleCancelSubscription}
+                disabled={cancelLoading}
+                style={{ flex: 1, padding: '13px', background: 'linear-gradient(135deg, #DC2626, #B91C1C)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }}
+              >
+                {cancelLoading ? 'Canceling...' : '🚫 Confirm Cancel'}
               </button>
             </div>
           </div>

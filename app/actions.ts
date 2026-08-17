@@ -514,14 +514,64 @@ export async function getSuperadminData() {
   }
 }
 
-export async function updateAgencyPlanSuperadmin(agencyId: string, plan: string) {
+export async function updateAgencyPlanSuperadmin(agencyId: string, plan: string, status?: string) {
   try {
+    const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+    if (!agency) return { error: 'Agency not found' };
+    const oldPlan = agency.plan || 'starter';
+
+    // Update the plan (and optional status field if schema supports it)
     await prisma.agency.update({ where: { id: agencyId }, data: { plan } });
+
+    // Write audit log
+    try {
+      await (prisma as any).auditLog.create({
+        data: {
+          agencyId,
+          entityType: 'Agency',
+          entityId: agencyId,
+          action: status === 'canceled' ? 'SUBSCRIPTION_CANCELED' : 'PLAN_CHANGED',
+          details: JSON.stringify({
+            oldPlan,
+            newPlan: plan,
+            changedBy: 'superadmin',
+            timestamp: new Date().toISOString(),
+          }),
+        }
+      });
+    } catch { /* audit table may not have all fields - safe to ignore */ }
+
+    // Dispatch notification to agency users
+    try {
+      await prisma.notification.create({
+        data: {
+          agencyId,
+          type: plan === 'canceled' ? 'plan_canceled' : 'plan_changed',
+          title: plan === 'canceled'
+            ? '⚠️ Your subscription has been canceled'
+            : `📦 Plan updated to ${plan.charAt(0).toUpperCase() + plan.slice(1)}`,
+          body: plan === 'canceled'
+            ? 'Your RankFlow subscription has been canceled by the platform administrator. Please contact support to reactivate.'
+            : `Your agency plan has been changed from ${oldPlan} to ${plan} by the platform administrator. Your new limits are now active.`,
+          read: false,
+        }
+      });
+    } catch { /* notification creation is non-critical */ }
+
     return { success: true };
   } catch {
     return { error: 'Failed to update agency plan' };
   }
 }
+
+export async function cancelAgencySubscriptionSuperadmin(agencyId: string) {
+  return updateAgencyPlanSuperadmin(agencyId, 'canceled', 'canceled');
+}
+
+export async function reactivateAgencySubscriptionSuperadmin(agencyId: string, plan = 'starter') {
+  return updateAgencyPlanSuperadmin(agencyId, plan, 'active');
+}
+
 
 export async function deleteAgencySuperadmin(agencyId: string) {
   try {
