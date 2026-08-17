@@ -7,19 +7,37 @@
  */
 
 import { Resend } from 'resend';
+import fs from 'fs';
+import path from 'path';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+/**
+ * Dynamically resolves Resend configuration from environment variables or disk-persisted settings.
+ */
+function getEmailConfig(): { apiKey?: string; from: string; appUrl: string } {
+  let apiKey = process.env.RESEND_API_KEY;
+  let from = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+  const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
-// From address — in Resend free tier, only "onboarding@resend.dev" works
-// until you verify a custom domain. Switch to your own domain once verified.
-const FROM = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-const APP_URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  // Check disk-persisted platform settings if env var is not explicitly set
+  try {
+    const settingsPath = path.join(process.cwd(), 'data', 'platform-settings.json');
+    if (fs.existsSync(settingsPath)) {
+      const data = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      if (!apiKey && data.resendApiKey) {
+        apiKey = data.resendApiKey;
+      }
+      if (!process.env.FROM_EMAIL && data.fromEmail) {
+        from = data.fromEmail;
+      }
+    }
+  } catch {
+    // Ignore read errors gracefully
+  }
+
+  return { apiKey, from, appUrl };
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function isDev(): boolean {
-  return process.env.NODE_ENV !== 'production';
-}
 
 async function sendEmail(opts: {
   to: string;
@@ -27,15 +45,24 @@ async function sendEmail(opts: {
   html: string;
   replyTo?: string;
 }) {
-  if (!process.env.RESEND_API_KEY) {
+  const { apiKey, from } = getEmailConfig();
+
+  if (!apiKey) {
     // Dev fallback — print to console
-    console.log('\n[EMAIL — no RESEND_API_KEY]\nTo:', opts.to, '\nSubject:', opts.subject, '\n');
+    console.log('\n[EMAIL DEV FALLBACK — No RESEND_API_KEY configured]');
+    console.log('To:', opts.to);
+    console.log('Subject:', opts.subject);
+    console.log('From:', from);
+    console.log('--------------------------------------------------\n');
     return true;
   }
 
   try {
-    const { error } = await resend.emails.send({
-      from: `RankFlow <${FROM}>`,
+    const resend = new Resend(apiKey);
+    const fromAddress = from.includes('<') ? from : `RankFlow <${from}>`;
+
+    const { data, error } = await resend.emails.send({
+      from: fromAddress,
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
@@ -43,12 +70,14 @@ async function sendEmail(opts: {
     });
 
     if (error) {
-      console.error('[Resend error]', error);
+      console.error('[Resend Error]', error);
       return false;
     }
+
+    console.log(`[Resend Success] Email delivered to ${opts.to} (Message ID: ${data?.id || 'sent'})`);
     return true;
   } catch (err) {
-    console.error('[Email send failed]', err);
+    console.error('[Email Send Failed]', err);
     return false;
   }
 }
@@ -152,7 +181,8 @@ export async function sendReportReadyEmail(
   reportId: string,
   agencyName: string
 ) {
-  const portalLink = `${APP_URL}/reports/render/${reportId}`;
+  const { appUrl } = getEmailConfig();
+  const portalLink = `${appUrl}/reports/render/${reportId}`;
 
   const html = baseTemplate(`
     <h2>Your SEO report is ready 📊</h2>
@@ -180,6 +210,8 @@ export async function sendClientMessageNotificationEmail(
   messageBody: string,
   agencyName: string
 ) {
+  const { appUrl } = getEmailConfig();
+
   const html = baseTemplate(`
     <h2>New message from ${clientName}</h2>
     <p>Your client <strong>${clientName}</strong> has sent a new message through the client portal:</p>
@@ -187,7 +219,7 @@ export async function sendClientMessageNotificationEmail(
       <div style="font-size:12px;color:#dc2626;font-weight:700;margin-bottom:8px;text-transform:uppercase">${subject || 'General Inquiry'}</div>
       <p style="margin:0;color:#e2e8f0">${messageBody}</p>
     </div>
-    <a href="${APP_URL}" class="btn">Reply in Dashboard →</a>
+    <a href="${appUrl}" class="btn">Reply in Dashboard →</a>
     <div class="muted">You received this because you are an admin of <strong>${agencyName}</strong>.</div>
   `, agencyName);
 
