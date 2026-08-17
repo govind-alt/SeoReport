@@ -147,3 +147,35 @@ When `sendEmail(...)` is triggered, `getEmailConfig()` checks `process.env.RESEN
 None.
 
 ---
+
+## [2026-08-17] Complete Fix & Full Wiring of All Resend-Dependent Features
+
+**Task:** Audit, fix, and wire all features utilizing the Resend API (Password Resets, Team Invites, Resend button, Monthly Reports, Client Portal Notifications) to ensure 100% full functionality.
+**Files Changed:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\actions.ts` — modified (implemented `inviteTeamMember`, `resendTeamInvite`, `removeTeamMember`, `cancelTeamInvite`, `updateAgencySettings`, `updateAgencyPlan`, `updateUserAccount`)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\api\auth\reset-password\route.ts` — modified (added GET token verification and robust POST reset)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\api\auth\forgot-password\route.ts` — modified (safe body parsing, direct token creation)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\[domain]\(dashboard)\settings\SettingsTabsClient.tsx` — modified (wired 🔄 Resend and Cancel buttons)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\[domain]\(dashboard)\team\TeamClient.tsx` — modified (wired Revoke / Remove button)
+- `C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\...` — synced all modified files
+
+**What Was Done:**
+- Implemented missing team invitation server actions in `app/actions.ts` that create/refresh database `Invitation` records and dispatch welcome/invite emails via Resend.
+- Connected the `🔄 Resend` button in the Agency Settings Team tab so agency admins can re-trigger invitation emails and refresh token expiration.
+- Added `GET /api/auth/reset-password?token=...` endpoint to validate tokens on page mount and return associated email addresses.
+- Fixed `POST /api/auth/forgot-password` to safely parse input, create verification tokens in Prisma, and deliver reset emails via Resend.
+- Tested and verified the complete password reset flow and email dispatching mechanisms.
+
+**Why:**
+Multiple frontend components (Team settings, Reset password, Pending invites) had missing server actions or lacked onClick handlers, leaving features non-functional despite UI buttons existing.
+
+**How It Works:**
+When team members are invited or resent from the agency portal, `inviteTeamMember` and `resendTeamInvite` generate a 7-day cryptographically secure token, persist it to Prisma, and trigger `sendWelcomeEmail` via Resend with dynamic subdomain login links.
+
+**Gotchas / Watch Out For:**
+- PowerShell strips unescaped double quotes when passing JSON via CLI (`curl.exe`), which could lead to JSON parse errors during terminal testing. The web app uses standard `fetch` with `JSON.stringify`, which works reliably.
+
+**Open Questions:**
+None.
+
+---

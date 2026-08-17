@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------| 
+| 2026-08-17 | Complete Fix & Full Wiring of All Resend-Dependent Features | api | Implemented missing server actions (inviteTeamMember, resendTeamInvite), hooked up 🔄 Resend buttons, added GET token validation for password resets, and verified full functionality. |
 | 2026-08-17 | Resend Email Gateway Hardening & Dynamic Configuration | api | Upgraded lib/email.ts with dynamic disk/env config resolution, active sender resolution, and .env configuration. |
 | 2026-08-17 | Admin Agencies Tab Backend Integration | api | Connected the Super Admin Agencies tab to persistent DB endpoints by adding status to Prisma Agency model and implementing POST/PATCH API routes. |
 | 2026-08-17 | Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling | frontend | Fixed dev overlay fetch error by catching network failures in fetchLiveData. Upgraded Reports table styling to premium design with sleek badges and dark buttons. |
