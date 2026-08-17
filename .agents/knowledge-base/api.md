@@ -118,3 +118,32 @@ The UI continues to use optimistic state updates (e.g. `setAgencies(prev => ...)
 None.
 
 ---
+
+## [2026-08-17] Resend Email Gateway Hardening & Dynamic Configuration
+
+**Task:** Properly configure and harden the Resend API integration for prioritized transactional email workflows (Reports delivery, Password resets, Onboarding).
+**Files Changed:**
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\lib\email.ts` — modified
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\.env` — modified
+- `C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\lib\email.ts` — synced
+- `C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\.env` — synced
+
+**What Was Done:**
+- Upgraded `lib/email.ts` with dynamic `getEmailConfig()` resolution that seamlessly falls back to disk-persisted Super Admin settings (`data/platform-settings.json`) if environment variables are not explicitly provided.
+- Added dynamic instantiation of `new Resend(apiKey)` and formatted sender resolution on dispatch, ensuring Super Admin UI key updates immediately propagate without requiring a server reboot.
+- Added `RESEND_API_KEY` and `FROM_EMAIL` variables to `.env`.
+- Preserved graceful local development logging when no API key is provided, preventing crashes during offline or test environments.
+
+**Why:**
+Previously, `lib/email.ts` statically initialized `new Resend(process.env.RESEND_API_KEY)` at module load time. If the environment variable was missing, email dispatches would default to console logging even if configured in the Super Admin dashboard.
+
+**How It Works:**
+When `sendEmail(...)` is triggered, `getEmailConfig()` checks `process.env.RESEND_API_KEY` followed by `data/platform-settings.json`'s `resendApiKey`. If present, it creates a Resend client on-the-fly and sends the email with appropriate error handling and message ID tracking.
+
+**Gotchas / Watch Out For:**
+- Free Resend accounts (`onboarding@resend.dev`) are restricted to sending only to the account owner's email address (sandbox restriction). To send to arbitrary client/agency emails, a custom domain must be verified in the Resend dashboard (`resend.com/domains`).
+
+**Open Questions:**
+None.
+
+---
