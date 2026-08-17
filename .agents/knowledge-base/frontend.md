@@ -219,3 +219,14 @@ User requested that clicking Download in the superadmin reports view should down
 ull\ instead of rejecting the entire promise.
 
 ---
+## 2026-08-17 — Admin Reports Table Navy Theme
+
+**Task:** Re-styled the admin reports table to strictly match the White & Navy Blue (#1A1A2E) brand theme.  
+**Files Changed:**
+- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ — modified
+- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ — synced
+
+**What Was Done:**
+Changed the button colors and table text from Slate 900 (#0F172A) to Navy Blue (#1A1A2E) to align perfectly with the sidebar and headers.
+
+---
