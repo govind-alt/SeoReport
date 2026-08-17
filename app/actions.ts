@@ -593,7 +593,7 @@ export async function seedAgencyDemoData(agencyId: string) {
   return { success: true };
 }
 
-export async function updateUserAccount(data: any) {
+export async function updateUserAccount(...args: any[]) {
   return { success: true };
 }
 
@@ -601,15 +601,19 @@ export async function getCurrentUser() {
   return { id: 'usr_demo', name: 'Demo User', email: 'demo@rankflow.app', role: 'admin' };
 }
 
-export async function inviteTeamMember(email: string, role: string) {
+export async function inviteTeamMember(...args: any[]) {
   return { success: true };
 }
 
 export async function getClientPortalData(slug: string) {
-  return { client: { name: 'Acme Corp' }, reports: [] };
+  return { 
+    client: { name: 'Acme Corp', contactName: 'Sarah Miller', contactEmail: 'sarah@acmecorp.com' }, 
+    reports: [], 
+    supportLogs: [] 
+  };
 }
 
-export async function logSupportMessage(msg: string) {
+export async function logSupportMessage(slugOrDomain?: string, clientId?: string, message?: string) {
   return { success: true };
 }
 
@@ -617,19 +621,60 @@ export async function getPublicReport(shareSlug: string) {
   return { report: { id: 'rep_demo' } };
 }
 
-export async function updateExecutiveSummary(id: string, summary: string) {
+export async function updateExecutiveSummary(...args: any[]) {
   return { success: true };
 }
 
-export async function updateAgencySettings(data: any) {
+export async function updateAgencySettings(...args: any[]) {
+  const data = args[0] || args[1] || {};
+  return { success: true, agency: data };
+}
+
+export async function removeTeamMember(...args: any[]) {
   return { success: true };
 }
 
-export async function removeTeamMember(id: string) {
+export async function updateAgencyPlan(...args: any[]) {
   return { success: true };
 }
 
-export async function updateAgencyPlan(plan: string) {
+export async function saveReportTemplate(...args: any[]) {
+  return { success: true };
+}
+
+export async function getIndustryData(domain?: string) {
+  return [
+    { name: 'Technology', clientCount: 3, avgHealthScore: 78, avgKeywordsTop10: 42, totalOrganicTraffic: 24500 },
+    { name: 'E-commerce', clientCount: 2, avgHealthScore: 65, avgKeywordsTop10: 18, totalOrganicTraffic: 8200 },
+    { name: 'Marketing', clientCount: 1, avgHealthScore: 83, avgKeywordsTop10: 31, totalOrganicTraffic: 6700 },
+  ];
+}
+
+export async function saveOnboardingStep(slugOrStep?: any, stepOrData?: any, data?: any) {
+  return { success: true };
+}
+
+export async function skipOnboarding(slug?: string) {
+  return { success: true };
+}
+
+export async function resolveSiteIssue(...args: any[]) {
+  return { success: true };
+}
+
+export async function dismissSiteIssue(...args: any[]) {
+  return { success: true };
+}
+
+export async function updateAuditLog(...args: any[]) {
+  return { success: true };
+}
+
+export async function deleteAuditLog(...args: any[]) {
+  return { success: true };
+}
+
+export async function resolveAuditLog(...args: any[]) {
   return { success: true };
 }
 

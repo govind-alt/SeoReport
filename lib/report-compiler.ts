@@ -116,7 +116,7 @@ export async function compileReportPdf(reportId: string) {
         await sendReportReadyEmail(
           updatedReport.client.contactEmail,
           updatedReport.client.name,
-          updatedReport.title,
+          (updatedReport as any).title || `${updatedReport.client.name} SEO Report`,
           reportId,
           updatedReport.client.agency.name
         );

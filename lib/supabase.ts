@@ -51,6 +51,7 @@ export async function uploadToSupabaseStorage(
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         'apikey': SUPABASE_ANON_KEY,
         'Content-Type': contentType,
+      },
       body: new Uint8Array(fileBuffer) as any,
     });
 

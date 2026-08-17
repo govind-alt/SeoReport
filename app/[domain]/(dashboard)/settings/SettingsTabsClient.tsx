@@ -983,7 +983,7 @@ export default function SettingsTabsClient({ domain, initialAgency }: { domain: 
                             if (isCurrent) return;
                             try {
                               toast.loading(`Switching to ${plan.label}...`, { id: 'plan-switch' });
-                              const res = await updateAgencyPlan(domain, plan.id);
+                              const res: any = await updateAgencyPlan(domain, plan.id);
                               setAgency(res.agency);
                               toast.success(`✅ Switched to ${plan.label} Plan! Changes take effect immediately.`, { id: 'plan-switch' });
                             } catch (e) {
