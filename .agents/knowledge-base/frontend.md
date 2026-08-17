@@ -198,3 +198,24 @@ User requested that clicking Download in the superadmin reports view should down
 - None â€” feature is fully implemented and verified visually in browser.
 
 ---
+## 2026-08-17 — Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling
+
+**Task:** Fix Next.js dev overlay 'Failed to fetch' error on admin dashboard & upgrade report table styling to premium standard.  
+**Files Changed:**
+- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ — modified
+- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ — synced
+
+**What Was Done:**
+1. **Network Error Handling:** Added individual \.catch(() => null)\ handlers to all 7 API \etch\ calls inside \etchLiveData()\ on the admin dashboard.
+2. **Premium Table Styling:** Upgraded the "All Platform Reports" table styling. Replaced pastel inline styles with premium dark mode inspired styles. "Download PDF" is now a solid dark Slate button. "Preview" is a clean white/gray outline button. Status badges mapped exactly to "failed" (red), "generated" (green), and "done" (blue) with pill aesthetics.
+
+**Why:**
+- The \etchLiveData()\ interval was throwing a \TypeError: Failed to fetch\ unhandled rejection if it fired while the Next.js dev server was restarting or unavailable. This caused the Next.js dev overlay to block the UI. Catching it allows silent background failures.
+- The user requested a "professional", sleek, premium look for the table, moving away from generic basic colors.
+
+**Gotchas / Watch Out For:**
+- The pp/admin/page.tsx uses mostly inline styles rather than Tailwind classes. Upgrading styling required injecting sophisticated inline styles (e.g. boxShadow, border color changes).
+- The \etchLiveData\ fix relies on \Promise.all()\ successfully resolving array elements to \
+ull\ instead of rejecting the entire promise.
+
+---
