@@ -488,3 +488,301 @@ export async function registerClient(data: any) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SUPERADMIN SERVER ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches all platform-wide data for the Superadmin dashboard.
+ * Returns agencies, users, reports, support tickets, and computed KPIs.
+ */
+export async function getSuperadminData() {
+  const [agencies, users, reports, messages] = await Promise.all([
+    prisma.agency.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { clients: true, users: true } }
+      }
+    }),
+    prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { agency: { select: { id: true, name: true, slug: true } } }
+    }),
+    prisma.report.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+            domain: true,
+            agency: { select: { id: true, name: true, subdomain: true, slug: true } }
+          }
+        }
+      }
+    }),
+    prisma.message.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: {
+        agency: { select: { id: true, name: true, slug: true } },
+        client: { select: { id: true, name: true } }
+      }
+    })
+  ]);
+
+  const totalAgencies = agencies.length;
+  const totalClients = agencies.reduce((sum, a) => sum + a._count.clients, 0);
+  const totalReports = reports.length;
+  const generatedReports = reports.filter(r => r.status === 'done' || r.status === 'generated').length;
+  const failedReports = reports.filter(r => r.status === 'failed').length;
+
+  const planStats = {
+    enterprise: agencies.filter(a => a.plan === 'enterprise').length,
+    professional: agencies.filter(a => a.plan === 'professional' || a.plan === 'pro').length,
+    starter: agencies.filter(a => a.plan !== 'enterprise' && a.plan !== 'professional' && a.plan !== 'pro' && a.plan !== 'suspended').length,
+  };
+
+  const mrr = agencies.reduce((sum, a) => {
+    if (a.plan === 'enterprise') return sum + 249;
+    if (a.plan === 'professional' || a.plan === 'pro') return sum + 99;
+    if (a.plan === 'suspended') return sum;
+    return sum + 49;
+  }, 0);
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const now = new Date();
+  const mrrChartData = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    return { name: months[d.getMonth()], value: Math.round(mrr * (0.7 + i * 0.06)) };
+  });
+
+  const agencyChartData = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    const count = agencies.filter(a => {
+      const created = new Date(a.createdAt);
+      return created.getFullYear() === d.getFullYear() && created.getMonth() === d.getMonth();
+    }).length;
+    return { name: months[d.getMonth()], value: count };
+  });
+
+  // Support tickets: client messages sent to agency (not from agency)
+  const supportTickets = messages
+    .filter(m => !m.isFromAgency)
+    .map(m => ({
+      id: m.id,
+      createdAt: m.createdAt,
+      agency: m.agency,
+      client: m.client,
+      action: `Client (${m.client?.name || 'Client'}) Support Request: "${m.subject || m.body.substring(0, 80)}"`,
+    }));
+
+  // Format reports for the superadmin reports tab
+  const formattedReports = reports.map(r => ({
+    id: r.id,
+    clientId: r.clientId,
+    clientName: r.client?.name || 'Unknown Client',
+    clientDomain: r.client?.domain || '',
+    agencyName: r.client?.agency?.name || 'Unknown Agency',
+    agencySubdomain: r.client?.agency?.subdomain || r.client?.agency?.slug || '',
+    period: new Date(r.periodStart).toLocaleString('default', { month: 'long', year: 'numeric' }),
+    periodStart: r.periodStart,
+    status: r.status,
+    pdfUrl: r.pdfUrl,
+    shareSlug: r.shareSlug,
+    generatedAt: r.generatedAt
+      ? new Date(r.generatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : 'Pending',
+    createdAt: r.createdAt,
+  }));
+
+  const recentLogs = [
+    ...agencies.slice(0, 3).map(a => ({ id: a.id, action: `Agency "${a.name}" registered`, createdAt: a.createdAt })),
+    ...users.slice(0, 3).map(u => ({ id: u.id, action: `User "${u.email}" joined`, createdAt: u.createdAt })),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 6);
+
+  return {
+    agencies,
+    users,
+    reports: formattedReports,
+    totalAgencies,
+    totalClients,
+    totalReports,
+    generatedReports,
+    failedReports,
+    mrr,
+    planStats,
+    mrrChartData,
+    agencyChartData,
+    supportTickets,
+    recentLogs,
+  };
+}
+
+/**
+ * Creates a new platform user (superadmin action).
+ */
+export async function createUserSuperadmin(data: {
+  name: string;
+  email: string;
+  role: string;
+  agencyId?: string;
+  password: string;
+}) {
+  if (!data.email || !data.password || !data.name) throw new Error('Name, email, and password are required');
+  if (data.password.length < 6) throw new Error('Password must be at least 6 characters');
+
+  const existing = await prisma.user.findUnique({ where: { email: data.email.toLowerCase() } });
+  if (existing) throw new Error('A user with this email already exists');
+
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+  const user = await prisma.user.create({
+    data: {
+      name: data.name,
+      email: data.email.toLowerCase(),
+      password: hashedPassword,
+      role: data.role || 'admin',
+      agencyId: data.agencyId || null,
+    },
+    include: { agency: { select: { id: true, name: true, slug: true } } }
+  });
+
+  revalidatePath('/superadmin');
+  return { success: true, user };
+}
+
+/**
+ * Updates a user's role (superadmin action).
+ */
+export async function updateUserRoleSuperadmin(userId: string, role: string) {
+  if (!userId || !role) throw new Error('userId and role are required');
+  await prisma.user.update({ where: { id: userId }, data: { role } });
+  revalidatePath('/superadmin');
+  return { success: true };
+}
+
+/**
+ * Deletes/deactivates a user account (superadmin action).
+ */
+export async function deleteUserSuperadmin(userId: string) {
+  if (!userId) throw new Error('userId is required');
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+  if (user.role === 'superadmin') throw new Error('Cannot deactivate a superadmin account');
+  await prisma.user.delete({ where: { id: userId } });
+  revalidatePath('/superadmin');
+  return { success: true };
+}
+
+/**
+ * Updates an agency's subscription plan (superadmin action).
+ */
+export async function updateAgencyPlanSuperadmin(agencyId: string, plan: string) {
+  if (!agencyId || !plan) throw new Error('agencyId and plan are required');
+  await prisma.agency.update({ where: { id: agencyId }, data: { plan } });
+  revalidatePath('/superadmin');
+  return { success: true };
+}
+
+/**
+ * Permanently deletes an agency and all cascading data (superadmin action).
+ */
+export async function deleteAgencySuperadmin(agencyId: string) {
+  if (!agencyId) throw new Error('agencyId is required');
+  const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+  if (!agency) throw new Error('Agency not found');
+  await prisma.agency.delete({ where: { id: agencyId } });
+  revalidatePath('/superadmin');
+  return { success: true };
+}
+
+/**
+ * Creates a new agency tenant (superadmin action).
+ */
+export async function createAgencySuperadmin(data: {
+  name: string;
+  slug: string;
+  subdomain: string;
+  plan: string;
+  contactEmail: string;
+}) {
+  if (!data.name || !data.slug || !data.subdomain || !data.contactEmail) {
+    throw new Error('All fields are required');
+  }
+  const existing = await prisma.agency.findFirst({
+    where: { OR: [{ slug: data.slug }, { subdomain: data.subdomain }] }
+  });
+  if (existing) throw new Error('An agency with this slug or subdomain already exists');
+
+  const agency = await prisma.agency.create({
+    data: {
+      name: data.name,
+      slug: data.slug,
+      subdomain: data.subdomain,
+      plan: data.plan || 'starter',
+      billingEmail: data.contactEmail,
+    }
+  });
+
+  revalidatePath('/superadmin');
+  return { success: true, agency };
+}
+
+/**
+ * Toggles an agency between suspended and active (superadmin action).
+ */
+export async function toggleSuspendAgencySuperadmin(agencyId: string) {
+  if (!agencyId) throw new Error('agencyId is required');
+  const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
+  if (!agency) throw new Error('Agency not found');
+
+  const newPlan = agency.plan === 'suspended' ? 'starter' : 'suspended';
+  await prisma.agency.update({ where: { id: agencyId }, data: { plan: newPlan } });
+  revalidatePath('/superadmin');
+  return { success: true, newPlan };
+}
+
+/**
+ * Returns the impersonation redirect URL for an agency subdomain (superadmin action).
+ */
+export async function impersonateAgencyAction(agencySlug: string) {
+  if (!agencySlug) throw new Error('agencySlug is required');
+  const agency = await prisma.agency.findFirst({
+    where: { OR: [{ slug: agencySlug }, { subdomain: agencySlug }] }
+  });
+  if (!agency) throw new Error('Agency not found');
+
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const subdomain = agency.subdomain || agency.slug;
+  // Redirect to agency dashboard on their subdomain
+  const redirectUrl = baseUrl.includes('localhost')
+    ? `http://${subdomain}.localhost:3000`
+    : baseUrl.replace('://', `://${subdomain}.`);
+
+  return { success: true, redirectUrl };
+}
+
+/**
+ * Records a superadmin reply on a support ticket/message (superadmin action).
+ */
+export async function respondToTicketSuperadmin(ticketId: string, replyText: string) {
+  if (!ticketId || !replyText) throw new Error('ticketId and replyText are required');
+  const message = await prisma.message.findUnique({ where: { id: ticketId } });
+  if (!message) throw new Error('Ticket not found');
+
+  // Append reply marker to body so it persists across reloads
+  const baseBody = message.body.includes(' | Response: "') 
+    ? message.body.split(' | Response: "')[0] 
+    : message.body;
+
+  await prisma.message.update({
+    where: { id: ticketId },
+    data: {
+      body: `${baseBody} | Response: "${replyText}" [RESOLVED]`,
+      isRead: true,
+    }
+  });
+
+  revalidatePath('/superadmin');
+  return { success: true };
+}

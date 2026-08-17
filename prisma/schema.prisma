@@ -20,6 +20,7 @@ model Agency {
   slug            String   @unique
   subdomain       String?  @unique
   plan            String   @default("starter") // starter, pro, agency
+  status          String   @default("active") // active, trial, suspended
   billingEmail    String?
   notificationEmail String? // Dedicated email for client message/query alerts
   customDomain    String?

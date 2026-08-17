@@ -38,6 +38,70 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   const [usrPassword, setUsrPassword] = useState('');
   const [creatingUser, setCreatingUser] = useState(false);
 
+  // Reports Tab State
+  const [reportsList] = useState<any[]>(data.reports || []);
+  const [reportSearch, setReportSearch] = useState('');
+  const [downloadingPdf, setDownloadingPdf] = useState<Record<string, boolean>>({});
+
+  const handleDownloadReportPdf = async (report: any) => {
+    setDownloadingPdf(prev => ({ ...prev, [report.id]: true }));
+    const toastId = toast.loading(`Generating PDF for ${report.clientName} — ${report.period}...`);
+    try {
+      // Trigger compilation / check status
+      const res = await fetch(`/api/reports/${report.id}/pdf`);
+      const json = await res.json();
+
+      if (json.status === 'failed') {
+        toast.error('PDF generation failed. Try regenerating this report.', { id: toastId });
+        return;
+      }
+
+      // Poll until generated
+      let pdfUrl = json.pdfUrl;
+      if (!pdfUrl) {
+        let attempts = 0;
+        while (attempts < 30) {
+          await new Promise(r => setTimeout(r, 2000));
+          const poll = await fetch(`/api/reports/${report.id}/pdf`);
+          const pollJson = await poll.json();
+          if (pollJson.status === 'generated' && pollJson.pdfUrl) {
+            pdfUrl = pollJson.pdfUrl;
+            break;
+          }
+          if (pollJson.status === 'failed') {
+            toast.error('PDF generation failed.', { id: toastId });
+            return;
+          }
+          attempts++;
+        }
+      }
+
+      if (!pdfUrl) {
+        toast.error('PDF is taking too long. Please try again.', { id: toastId });
+        return;
+      }
+
+      // Download the file with a proper filename
+      const cleanClient = (report.clientName || 'Client').replace(/[^a-z0-9]/gi, '_');
+      const cleanPeriod = (report.period || 'Report').replace(/[^a-z0-9]/gi, '_');
+      const filename = `RankFlow_Report_${cleanClient}_${cleanPeriod}.pdf`;
+
+      const fileRes = await fetch(pdfUrl);
+      const blob = await fileRes.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+
+      toast.success(`Downloaded: ${filename}`, { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to download PDF', { id: toastId });
+    } finally {
+      setDownloadingPdf(prev => ({ ...prev, [report.id]: false }));
+    }
+  };
+
   const handleExportUsersCsv = () => {
     const headers = 'ID,Name,Email,Role,Agency,CreatedAt\n';
     const rows = usersList.map(u => `"${u.id}","${u.name || ''}","${u.email}","${u.role}","${u.agency?.name || 'Platform'}","${u.createdAt}"`).join('\n');
@@ -343,6 +407,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
         { id: 'overview', label: 'Overview', icon: '📊' },
         { id: 'agencies', label: 'Agencies', icon: '🏢' },
         { id: 'users', label: 'Users', icon: '👥' },
+        { id: 'reports', label: 'Reports', icon: '📄' },
         { id: 'tickets', label: 'Support Tickets', icon: '💬' },
         { id: 'api-limits', label: 'API Quotas', icon: '⚡' },
         { id: 'broadcast', label: 'Broadcast Banners', icon: '📢' },
@@ -812,6 +877,128 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
               </div>
               <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
                 {usersList.length} active platform accounts
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* REPORTS TAB */}
+        {activeTab === 'reports' && (
+          <div className="fade-in">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px' }}>
+              <div>
+                <h2 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '8px' }}>All Reports</h2>
+                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '15px' }}>{reportsList.length} reports across all agencies — download as PDF with correct filename</p>
+              </div>
+              <div style={{ position: 'relative', width: '280px' }}>
+                <span style={{ position: 'absolute', left: '12px', top: '8px', color: 'rgba(255,255,255,0.45)' }}>🔍</span>
+                <input
+                  className="form-input"
+                  style={{ width: '100%', padding: '8px 12px 8px 36px', fontSize: '13px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px' }}
+                  placeholder="Search by client or agency..."
+                  value={reportSearch}
+                  onChange={e => setReportSearch(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', backdropFilter: 'blur(8px)', overflow: 'hidden' }}>
+              <div className="table-wrapper" style={{ margin: 0, border: 'none' }}>
+                <table style={{ background: 'transparent', width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left' }}>CLIENT</th>
+                      <th style={{ textAlign: 'left' }}>AGENCY</th>
+                      <th style={{ textAlign: 'left' }}>PERIOD</th>
+                      <th style={{ textAlign: 'left' }}>STATUS</th>
+                      <th style={{ textAlign: 'left' }}>GENERATED</th>
+                      <th style={{ textAlign: 'right' }}>ACTIONS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportsList
+                      .filter(r =>
+                        !reportSearch ||
+                        r.clientName?.toLowerCase().includes(reportSearch.toLowerCase()) ||
+                        r.agencyName?.toLowerCase().includes(reportSearch.toLowerCase())
+                      )
+                      .map((report: any) => {
+                        const statusColor = report.status === 'done' || report.status === 'generated'
+                          ? '#10B981'
+                          : report.status === 'failed'
+                          ? '#EF4444'
+                          : report.status === 'generating'
+                          ? '#F59E0B'
+                          : 'rgba(255,255,255,0.4)';
+                        const statusLabel = report.status === 'done' ? 'Ready'
+                          : report.status === 'generated' ? 'Ready'
+                          : report.status === 'failed' ? 'Failed'
+                          : report.status === 'generating' ? 'Generating'
+                          : 'Draft';
+                        const isReady = report.status === 'done' || report.status === 'generated';
+                        const isDownloading = downloadingPdf[report.id];
+
+                        return (
+                          <tr key={report.id} className="report-row">
+                            <td style={{ padding: '16px 24px' }}>
+                              <div style={{ fontWeight: 700, color: 'white' }}>{report.clientName}</div>
+                              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}>{report.clientDomain}</div>
+                            </td>
+                            <td style={{ padding: '16px 24px', color: 'rgba(255,255,255,0.7)', fontSize: '13px' }}>{report.agencyName}</td>
+                            <td style={{ padding: '16px 24px', fontWeight: 600, color: 'white' }}>{report.period}</td>
+                            <td style={{ padding: '16px 24px' }}>
+                              <span style={{
+                                background: `${statusColor}20`,
+                                border: `1px solid ${statusColor}50`,
+                                color: statusColor,
+                                padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px'
+                              }}>
+                                {statusLabel}
+                              </span>
+                            </td>
+                            <td style={{ padding: '16px 24px', color: 'rgba(255,255,255,0.45)', fontSize: '12px' }}>{report.generatedAt}</td>
+                            <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                {report.shareSlug && (
+                                  <a
+                                    href={`/reports/render/${report.id}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-ghost btn-sm"
+                                    style={{ padding: '5px 10px', fontSize: '11px', border: '1px solid rgba(255,255,255,0.1)', textDecoration: 'none', color: 'rgba(255,255,255,0.7)' }}
+                                  >
+                                    👁️ View
+                                  </a>
+                                )}
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  style={{
+                                    padding: '5px 12px', fontSize: '11px',
+                                    border: isReady ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.15)',
+                                    color: isReady ? '#10B981' : 'rgba(255,255,255,0.4)',
+                                    background: isReady ? 'rgba(16,185,129,0.08)' : 'transparent',
+                                    cursor: isDownloading ? 'wait' : 'pointer',
+                                    opacity: isDownloading ? 0.6 : 1,
+                                  }}
+                                  onClick={() => handleDownloadReportPdf(report)}
+                                  disabled={isDownloading}
+                                  title={`Download PDF: RankFlow_Report_${report.clientName}_${report.period}.pdf`}
+                                >
+                                  {isDownloading ? '⏳ Generating...' : '⬇️ Download PDF'}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    {reportsList.length === 0 && (
+                      <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: 'rgba(255,255,255,0.45)' }}>No reports found across all agencies.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
+                {reportsList.length} total reports · {reportsList.filter(r => r.status === 'done' || r.status === 'generated').length} ready · {reportsList.filter(r => r.status === 'failed').length} failed
               </div>
             </div>
           </div>

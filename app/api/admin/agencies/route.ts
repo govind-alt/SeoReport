@@ -44,7 +44,7 @@ export async function GET() {
         plan: a.plan || 'pro',
         clients: a._count.clients,
         reports: reportsCount,
-        status: 'active',
+        status: a.status || 'active',
         mrr: planMrr[a.plan] || 299,
         joined: new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
         email: a.billingEmail || a.users[0]?.email || 'N/A',
@@ -55,6 +55,45 @@ export async function GET() {
     return NextResponse.json(formattedAgencies);
   } catch (error) {
     console.error('[ADMIN_AGENCIES_GET]', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { name, email, plan, subdomain, contactName } = body;
+
+    if (!name || !email || !subdomain) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const agency = await prisma.agency.create({
+      data: {
+        name,
+        slug: subdomain,
+        subdomain,
+        plan: plan || 'starter',
+        status: 'trial',
+        billingEmail: email,
+        users: {
+          create: {
+            name: contactName || 'Admin',
+            email,
+            role: 'admin'
+          }
+        }
+      }
+    });
+
+    return NextResponse.json(agency);
+  } catch (error) {
+    console.error('[ADMIN_AGENCIES_POST]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

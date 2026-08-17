@@ -1282,7 +1282,7 @@ function AgencyDashboardView({ agency, onBack, onToggleSuspend }: {
 }
 
 /* ─── Invite Agency Modal ─── */
-function InviteAgencyModal({ onClose, onInvite }: { onClose: () => void; onInvite: (data: { name: string; email: string; plan: string }) => void }) {
+function InviteAgencyModal({ onClose, onInvite }: { onClose: () => void; onInvite: (data: { name: string; email: string; plan: string; subdomain: string; contactName: string }) => void }) {
   const [form, setForm] = useState({ name: '', email: '', plan: 'starter', contactName: '', subdomain: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -1305,7 +1305,7 @@ function InviteAgencyModal({ onClose, onInvite }: { onClose: () => void; onInvit
     await new Promise(r => setTimeout(r, 1400));
     setSending(false);
     setSent(true);
-    onInvite({ name: form.name, email: form.email, plan: form.plan });
+    onInvite({ name: form.name, email: form.email, plan: form.plan, subdomain: form.subdomain, contactName: form.contactName });
     setTimeout(onClose, 1800);
   };
 
@@ -1740,30 +1740,45 @@ export default function SuperAdminDashboard() {
   });
 
   /* ─── Actions ─── */
-  const toggleSuspend = (id: string) => {
-    setAgencies(prev => prev.map(a => {
-      if (a.id !== id) return a;
-      const next = a.status === 'active' ? 'suspended' : 'active';
-      showToast(`${a.name} has been ${next === 'suspended' ? 'suspended' : 'restored'}.`);
-      return { ...a, status: next };
-    }));
+  const toggleSuspend = async (id: string) => {
+    const agency = agencies.find(a => a.id === id);
+    if (!agency) return;
+    const nextStatus = agency.status === 'active' ? 'suspended' : 'active';
+    
+    // Optimistic update
+    setAgencies(prev => prev.map(a => a.id === id ? { ...a, status: nextStatus } : a));
+    showToast(`${agency.name} has been ${nextStatus === 'suspended' ? 'suspended' : 'restored'}.`);
+    
+    try {
+      await fetch(`/api/admin/agencies/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      fetchLiveData(false);
+    } catch (err) {
+      // Revert optimistic update
+      setAgencies(prev => prev.map(a => a.id === id ? { ...a, status: agency.status } : a));
+      showToast('Failed to update status', 'error');
+    }
   };
 
-  const handleInvite = (data: { name: string; email: string; plan: string }) => {
-    const newAgency: Agency = {
-      id: String(Date.now()),
-      name: data.name,
-      subdomain: data.name.toLowerCase().replace(/\s+/g, '-'),
-      plan: data.plan as Agency['plan'],
-      clients: 0,
-      reports: 0,
-      status: 'trial',
-      mrr: 0,
-      joined: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      email: data.email,
-    };
-    setAgencies(prev => [newAgency, ...prev]);
-    showToast(`Invitation sent to ${data.email}`);
+  const handleInvite = async (data: { name: string; email: string; plan: string; subdomain: string; contactName: string }) => {
+    try {
+      const res = await fetch('/api/admin/agencies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || 'Failed to invite agency');
+      }
+      showToast(`Invitation sent to ${data.email}`);
+      fetchLiveData(false);
+    } catch (err: any) {
+      showToast(err.message, 'error');
+    }
   };
 
   /* ─── CSV Exports ─── */
@@ -3444,9 +3459,27 @@ export default function SuperAdminDashboard() {
         <EditAgencyModal
           agency={editAgencyModal}
           onClose={() => setEditAgencyModal(null)}
-          onSave={(updated) => {
+          onSave={async (updated) => {
+            // Optimistic update
             setAgencies(prev => prev.map(a => a.id === updated.id ? updated : a));
             showToast(`Agency "${updated.name}" updated successfully.`);
+            
+            try {
+              await fetch(`/api/admin/agencies/${updated.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: updated.name,
+                  subdomain: updated.subdomain,
+                  plan: updated.plan,
+                  status: updated.status,
+                  mrr: updated.mrr
+                })
+              });
+              // Can call fetchLiveData if we want, but optimistic update is usually fine.
+            } catch (err) {
+              showToast('Failed to save agency updates', 'error');
+            }
           }}
         />
       )}
