@@ -643,10 +643,6 @@ export async function seedAgencyDemoData(agencyId: string) {
   return { success: true };
 }
 
-export async function updateUserAccount(...args: any[]) {
-  return { success: true };
-}
-
 export async function getCurrentUser() {
   const session = await auth();
   if (session?.user?.email) {
