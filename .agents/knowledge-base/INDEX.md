@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-18 | Client Portal MessagesSection Purge | frontend | Completely removed MessagesSection chat UI component, state, and hash listeners from client dashboard page.tsx |
 | 2026-08-18 | Client Portal Inbox & Chat Removal | frontend | Removed Inbox & Chat navigation item and unused MessageSquare icon from client portal layout.tsx |
 | 2026-08-18 | Agency Sidebar Inbox Removal | frontend | Removed Inbox item and unused icon from Sidebar.tsx navItems for streamlined agency navigation |
 | 2026-08-18 | Full Agency Portal Audit & SessionProvider Fix | auth | Fixed SessionProvider wrapping in root providers, fixed duplicate export in actions.ts, and verified full 10-module agency workspace in Chrome |
