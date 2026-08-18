@@ -7,7 +7,7 @@ import { usePathname, useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   LayoutDashboard, Users, FileText, Settings, HelpCircle,
-  ChevronUp, LogOut, CreditCard, User, Zap, Shield, Inbox,
+  ChevronUp, LogOut, CreditCard, User, Zap, Shield,
   Search, Calendar, CheckSquare, Target
 } from 'lucide-react';
 
@@ -106,7 +106,6 @@ export function Sidebar() {
 
   const navItems = [
     { href: `${basePath}`,                   label: 'Dashboard',         icon: LayoutDashboard, exact: true  },
-    { href: `${basePath}/inbox`,             label: 'Inbox',             icon: Inbox,            exact: false },
     { href: `${basePath}/clients`,           label: 'Clients',           icon: Users,            exact: false },
     { href: `${basePath}/reports`,           label: 'Reports',           icon: FileText,         exact: false },
     { href: `${basePath}/keyword-explorer`, label: 'Keyword Research', icon: Search,           exact: false },
