@@ -12,11 +12,9 @@ async function testLogin(email: string, pass: string) {
 }
 
 async function main() {
-  await testLogin('superadmin@rankflow.app', 'Password123!');
-  await testLogin('sarah.jenkins@digitalhorizons.com', 'Password123!');
-  await testLogin('admin@agency.com', 'Password123!');
-  await testLogin('john@acmestore.com', 'Password123!');
-  await testLogin('client@zomato.com', 'Password123!');
+  await testLogin('superadmin@rankflow.app', 'admin@123');
+  await testLogin('demo@rankflow.app', 'demo123');
+  await testLogin('client@acme.com', 'client123');
 }
 
 main()

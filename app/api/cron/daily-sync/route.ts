@@ -60,12 +60,11 @@ export async function GET(request: Request) {
                 if (p.position > 0 && p.position <= 10) top10++;
                 if (p.position > 0 && p.position <= 100) top100++;
               });
-              const proj = await prisma.sERankingProject.findUnique({ where: { clientId: client.id } });
-              if (proj) {
-                await prisma.keywordSnapshot.create({
-                  data: { serankingProjectId: proj.id, date: today, totalKeywords: rankings.positions.length, top3Count: top3, top10Count: top10, top100Count: top100 }
-                });
-              }
+              await prisma.keywordSnapshot.upsert({
+                where: { clientId_date: { clientId: client.id, date: today } },
+                update: { totalKeywords: rankings.positions.length, top3Count: top3, top10Count: top10, top100Count: top100 },
+                create: { clientId: client.id, date: today, totalKeywords: rankings.positions.length, top3Count: top3, top10Count: top10, top100Count: top100 }
+              });
             } catch (e: any) {
               agencyResult.errors.push(`${client.name}: Rankings - ${e.message}`);
             }
@@ -73,18 +72,22 @@ export async function GET(request: Request) {
             // Fetch and store site audit
             try {
               const audit = await seClient.getAudit(projectId);
-              const proj = await prisma.sERankingProject.findUnique({ where: { clientId: client.id } });
-              if (proj) {
-                await prisma.auditSnapshot.create({
-                  data: {
-                    serankingProjectId: proj.id, date: today,
-                    healthScore: audit.health_score || 0,
-                    criticalIssues: audit.issues?.critical || 0,
-                    warningIssues: audit.issues?.warnings || 0,
-                    noticeIssues: audit.issues?.notices || 0,
-                  }
-                });
-              }
+              await prisma.auditSnapshot.upsert({
+                where: { clientId_date: { clientId: client.id, date: today } },
+                update: {
+                  healthScore: audit.health_score || 0,
+                  criticalIssues: audit.issues?.critical || 0,
+                  warningIssues: audit.issues?.warnings || 0,
+                  noticeIssues: audit.issues?.notices || 0,
+                },
+                create: {
+                  clientId: client.id, date: today,
+                  healthScore: audit.health_score || 0,
+                  criticalIssues: audit.issues?.critical || 0,
+                  warningIssues: audit.issues?.warnings || 0,
+                  noticeIssues: audit.issues?.notices || 0,
+                }
+              });
             } catch (e: any) {
               agencyResult.errors.push(`${client.name}: Audit - ${e.message}`);
             }
@@ -92,19 +95,24 @@ export async function GET(request: Request) {
             // Fetch and store backlink data
             try {
               const backlinksData: any = await seClient.getNewBacklinks(projectId.toString());
-              const proj = await prisma.sERankingProject.findUnique({ where: { clientId: client.id } });
-              if (proj) {
-                await prisma.backlinkSnapshot.create({
-                  data: {
-                    serankingProjectId: proj.id, date: today,
-                    totalBacklinks: backlinksData?.backlinks || backlinksData?.length || 0,
-                    referringDomains: backlinksData?.referring_domains || 0,
-                    newBacklinks: backlinksData?.new_backlinks_30d || 0,
-                    lostBacklinks: backlinksData?.lost_backlinks_30d || 0,
-                    domainTrust: backlinksData?.domain_trust || 0,
-                  }
-                });
-              }
+              await prisma.backlinkSnapshot.upsert({
+                where: { clientId_date: { clientId: client.id, date: today } },
+                update: {
+                  totalBacklinks: backlinksData?.backlinks || backlinksData?.length || 0,
+                  referringDomains: backlinksData?.referring_domains || 0,
+                  newBacklinks: backlinksData?.new_backlinks_30d || 0,
+                  lostBacklinks: backlinksData?.lost_backlinks_30d || 0,
+                  domainTrust: backlinksData?.domain_trust || 0,
+                },
+                create: {
+                  clientId: client.id, date: today,
+                  totalBacklinks: backlinksData?.backlinks || backlinksData?.length || 0,
+                  referringDomains: backlinksData?.referring_domains || 0,
+                  newBacklinks: backlinksData?.new_backlinks_30d || 0,
+                  lostBacklinks: backlinksData?.lost_backlinks_30d || 0,
+                  domainTrust: backlinksData?.domain_trust || 0,
+                }
+              });
             } catch (e: any) {
               agencyResult.errors.push(`${client.name}: Backlinks - ${e.message}`);
             }

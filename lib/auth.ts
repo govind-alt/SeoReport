@@ -24,7 +24,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   // ── Security ──────────────────────────────────────────────────────────────
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "development-fallback-secret-key-12345",
   trustHost: true,
-  adapter: PrismaAdapter(prisma),
 
   // ── Session: JWT strategy with 24-hour expiry ─────────────────────────────
   session: {

@@ -9,16 +9,10 @@
  *   Password: demo123
  */
 
-import { PrismaClient } from '@prisma/client';
+import "dotenv/config";
+import { prisma } from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-
-import { PrismaLibSql } from '@prisma/adapter-libsql';
-
-const adapter = new PrismaLibSql({
-  url: "file:./dev.db",
-});
-const prisma = new PrismaClient({ adapter });
 
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -212,92 +206,73 @@ async function main() {
       },
     });
 
-    // SERankingProject
-    await prisma.sERankingProject.upsert({
-      where: { clientId: client.id },
-      update: {},
-      create: {
-        serankingId: 1001 + CLIENTS.indexOf(fixture),
-        name: fixture.name,
-        url: `https://${fixture.domain}`,
-        clientId: client.id,
-        lastSyncedAt: new Date(),
-      },
-    });
+    // Snapshots — 6 months attached directly to client
+    for (let m = 5; m >= 0; m--) {
+      const date = monthsAgo(m);
+      const idx = 5 - m;
 
-    // Snapshots — 6 months
-    const serankingProject = await prisma.sERankingProject.findUnique({
-      where: { clientId: client.id },
-    });
+      // Keyword snapshot
+      await prisma.keywordSnapshot.upsert({
+        where: { clientId_date: { clientId: client.id, date } },
+        update: {},
+        create: {
+          clientId: client.id,
+          date,
+          top3Count: Math.floor(fixture.top10[idx] * 0.25),
+          top10Count: fixture.top10[idx],
+          top30Count: Math.floor(fixture.top10[idx] * 1.9),
+          top100Count: Math.floor(fixture.top10[idx] * 4.2),
+          totalKeywords: Math.floor(fixture.top10[idx] * 5.5),
+          avgPosition: parseFloat((22 - idx * 1.2).toFixed(1)),
+        },
+      });
 
-    if (serankingProject) {
-      for (let m = 5; m >= 0; m--) {
-        const date = monthsAgo(m);
-        const idx = 5 - m;
+      // Backlink snapshot
+      await prisma.backlinkSnapshot.upsert({
+        where: { clientId_date: { clientId: client.id, date } },
+        update: {},
+        create: {
+          clientId: client.id,
+          date,
+          domainTrust: 30 + idx * 2,
+          totalBacklinks: fixture.backlinks[idx],
+          newBacklinks: Math.floor(Math.random() * 60) + 30,
+          lostBacklinks: Math.floor(Math.random() * 15) + 5,
+          referringDomains: Math.floor(fixture.backlinks[idx] / 4.5),
+          dofollowLinks: Math.floor(fixture.backlinks[idx] * 0.86),
+          nofollowLinks: Math.floor(fixture.backlinks[idx] * 0.14),
+        },
+      });
 
-        // Keyword snapshot
-        await prisma.keywordSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: serankingProject.id, date } },
-          update: {},
-          create: {
-            serankingProjectId: serankingProject.id,
-            date,
-            top3Count: Math.floor(fixture.top10[idx] * 0.25),
-            top10Count: fixture.top10[idx],
-            top30Count: Math.floor(fixture.top10[idx] * 1.9),
-            top100Count: Math.floor(fixture.top10[idx] * 4.2),
-            totalKeywords: Math.floor(fixture.top10[idx] * 5.5),
-            avgPosition: parseFloat((22 - idx * 1.2).toFixed(1)),
-          },
-        });
+      // Audit snapshot
+      await prisma.auditSnapshot.upsert({
+        where: { clientId_date: { clientId: client.id, date } },
+        update: {},
+        create: {
+          clientId: client.id,
+          date,
+          healthScore: fixture.health[idx],
+          pagesCrawled: 600 + idx * 40,
+          criticalIssues: Math.max(0, 6 - idx),
+          warningIssues: Math.max(8, 20 - idx * 2),
+          noticeIssues: Math.max(15, 35 - idx * 3),
+        },
+      });
 
-        // Backlink snapshot
-        await prisma.backlinkSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: serankingProject.id, date } },
-          update: {},
-          create: {
-            serankingProjectId: serankingProject.id,
-            date,
-            domainTrust: 30 + idx * 2,
-            totalBacklinks: fixture.backlinks[idx],
-            newBacklinks: Math.floor(Math.random() * 60) + 30,
-            lostBacklinks: Math.floor(Math.random() * 15) + 5,
-            referringDomains: Math.floor(fixture.backlinks[idx] / 4.5),
-            dofollowLinks: Math.floor(fixture.backlinks[idx] * 0.86),
-            nofollowLinks: Math.floor(fixture.backlinks[idx] * 0.14),
-          },
-        });
-
-        // Audit snapshot
-        await prisma.auditSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: serankingProject.id, date } },
-          update: {},
-          create: {
-            serankingProjectId: serankingProject.id,
-            date,
-            healthScore: fixture.health[idx],
-            pagesCrawled: 600 + idx * 40,
-            criticalIssues: Math.max(0, 6 - idx),
-            warningIssues: Math.max(8, 20 - idx * 2),
-            noticeIssues: Math.max(15, 35 - idx * 3),
-          },
-        });
-
-        // Analytics snapshot
-        await prisma.analyticsSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: serankingProject.id, date } },
-          update: {},
-          create: {
-            serankingProjectId: serankingProject.id,
-            date,
-            organicSessions: fixture.traffic[idx],
-            clicks: Math.floor(fixture.traffic[idx] * 1.18),
-            impressions: Math.floor(fixture.traffic[idx] * 18),
-            ctr: parseFloat((6.2 + idx * 0.1).toFixed(2)),
-            avgPosition: parseFloat((8.4 - idx * 0.3).toFixed(1)),
-          },
-        });
-      }
+      // Analytics snapshot
+      await prisma.analyticsSnapshot.upsert({
+        where: { clientId_date: { clientId: client.id, date } },
+        update: {},
+        create: {
+          clientId: client.id,
+          date,
+          organicSessions: fixture.traffic[idx],
+          clicks: Math.floor(fixture.traffic[idx] * 1.18),
+          impressions: Math.floor(fixture.traffic[idx] * 18),
+          ctr: parseFloat((6.2 + idx * 0.1).toFixed(2)),
+          avgPosition: parseFloat((8.4 - idx * 0.3).toFixed(1)),
+        },
+      });
     }
 
     // Reports — 3 months of "done" reports

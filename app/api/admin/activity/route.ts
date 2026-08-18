@@ -9,7 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [notifications, recentAgencies, recentClients, recentReports, recentMessages] = await Promise.all([
+    const [notifications, recentAgencies, recentClients, recentReports] = await Promise.all([
       prisma.notification.findMany({
         take: 15,
         orderBy: { createdAt: 'desc' },
@@ -29,11 +29,6 @@ export async function GET() {
         take: 5,
         orderBy: { createdAt: 'desc' },
         include: { client: { select: { name: true, agency: { select: { name: true } } } } }
-      }),
-      prisma.message.findMany({
-        take: 5,
-        orderBy: { createdAt: 'desc' },
-        include: { client: { select: { name: true } }, agency: { select: { name: true } } }
       })
     ]);
 
@@ -84,18 +79,6 @@ export async function GET() {
         agency: r.client.agency.name,
         time: new Date(r.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
         timestamp: r.createdAt
-      });
-    });
-
-    recentMessages.forEach((m) => {
-      activityFeed.push({
-        id: `msg-${m.id}`,
-        type: 'message',
-        title: `Client Communication`,
-        detail: `Message ${m.isFromAgency ? 'from agency ' + m.agency.name : 'from client ' + m.client.name}: "${m.body.slice(0, 50)}..."`,
-        agency: m.agency.name,
-        time: new Date(m.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        timestamp: m.createdAt
       });
     });
 

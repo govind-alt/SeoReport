@@ -14,14 +14,12 @@ export async function GET() {
       totalClients,
       totalUsers,
       totalReports,
-      totalMessages,
       recentAgencies
     ] = await Promise.all([
       prisma.agency.count(),
       prisma.client.count(),
       prisma.user.count(),
       prisma.report.count(),
-      prisma.message.count(),
       prisma.agency.findMany({
         take: 10,
         orderBy: { createdAt: 'desc' },
@@ -46,7 +44,7 @@ export async function GET() {
       totalClients,
       totalUsers,
       totalReports,
-      totalMessages,
+      totalMessages: 0,
       totalMrr,
       recentAgencies
     });

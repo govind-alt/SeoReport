@@ -219,7 +219,7 @@ function LoginFormContent() {
       <div className="auth-layout">
         <div className="auth-brand-panel">
           <div className="brand-logo">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="brand-logo-left">
               <div className="brand-icon">RF</div>
               <div>
                 <div className="brand-name">RankFlow</div>

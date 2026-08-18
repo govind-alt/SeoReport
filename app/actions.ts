@@ -66,14 +66,11 @@ export async function syncClientData(clientId: string, domain: string) {
         if (p.position > 0 && p.position <= 100) top100++;
       });
 
-      const project = await prisma.sERankingProject.findUnique({ where: { clientId } });
-      if (project) {
-        await prisma.keywordSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: project.id, date: today } },
-          update: { top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length },
-          create: { serankingProjectId: project.id, date: today, top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length }
-        });
-      }
+      await prisma.keywordSnapshot.upsert({
+        where: { clientId_date: { clientId, date: today } },
+        update: { top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length },
+        create: { clientId, date: today, top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length }
+      });
     } catch (e) {
       console.error("Failed to fetch rankings:", e);
     }
@@ -81,14 +78,11 @@ export async function syncClientData(clientId: string, domain: string) {
     // Fetch Audit
     try {
       const audit = await seClient.getAudit(projectId);
-      const project = await prisma.sERankingProject.findUnique({ where: { clientId } });
-      if (project) {
-        await prisma.auditSnapshot.upsert({
-          where: { serankingProjectId_date: { serankingProjectId: project.id, date: today } },
-          update: { healthScore: audit.health_score || 0, pagesCrawled: audit.pages_crawled || 0, criticalIssues: audit.issues?.critical || 0, warningIssues: audit.issues?.warnings || 0, noticeIssues: audit.issues?.notices || 0 },
-          create: { serankingProjectId: project.id, date: today, healthScore: audit.health_score || 0, pagesCrawled: audit.pages_crawled || 0, criticalIssues: audit.issues?.critical || 0, warningIssues: audit.issues?.warnings || 0, noticeIssues: audit.issues?.notices || 0 }
-        });
-      }
+      await prisma.auditSnapshot.upsert({
+        where: { clientId_date: { clientId, date: today } },
+        update: { healthScore: audit.health_score || 0, pagesCrawled: audit.pages_crawled || 0, criticalIssues: audit.issues?.critical || 0, warningIssues: audit.issues?.warnings || 0, noticeIssues: audit.issues?.notices || 0 },
+        create: { clientId, date: today, healthScore: audit.health_score || 0, pagesCrawled: audit.pages_crawled || 0, criticalIssues: audit.issues?.critical || 0, warningIssues: audit.issues?.warnings || 0, noticeIssues: audit.issues?.notices || 0 }
+      });
     } catch (e) {
       console.error("Failed to fetch audit:", e);
     }
@@ -361,18 +355,7 @@ export async function registerClient(data: any) {
       }
     });
 
-    // 5. Create SERankingProject
-    const serankingId = Math.floor(1000000 + Math.random() * 9000000);
-    const project = await prisma.sERankingProject.create({
-      data: {
-        serankingId,
-        name: companyName,
-        url: sanitizedDomain,
-        clientId: client.id
-      }
-    });
-
-    // 6. Seed 6 months of historical keyword and analytics snapshots
+    // 5. Seed 6 months of historical keyword and analytics snapshots
     const now = new Date();
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -395,7 +378,7 @@ export async function registerClient(data: any) {
       await prisma.keywordSnapshot.create({
         data: {
           date,
-          serankingProjectId: project.id,
+          clientId: client.id,
           top3Count,
           top10Count,
           top30Count,
@@ -413,7 +396,7 @@ export async function registerClient(data: any) {
       await prisma.analyticsSnapshot.create({
         data: {
           date,
-          serankingProjectId: project.id,
+          clientId: client.id,
           organicSessions: sessions,
           clicks,
           impressions,
@@ -435,7 +418,7 @@ export async function registerClient(data: any) {
     await prisma.auditSnapshot.create({
       data: {
         date: now,
-        serankingProjectId: project.id,
+        clientId: client.id,
         healthScore: 78,
         pagesCrawled: 154,
         criticalIssues: 2,
@@ -451,7 +434,7 @@ export async function registerClient(data: any) {
     await prisma.backlinkSnapshot.create({
       data: {
         date: now,
-        serankingProjectId: project.id,
+        clientId: client.id,
         domainTrust: 42,
         totalBacklinks: 2450,
         newBacklinks: 15,

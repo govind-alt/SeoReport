@@ -1,105 +1,68 @@
-// RankFlow — Prisma Schema v2 (Enhanced)
-// SQLite for dev, Postgres for production
+// RankFlow — Minimal Clean Schema (PostgreSQL)
+// Core SaaS Models + SEO Snapshots
 
 generator client {
-  provider    = "prisma-client-js"
-  engineType  = "library"
+  provider   = "prisma-client-js"
+  engineType = "library"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AGENCY & USERS
+// 1. AGENCY (Tenant)
 // ─────────────────────────────────────────────────────────────────────────────
 
 model Agency {
-  id              String   @id @default(cuid())
-  name            String
-  slug            String   @unique
-  subdomain       String?  @unique
-  plan            String   @default("starter") // starter, pro, agency
-  status          String   @default("active") // active, trial, suspended
-  billingEmail    String?
-  notificationEmail String? // Dedicated email for client message/query alerts
-  customDomain    String?
-  serankingApiKey String?  // AES-256 encrypted
-  googleRefreshToken String? // OAuth 2.0 refresh token for GSC
-  stripeCustomerId String?
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  subdomain          String?  @unique
+  plan               String   @default("starter") // starter, pro, agency
+  status             String   @default("active") // active, trial, suspended
+  billingEmail       String?
+  notificationEmail  String?
+  customDomain       String?
+  serankingApiKey    String?  // AES-256 encrypted
+  googleRefreshToken String?  // OAuth 2.0 refresh token for GSC
+  stripeCustomerId   String?
   stripeSubscriptionId String?
-  stripePriceId String?
-  brandingJson    String?  // { primaryColor, logoUrl, accentColor }
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  stripePriceId      String?
+  brandingJson       String?  // { primaryColor, logoUrl, accentColor }
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  users           User[]
-  clients         Client[]
-  reportSchedules ReportSchedule[]
-  invitations     Invitation[]
-  notifications   Notification[]
-  messages        Message[]
-  webhooks        WebhookEndpoint[]
-  auditLogs       AuditLog[]
-  googleCredentials GoogleCredential[]
-}
-
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  twoFactorEnabled Boolean @default(false)
-  twoFactorSecret  String?
-  role          String    @default("member") // superadmin | admin | member | client
-  agencyId      String?
-  stripeCustomerId String?
-  agency        Agency?   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  accounts      Account[]
-  sessions      Session[]
-  invitations   Invitation[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+  users              User[]
+  clients            Client[]
+  reportSchedules    ReportSchedule[]
+  invitations        Invitation[]
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CLIENTS
+// 2. USER (Auth & Team)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  twoFactorEnabled Boolean   @default(false)
+  twoFactorSecret  String?
+  role             String    @default("member") // superadmin | admin | member | client
+  agencyId         String?
+  stripeCustomerId String?
+  agency           Agency?   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  invitations      Invitation[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. CLIENT
 // ─────────────────────────────────────────────────────────────────────────────
 
 model Client {
@@ -117,29 +80,9 @@ model Client {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  serankingProject   SERankingProject?
   reports            Report[]
   reportSchedule     ReportSchedule?
   invitations        Invitation[]
-  messages           Message[]
-  competitors        Competitor[]
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SERANKING PROJECT (linked to Client)
-// ─────────────────────────────────────────────────────────────────────────────
-
-model SERankingProject {
-  id           String   @id @default(cuid())
-  serankingId  Int      @unique  // Numeric project ID from SERanking API
-  name         String
-  url          String
-  clientId     String   @unique
-  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  lastSyncedAt DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
   keywordSnapshots   KeywordSnapshot[]
   backlinkSnapshots  BacklinkSnapshot[]
   auditSnapshots     AuditSnapshot[]
@@ -147,82 +90,82 @@ model SERankingProject {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SNAPSHOTS — Daily sync data from SERanking
+// 4. SEO SNAPSHOTS (Directly attached to Client)
 // ─────────────────────────────────────────────────────────────────────────────
 
 model KeywordSnapshot {
-  id                 String           @id @default(cuid())
-  date               DateTime
-  serankingProjectId String
-  project            SERankingProject @relation(fields: [serankingProjectId], references: [id], onDelete: Cascade)
-  top3Count          Int              @default(0)
-  top10Count         Int              @default(0)
-  top30Count         Int              @default(0)
-  top100Count        Int              @default(0)
-  totalKeywords      Int              @default(0)
-  avgPosition        Float?
-  positionsJson      String?          // JSON array of keyword positions
-  createdAt          DateTime         @default(now())
+  id            String   @id @default(cuid())
+  date          DateTime
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  top3Count     Int      @default(0)
+  top10Count    Int      @default(0)
+  top30Count    Int      @default(0)
+  top100Count   Int      @default(0)
+  totalKeywords Int      @default(0)
+  avgPosition   Float?
+  positionsJson String?
+  createdAt     DateTime @default(now())
 
-  @@unique([serankingProjectId, date])
-  @@index([serankingProjectId, date])
+  @@unique([clientId, date])
+  @@index([clientId, date])
 }
 
 model BacklinkSnapshot {
-  id                 String           @id @default(cuid())
-  date               DateTime
-  serankingProjectId String
-  project            SERankingProject @relation(fields: [serankingProjectId], references: [id], onDelete: Cascade)
-  domainTrust        Int?
-  totalBacklinks     Int              @default(0)
-  newBacklinks       Int              @default(0)
-  lostBacklinks      Int              @default(0)
-  referringDomains   Int              @default(0)
-  dofollowLinks      Int              @default(0)
-  nofollowLinks      Int              @default(0)
-  createdAt          DateTime         @default(now())
+  id               String   @id @default(cuid())
+  date             DateTime
+  clientId         String
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  domainTrust      Int?
+  totalBacklinks   Int      @default(0)
+  newBacklinks     Int      @default(0)
+  lostBacklinks    Int      @default(0)
+  referringDomains Int      @default(0)
+  dofollowLinks    Int      @default(0)
+  nofollowLinks    Int      @default(0)
+  createdAt        DateTime @default(now())
 
-  @@unique([serankingProjectId, date])
-  @@index([serankingProjectId, date])
+  @@unique([clientId, date])
+  @@index([clientId, date])
 }
 
 model AuditSnapshot {
-  id                 String           @id @default(cuid())
-  date               DateTime
-  serankingProjectId String
-  project            SERankingProject @relation(fields: [serankingProjectId], references: [id], onDelete: Cascade)
-  healthScore        Int              @default(0)
-  pagesCrawled       Int              @default(0)
-  criticalIssues     Int              @default(0)
-  warningIssues      Int              @default(0)
-  noticeIssues       Int              @default(0)
-  issuesJson         String?          // Full issues JSON
-  createdAt          DateTime         @default(now())
+  id             String   @id @default(cuid())
+  date           DateTime
+  clientId       String
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  healthScore    Int      @default(0)
+  pagesCrawled   Int      @default(0)
+  criticalIssues Int      @default(0)
+  warningIssues  Int      @default(0)
+  noticeIssues   Int      @default(0)
+  issuesJson     String?
+  createdAt      DateTime @default(now())
 
-  @@unique([serankingProjectId, date])
-  @@index([serankingProjectId, date])
+  @@unique([clientId, date])
+  @@index([clientId, date])
 }
 
 model AnalyticsSnapshot {
-  id                 String           @id @default(cuid())
-  date               DateTime
-  serankingProjectId String
-  project            SERankingProject @relation(fields: [serankingProjectId], references: [id], onDelete: Cascade)
-  organicSessions    Int              @default(0)
-  clicks             Int              @default(0)
-  impressions        Int              @default(0)
-  ctr                Float?
-  avgPosition        Float?
-  topQueriesJson     String?          // JSON: [{ query, clicks, impressions, ctr, position }]
-  topPagesJson       String?          // JSON: [{ page, clicks, impressions }]
-  createdAt          DateTime         @default(now())
+  id              String   @id @default(cuid())
+  date            DateTime
+  clientId        String
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  organicSessions Int      @default(0)
+  clicks          Int      @default(0)
+  impressions     Int      @default(0)
+  ctr             Float?
+  avgPosition     Float?
+  topQueriesJson  String?
+  topPagesJson    String?
+  createdAt       DateTime @default(now())
 
-  @@unique([serankingProjectId, date])
-  @@index([serankingProjectId, date])
+  @@unique([clientId, date])
+  @@index([clientId, date])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// REPORTS
+// 5. REPORTS & SCHEDULES
 // ─────────────────────────────────────────────────────────────────────────────
 
 model Report {
@@ -232,9 +175,9 @@ model Report {
   periodStart  DateTime
   periodEnd    DateTime
   status       String    @default("draft") // draft | generating | done | failed
-  sectionsJson String?   // { keywords, backlinks, audit, analytics, competitors, aiRecs }
+  sectionsJson String?
   pdfUrl       String?
-  aiRecsJson   String?   // AI-generated recommendations JSON
+  aiRecsJson   String?
   shareSlug    String?   @unique
   viewCount    Int       @default(0)
   lastViewedAt DateTime?
@@ -246,22 +189,22 @@ model Report {
 }
 
 model ReportSchedule {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   agencyId   String
-  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  clientId   String   @unique
-  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  dayOfMonth Int      @default(1)
-  autoSend   Boolean  @default(false)
-  isActive   Boolean  @default(true)
+  agency     Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  clientId   String    @unique
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  dayOfMonth Int       @default(1)
+  autoSend   Boolean   @default(false)
+  isActive   Boolean   @default(true)
   lastRunAt  DateTime?
   nextRunAt  DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// INVITATIONS (Client Portal access)
+// 6. INVITATIONS
 // ─────────────────────────────────────────────────────────────────────────────
 
 model Invitation {
@@ -280,114 +223,3 @@ model Invitation {
 
   @@index([email])
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// WEBHOOKS
-// ─────────────────────────────────────────────────────────────────────────────
-
-model WebhookEndpoint {
-  id        String   @id @default(cuid())
-  agencyId  String
-  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  url       String
-  events    String   // JSON array of events like ["report.generated", "sync.failed"]
-  secret    String?  // HMAC signature secret
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-
-  @@index([agencyId])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NOTIFICATIONS
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Notification {
-  id        String   @id @default(cuid())
-  agencyId  String
-  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  type      String   // report | ranking | alert | sync | invite
-  title     String
-  body      String
-  link      String?  // optional deep-link URL
-  read      Boolean  @default(false)
-  dismissed Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([agencyId, createdAt])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MESSAGES (Client Inbox)
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Message {
-  id           String   @id @default(cuid())
-  subject      String?
-  body         String
-  isRead       Boolean  @default(false)
-  isFromAgency Boolean  @default(false)
-  senderName   String?
-  
-  clientId     String
-  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  agencyId     String
-  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  
-  createdAt    DateTime @default(now())
-
-  @@index([agencyId, createdAt])
-  @@index([clientId, createdAt])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// AUDIT LOGS
-// ─────────────────────────────────────────────────────────────────────────────
-
-model AuditLog {
-  id           String   @id @default(cuid())
-  agencyId     String
-  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  action       String
-  userName     String?
-  userInitials String?
-  createdAt    DateTime @default(now())
-
-  @@index([agencyId, createdAt])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GOOGLE CREDENTIALS (GSC & GA4 OAuth)
-// ─────────────────────────────────────────────────────────────────────────────
-
-model GoogleCredential {
-  id           String   @id @default(cuid())
-  email        String
-  accessToken  String
-  refreshToken String?
-  expiresAt    DateTime
-  agencyId     String
-  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([agencyId])
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPETITORS
-// ─────────────────────────────────────────────────────────────────────────────
-
-model Competitor {
-  id                 String   @id @default(cuid())
-  name               String
-  domain             String
-  serankingProjectId Int?
-  clientId           String
-  client             Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  createdAt          DateTime @default(now())
-
-  @@index([clientId])
-}
-
