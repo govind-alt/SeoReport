@@ -5,7 +5,7 @@ import { encrypt, decrypt } from '@/lib/encryption';
 import { SERankingClient } from '@/lib/seranking/client';
 import { revalidatePath } from 'next/cache';
 import bcrypt from 'bcryptjs';
-import { sendWelcomeEmail } from '@/lib/email';
+import { sendWelcomeEmail, sendTeamInviteEmail } from '@/lib/email';
 
 /**
  * Saves the SERanking API key for an agency.
@@ -648,44 +648,118 @@ export async function updateUserAccount(...args: any[]) {
 }
 
 export async function getCurrentUser() {
+  const session = await auth();
+  if (session?.user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: { agency: true }
+    });
+    if (user) return user;
+  }
   return { id: 'usr_demo', name: 'Demo User', email: 'demo@rankflow.app', role: 'admin' };
 }
 
-export async function inviteTeamMember(...args: any[]) {
+export async function inviteTeamMember(domain: string, email: string, role: string = 'member') {
+  if (!email) throw new Error('Email is required');
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const agency = await prisma.agency.findFirst({
+    where: { OR: [{ slug: domain }, { subdomain: domain }] },
+    include: { users: true }
+  });
+  if (!agency) throw new Error('Agency workspace not found');
+
+  const inviter = agency.users[0] || { id: 'sys_admin', name: agency.name };
+
+  // First client or dummy client for invitation schema relation
+  let client = await prisma.client.findFirst({ where: { agencyId: agency.id } });
+  if (!client) {
+    client = await prisma.client.create({
+      data: {
+        name: 'Internal Team',
+        domain: `${agency.slug}.internal`,
+        agencyId: agency.id
+      }
+    });
+  }
+
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(24).toString('hex');
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  const invitation = await prisma.invitation.create({
+    data: {
+      email: normalizedEmail,
+      token,
+      agencyId: agency.id,
+      clientId: client.id,
+      invitedById: inviter.id,
+      expiresAt
+    }
+  });
+
+  const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const inviteUrl = `${appUrl}/register?token=${token}&email=${encodeURIComponent(normalizedEmail)}`;
+
+  await sendTeamInviteEmail(
+    normalizedEmail,
+    inviteUrl,
+    agency.name,
+    inviter.name || agency.name,
+    role
+  );
+
+  revalidatePath('/[domain]/settings', 'page');
+  return { success: true, invitation };
+}
+
+export async function resendTeamInvite(domain: string, inviteId: string) {
+  const invitation = await prisma.invitation.findUnique({
+    where: { id: inviteId },
+    include: { agency: true, invitedBy: true }
+  });
+
+  if (!invitation) throw new Error('Invitation not found');
+
+  const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const inviteUrl = `${appUrl}/register?token=${invitation.token}&email=${encodeURIComponent(invitation.email)}`;
+
+  await sendTeamInviteEmail(
+    invitation.email,
+    inviteUrl,
+    invitation.agency.name,
+    invitation.invitedBy?.name || invitation.agency.name,
+    'Team Member'
+  );
+
   return { success: true };
 }
 
-export async function getClientPortalData(slug: string) {
-  return {
-    client: { name: 'Acme Corp', contactName: 'Sarah Miller', contactEmail: 'sarah@acmecorp.com' },
-    reports: [],
-    supportLogs: []
-  };
-}
-
-export async function logSupportMessage(slugOrDomain?: string, clientId?: string, message?: string) {
+export async function cancelTeamInvite(domain: string, inviteId: string) {
+  await prisma.invitation.delete({
+    where: { id: inviteId }
+  });
+  revalidatePath('/[domain]/settings', 'page');
   return { success: true };
 }
 
-export async function getPublicReport(shareSlug: string) {
-  return { report: { id: 'rep_demo' } };
-}
+export async function updateUserAccount(domain: string, data: { name?: string; email?: string; password?: string }) {
+  const session = await auth();
+  if (!session?.user?.email) throw new Error('Unauthorized');
 
-export async function updateExecutiveSummary(...args: any[]) {
-  return { success: true };
-}
+  const updateData: any = {};
+  if (data.name) updateData.name = data.name.trim();
+  if (data.password && data.password.length >= 6) {
+    updateData.password = await bcrypt.hash(data.password, 10);
+  }
 
-export async function updateAgencySettings(...args: any[]) {
-  const data = args[0] || args[1] || {};
-  return { success: true, agency: data };
-}
+  const updated = await prisma.user.update({
+    where: { email: session.user.email },
+    data: updateData
+  });
 
-export async function removeTeamMember(...args: any[]) {
-  return { success: true };
-}
-
-export async function updateAgencyPlan(...args: any[]) {
-  return { success: true };
+  revalidatePath('/[domain]/settings', 'page');
+  return { success: true, user: updated };
 }
 
 export async function saveReportTemplate(...args: any[]) {

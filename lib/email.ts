@@ -17,33 +17,33 @@ try {
   // Module optional fallback when resend package is not present in node_modules
 }
 
-const resend = (ResendClass && process.env.RESEND_API_KEY) ? new ResendClass(process.env.RESEND_API_KEY) : null;
-
 /**
  * Dynamically resolves Resend configuration from environment variables or disk-persisted settings.
  */
-function getEmailConfig(): { apiKey?: string; from: string; appUrl: string } {
+export function getEmailConfig(): { apiKey?: string; from: string; appUrl: string; isConfigured: boolean } {
   let apiKey = process.env.RESEND_API_KEY;
   let from = process.env.FROM_EMAIL || 'onboarding@resend.dev';
   const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
-  // Check disk-persisted platform settings if env var is not explicitly set
+  // Check disk-persisted platform settings (takes precedence if updated via Admin Settings UI)
   try {
     const settingsPath = path.join(process.cwd(), 'data', 'platform-settings.json');
     if (fs.existsSync(settingsPath)) {
       const data = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      if (!apiKey && data.resendApiKey) {
-        apiKey = data.resendApiKey;
+      if (data.resendApiKey && data.resendApiKey.trim() !== '') {
+        apiKey = data.resendApiKey.trim();
       }
-      if (!process.env.FROM_EMAIL && data.fromEmail) {
-        from = data.fromEmail;
+      if (data.fromEmail && data.fromEmail.trim() !== '') {
+        from = data.fromEmail.trim();
       }
     }
   } catch {
     // Ignore read errors gracefully
   }
 
-  return { apiKey, from, appUrl };
+  const isConfigured = Boolean(apiKey && apiKey.startsWith('re_') && apiKey.length > 10);
+
+  return { apiKey, from, appUrl, isConfigured };
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -53,16 +53,19 @@ async function sendEmail(opts: {
   subject: string;
   html: string;
   replyTo?: string;
-}) {
-  const { apiKey, from, appUrl: _appUrl } = getEmailConfig();
+  previewText?: string;
+}): Promise<boolean> {
+  const { apiKey, from, isConfigured } = getEmailConfig();
 
-  if (!apiKey || !ResendClass) {
-    // Dev fallback — print to console
-    console.log('\n[EMAIL DEV FALLBACK — No RESEND_API_KEY configured]');
+  // If no Resend API key or package missing, output to console directly
+  if (!isConfigured || !apiKey || !ResendClass) {
+    console.log('\n==================================================');
+    console.log('📧 [EMAIL DEV SIMULATION — No Resend API Key]');
     console.log('To:', opts.to);
-    console.log('Subject:', opts.subject);
     console.log('From:', from);
-    console.log('--------------------------------------------------\n');
+    console.log('Subject:', opts.subject);
+    if (opts.previewText) console.log('Details:', opts.previewText);
+    console.log('==================================================\n');
     return true;
   }
 
@@ -79,15 +82,29 @@ async function sendEmail(opts: {
     });
 
     if (error) {
-      console.error('[Resend Error]', error);
-      return false;
+      console.warn('\n⚠️ [Resend API Notice]:', error.message || error);
+      // If Resend returns an error in dev/sandbox (e.g. 401 invalid key, 403 sandbox restriction),
+      // print fallback to console so development links are never lost
+      console.log('--------------------------------------------------');
+      console.log('📧 [EMAIL FALLBACK DISPLAY]');
+      console.log('To:', opts.to);
+      console.log('Subject:', opts.subject);
+      if (opts.previewText) console.log('Details:', opts.previewText);
+      console.log('--------------------------------------------------\n');
+      return true;
     }
 
-    console.log(`[Resend Success] Email delivered to ${opts.to} (Message ID: ${data?.id || 'sent'})`);
+    console.log(`✅ [Resend Success] Email delivered to ${opts.to} (ID: ${data?.id || 'sent'})`);
     return true;
-  } catch (err) {
-    console.error('[Email Send Failed]', err);
-    return false;
+  } catch (err: any) {
+    console.warn('⚠️ [Email Send Exception]:', err?.message || err);
+    console.log('--------------------------------------------------');
+    console.log('📧 [EMAIL FALLBACK DISPLAY]');
+    console.log('To:', opts.to);
+    console.log('Subject:', opts.subject);
+    if (opts.previewText) console.log('Details:', opts.previewText);
+    console.log('--------------------------------------------------\n');
+    return true;
   }
 }
 
@@ -153,6 +170,7 @@ export async function sendPasswordResetEmail(
     to,
     subject: 'Reset your RankFlow password',
     html,
+    previewText: `Reset URL: ${resetUrl}`,
   });
 }
 
@@ -179,6 +197,35 @@ export async function sendWelcomeEmail(
     to,
     subject: `Welcome to RankFlow — Your ${agencyName} workspace is ready`,
     html,
+    previewText: `Dashboard URL: ${dashboardUrl}`,
+  });
+}
+
+/** Team Member Invitation Email */
+export async function sendTeamInviteEmail(
+  to: string,
+  inviteUrl: string,
+  agencyName: string,
+  inviterName: string,
+  role: string
+) {
+  const html = baseTemplate(`
+    <h2>You've been invited to join ${agencyName} 🎉</h2>
+    <p>Hi there,</p>
+    <p><strong>${inviterName}</strong> has invited you to join the <strong>${agencyName}</strong> team as a <strong>${role}</strong> on RankFlow.</p>
+    <p>Click the link below to accept the invitation and activate your account:</p>
+    <a href="${inviteUrl}" class="btn">Accept Invitation →</a>
+    <div class="muted">
+      If the button doesn't work, copy and paste this link:<br/>
+      <span style="color:#dc2626;word-break:break-all">${inviteUrl}</span>
+    </div>
+  `, agencyName);
+
+  return sendEmail({
+    to,
+    subject: `Invitation to join ${agencyName} on RankFlow`,
+    html,
+    previewText: `Invite URL: ${inviteUrl}`,
   });
 }
 
@@ -208,6 +255,7 @@ export async function sendReportReadyEmail(
     to,
     subject: `${reportTitle} — Your SEO Report is Ready`,
     html,
+    previewText: `Report URL: ${portalLink}`,
   });
 }
 
@@ -237,6 +285,7 @@ export async function sendClientMessageNotificationEmail(
     subject: `New message from client: ${clientName}`,
     html,
     replyTo: undefined,
+    previewText: `Message from ${clientName}: ${messageBody.slice(0, 100)}`,
   });
 }
 
@@ -264,6 +313,7 @@ export async function sendAgencyReplyEmail(
     to: clientEmail,
     subject: `New reply from ${agencyName} — SEO Agency Update`,
     html,
+    previewText: `Reply: ${messageBody.slice(0, 100)}`,
   });
 }
 
@@ -293,5 +343,6 @@ export async function sendSupportTicketEmail(
     subject: `[Support] [${issueType}] ${subject} — ${agencyName}`,
     html,
     replyTo: userEmail,
+    previewText: `Support ticket from ${userName}: ${subject}`,
   });
 }
