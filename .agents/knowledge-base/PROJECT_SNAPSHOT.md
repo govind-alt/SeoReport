@@ -70,13 +70,13 @@ Server starts on **http://localhost:3000**.
 
 ---
 
-## 🚀 Running State (as of 2026-08-13)
+## 🚀 Running State (as of 2026-08-18)
 
 | Status | Detail |
 |--------|--------|
-| Dev server | ✅ Running on http://localhost:3000 |
-| Database | ✅ SQLite dev.db with seeded users |
-| Auth | ✅ Credentials provider active |
+| Dev server | ✅ Running on http://localhost:3000 (Next.js 16.2.10 Turbopack) |
+| Database | ✅ SQLite dev.db (connected via PrismaLibSql adapter reading env DATABASE_URL) |
+| Auth | ✅ NextAuth v5 credentials + SessionProvider wrapping active |
 
 ---
 
@@ -127,7 +127,7 @@ wireframes/          ← HTML wireframes (static, no server needed)
 3. **Next.js 16.2.10** — This is a cutting-edge version; APIs may differ from training data. Check `node_modules/next/dist/docs/` for guidance
 4. **Prisma 7 + SQLite** — The libSQL adapter is configured but dev uses plain SQLite via `file:./dev.db`
 5. **NextAuth v5 beta** — The auth API differs from NextAuth v4; use `auth()` from `lib/auth.ts`, not `getServerSession()`
-6. **Desktop workspace node_modules is a symlink** — Running `next dev` from Desktop causes duplicate module loading crash. Always use the Downloads path.
+6. **Desktop workspace node_modules** — Fresh local install active (574 audited packages); Turbopack dev server operational.
 7. **Git branch rule (USER RULE)** — NEVER commit or push to `main` without explicit user permission. All work goes to `hrishita-work` only.
 
 ---
@@ -136,6 +136,13 @@ wireframes/          ← HTML wireframes (static, no server needed)
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-18 | Client Portal MessagesSection Purge | ✅ Completely removed MessagesSection UI component, state, and hash listeners from client dashboard page.tsx |
+| 2026-08-18 | Client Portal Inbox & Chat Removal | ✅ Removed Inbox & Chat navigation item and unused icon from client portal layout.tsx |
+| 2026-08-18 | Agency Sidebar Inbox Removal | ✅ Removed Inbox item and unused icon from Sidebar.tsx navItems for streamlined agency navigation |
+| 2026-08-18 | Full Agency Portal Audit & SessionProvider Fix | ✅ Fixed SessionProvider wrapping in root providers, fixed duplicate export in actions.ts, and verified full 10-module agency workspace in Chrome |
+| 2026-08-18 | Resend Email Gateway Audit, Fallback & Team Invites | ✅ Tested Resend integration across all touchpoints, resolved 401 error behavior with console fallback, and implemented team invite actions |
+| 2026-08-18 | Database Connectivity Analysis & Prisma Adapter Env Fix | ✅ Verified SQLite connection (18 tables, 31 reports), updated lib/prisma.ts to read process.env.DATABASE_URL |
+| 2026-08-18 | TypeScript Error Resolution & Fresh Node Modules | ✅ Fixed all 9 missing path/fs/resend errors in email.ts and installed local node_modules |
 | 2026-08-16 | Admin Reports PDF Download & Superadmin Connectivity | ✅ Added 10 missing server actions and PDF download functionality to admin reports |
 | 2026-08-14 | Launch on Chrome | ✅ Next dev server started on http://localhost:3000 & opened Chrome to login page |
 | 2026-08-13 | Full session: app launch, routing, full-screen report, git hygiene | ✅ All 7 changed files committed to hrishita-work (b837cb4) |
