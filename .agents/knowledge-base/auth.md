@@ -148,3 +148,33 @@ When `Credentials` `authorize` is called, it checks `roleTab === 'agency' && use
 None.
 
 ---
+
+## [2026-08-18] Google OAuth Setup & /auth-success Role-Based Router
+
+**Task:** Resolve Google OAuth 401 invalid_client error, configure Google credentials, and implement secure role-targeted post-login routing.
+**Files Changed:**
+- `.env` — modified (added `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`)
+- `app/auth-success/page.tsx` — created
+- `app/(auth)/login/page.tsx` — modified
+
+**What Was Done:**
+- Added user's Google Cloud Web Application OAuth credentials to `.env`.
+- Created `app/auth-success/page.tsx` server component to safely intercept callbacks from NextAuth `signIn('google', { callbackUrl: '/auth-success' })`.
+- Inspected session user role:
+  - `superadmin` -> redirects to `/superadmin`
+  - `client` -> redirects to `/client-portal`
+  - `admin` / agency user -> redirects to `/admin/dashboard`
+  - unauthenticated -> redirects to `/login`
+- Confirmed that Google OAuth sign-in auto-provisions an Agency workspace via `events.createUser` with `role = "admin"`, ensuring Google users land directly in their agency dashboard and cannot access Superadmin.
+
+**Why:**
+The user experienced Error 401 invalid_client due to missing OAuth credentials in `.env`, and needed clarification on how Google OAuth distinguishes between agency admins and superadmins.
+
+**How It Works:**
+NextAuth's `Google` provider initiates the OAuth 2.0 PKCE handshake. Upon user authorization, `events.createUser` executes in `lib/auth.ts`, creating an `Agency` record and binding the user with `role: "admin"`. The client redirects to `/auth-success`, which retrieves the JWT session via `await auth()` and directs the user to `/admin/dashboard`.
+
+**Gotchas / Watch Out For:**
+- The Google Cloud OAuth consent screen must include authorized JavaScript origin (`http://localhost:3000`) and authorized redirect URI (`http://localhost:3000/api/auth/callback/google`).
+- While in "Testing" mode in Google Cloud Console, login emails must be listed in "Test users".
+
+---

@@ -243,3 +243,24 @@ ull\ instead of rejecting the entire promise.
 Changed the button colors and table text from Slate 900 (#0F172A) to Navy Blue (#1A1A2E) to align perfectly with the sidebar and headers.
 
 ---
+
+## [2026-08-18] Login Page Unified Scrolling & Seamless Two-Column Redesign
+
+**Task:** Fix login page visual separation/partition appearance and unify document scrolling.
+**Files Changed:**
+- `app/(auth)/login/login.css` — modified
+- `app/(auth)/login/page.tsx` — modified
+
+**What Was Done:**
+- Removed split-screen independent scrollbars and `position: sticky` on the right form panel.
+- Refactored right form panel to a fixed, compact 440px width with clean subtle border and shadow.
+- Changed page container to flex with `min-height: 100vh`, allowing both the dark brand hero on the left and the white sign-in card on the right to scroll together naturally as one cohesive page.
+- Adjusted body background to solid white `#ffffff` to eliminate any color bleeding behind the form panel.
+
+**Why:**
+The user found the split-scroll partition and wide sign-in panel visually fragmented. Unified scrolling ensures the entire document flows together when scrolling up/down.
+
+**Gotchas / Watch Out For:**
+- Ensure `html` and `body` do not have `overflow: hidden` when unified scrolling is desired.
+
+---
