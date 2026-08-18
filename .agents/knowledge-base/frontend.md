@@ -14,63 +14,63 @@
 
 ## Important: Tailwind v4 Differences
 
-Tailwind v4 uses a CSS-first configuration. No `tailwind.config.js` — configuration is done in `globals.css` using `@theme` directive. Class names and utilities may differ from v3.
+Tailwind v4 uses a CSS-first configuration. No `tailwind.config.js` â€” configuration is done in `globals.css` using `@theme` directive. Class names and utilities may differ from v3.
 
 ## Global Styles
 
-`app/globals.css` — glassmorphism & executive dark slate theme. Check here before adding custom styles.
+`app/globals.css` â€” glassmorphism & executive dark slate theme. Check here before adding custom styles.
 
 ## Providers
 
-`app/providers.tsx` — wraps the app with auth context (NextAuth SessionProvider) and notification provider (Sonner's Toaster).
+`app/providers.tsx` â€” wraps the app with auth context (NextAuth SessionProvider) and notification provider (Sonner's Toaster).
 
 ## Layout Structure
 
 ```
 app/
-  layout.tsx                          ← Root layout (wraps everything)
+  layout.tsx                          â†� Root layout (wraps everything)
   [domain]/
-    layout.tsx                        ← Agency/client layout
+    layout.tsx                        â†� Agency/client layout
     (dashboard)/
-      layout.tsx                      ← Dashboard layout (sidebar, header)
-      page.tsx                        ← Dashboard home
+      layout.tsx                      â†� Dashboard layout (sidebar, header)
+      page.tsx                        â†� Dashboard home
       clients/page.tsx
       reports/page.tsx
       ...
     c/
-      layout.tsx                      ← Client portal layout
+      layout.tsx                      â†� Client portal layout
 ```
 
 ---
 
-## 2026-07-27 — Color Scheme Updated to Black/Red
+## 2026-07-27 â€” Color Scheme Updated to Black/Red
 
 **Task:** Update the entire app color scheme from Deep Navy + Electric Blue to Obsidian Black + Crimson Red  
 **Files Changed:**
-- `app/globals.css` — modified
+- `app/globals.css` â€” modified
 
 **What Was Done:**
 All CSS design tokens in `:root` and `html.dark` were updated. Every blue/navy color reference replaced with black/red equivalents. Sidebar, buttons, hero banner, avatars, badge accents, glow shadows, and progress fills all updated.
 
 **Key Token Changes:**
-- `--primary`: `#4F8EF7` → `#E53E3E` (Crimson Red)
-- `--primary-dark`: `#2563EB` → `#9B2C2C`
-- `--navy`/sidebar-bg: `#1A1A2E` → `#0A0A0A`
-- Hero banner: navy-to-blue gradient → black-to-dark-red gradient
-- All `rgba(79,142,247,…)` glow values → `rgba(229,62,62,…)`
+- `--primary`: `#4F8EF7` â†’ `#E53E3E` (Crimson Red)
+- `--primary-dark`: `#2563EB` â†’ `#9B2C2C`
+- `--navy`/sidebar-bg: `#1A1A2E` â†’ `#0A0A0A`
+- Hero banner: navy-to-blue gradient â†’ black-to-dark-red gradient
+- All `rgba(79,142,247,â€¦)` glow values â†’ `rgba(229,62,62,â€¦)`
 
 **Gotchas:**
-- The design system is 100% CSS-variable driven. All components pick up changes automatically — no component files needed editing.
+- The design system is 100% CSS-variable driven. All components pick up changes automatically â€” no component files needed editing.
 - Dark mode sidebar is now `#000000` (pure black) for maximum contrast.
 
 ---
 
-## 2026-07-27 — Knowledge Curator Git Commit/Push Rule Added
+## 2026-07-27 â€” Knowledge Curator Git Commit/Push Rule Added
 
 **Task:** After every Knowledge Curator run, automatically git commit and push  
 **Files Changed:**
-- `.agents/skills/knowledge-curator/SKILL.md` — added Step 6: git commit + push
-- `.agents/AGENTS.md` — updated Rule 2 to include git step and new confirmation format
+- `.agents/skills/knowledge-curator/SKILL.md` â€” added Step 6: git commit + push
+- `.agents/AGENTS.md` â€” updated Rule 2 to include git step and new confirmation format
 
 **What Was Done:**
 Added a mandatory Step 6 to the Knowledge Curator workflow: after writing all knowledge entries, agents must run:
@@ -91,11 +91,11 @@ User wants every knowledge base update to be version-controlled and synced to re
 
 ---
 
-## 2026-08-10 — Settings Module Full Persistence Fix
+## 2026-08-10 â€” Settings Module Full Persistence Fix
 
 **Task:** Make all remaining mock UI settings (Notifications, Security, Integrations, Billing) fully functional and persistent  
 **Files Changed:**
-- `app/[domain]/(dashboard)/settings/page.tsx` — modified
+- `app/[domain]/(dashboard)/settings/page.tsx` â€” modified
 
 **What Was Done:**
 - Cleaned up duplicate modals in the Billing tab (removed static "Upgrade Plan Modal").
@@ -112,12 +112,12 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 **Gotchas / Watch Out For:**
 - The `brandingJson` blob is now being used for settings far beyond just branding (e.g., security, billing, notifications). If the backend is ever moved to production, these should be migrated to proper database columns or a dedicated `settingsJson` field.
 
-## 2026-08-13 — PDF Report Render Full-Screen Layout & Self-Hosted Font Fix
+## 2026-08-13 â€” PDF Report Render Full-Screen Layout & Self-Hosted Font Fix
 
 **Task:** Make the PDF report preview/render page (`/reports/render/[id]`) full-screen edge-to-edge on screen, and fix network font issues.  
 **Files Changed:**
-- `app/reports/render/[id]/render.css` — modified
-- `app/reports/render/[id]/page.tsx` — modified
+- `app/reports/render/[id]/render.css` â€” modified
+- `app/reports/render/[id]/page.tsx` â€” modified
 
 **What Was Done:**
 1. Updated `.report-page` CSS from fixed `794px` (A4) centered layout with box-shadows to `width: 100%; max-width: 100%; margin: 0;` for full-screen edge-to-edge display on desktop screens.
@@ -131,6 +131,19 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 **How It Works:**
 - `Inter` from `next/font/google` provides `inter.className` which is applied to the root container in `page.tsx`.
 - CSS in `render.css` uses `width: 100%` on screen, expanding the cover and report sections to the full viewport width while print media queries keep exact A4 dimensions.
+
+---
+
+## 2026-08-18 — Login Page Screen Fit & Responsive Layout Fix
+
+**Task:** Fix the login page viewport layout, eliminate vertical/horizontal double scrollbars, and balance split on wide displays.  
+**Files Changed:**
+- `app/(auth)/login/login.css` — upgraded `.auth-layout` to a balanced grid (`1.1fr 0.9fr`), added full viewport bounds (`100vw x 100vh`), tuned padding, hero title scale, and scroll container bounds.
+
+**What Was Done:**
+1. Applied clean 100vh viewport constraints to `.auth-brand-panel` and `.auth-form-panel` with custom subtle scrollbars.
+2. Verified on Chrome (1902x859 resolution) with browser subagent — zero scrolling artifacts or cut-offs.
+3. Verified auto-fill demo credentials and seamless sign-in into the `/digital-horizons` agency dashboard backed by Supabase.
 
 ---
 
@@ -154,32 +167,32 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 
 
 
-## 2026-08-16 — Admin Reports "Download PDF" Button + Superadmin Reports Tab
+## 2026-08-16 â€” Admin Reports "Download PDF" Button + Superadmin Reports Tab
 
 **Task:** Add a working "Download PDF" button to the admin `/admin` Reports page and add a new Reports tab to `SuperadminClient.tsx` with the same download capability.
 
 **Files Changed:**
-- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx` — modified (added `downloadingPdf` state, `handleDownloadReportPdf` handler, Download PDF button per report row)
-- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\superadmin\SuperadminClient.tsx` — modified (added Reports tab to nav, Reports tab content panel, `reportsList` state, `handleDownloadReportPdf` handler, `reportSearch` state)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx` â€” modified (added `downloadingPdf` state, `handleDownloadReportPdf` handler, Download PDF button per report row)
+- `c:\Users\hrish\OneDrive\Desktop\SeoReport\app\superadmin\SuperadminClient.tsx` â€” modified (added Reports tab to nav, Reports tab content panel, `reportsList` state, `handleDownloadReportPdf` handler, `reportSearch` state)
 
 **What Was Done:**
 
 **`app/admin/page.tsx` (the actual superadmin UI at `/admin`):**
 - Added `downloadingPdf: Record<string, boolean>` state.
 - Added `handleDownloadReportPdf(report)` async function.
-- In the Reports tab table, replaced the single "👁️ Preview" button with two buttons side-by-side: "Preview" (existing) + "⬇ Download PDF" (new).
-- Download button shows "Generating…" while in progress.
+- In the Reports tab table, replaced the single "ðŸ‘�ï¸� Preview" button with two buttons side-by-side: "Preview" (existing) + "â¬‡ Download PDF" (new).
+- Download button shows "Generatingâ€¦" while in progress.
 
 **`app/superadmin/SuperadminClient.tsx` (legacy `/superadmin` route):**
-- Added `📄 Reports` tab to the tab nav array (between Users and Support Tickets).
+- Added `ðŸ“„ Reports` tab to the tab nav array (between Users and Support Tickets).
 - Added `[reportsList]` state initialized from `data.reports` (provided by `getSuperadminData()`).
 - Added `reportSearch` state for filtering.
 - Added full Reports tab panel with table (columns: Client, Agency, Period, Status, Generated, Actions).
-- Each row has 👁️ View (opens `/reports/render/[id]` in new tab) and ⬇️ Download PDF buttons.
+- Each row has ðŸ‘�ï¸� View (opens `/reports/render/[id]` in new tab) and â¬‡ï¸� Download PDF buttons.
 
 **How the PDF Download Works:**
 1. Button calls `handleDownloadReportPdf(report)`.
-2. `GET /api/reports/[id]/pdf` is called — this triggers Puppeteer compilation if not yet done.
+2. `GET /api/reports/[id]/pdf` is called â€” this triggers Puppeteer compilation if not yet done.
 3. If `pdfUrl` is not immediately returned, the function polls every 2 seconds for up to 30 attempts (~60 seconds).
 4. Once `pdfUrl` is available, the file is fetched as a blob and downloaded using a programmatic `<a>` element.
 5. Filename is set as: `RankFlow_Report_{cleanClientName}_{cleanPeriod}.pdf` (non-alphanumeric chars replaced with `_`).
@@ -188,22 +201,22 @@ When `page.tsx` loads, `fetch('/api/agency/settings')` retrieves the Agency obje
 User requested that clicking Download in the superadmin reports view should download the PDF with the correct filename. Previously the button didn't exist.
 
 **Gotchas / Watch Out For:**
-- `app/admin/page.tsx` is a **228KB single-file client component** — the entire admin UI lives here. Do not confuse it with `app/superadmin/SuperadminClient.tsx` which is a different (older, less featured) UI at `/superadmin`.
-- The actual superadmin UI the user sees at http://localhost:3000/admin is `app/admin/page.tsx` — NOT `SuperadminClient.tsx`.
-- PDF compilation may take 30-60 seconds on first run (Puppeteer spins up Chromium). The button shows "Generating…" while polling.
+- `app/admin/page.tsx` is a **228KB single-file client component** â€” the entire admin UI lives here. Do not confuse it with `app/superadmin/SuperadminClient.tsx` which is a different (older, less featured) UI at `/superadmin`.
+- The actual superadmin UI the user sees at http://localhost:3000/admin is `app/admin/page.tsx` â€” NOT `SuperadminClient.tsx`.
+- PDF compilation may take 30-60 seconds on first run (Puppeteer spins up Chromium). The button shows "Generatingâ€¦" while polling.
 - If Puppeteer fails (Chromium not found), the report status becomes `'failed'` and an error toast is shown.
-- The `Download` icon is imported from `lucide-react` in `admin/page.tsx` — already present in the imports list.
+- The `Download` icon is imported from `lucide-react` in `admin/page.tsx` â€” already present in the imports list.
 
 **Open Questions:**
-- None — feature is fully implemented and verified visually in browser.
+- None â€” feature is fully implemented and verified visually in browser.
 
 ---
-## 2026-08-17 � Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling
+## 2026-08-17 — Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling
 
 **Task:** Fix Next.js dev overlay 'Failed to fetch' error on admin dashboard & upgrade report table styling to premium standard.  
 **Files Changed:**
-- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ � modified
-- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ � synced
+- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ — modified
+- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ — synced
 
 **What Was Done:**
 1. **Network Error Handling:** Added individual \.catch(() => null)\ handlers to all 7 API \etch\ calls inside \etchLiveData()\ on the admin dashboard.
@@ -219,12 +232,12 @@ User requested that clicking Download in the superadmin reports view should down
 ull\ instead of rejecting the entire promise.
 
 ---
-## 2026-08-17 � Admin Reports Table Navy Theme
+## 2026-08-17 — Admin Reports Table Navy Theme
 
 **Task:** Re-styled the admin reports table to strictly match the White & Navy Blue (#1A1A2E) brand theme.  
 **Files Changed:**
-- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ � modified
-- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ � synced
+- \c:\Users\hrish\OneDrive\Desktop\SeoReport\app\admin\page.tsx\ — modified
+- \C:\Users\hrish\Downloads\SeoReport-main v3\SeoReport-main\app\admin\page.tsx\ — synced
 
 **What Was Done:**
 Changed the button colors and table text from Slate 900 (#0F172A) to Navy Blue (#1A1A2E) to align perfectly with the sidebar and headers.
