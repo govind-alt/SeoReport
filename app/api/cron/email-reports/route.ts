@@ -108,16 +108,6 @@ export async function GET(req: Request) {
       } catch (err: any) {
         dispatchLog.push({ clientId: client.id, clientName: client.name, email: recipientEmail, status: `simulated: ${err.message}` });
       }
-
-      // Log in notifications
-      await prisma.notification.create({
-        data: {
-          agencyId: client.agency.id,
-          type: 'alert',
-          title: 'Monthly Report Dispatched',
-          body: `Report generated & emailed to ${recipientEmail} for ${client.name}`,
-        }
-      }).catch(() => {});
     }
 
     return NextResponse.json({

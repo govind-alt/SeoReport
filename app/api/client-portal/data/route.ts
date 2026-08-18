@@ -24,14 +24,10 @@ export async function GET() {
       include: {
         client: {
           include: {
-            serankingProject: {
-              include: {
-                keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
-                analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
-                auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
-                backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
-              },
-            },
+            keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+            analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+            auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+            backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
             reports: { orderBy: { periodStart: 'desc' }, take: 20 },
             reportSchedule: true,
           },
@@ -45,14 +41,10 @@ export async function GET() {
       const fallbackClient = await prisma.client.findFirst({
         where: { contactEmail: email },
         include: {
-          serankingProject: {
-            include: {
-              keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
-              analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
-              auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
-              backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
-            },
-          },
+          keywordSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+          analyticsSnapshots: { orderBy: { date: 'desc' }, take: 7 },
+          auditSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+          backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
           reports: { orderBy: { periodStart: 'desc' }, take: 20 },
           reportSchedule: true,
         },
@@ -62,7 +54,7 @@ export async function GET() {
       }
     }
 
-    const project = client?.serankingProject;
+    const project = client;
     
     // ── Check if we need to return demo data ──────────────────────────────
     const isDemo = !project || project.keywordSnapshots.length < 2 || project.analyticsSnapshots.length < 2;
@@ -146,7 +138,7 @@ export async function GET() {
     }
 
     // ── Reports ───────────────────────────────────────────────────────────
-    const reports = client!.reports.map((r) => {
+    const reports = client!.reports.map((r: any) => {
       let aiRecs: any[] = [];
       let sections: any = {};
       if (r.aiRecsJson) { try { aiRecs = JSON.parse(r.aiRecsJson); } catch {} }

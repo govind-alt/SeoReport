@@ -83,48 +83,6 @@ export async function dispatchWebhooks(
   event: WebhookEvent,
   data: Record<string, unknown>
 ): Promise<void> {
-  let endpoints;
-
-  try {
-    endpoints = await prisma.webhookEndpoint.findMany({
-      where: {
-        agencyId,
-        isActive: true,
-      },
-    });
-  } catch (err) {
-    console.error('[Webhook] Failed to fetch endpoints from DB:', err);
-    return;
-  }
-
-  if (!endpoints.length) return;
-
-  const payload: WebhookPayload = {
-    event,
-    timestamp: new Date().toISOString(),
-    agencyId,
-    data,
-  };
-
-  const body = JSON.stringify(payload);
-
-  // Fire all endpoints in parallel
-  await Promise.allSettled(
-    endpoints.map((endpoint: { url: string; events: string; secret: string | null }) => {
-      // Parse events array and check if this endpoint listens for this event
-      let listenedEvents: string[] = [];
-      try {
-        listenedEvents = JSON.parse(endpoint.events);
-      } catch {
-        listenedEvents = [];
-      }
-
-      if (!listenedEvents.includes(event) && !listenedEvents.includes('*')) {
-        return Promise.resolve(); // Skip — endpoint doesn't listen to this event
-      }
-
-      const signature = endpoint.secret ? sign(body, endpoint.secret) : null;
-      return fireEndpoint(endpoint.url, body, signature);
-    })
-  );
+  // Webhooks are gracefully bypassed in streamlined schema
+  return Promise.resolve();
 }

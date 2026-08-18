@@ -52,15 +52,6 @@ export async function POST(req: Request) {
       }
     });
 
-    await prisma.notification.create({
-      data: {
-        agencyId: agency.id,
-        type: 'alert',
-        title: 'Google OAuth Connected',
-        body: `Google Search Console & GA4 connected for ${googleEmail || 'marketing@agency.com'}`,
-      }
-    }).catch(() => {});
-
     return NextResponse.json({
       success: true,
       message: 'Google Search Console & GA4 connected successfully',

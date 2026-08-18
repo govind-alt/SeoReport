@@ -18,11 +18,11 @@ export async function GET(req: NextRequest) {
     let agency = null;
 
     if (siteIdStr) {
-      const project = await prisma.sERankingProject.findFirst({
-        where: { serankingId: parseInt(siteIdStr) },
-        include: { client: { include: { agency: true } } },
+      const client = await prisma.client.findFirst({
+        where: { serankingProjectId: parseInt(siteIdStr) },
+        include: { agency: true },
       });
-      agency = project?.client?.agency;
+      agency = client?.agency;
     } else if (domain) {
       agency = await prisma.agency.findFirst({
         where: { OR: [{ slug: domain }, { subdomain: domain }] },

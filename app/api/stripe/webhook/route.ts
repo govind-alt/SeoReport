@@ -24,7 +24,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const Stripe = (await import('stripe')).default;
+    let Stripe: any;
+    try {
+      const req = eval('require');
+      Stripe = req('stripe');
+    } catch {
+      return NextResponse.json({ error: 'Stripe module not found' }, { status: 500 });
+    }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-06-24.dahlia' });
     
     // Verify webhook authenticity

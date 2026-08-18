@@ -24,7 +24,6 @@ export async function GET() {
     const clients = await prisma.client.findMany({
       where: { agencyId: session.user.agencyId as string },
       include: {
-        serankingProject: { select: { serankingId: true, name: true, lastSyncedAt: true } },
         reportSchedule: { select: { isActive: true, nextRunAt: true, autoSend: true } },
         reports: {
           orderBy: { createdAt: 'desc' },

@@ -39,17 +39,6 @@ export async function POST(request: Request) {
       }
     });
 
-    // Notify agency of client profile update
-    await prisma.notification.create({
-      data: {
-        agencyId: client.agencyId,
-        type: 'alert',
-        title: `Client Profile Updated: ${client.name}`,
-        body: `${client.name} updated their contact info or notes in client portal.`,
-        link: `/clients`
-      }
-    }).catch(() => null);
-
     return NextResponse.json({ success: true, client: updatedClient });
   } catch (error) {
     console.error('[CLIENT_PORTAL_UPDATE_DATA]', error);

@@ -18,8 +18,14 @@ import { prisma } from '@/lib/prisma';
 
 // ── Helper: get or create Stripe customer ───────────────────────────────────
 async function getOrCreateStripeCustomer(agencyId: string, agencyEmail: string, agencyName: string) {
-  // Lazy import Stripe only when keys exist
-  const Stripe = (await import('stripe')).default;
+  // Lazy load Stripe only when keys exist
+  let Stripe: any;
+  try {
+    const req = eval('require');
+    Stripe = req('stripe');
+  } catch {
+    throw new Error('Stripe package is not installed');
+  }
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2026-06-24.dahlia' });
 
   const agency = await prisma.agency.findUnique({ where: { id: agencyId } });
@@ -60,7 +66,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const Stripe = (await import('stripe')).default;
+    let Stripe: any;
+    try {
+      const req = eval('require');
+      Stripe = req('stripe');
+    } catch {
+      return NextResponse.json({ error: 'Stripe module not found' }, { status: 500 });
+    }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-06-24.dahlia' });
 
     const { domain, returnUrl } = await request.json();

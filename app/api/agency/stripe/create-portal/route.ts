@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2026-06-24.dahlia',
-});
+// Safe dynamic Stripe helper
+function getStripeClient() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return null;
+  try {
+    const req = eval('require');
+    const Stripe = req('stripe');
+    return new Stripe(key, { apiVersion: '2026-06-24.dahlia' });
+  } catch {
+    return null;
+  }
+}
 
 /**
  * GET /api/agency/stripe/create-portal
@@ -18,9 +25,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    const stripe = getStripeClient();
+    if (!stripe) {
       return NextResponse.json({ 
-        error: 'Stripe keys are not configured. Please add STRIPE_SECRET_KEY to your environment variables.' 
+        error: 'Stripe keys are not configured or stripe module not available.' 
       }, { status: 400 });
     }
 

@@ -27,7 +27,6 @@ export async function GET(_req: Request, { params }: Params) {
     const client = await prisma.client.findFirst({
       where: { id: clientId, agencyId: session.user.agencyId as string },
       include: {
-        serankingProject: true,
         reportSchedule: true,
         reports: {
           orderBy: { createdAt: 'desc' },

@@ -44,16 +44,6 @@ export async function POST(req: Request) {
       results.teams = await sendTeamsAlert(agencyAny.teamsWebhookUrl, payload);
     }
 
-    // Notification log entry
-    await prisma.notification.create({
-      data: {
-        agencyId: agency.id,
-        type: 'alert',
-        title: `Alert Dispatched: ${type || 'Test Audit Alert'}`,
-        body: `Alert dispatched for ${payload.clientName}`,
-      }
-    }).catch(() => {});
-
     return NextResponse.json({
       success: true,
       message: 'Alert processing complete',
@@ -89,15 +79,6 @@ export async function PUT(req: Request) {
       where: { id: agencyId },
       data: updateData as any,
     });
-
-    await prisma.notification.create({
-      data: {
-        agencyId,
-        type: 'alert',
-        title: 'Webhook Configuration Updated',
-        body: `Webhook URL updated: ${Object.keys(updateData).join(', ')}`,
-      }
-    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

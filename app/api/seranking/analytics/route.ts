@@ -13,9 +13,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Get the serankingProject linked to this client
-    const project = await prisma.sERankingProject.findFirst({
-      where: { clientId },
+    // Get the client's analytics snapshots
+    const client = await prisma.client.findUnique({
+      where: { id: clientId },
       include: {
         analyticsSnapshots: {
           orderBy: { date: 'desc' },
@@ -24,11 +24,11 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!project || project.analyticsSnapshots.length === 0) {
+    if (!client || client.analyticsSnapshots.length === 0) {
       return NextResponse.json({ current: null, prev: null, history: [] });
     }
 
-    const snapshots = project.analyticsSnapshots;
+    const snapshots = client.analyticsSnapshots;
     const current   = snapshots[0];
     const prev      = snapshots[1] ?? null;
 

@@ -19,14 +19,10 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
       client: {
         include: {
           agency: true,
-          serankingProject: {
-            include: {
-              keywordSnapshots: { orderBy: { date: 'desc' }, take: 2 },
-              analyticsSnapshots: { orderBy: { date: 'desc' }, take: 2 },
-              backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
-              auditSnapshots: { orderBy: { date: 'desc' }, take: 1 }
-            }
-          }
+          keywordSnapshots: { orderBy: { date: 'desc' }, take: 2 },
+          analyticsSnapshots: { orderBy: { date: 'desc' }, take: 2 },
+          backlinkSnapshots: { orderBy: { date: 'desc' }, take: 1 },
+          auditSnapshots: { orderBy: { date: 'desc' }, take: 1 }
         }
       }
     }
@@ -58,13 +54,13 @@ export default async function ReportRenderPage({ params }: { params: Promise<{ i
     const d = new Date(report.periodStart);
     period = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-    const kw = report.client.serankingProject?.keywordSnapshots[0];
-    const prevKw = report.client.serankingProject?.keywordSnapshots[1];
-    const an = report.client.serankingProject?.analyticsSnapshots[0];
-    const prevAn = report.client.serankingProject?.analyticsSnapshots[1];
-    const au = report.client.serankingProject?.auditSnapshots[0];
-    const prevAu = report.client.serankingProject?.auditSnapshots[1];
-    const bl = report.client.serankingProject?.backlinkSnapshots[0];
+    const kw = report.client.keywordSnapshots[0];
+    const prevKw = report.client.keywordSnapshots[1];
+    const an = report.client.analyticsSnapshots[0];
+    const prevAn = report.client.analyticsSnapshots[1];
+    const au = report.client.auditSnapshots[0];
+    const prevAu = report.client.auditSnapshots[1];
+    const bl = report.client.backlinkSnapshots[0];
 
     if (au) healthScore = au.healthScore;
     if (an) { sessions = an.organicSessions; clicks = Math.round(sessions * 1.2); impressions = Math.round(clicks * 11.66); ctr = parseFloat((clicks / impressions * 100).toFixed(2)); }

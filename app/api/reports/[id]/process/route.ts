@@ -28,7 +28,6 @@ export async function POST(
         client: {
           include: {
             agency: { select: { id: true, serankingApiKey: true } },
-            serankingProject: true,
           },
         },
       },
@@ -50,12 +49,12 @@ export async function POST(
     let snapshotSaved = false;
 
     // ── Attempt real SE Ranking fetch if API key + project linked ──────────
-    if (agency.serankingApiKey && client.serankingProjectId && client.serankingProject) {
+    if (agency.serankingApiKey && client.serankingProjectId) {
       try {
         const apiKey = decrypt(agency.serankingApiKey);
         const seClient = new SERankingClient(apiKey);
         const projectId = client.serankingProjectId;
-        const seProjectId = client.serankingProject.id;
+        const clientId = client.id;
 
         // Parallel fetch
         const [rankingsResult, auditResult, backlinkResult] = await Promise.allSettled([
@@ -76,9 +75,9 @@ export async function POST(
           });
 
           await prisma.keywordSnapshot.upsert({
-            where: { serankingProjectId_date: { serankingProjectId: seProjectId, date: today } },
+            where: { clientId_date: { clientId, date: today } },
             update: { top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length },
-            create: { serankingProjectId: seProjectId, date: today, top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length },
+            create: { clientId, date: today, top3Count: top3, top10Count: top10, top30Count: top30, top100Count: top100, totalKeywords: rankings.positions.length },
           });
           snapshotSaved = true;
         }
@@ -87,7 +86,7 @@ export async function POST(
         if (auditResult.status === 'fulfilled') {
           const audit = auditResult.value;
           await prisma.auditSnapshot.upsert({
-            where: { serankingProjectId_date: { serankingProjectId: seProjectId, date: today } },
+            where: { clientId_date: { clientId, date: today } },
             update: {
               healthScore: audit.health_score ?? 0,
               pagesCrawled: audit.pages_crawled ?? 0,
@@ -96,7 +95,7 @@ export async function POST(
               noticeIssues: audit.issues?.notices ?? 0,
             },
             create: {
-              serankingProjectId: seProjectId,
+              clientId,
               date: today,
               healthScore: audit.health_score ?? 0,
               pagesCrawled: audit.pages_crawled ?? 0,
@@ -112,7 +111,7 @@ export async function POST(
         if (backlinkResult.status === 'fulfilled') {
           const bl = backlinkResult.value;
           await prisma.backlinkSnapshot.upsert({
-            where: { serankingProjectId_date: { serankingProjectId: seProjectId, date: today } },
+            where: { clientId_date: { clientId, date: today } },
             update: {
               domainTrust: (bl as any).domain_trust ?? (bl as any).domain_authority ?? null,
               totalBacklinks: bl.total_backlinks ?? 0,
@@ -121,7 +120,7 @@ export async function POST(
               referringDomains: bl.referring_domains ?? 0,
             },
             create: {
-              serankingProjectId: seProjectId,
+              clientId,
               date: today,
               domainTrust: (bl as any).domain_trust ?? (bl as any).domain_authority ?? null,
               totalBacklinks: bl.total_backlinks ?? 0,
@@ -138,18 +137,18 @@ export async function POST(
     }
 
     // ── Demo/fallback snapshot if no real data saved ──────────────────────
-    if (!snapshotSaved && client.serankingProject) {
-      const seProjectId = client.serankingProject.id;
+    if (!snapshotSaved && client.id) {
+      const clientId = client.id;
 
-      // Only create demo snapshots if none exist for this project
+      // Only create demo snapshots if none exist for this client
       const existingKw = await prisma.keywordSnapshot.findFirst({
-        where: { serankingProjectId: seProjectId },
+        where: { clientId },
       });
 
       if (!existingKw) {
         await prisma.keywordSnapshot.create({
           data: {
-            serankingProjectId: seProjectId,
+            clientId,
             date: today,
             top3Count: 12,
             top10Count: 43,
@@ -162,7 +161,7 @@ export async function POST(
 
         await prisma.auditSnapshot.create({
           data: {
-            serankingProjectId: seProjectId,
+            clientId,
             date: today,
             healthScore: 78,
             pagesCrawled: 843,
@@ -174,7 +173,7 @@ export async function POST(
 
         await prisma.backlinkSnapshot.create({
           data: {
-            serankingProjectId: seProjectId,
+            clientId,
             date: today,
             domainTrust: 42,
             totalBacklinks: 2840,

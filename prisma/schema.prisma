@@ -223,3 +223,16 @@ model Invitation {
 
   @@index([email])
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7. VERIFICATION TOKENS (Email & Password Reset)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+

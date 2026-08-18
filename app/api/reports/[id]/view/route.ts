@@ -25,16 +25,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       }
     });
 
-    // Notify agency of report view
-    await prisma.notification.create({
-      data: {
-        agencyId: report.client.agencyId,
-        type: 'report',
-        title: `Report Viewed: ${report.client.name}`,
-        body: `Client ${report.client.name} viewed their SEO report. Total views: ${updatedReport.viewCount}`,
-        link: `/reports`
-      }
-    }).catch(() => null);
+    // View count updated successfully
 
     return NextResponse.json({ success: true, viewCount: updatedReport.viewCount });
   } catch (error) {
