@@ -57,6 +57,27 @@ User requested advancing database capabilities with Supabase PostgreSQL readines
 
 ---
 
+## 2026-08-18 — Database Pruning & Unnecessary Tables Removal
+
+**Task:** Remove 5 unused and redundant database tables (`Message`, `GoogleCredential`, `Account`, `Session`, `VerificationToken`) from Supabase PostgreSQL and Prisma schema.  
+**Files Changed:**
+- `prisma/schema.prisma` — removed 5 unused models and cleaned relations in `Agency`, `User`, `Client`
+- `lib/auth.ts` — removed unnecessary `PrismaAdapter` (using JWT strategy)
+- `app/api/admin/stats/route.ts` & `app/api/admin/activity/route.ts` — cleaned stats and activity feed
+- `app/api/messages/...` — cleaned dummy responses for deprecated message routes
+- `scripts/test-db.js` — updated test suite for the 12 active models
+
+**What Was Done:**
+1. Dropped `Message`, `GoogleCredential`, `Account`, `Session`, and `VerificationToken` tables from Supabase PostgreSQL via `prisma db push --accept-data-loss`.
+2. Regenerated Prisma Client (`prisma generate`).
+3. Ran `scripts/test-db.js` verifying 100% pass rate across all 12 remaining core models.
+4. Ran `scripts/test-login.ts` verifying all login flows remain 100% operational.
+
+**Why:**
+User requested removing all unnecessary and redundant tables from the Supabase database to keep the schema clean and minimal.
+
+---
+
 ## 2026-08-18 — Supabase PostgreSQL Database Integration & Schema Migration
  
 **Task:** Configure and migrate database to Supabase PostgreSQL, connect Prisma 7 via `@prisma/adapter-pg`, and seed all demo data.  
