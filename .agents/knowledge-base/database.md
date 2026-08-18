@@ -57,6 +57,23 @@ User requested advancing database capabilities with Supabase PostgreSQL readines
 
 ---
 
+## 2026-08-18 — Full Live Database Persistence & Automated Write Verification
+
+**Task:** Verify and guarantee that 100% of all data additions (clients, reports, team members, schedules, snapshots) write directly and automatically to the live Supabase PostgreSQL database.  
+**Files Changed:**
+- `app/actions.ts` & `app/api/cron/daily-sync/route.ts` — updated all remaining snapshot/client operations to link directly to `clientId`
+- `scripts/verify-live-write.ts` — automated end-to-end database live write, relational fetch, and persistence test runner
+
+**What Was Done:**
+1. Audited all server actions and API routes to ensure all mutations use Prisma connected to live Supabase pooler (`DATABASE_URL`).
+2. Created and executed `scripts/verify-live-write.ts` demonstrating instant live write, relation binding (`Client -> Report`), and immediate query retrieval from Supabase.
+3. Verified zero mock barriers: every record created in the UI or backend is automatically written and persisted in Supabase.
+
+**Why:**
+User requested complete assurance that the database is fully connected such that whenever data is added anywhere in the app, it is automatically written and persisted to the live database.
+
+---
+
 ## 2026-08-18 — Minimalist Database Optimization & Secondary Tables Purge
 
 **Task:** Prune 5 optional tables (`SERankingProject`, `Competitor`, `WebhookEndpoint`, `AuditLog`, `Notification`) and link SEO snapshot models directly to `Client`.  

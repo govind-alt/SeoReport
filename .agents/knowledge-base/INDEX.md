@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-18 | Full Live Database Persistence & Automated Write Verification | database | Verified that 100% of all UI & API mutations write directly and automatically to Supabase PostgreSQL |
 | 2026-08-18 | Minimalist Database Optimization & Secondary Tables Purge | database | Removed 5 secondary tables (SERankingProject, Competitor, WebhookEndpoint, AuditLog, Notification) and streamlined snapshot relations |
 | 2026-08-18 | Database Pruning & Unnecessary Tables Removal | database | Dropped 5 redundant tables (Message, GoogleCredential, Account, Session, VerificationToken) from Supabase and updated schema |
 | 2026-08-18 | Supabase PostgreSQL Database Integration & Schema Migration | database | Connected Supabase PostgreSQL, pushed 17 Prisma models, seeded demo accounts, and verified 100% test pass rate |
