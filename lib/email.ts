@@ -6,6 +6,9 @@
  * so the app works in development without any email config.
  */
 
+import path from 'path';
+import fs from 'fs';
+
 let ResendClass: any = null;
 try {
   const req = eval('require');
@@ -51,7 +54,9 @@ async function sendEmail(opts: {
   html: string;
   replyTo?: string;
 }) {
-  if (!resend || !process.env.RESEND_API_KEY) {
+  const { apiKey, from, appUrl: _appUrl } = getEmailConfig();
+
+  if (!apiKey || !ResendClass) {
     // Dev fallback — print to console
     console.log('\n[EMAIL DEV FALLBACK — No RESEND_API_KEY configured]');
     console.log('To:', opts.to);
@@ -62,10 +67,10 @@ async function sendEmail(opts: {
   }
 
   try {
-    const resend = new Resend(apiKey);
+    const client = new ResendClass(apiKey);
     const fromAddress = from.includes('<') ? from : `RankFlow <${from}>`;
 
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await client.emails.send({
       from: fromAddress,
       to: opts.to,
       subject: opts.subject,
