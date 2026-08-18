@@ -157,7 +157,7 @@ export default function ClientDashboardPage() {
   const firstName = session?.user?.name?.split(' ')[0] ?? 'Client';
 
   /* ── State ─────────────────────────────────────────── */
-  const [activeSection, setActiveSection] = useState<'dashboard' | 'reports' | 'rankings' | 'analytics' | 'messages' | 'profile' | 'manage-data'>('dashboard');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'reports' | 'rankings' | 'analytics' | 'profile' | 'manage-data'>('dashboard');
   const [selectedReport, setSelectedReportState] = useState<any | null>(null);
   const [showContact, setShowContact] = useState(false);
   const [contactMsg, setContactMsg] = useState('');
@@ -171,7 +171,6 @@ export default function ClientDashboardPage() {
 
   /* ── Real data state ────────────────────────────────── */
   const [portalData, setPortalData] = useState<any>(null);
-  const [clientMessages, setClientMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dataError, setDataError] = useState<string | null>(null);
 
@@ -186,13 +185,6 @@ export default function ClientDashboardPage() {
     if (report?.id && report.id !== 'r1' && report.id !== 'r2') {
       fetch(`/api/reports/${report.id}/view`, { method: 'POST' }).catch(() => null);
     }
-  };
-
-  const fetchMessages = () => {
-    fetch('/api/client-portal/messages')
-      .then(r => r.ok ? r.json() : [])
-      .then(data => Array.isArray(data) && setClientMessages(data))
-      .catch(() => null);
   };
 
   /* ── Fetch real portal data ─────────────────────────── */
@@ -223,7 +215,6 @@ export default function ClientDashboardPage() {
         setLoading(false);
       });
 
-    fetchMessages();
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email]);
@@ -232,9 +223,9 @@ export default function ClientDashboardPage() {
   useEffect(() => {
     const syncHash = () => {
       const hash = (window.location.hash || '').replace('#', '');
-      if (['dashboard', 'reports', 'rankings', 'analytics', 'messages', 'profile', 'manage-data'].includes(hash)) {
+      if (['dashboard', 'reports', 'rankings', 'analytics', 'profile', 'manage-data'].includes(hash)) {
         setActiveSection(hash as any);
-      } else if (!hash) {
+      } else {
         setActiveSection('dashboard');
       }
     };
@@ -250,7 +241,6 @@ export default function ClientDashboardPage() {
         setPortalData(data);
       })
       .catch(err => console.error(err));
-    fetchMessages();
   };
 
   /* ── Derived real data (with fallbacks) ─────────────── */
@@ -275,7 +265,7 @@ export default function ClientDashboardPage() {
   useEffect(() => {
     const sync = () => {
       const h = window.location.hash.slice(1);
-      if (['reports', 'rankings', 'analytics', 'messages', 'profile', 'manage-data'].includes(h)) {
+      if (['reports', 'rankings', 'analytics', 'profile', 'manage-data'].includes(h)) {
         setActiveSection(h as any);
       } else {
         setActiveSection('dashboard');
@@ -1170,203 +1160,13 @@ export default function ClientDashboardPage() {
         />
       )}
 
-      {/* ── MESSAGES / INBOX & CHAT SECTION ── */}
-      {activeSection === 'messages' && (
-        <MessagesSection
-          clientMessages={clientMessages}
-          setClientMessages={setClientMessages}
-          fetchMessages={fetchMessages}
+      {/* ── MANAGE DATA SECTION ── */}
+      {activeSection === 'manage-data' && (
+        <ManageDataSection
           client={client}
-          agencyName={portalData?.agency?.name}
+          realKeywords={realKeywords}
         />
       )}
-    </div>
-  );
-}
-
-/* ─── Interactive Inbox & Chat Section (2-Way Real-time Messaging) ─── */
-function MessagesSection({
-  clientMessages, setClientMessages, fetchMessages, client, agencyName
-}: {
-  clientMessages: any[]; setClientMessages: any; fetchMessages: () => void; client: any; agencyName?: string;
-}) {
-  const [newMsg, setNewMsg] = useState('');
-  const [sending, setSending] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [clientMessages]);
-
-  const handleSend = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!newMsg.trim() || sending) return;
-
-    setSending(true);
-    try {
-      const res = await fetch('/api/client-portal/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: newMsg }),
-      });
-      const data = await res.json();
-      if (res.ok && data.message) {
-        setClientMessages((prev: any[]) => [...prev, data.message]);
-        setNewMsg('');
-        toast.success('Message sent to agency!');
-      } else {
-        toast.error(data.error || 'Failed to send message');
-      }
-    } catch {
-      toast.error('Network error. Failed to send message.');
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20, flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: T.textDark, margin: 0 }}>Inbox & Chat</h2>
-          <p style={{ fontSize: 13, color: T.textMuted, margin: '4px 0 0' }}>
-            Direct 2-way messaging channel with your managing agency ({agencyName || 'SEO Agency'})
-          </p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 20, fontSize: 12, fontWeight: 700, color: '#059669' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }} />
-          Agency Online & Active
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 20, minHeight: 520, background: '#fff', border: `1px solid ${T.border}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-        
-        {/* Left Thread List */}
-        <div style={{ borderRight: `1px solid ${T.border}`, background: '#F8FAFC', padding: 16, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 11, fontWeight: 800, color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 }}>
-            Conversations
-          </div>
-          
-          <div style={{ padding: '12px 14px', borderRadius: 12, background: '#ffffff', border: `1.5px solid ${T.primary}`, boxShadow: '0 2px 8px rgba(79,142,247,0.12)', cursor: 'pointer', marginBottom: 8 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-              <div style={{ fontSize: 13, fontWeight: 800, color: T.textDark }}>Agency Support & Strategy</div>
-              <span style={{ fontSize: 10, color: T.textMuted }}>Live</span>
-            </div>
-            <div style={{ fontSize: 11, color: T.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {clientMessages.length > 0 ? clientMessages[clientMessages.length - 1].body : 'Start a discussion with your team...'}
-            </div>
-          </div>
-
-          <div style={{ marginTop: 'auto', padding: '12px', background: 'rgba(79,142,247,0.06)', borderRadius: 12, border: '1px solid rgba(79,142,247,0.15)' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: T.primary, marginBottom: 2 }}>💡 Response Commitment</div>
-            <div style={{ fontSize: 11, color: T.textLight, lineHeight: 1.4 }}>Messages are delivered instantly to your dedicated agency manager.</div>
-          </div>
-        </div>
-
-        {/* Right Chat Thread Window */}
-        <div style={{ display: 'flex', flexDirection: 'column', height: 560 }}>
-          {/* Thread Header */}
-          <div style={{ padding: '14px 20px', borderBottom: `1px solid ${T.border}`, background: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #1A1A2E, #16213E)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>
-                {agencyName ? agencyName.charAt(0).toUpperCase() : 'A'}
-              </div>
-              <div>
-                <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark }}>{agencyName || 'Agency Manager'}</div>
-                <div style={{ fontSize: 11, color: T.textMuted }}>Connected to {client?.name || 'Client Portal'}</div>
-              </div>
-            </div>
-            <button onClick={fetchMessages} style={{ padding: '6px 12px', borderRadius: 8, background: T.surface2, border: `1px solid ${T.border}`, fontSize: 12, fontWeight: 600, color: T.textLight, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <RefreshCw size={12} /> Refresh Thread
-            </button>
-          </div>
-
-          {/* Message List */}
-          <div style={{ flex: 1, padding: 20, overflowY: 'auto', background: '#F8FAFC', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {clientMessages.length === 0 ? (
-              <div style={{ margin: 'auto', textAlign: 'center', maxWidth: 320, padding: 20 }}>
-                <div style={{ width: 48, height: 48, borderRadius: 16, background: T.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                  <MessageSquare size={24} color={T.primary} />
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 800, color: T.textDark, marginBottom: 4 }}>No messages yet</div>
-                <div style={{ fontSize: 12, color: T.textMuted }}>Send your first message below to start a conversation with your agency!</div>
-              </div>
-            ) : (
-              clientMessages.map((msg: any, idx: number) => {
-                const isFromClient = !msg.isFromAgency;
-                return (
-                  <div key={msg.id || idx} style={{ display: 'flex', flexDirection: 'column', alignItems: isFromClient ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ fontSize: 10, color: T.textMuted, marginBottom: 3, padding: '0 4px' }}>
-                      {isFromClient ? 'You' : msg.senderName || agencyName || 'Agency'} · {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
-                    </div>
-                    <div style={{
-                      maxWidth: '75%',
-                      padding: '12px 16px',
-                      borderRadius: isFromClient ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                      background: isFromClient ? 'linear-gradient(135deg, #4F8EF7, #2563EB)' : '#1A1A2E',
-                      color: '#ffffff',
-                      fontSize: 13,
-                      lineHeight: 1.5,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                      whiteSpace: 'pre-wrap'
-                    }}>
-                      {msg.body}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Quick Prompts */}
-          <div style={{ padding: '8px 16px', background: '#ffffff', borderTop: `1px solid ${T.border}`, display: 'flex', gap: 8, overflowX: 'auto' }}>
-            {[
-              'Request keyword ranking update',
-              'Schedule monthly review call',
-              'Question about recent report',
-            ].map((promptText, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setNewMsg(promptText)}
-                style={{
-                  padding: '5px 12px', borderRadius: 20, background: '#F1F5F9', border: '1px solid #E4E9F2',
-                  fontSize: 11, fontWeight: 600, color: T.textLight, cursor: 'pointer', whiteSpace: 'nowrap',
-                  transition: 'all 0.15s'
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = T.primaryLight; e.currentTarget.style.color = T.primary; }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.color = T.textLight; }}
-              >
-                {promptText}
-              </button>
-            ))}
-          </div>
-
-          {/* Input Form */}
-          <form onSubmit={handleSend} style={{ padding: 14, background: '#ffffff', borderTop: `1px solid ${T.border}`, display: 'flex', gap: 10 }}>
-            <input
-              type="text"
-              value={newMsg}
-              onChange={e => setNewMsg(e.target.value)}
-              placeholder="Type your message to the agency..."
-              style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${T.border}`, fontSize: 13, outline: 'none', background: '#F8FAFC' }}
-            />
-            <button
-              type="submit"
-              disabled={sending || !newMsg.trim()}
-              className="btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: sending || !newMsg.trim() ? 0.6 : 1 }}
-            >
-              <Send size={14} /> {sending ? 'Sending...' : 'Send'}
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
   );
 }
