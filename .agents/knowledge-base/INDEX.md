@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-18 | Resend Email Gateway Audit, Fallback & Team Invites | api | Tested Resend integration across all touchpoints, resolved 401 error behavior with console fallback, and implemented team invite actions |
 | 2026-08-17 | Subscription Tier Upscaling & Superadmin Cancellation | billing | Upscaled tiers ($49, $149, $399, $799), built Manage Plan & Cancel Sub modals in Superadmin & Agency Billing |
 | 2026-08-17 | E2E Chrome Browser Verification & Auth Fix | devops | Fixed /api/auth/session endpoint, verified interactive role tabs, demo auto-fill & registration pages |
 | 2026-08-17 | Full Codebase Error Audit & 0-Error Resolution | devops | Resolved all TypeScript type mismatches, Next.js 16 route handlers, and server actions (0 errors) |

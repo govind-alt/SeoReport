@@ -2,6 +2,19 @@
 
 > Maintained by Knowledge Curator. Append new entries using the format defined in SKILL.md.
 
+## 2026-08-18 — Resend API Testing, Graceful Fallback & Team Invite Actions
+
+**Task:** Audit and test Resend email delivery across all application touchpoints, resolve sandbox/invalid key fallback behavior, and implement team member invitation actions.
+
+**Files Changed:**
+- `lib/email.ts` — Enhanced `getEmailConfig()` to prioritize disk-persisted settings (`data/platform-settings.json`), added dev console fallback display with clickable links when Resend API returns errors (401/403/network), added `sendTeamInviteEmail`.
+- `app/actions.ts` — Implemented `inviteTeamMember`, `resendTeamInvite`, `cancelTeamInvite`, and `updateUserAccount` actions.
+
+**What Was Done:**
+1. Direct testing of Resend API key revealed `401 API key is invalid` with the expired placeholder key in `.env`.
+2. Hardened `lib/email.ts` so that regardless of whether a valid key or expired key is in `.env`, the user flow (signup, password reset, team invites, support tickets) is never blocked; if Resend API call fails or is unconfigured, full email content with action links is clearly logged to the console for seamless local development.
+3. Connected team invitation email triggers to `inviteTeamMember` and `resendTeamInvite`.
+
 ## Context
 
 ### API Routes Structure
