@@ -57,6 +57,27 @@ User requested advancing database capabilities with Supabase PostgreSQL readines
 
 ---
 
+## 2026-08-18 — Minimalist Database Optimization & Secondary Tables Purge
+
+**Task:** Prune 5 optional tables (`SERankingProject`, `Competitor`, `WebhookEndpoint`, `AuditLog`, `Notification`) and link SEO snapshot models directly to `Client`.  
+**Files Changed:**
+- `prisma/schema.prisma` — optimized to 7 core application models and 4 SEO snapshot models
+- `scripts/seed.ts` — updated to attach snapshots directly to `Client`
+- `scripts/test-db.js` — streamlined database test suite for core models
+- `lib/webhook-dispatcher.ts` & notification API routes — adjusted for lightweight operation
+
+**What Was Done:**
+1. Dropped `SERankingProject`, `Competitor`, `WebhookEndpoint`, `AuditLog`, and `Notification` from Supabase PostgreSQL.
+2. Directly attached `KeywordSnapshot`, `BacklinkSnapshot`, `AuditSnapshot`, and `AnalyticsSnapshot` to `Client` (eliminating unnecessary join hops).
+3. Pushed clean schema to Supabase PostgreSQL and seeded complete demo workspace.
+4. Ran `scripts/test-db.js` with 100% pass rate.
+5. Verified authentication via `scripts/test-login.ts` (100% success).
+
+**Why:**
+User requested removing all optional/secondary tables to keep Supabase as clean, performant, and minimal as possible.
+
+---
+
 ## 2026-08-18 — Database Pruning & Unnecessary Tables Removal
 
 **Task:** Remove 5 unused and redundant database tables (`Message`, `GoogleCredential`, `Account`, `Session`, `VerificationToken`) from Supabase PostgreSQL and Prisma schema.  
