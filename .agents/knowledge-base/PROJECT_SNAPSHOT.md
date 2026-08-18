@@ -59,14 +59,19 @@ Server starts on **http://localhost:3000**.
 
 ### Environment File
 `.env` exists at project root with:
-- `DATABASE_URL="file:./dev.db"` (SQLite)
+- `DATABASE_URL` (Supabase PostgreSQL transaction pooler, port 6543)
+- `DIRECT_URL` (Supabase PostgreSQL direct session pooler, port 5432)
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXTAUTH_SECRET` set
 - `NEXTAUTH_URL="http://localhost:3000"`
 - `NEXT_PUBLIC_ROOT_DOMAIN="localhost:3000"`
 
 ### Database
-- Dev database: `dev.db` (SQLite, 303 KB, already has seed data)
-- Do NOT run `prisma migrate dev` unless you know migrations are needed
+- Active Database: **Supabase PostgreSQL** (`aws-0-ap-southeast-1.pooler.supabase.com`)
+- ORM: Prisma 7 (`@prisma/adapter-pg` with `pg.Pool`)
+- Schema: Synchronized via `prisma db push` (17 models, all relations and constraints intact)
 
 ---
 
@@ -75,7 +80,7 @@ Server starts on **http://localhost:3000**.
 | Status | Detail |
 |--------|--------|
 | Dev server | ✅ Running on http://localhost:3000 (Next.js 16.2.10 Turbopack) |
-| Database | ✅ SQLite dev.db (connected via PrismaLibSql adapter reading env DATABASE_URL) |
+| Database | ✅ Supabase PostgreSQL (connected via @prisma/adapter-pg + pg.Pool) |
 | Auth | ✅ NextAuth v5 credentials + SessionProvider wrapping active |
 
 ---

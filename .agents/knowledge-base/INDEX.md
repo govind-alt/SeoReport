@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-18 | Supabase PostgreSQL Database Integration & Schema Migration | database | Connected Supabase PostgreSQL, pushed 17 Prisma models, seeded demo accounts, and verified 100% test pass rate |
 | 2026-08-18 | SQLite Schema Sync & Agency Status Column Fix | database | Synchronized SQLite dev.db with Prisma schema using db push and verified 100% test suite pass rate |
 | 2026-08-18 | Client Portal MessagesSection Purge | frontend | Completely removed MessagesSection chat UI component, state, and hash listeners from client dashboard page.tsx |
 | 2026-08-18 | Client Portal Inbox & Chat Removal | frontend | Removed Inbox & Chat navigation item and unused MessageSquare icon from client portal layout.tsx |
