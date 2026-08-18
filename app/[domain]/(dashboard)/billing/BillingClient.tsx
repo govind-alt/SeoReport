@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { updateAgencyPlan } from '@/app/actions';
+import { PLANS, ACTIVE_PLAN_IDS, getPlan, getPlanMRR, getPlanDisplayName, isCanceled } from '@/lib/plans';
 
 export default function BillingClient({ plan, clientCount, clientLimit, agencyName }: { plan: string, clientCount: number, clientLimit: number, agencyName: string }) {
   const [currentPlan, setCurrentPlan] = useState(plan);
@@ -47,12 +48,12 @@ export default function BillingClient({ plan, clientCount, clientLimit, agencyNa
 
   const handleChangePlanSubmit = async (targetPlan: string) => {
     setIsUpdatingPlan(true);
-    const t = toast.loading(`Updating subscription to ${targetPlan.toUpperCase()} plan...`);
+    const t = toast.loading(`Updating subscription to ${getPlanDisplayName(targetPlan)} plan...`);
 
     try {
       await updateAgencyPlan(domain, targetPlan);
       setCurrentPlan(targetPlan);
-      toast.success(`Successfully switched to ${targetPlan.toUpperCase()} plan!`, { id: t });
+      toast.success(`Successfully switched to ${getPlanDisplayName(targetPlan)} plan!`, { id: t });
       setIsChangePlanModalOpen(false);
       window.location.reload();
     } catch (e: any) {
@@ -66,8 +67,10 @@ export default function BillingClient({ plan, clientCount, clientLimit, agencyNa
     window.open(`/invoices/${invoiceId}`, '_blank');
   };
 
-  const computedLimit = currentPlan === 'enterprise' ? 9999 : currentPlan === 'professional' ? 25 : 5;
-  const usagePercentage = Math.min(100, Math.round((clientCount / computedLimit) * 100));
+  const activePlanConfig = getPlan(currentPlan);
+  const computedLimit = activePlanConfig.maxClients === -1 ? 9999 : activePlanConfig.maxClients;
+  const usagePercentage = computedLimit === 9999 ? 0 : Math.min(100, Math.round((clientCount / computedLimit) * 100));
+  const planIsCanceled = isCanceled(currentPlan);
 
   return (
     <div className="fade-in">
@@ -77,6 +80,18 @@ export default function BillingClient({ plan, clientCount, clientLimit, agencyNa
           <p style={{ color: 'var(--text-muted)' }}>Manage your subscription tier, payment methods, and invoices for {agencyName}.</p>
         </div>
       </div>
+
+      {planIsCanceled && (
+        <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ color: '#EF4444', fontWeight: 800, fontSize: '16px', marginBottom: '4px' }}>🚫 Subscription Canceled</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Your agency subscription has been canceled by the platform administrator. Access to paid features is currently restricted.</div>
+          </div>
+          <button className="btn btn-primary" onClick={() => setIsChangePlanModalOpen(true)}>
+            Reactivate Plan
+          </button>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px' }}>
         
@@ -89,19 +104,25 @@ export default function BillingClient({ plan, clientCount, clientLimit, agencyNa
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <h2 style={{ fontSize: '24px', fontWeight: 800, textTransform: 'capitalize' }}>
-                    {currentPlan === 'professional' ? 'Pro' : currentPlan} Plan
+                  <h2 style={{ fontSize: '24px', fontWeight: 800 }}>
+                    {activePlanConfig.badge} {activePlanConfig.displayName} Plan
                   </h2>
-                  <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 700 }}>Active</span>
+                  <span style={{
+                    background: planIsCanceled ? 'rgba(239,68,68,0.15)' : 'rgba(16, 185, 129, 0.15)',
+                    color: planIsCanceled ? '#EF4444' : '#10B981',
+                    padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: 700
+                  }}>
+                    {planIsCanceled ? 'Canceled' : 'Active'}
+                  </span>
                 </div>
-                <p style={{ color: 'var(--text-secondary)' }}>You are currently on the {currentPlan} tier.</p>
+                <p style={{ color: 'var(--text-secondary)' }}>{activePlanConfig.tagline}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: '32px', fontWeight: 900, color: 'var(--text-primary)' }}>
-                  ${currentPlan === 'enterprise' ? '249' : currentPlan === 'professional' ? '99' : '49'}
+                <div style={{ fontSize: '32px', fontWeight: 900, color: 'var(--text-primary)', textDecoration: planIsCanceled ? 'line-through' : 'none' }}>
+                  ${getPlanMRR(currentPlan)}
                   <span style={{ fontSize: '16px', color: 'var(--text-muted)', fontWeight: 500 }}>/mo</span>
                 </div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>Next billing date: Aug 1, 2026</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{planIsCanceled ? 'Billing suspended' : 'Next billing date: Aug 1, 2026'}</p>
               </div>
             </div>
 
@@ -207,80 +228,41 @@ export default function BillingClient({ plan, clientCount, clientLimit, agencyNa
               <button onClick={() => setIsChangePlanModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', color: 'var(--text-muted)' }}>×</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-              
-              {/* Starter Tier */}
-              <div style={{
-                background: currentPlan === 'starter' ? 'var(--primary-light)' : 'var(--bg)',
-                border: currentPlan === 'starter' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column'
-              }}>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>Starter</div>
-                <div style={{ fontSize: '24px', fontWeight: 900, margin: '8px 0' }}>$49<span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>5 Active Clients</div>
-                <ul style={{ fontSize: '12px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 20px 0', flex: 1, lineHeight: '1.6' }}>
-                  <li>Daily SERanking Sync</li>
-                  <li>Automated Monthly PDFs</li>
-                  <li>Email Support</li>
-                </ul>
-                <button
-                  className={`btn ${currentPlan === 'starter' ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-                  disabled={currentPlan === 'starter' || isUpdatingPlan}
-                  onClick={() => handleChangePlanSubmit('starter')}
-                >
-                  {currentPlan === 'starter' ? 'Current Plan' : 'Select Starter'}
-                </button>
-              </div>
-
-              {/* Professional Tier */}
-              <div style={{
-                background: currentPlan === 'professional' ? 'var(--primary-light)' : 'var(--bg)',
-                border: currentPlan === 'professional' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', position: 'relative'
-              }}>
-                <div style={{ position: 'absolute', top: '-10px', right: '12px', background: 'var(--primary)', color: 'white', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '10px' }}>MOST POPULAR</div>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>Professional</div>
-                <div style={{ fontSize: '24px', fontWeight: 900, margin: '8px 0' }}>$99<span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>25 Active Clients</div>
-                <ul style={{ fontSize: '12px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 20px 0', flex: 1, lineHeight: '1.6' }}>
-                  <li>All Starter Features</li>
-                  <li>White-label Branding</li>
-                  <li>Client Portal Access</li>
-                  <li>Google Search Console</li>
-                </ul>
-                <button
-                  className={`btn ${currentPlan === 'professional' ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-                  disabled={currentPlan === 'professional' || isUpdatingPlan}
-                  onClick={() => handleChangePlanSubmit('professional')}
-                >
-                  {currentPlan === 'professional' ? 'Current Plan' : 'Select Pro'}
-                </button>
-              </div>
-
-              {/* Enterprise Tier */}
-              <div style={{
-                background: currentPlan === 'enterprise' ? 'var(--primary-light)' : 'var(--bg)',
-                border: currentPlan === 'enterprise' ? '2px solid var(--primary)' : '1px solid var(--border)',
-                borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column'
-              }}>
-                <div style={{ fontSize: '14px', fontWeight: 800 }}>Enterprise</div>
-                <div style={{ fontSize: '24px', fontWeight: 900, margin: '8px 0' }}>$249<span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></div>
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>Unlimited Clients</div>
-                <ul style={{ fontSize: '12px', color: 'var(--text-secondary)', paddingLeft: '16px', margin: '0 0 20px 0', flex: 1, lineHeight: '1.6' }}>
-                  <li>All Pro Features</li>
-                  <li>Unlimited Clients</li>
-                  <li>Custom Subdomains</li>
-                  <li>Dedicated Account Manager</li>
-                </ul>
-                <button
-                  className={`btn ${currentPlan === 'enterprise' ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-                  disabled={currentPlan === 'enterprise' || isUpdatingPlan}
-                  onClick={() => handleChangePlanSubmit('enterprise')}
-                >
-                  {currentPlan === 'enterprise' ? 'Current Plan' : 'Select Enterprise'}
-                </button>
-              </div>
-
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '24px' }}>
+              {ACTIVE_PLAN_IDS.map((planId) => {
+                const planCfg = PLANS[planId];
+                const isCurrent = currentPlan === planId || (currentPlan === 'professional' && planId === 'pro');
+                return (
+                  <div key={planId} style={{
+                    background: isCurrent ? 'var(--primary-light)' : 'var(--bg)',
+                    border: isCurrent ? '2px solid var(--primary)' : '1px solid var(--border)',
+                    borderRadius: '12px', padding: '18px', display: 'flex', flexDirection: 'column', position: 'relative'
+                  }}>
+                    {planId === 'pro' && (
+                      <div style={{ position: 'absolute', top: '-10px', right: '10px', background: 'var(--primary)', color: 'white', fontSize: '9px', fontWeight: 800, padding: '2px 6px', borderRadius: '10px' }}>POPULAR</div>
+                    )}
+                    <div style={{ fontSize: '15px', fontWeight: 800 }}>{planCfg.badge} {planCfg.displayName}</div>
+                    <div style={{ fontSize: '22px', fontWeight: 900, margin: '6px 0' }}>
+                      ${planCfg.price}<span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+                      {planCfg.maxClients === -1 ? 'Unlimited Clients' : `${planCfg.maxClients} Active Clients`}
+                    </div>
+                    <ul style={{ fontSize: '11px', color: 'var(--text-secondary)', paddingLeft: '14px', margin: '0 0 16px 0', flex: 1, lineHeight: '1.5' }}>
+                      {planCfg.features.slice(0, 4).map((f, i) => (
+                        <li key={i}>{f}</li>
+                      ))}
+                    </ul>
+                    <button
+                      className={`btn ${isCurrent ? 'btn-secondary' : 'btn-primary'} btn-sm`}
+                      disabled={isCurrent || isUpdatingPlan}
+                      onClick={() => handleChangePlanSubmit(planId)}
+                    >
+                      {isCurrent ? 'Current Plan' : `Select ${planCfg.displayName}`}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

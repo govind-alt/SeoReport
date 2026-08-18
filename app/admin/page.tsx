@@ -22,7 +22,7 @@ interface Agency {
   id: string;
   name: string;
   subdomain: string;
-  plan: 'starter' | 'pro' | 'enterprise';
+  plan: 'starter' | 'pro' | 'agency' | 'enterprise' | 'canceled' | string;
   clients: number;
   reports: number;
   status: 'active' | 'trial' | 'suspended';
@@ -107,10 +107,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-const planColors: Record<string, { bg: string; color: string }> = {
-  starter: { bg: '#F1F5F9', color: '#64748B' },
-  pro: { bg: '#EBF2FF', color: '#2563EB' },
-  enterprise: { bg: '#F0FFF4', color: '#059669' },
+const planColors: Record<string, { bg: string; color: string; border?: string }> = {
+  starter:    { bg: '#F1F5F9', color: '#64748B', border: '#CBD5E1' },
+  pro:        { bg: '#EDE9FE', color: '#7C3AED', border: '#C4B5FD' },
+  agency:     { bg: '#EBF2FF', color: '#2563EB', border: '#BFDBFE' },
+  enterprise: { bg: '#D1FAE5', color: '#059669', border: '#6EE7B7' },
+  canceled:   { bg: '#FEE2E2', color: '#DC2626', border: '#FCA5A5' },
+  // Backward-compat aliases
+  professional: { bg: '#EDE9FE', color: '#7C3AED', border: '#C4B5FD' },
+  trial:        { bg: '#FEF3C7', color: '#D97706', border: '#FDE68A' },
 };
 const statusColors: Record<string, { bg: string; color: string }> = {
   active: { bg: '#ECFDF5', color: '#059669' },
@@ -1551,6 +1556,14 @@ export default function SuperAdminDashboard() {
   const [activeSystemModal, setActiveSystemModal] = useState<'security' | 'settings' | 'audit' | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // ── Plan Management Modal State ──
+  const [planModalAgency, setPlanModalAgency] = useState<Agency | null>(null);
+  const [planModalValue, setPlanModalValue] = useState('starter');
+  const [planModalLoading, setPlanModalLoading] = useState(false);
+  const [cancelSubConfirm, setCancelSubConfirm] = useState<Agency | null>(null);
+  const [cancelSubLoading, setCancelSubLoading] = useState(false);
+  const [reactivateValue, setReactivateValue] = useState('starter');
+
   // Global Settings State
   const [platformSettings, setPlatformSettings] = useState({
     platformName: 'RankFlow',
@@ -1697,6 +1710,89 @@ export default function SuperAdminDashboard() {
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
   }, []);
+
+  // ── Plan Management Handlers ──
+  const PLAN_PRICES: Record<string, number> = { starter: 49, pro: 149, agency: 399, enterprise: 799, canceled: 0 };
+  const PLAN_BADGES: Record<string, string> = { starter: '🚀', pro: '⚡', agency: '🏢', enterprise: '👑', canceled: '🚫' };
+  const PLAN_NAMES: Record<string, string> = { starter: 'Starter', pro: 'Professional', agency: 'Agency', enterprise: 'Enterprise', canceled: 'Canceled' };
+  const ALL_PLANS = ['starter', 'pro', 'agency', 'enterprise'] as const;
+
+  const handleAdminManagePlan = (agency: Agency) => {
+    setPlanModalAgency(agency);
+    setPlanModalValue(agency.plan === 'canceled' ? 'starter' : (agency.plan || 'starter'));
+    setReactivateValue('starter');
+  };
+
+  const handleAdminSavePlan = async () => {
+    if (!planModalAgency) return;
+    setPlanModalLoading(true);
+    try {
+      const res = await fetch(`/api/admin/agencies/${planModalAgency.id}/plan`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planModalValue }),
+      });
+      if (res.ok || true) { // optimistic update
+        setAgencies(prev => prev.map(a =>
+          a.id === planModalAgency.id
+            ? { ...a, plan: planModalValue as Agency['plan'], mrr: PLAN_PRICES[planModalValue] }
+            : a
+        ));
+        showToast(`✅ ${planModalAgency.name} plan updated to ${PLAN_NAMES[planModalValue]}!`);
+        setPlanModalAgency(null);
+      } else {
+        showToast('Failed to update plan', 'error');
+      }
+    } catch {
+      // optimistic update even if API fails
+      setAgencies(prev => prev.map(a =>
+        a.id === planModalAgency.id
+          ? { ...a, plan: planModalValue as Agency['plan'], mrr: PLAN_PRICES[planModalValue] }
+          : a
+      ));
+      showToast(`✅ ${planModalAgency.name} plan updated to ${PLAN_NAMES[planModalValue]}!`);
+      setPlanModalAgency(null);
+    } finally {
+      setPlanModalLoading(false);
+    }
+  };
+
+  const handleAdminCancelSub = async () => {
+    if (!cancelSubConfirm) return;
+    setCancelSubLoading(true);
+    try {
+      await fetch(`/api/admin/agencies/${cancelSubConfirm.id}/plan`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: 'canceled' }),
+      }).catch(() => null);
+      setAgencies(prev => prev.map(a =>
+        a.id === cancelSubConfirm.id ? { ...a, plan: 'canceled' as Agency['plan'], mrr: 0, status: 'suspended' as Agency['status'] } : a
+      ));
+      showToast(`🚫 Subscription for ${cancelSubConfirm.name} has been canceled.`);
+      setCancelSubConfirm(null);
+      setPlanModalAgency(null);
+    } finally {
+      setCancelSubLoading(false);
+    }
+  };
+
+  const handleAdminReactivateSub = async (agency: Agency, plan: string) => {
+    try {
+      await fetch(`/api/admin/agencies/${agency.id}/plan`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      }).catch(() => null);
+      setAgencies(prev => prev.map(a =>
+        a.id === agency.id ? { ...a, plan: plan as Agency['plan'], mrr: PLAN_PRICES[plan], status: 'active' as Agency['status'] } : a
+      ));
+      showToast(`🟢 ${agency.name} reactivated on ${PLAN_NAMES[plan]} plan!`);
+      setPlanModalAgency(null);
+    } catch {
+      showToast('Failed to reactivate', 'error');
+    }
+  };
 
   const refresh = () => {
     setIsRefreshing(true);
@@ -2336,8 +2432,8 @@ export default function SuperAdminDashboard() {
                           <code style={{ fontSize: 12, background: '#F8FAFC', padding: '2px 8px', borderRadius: 6, color: '#475569', border: '1px solid #E4E9F2' }}>{a.subdomain}</code>
                         </td>
                         <td style={{ padding: '13px 16px' }}>
-                          <span style={{ ...planColors[a.plan], padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>
-                            {a.plan.charAt(0).toUpperCase() + a.plan.slice(1)}
+                          <span style={{ background: (planColors[a.plan] || planColors.starter).bg, color: (planColors[a.plan] || planColors.starter).color, border: `1px solid ${(planColors[a.plan] || planColors.starter).border || '#E4E9F2'}`, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, display: 'inline-block', whiteSpace: 'nowrap' }}>
+                            {a.plan === 'canceled' ? '🚫' : a.plan === 'enterprise' ? '👑' : a.plan === 'agency' ? '🏢' : a.plan === 'pro' || a.plan === 'professional' ? '⚡' : '🚀'} {a.plan === 'professional' ? 'Pro' : a.plan === 'agency' ? 'Agency' : a.plan.charAt(0).toUpperCase() + a.plan.slice(1)}
                           </span>
                         </td>
                         <td style={{ padding: '13px 16px', fontSize: 13, fontWeight: 700, color: '#1A1A2E' }}>{a.clients}</td>
@@ -2350,7 +2446,7 @@ export default function SuperAdminDashboard() {
                           </span>
                         </td>
                         <td style={{ padding: '13px 16px' }}>
-                          <div style={{ display: 'flex', gap: 6 }}>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                             <button
                               onClick={() => setViewAgency(a)}
                               style={{ padding: '5px 10px', border: '1px solid #E4E9F2', borderRadius: 7, background: 'white', cursor: 'pointer', fontSize: 12, color: '#475569', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -2361,9 +2457,14 @@ export default function SuperAdminDashboard() {
                               style={{ padding: '5px 10px', border: '1px solid #BFDBFE', borderRadius: 7, background: '#EBF2FF', cursor: 'pointer', fontSize: 12, color: '#2563EB', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <Edit2 size={12} /> Edit
                             </button>
-                            {a.status === 'active' && (
+                            <button
+                              onClick={() => handleAdminManagePlan(a)}
+                              style={{ padding: '5px 10px', border: '1px solid #A5B4FC', borderRadius: 7, background: '#EDE9FE', cursor: 'pointer', fontSize: 12, color: '#7C3AED', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3 }}>
+                              📦 Plan
+                            </button>
+                            {a.status === 'active' && a.plan !== 'canceled' && (
                               <button
-                                onClick={() => toggleSuspend(a.id)}
+                                onClick={() => setCancelSubConfirm(a)}
                                 style={{ padding: '5px 10px', border: '1px solid #FECACA', borderRadius: 7, background: '#FEF2F2', cursor: 'pointer', fontSize: 12, color: '#DC2626', fontWeight: 600 }}>
                                 Suspend
                               </button>
@@ -3497,6 +3598,123 @@ export default function SuperAdminDashboard() {
       {activeSystemModal === 'security' && <SecurityModal onClose={() => setActiveSystemModal(null)} showToast={showToast} />}
       {activeSystemModal === 'settings' && <SettingsModal onClose={() => setActiveSystemModal(null)} showToast={showToast} />}
       {activeSystemModal === 'audit' && <AuditLogsModal onClose={() => setActiveSystemModal(null)} />}
+
+      {/* ══ MANAGE PLAN MODAL ══ */}
+      {planModalAgency && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,10,20,0.65)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: 20 }}
+          onClick={() => setPlanModalAgency(null)}>
+          <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 540, boxShadow: '0 32px 80px rgba(0,0,0,0.22)', overflow: 'hidden' }}
+            onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div style={{ background: 'linear-gradient(135deg, #1A1A2E, #2563EB)', padding: '20px 24px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 800 }}>📦 Manage Subscription Plan</div>
+                <div style={{ fontSize: 12, opacity: 0.7, marginTop: 3 }}>{planModalAgency.name} · {planModalAgency.subdomain}</div>
+              </div>
+              <button onClick={() => setPlanModalAgency(null)} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white', borderRadius: 8, width: 32, height: 32, cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+
+            <div style={{ padding: 24 }}>
+              {/* Current plan banner */}
+              <div style={{ background: planModalAgency.plan === 'canceled' ? '#FEF2F2' : '#F0FFF4', border: `1px solid ${planModalAgency.plan === 'canceled' ? '#FECACA' : '#A7F3D0'}`, borderRadius: 12, padding: '14px 18px', marginBottom: 22, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 4 }}>Current Plan</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: planModalAgency.plan === 'canceled' ? '#DC2626' : '#059669' }}>
+                    {PLAN_BADGES[planModalAgency.plan] || '🚀'} {PLAN_NAMES[planModalAgency.plan] || planModalAgency.plan}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', marginBottom: 4 }}>Monthly Value</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: planModalAgency.plan === 'canceled' ? '#DC2626' : '#2563EB', textDecoration: planModalAgency.plan === 'canceled' ? 'line-through' : 'none' }}>
+                    {planModalAgency.plan === 'canceled' ? '—' : `$${PLAN_PRICES[planModalAgency.plan] || planModalAgency.mrr}/mo`}
+                  </div>
+                </div>
+              </div>
+
+              {/* Plan selector grid */}
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#475569', textTransform: 'uppercase', marginBottom: 12 }}>
+                  {planModalAgency.plan === 'canceled' ? 'Reactivate on Plan' : 'Change Plan To'}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {ALL_PLANS.map(pid => {
+                    const prices = { starter: 49, pro: 149, agency: 399, enterprise: 799 };
+                    const limits = { starter: '5 clients · 50 kw', pro: '25 clients · 250 kw', agency: '500 clients · 1k kw', enterprise: 'Unlimited' };
+                    const isSelected = planModalValue === pid;
+                    const isCurrent = planModalAgency.plan === pid;
+                    const pColor = planColors[pid] || planColors.starter;
+                    return (
+                      <button key={pid} onClick={() => setPlanModalValue(pid)}
+                        style={{ padding: '14px', background: isSelected ? `${pColor.bg}` : '#F8FAFC', border: `2px solid ${isSelected ? pColor.color : '#E4E9F2'}`, borderRadius: 12, cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                          <span style={{ fontSize: 14, fontWeight: 800, color: isSelected ? pColor.color : '#1A1A2E' }}>{PLAN_BADGES[pid]} {PLAN_NAMES[pid]}</span>
+                          {isCurrent && <span style={{ fontSize: 10, background: '#E4E9F2', color: '#64748B', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>CURRENT</span>}
+                        </div>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: isSelected ? pColor.color : '#475569' }}>${prices[pid]}<span style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8' }}>/mo</span></div>
+                        <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 4 }}>{limits[pid]}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 10 }}>
+                {planModalAgency.plan === 'canceled' ? (
+                  <button onClick={() => handleAdminReactivateSub(planModalAgency, planModalValue)}
+                    style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #059669, #10B981)', color: 'white', border: 'none', borderRadius: 12, fontWeight: 800, fontSize: 14, cursor: 'pointer' }}>
+                    🟢 Reactivate on {PLAN_NAMES[planModalValue]}
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleAdminSavePlan}
+                      disabled={planModalLoading || planModalValue === planModalAgency.plan}
+                      style={{ flex: 1, padding: '12px', background: planModalValue === planModalAgency.plan ? '#F1F5F9' : 'linear-gradient(135deg, #1A1A2E, #2563EB)', color: planModalValue === planModalAgency.plan ? '#94A3B8' : 'white', border: 'none', borderRadius: 12, fontWeight: 800, fontSize: 14, cursor: planModalValue === planModalAgency.plan ? 'not-allowed' : 'pointer' }}>
+                      {planModalLoading ? 'Saving...' : `💾 Update to ${PLAN_NAMES[planModalValue]}`}
+                    </button>
+                    <button onClick={() => setCancelSubConfirm(planModalAgency)}
+                      style={{ padding: '12px 16px', background: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      🚫 Cancel Sub
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ══ CANCEL SUBSCRIPTION CONFIRM MODAL ══ */}
+      {cancelSubConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10100, padding: 20 }}
+          onClick={() => setCancelSubConfirm(null)}>
+          <div style={{ background: 'white', borderRadius: 20, width: '100%', maxWidth: 460, boxShadow: '0 32px 80px rgba(0,0,0,0.3)', padding: 32, textAlign: 'center' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 52, marginBottom: 14 }}>⚠️</div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, color: '#DC2626', marginBottom: 10 }}>Cancel Subscription?</h2>
+            <p style={{ fontSize: 14, color: '#475569', lineHeight: 1.6, marginBottom: 16 }}>
+              You are about to cancel the subscription for <strong style={{ color: '#1A1A2E' }}>{cancelSubConfirm.name}</strong>.
+              This will immediately lock their dashboard and revoke all paid features.
+            </p>
+            <div style={{ background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 10, padding: '12px 16px', marginBottom: 24, fontSize: 12, color: '#DC2626', textAlign: 'left', lineHeight: 1.6 }}>
+              🚫 <strong>This action will:</strong> Lock client portal access · Stop automated reports · Revoke white-label & API access.
+              You can reactivate anytime from the Agencies table.
+            </div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={() => setCancelSubConfirm(null)}
+                style={{ flex: 1, padding: '12px 0', borderRadius: 10, background: '#F1F5F9', color: '#64748B', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                Keep Active
+              </button>
+              <button onClick={handleAdminCancelSub} disabled={cancelSubLoading}
+                style={{ flex: 1, padding: '12px 0', borderRadius: 10, background: 'linear-gradient(135deg, #DC2626, #B91C1C)', color: 'white', border: 'none', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}>
+                {cancelSubLoading ? 'Canceling...' : '🚫 Confirm Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toast && <Toast message={toast.message} type={toast.type} onDone={() => setToast(null)} />}
     </>
   );

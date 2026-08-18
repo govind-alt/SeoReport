@@ -36,10 +36,10 @@ async function getOrCreateStripeCustomer(agencyId: string, agencyEmail: string, 
     metadata: { agencyId }
   });
 
-  // Persist the customer ID
+  // Persist billing email
   await prisma.agency.update({
     where: { id: agencyId },
-    data: { contactEmail: agencyEmail } // TODO: add stripeCustomerId field to schema
+    data: { billingEmail: agencyEmail }
   });
 
   return customer.id;
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     // Get or create Stripe customer
     const customerId = await getOrCreateStripeCustomer(
       agency.id,
-      agency.contactEmail || session.user.email!,
+      agency.billingEmail || agency.notificationEmail || session.user.email!,
       agency.name
     );
 

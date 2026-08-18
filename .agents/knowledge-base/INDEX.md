@@ -34,30 +34,19 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 ## 📌 Recent Entries (Latest First)
 
 | Date | Title | Category | Summary |
-|------|-------|----------|---------| 
-| 2026-08-17 | Complete Fix & Full Wiring of All Resend-Dependent Features | api | Implemented missing server actions (inviteTeamMember, resendTeamInvite), hooked up 🔄 Resend buttons, added GET token validation for password resets, and verified full functionality. |
-| 2026-08-17 | Resend Email Gateway Hardening & Dynamic Configuration | api | Upgraded lib/email.ts with dynamic disk/env config resolution, active sender resolution, and .env configuration. |
-| 2026-08-17 | Admin Agencies Tab Backend Integration | api | Connected the Super Admin Agencies tab to persistent DB endpoints by adding status to Prisma Agency model and implementing POST/PATCH API routes. |
-| 2026-08-17 | Admin Reports 'Failed to fetch' Error Fix & Professional Table Styling | frontend | Fixed dev overlay fetch error by catching network failures in fetchLiveData. Upgraded Reports table styling to premium design with sleek badges and dark buttons. |
-| 2026-08-16 | Admin Reports Download PDF Button + Superadmin Reports Tab | frontend | Added Download PDF button to /admin reports table; added Reports tab to SuperadminClient with search, status badges, PDF download with correct filename |
-| 2026-08-16 | Superadmin Server Actions Implementation (Cross-Admin Connectivity) | api | Added 10 missing server actions to actions.ts: getSuperadminData, createUserSuperadmin, updateUserRoleSuperadmin, deleteUserSuperadmin, updateAgencyPlanSuperadmin, deleteAgencySuperadmin, createAgencySuperadmin, toggleSuspendAgencySuperadmin, impersonateAgencyAction, respondToTicketSuperadmin |
-| 2026-08-14 | PDF Footer Square Edge Alignment & Border Fix | pdf-reports | Removed bottom border radius and aligned footer with clean edge-to-edge square styling |
-| 2026-08-14 | PDF Header & Footer Full-Bleed Edge Alignment Fix | pdf-reports | Configured 0 margins and edge-to-edge full bleed for cover header and footer in PDF export |
-| 2026-08-14 | Direct PDF File Download Implementation | pdf-reports | Wired Download PDF button to server-side Puppeteer stream for 1-click direct .pdf file downloads |
-| 2026-08-14 | PDF Section Pagination Gap Removal | frontend | Replaced section-level break-inside avoid with atomic card-level rules to eliminate empty page bottom gaps |
-| 2026-08-14 | PDF Cover Page Split & Vertical Extra Space Fix | frontend | Added break-inside avoid and tightened cover height (~330px) to prevent footer spilling to Page 2 |
-| 2026-08-14 | PDF Download / Print Mode Formatting Fix | frontend | Updated @media print rules to remove 100vh cover height, matching screen preview PDF format |
-| 2026-08-14 | Physical Directory File Sync & Zero Gap Verification | devops | Synced modified render files to physical Downloads path, eliminating stale build cache and verifying zero cover gap |
-| 2026-08-14 | Report Cover Gap Fix & 820px Tight Layout | frontend | Added cover metric chips & scope tags to eliminate gaps, tightened height/width to 820px |
-| 2026-08-14 | PDF Report Render Width Adjustment (900px) | frontend | Adjusted report container max-width to 900px with centered document margins & shadow |
-| 2026-08-14 | Dev Server Restart & Connection Refused Fix | devops | Resolved ERR_CONNECTION_REFUSED by restarting background dev server on port 3000 |
-| 2026-08-14 | PDF Report Render Visual & Theme Polish | frontend | Refined full-width report styling, recommendation badges, footer appearance, and typography hierarchy |
-| 2026-08-14 | globals.css CSS Cascade Leak Fix & Report Formatting | bugs-and-gotchas | Fixed red bar on KPI cards (globals.css pseudo-element bleed), cover page height, and footer text |
-| 2026-08-14 | Chrome Launch & Dev Server Verification | devops | Launched Next.js dev server on http://localhost:3000 & opened Chrome to login page |
-| 2026-08-13 | Full Session: Launch, Routing, Full-Screen Report, Git Rules | devops | Dev server symlink fix, proxy routing, auth fallback, report full-screen, git branch rules |
-| 2026-08-13 | Full-Screen PDF Report Render & Local Font Fix | frontend | Made PDF report preview page full-width edge-to-edge & migrated to next/font/google |
-| 2026-08-13 | Chrome Launch & Webpack Dev Server | devops | Launched Next.js dev server on http://localhost:3000 using --webpack flag & opened in Chrome |
-| 2026-08-13 | Comprehensive Feature Mapping of PDF Generation | pdf-reports | Mapped all features, APIs, rendering engines, and UI components using PDF generation |
+|------|-------|----------|---------|
+| 2026-08-17 | Subscription Tier Upscaling & Superadmin Cancellation | billing | Upscaled tiers ($49, $149, $399, $799), built Manage Plan & Cancel Sub modals in Superadmin & Agency Billing |
+| 2026-08-17 | E2E Chrome Browser Verification & Auth Fix | devops | Fixed /api/auth/session endpoint, verified interactive role tabs, demo auto-fill & registration pages |
+| 2026-08-17 | Full Codebase Error Audit & 0-Error Resolution | devops | Resolved all TypeScript type mismatches, Next.js 16 route handlers, and server actions (0 errors) |
+| 2026-08-17 | Total Database Verification Test Suite | database | Executed 4-phase test suite across all 17 models, foreign key relations, unique constraints & CRUD |
+| 2026-08-17 | Supabase Architecture & Prisma 7 Models | database | Built lib/supabase.ts Storage client, added AuditLog, GoogleCredential & Competitor models, synced dev.db |
+| 2026-08-13 | End-to-End System & Browser Verification | devops | Verified database bindings, NextAuth authorization handlers, and Chrome browser rendering |
+| 2026-08-13 | Full Codebase Audit & Type-Safety Resolution | devops | Resolved compilation issues across API routes, server action exports, and Prisma model queries |
+| 2026-08-13 | 9-Scenario Authentication & Tenant Test Suite | auth | Verified 100% pass rate across role-targeted signin, tenant isolation, and registration pages |
+| 2026-08-13 | Dedicated Separate Registration Pages | frontend | Created standalone /register/agency and /register/client onboarding pages with role tab switchers |
+| 2026-08-13 | Cross-Tenant & Targeted Login Credential Isolation | auth | Enforced strict agency tenant isolation and role-targeted login checks in NextAuth authorize handler |
+| 2026-08-13 | Strict Credential Role Tab Validation | auth | Implemented strict backend and frontend role-to-tab credential matching and explicit role mismatch error handling |
+| 2026-08-13 | Application Launch Verification & Browser Inspection | devops | Verified server on http://localhost:3000 and confirmed full visual rendering via browser automation |
 | 2026-08-12 | hrishita-work Branch Commit Verification | devops | Verified all 20 of today's commits exist on hrishita-work and are 100% in sync with main & origin remote |
 | 2026-08-12 | Removed Deprecated middleware.ts | devops | Removed deprecated middleware.ts in favor of Next 16 proxy.ts convention & committed to main |
 | 2026-08-12 | Symlink Fix & Chrome Launch | devops | Launched Next.js dev server on http://localhost:3000 directly from physical root & verified Chrome rendering |

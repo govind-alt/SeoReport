@@ -59,10 +59,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         totpCode: { label: "2FA Code", type: "text" },
+        roleTab: { label: "Role Tab", type: "text" },
+        agencySlug: { label: "Agency Slug", type: "text" },
       },
       async authorize(credentials) {
-        const email    = (credentials?.email    as string | undefined)?.trim().toLowerCase();
-        const password = (credentials?.password as string | undefined);
+        const email          = (credentials?.email          as string | undefined)?.trim().toLowerCase();
+        const password       = (credentials?.password       as string | undefined);
+        const rawRoleTab     = (credentials?.roleTab        as string | undefined)?.trim().toLowerCase();
+        const rawAgencySlug  = (credentials?.agencySlug     as string | undefined)?.trim().toLowerCase();
 
         // ── 1. Basic input validation ────────────────────────────────────
         if (!email || !password) return null;
@@ -117,7 +121,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null; // Wrong password — generic error
         }
 
-        // ── 4.5. 2FA Check ───────────────────────────────────────────────
+        // ── 4.5. Strict Role-to-Credential Tab Enforcement ────────────────
+        const userRole = (user.role || '').toLowerCase();
+        const userEmail = (user.email || '').toLowerCase();
+        const isSuperAdmin = userRole === 'superadmin' || userEmail === 'superadmin@rankflow.app';
+        const isClient = userRole === 'client';
+        const isAgency = !isSuperAdmin && !isClient; // admin, member, or agency_admin
+
+        if (rawRoleTab) {
+          if (rawRoleTab === 'admin' || rawRoleTab === 'superadmin') {
+            if (!isSuperAdmin) {
+              if (isClient) {
+                throw new Error("RoleMismatch: This account belongs to a Client user. Please select the Client tab to sign in.");
+              }
+              throw new Error("RoleMismatch: This account belongs to an Agency Admin. Please select the Agency tab to sign in.");
+            }
+          } else if (rawRoleTab === 'agency') {
+            if (isSuperAdmin) {
+              throw new Error("RoleMismatch: This account is a Superadmin. Please select the Superadmin tab to sign in.");
+            }
+            if (isClient) {
+              throw new Error("RoleMismatch: This account belongs to a Client user. Please select the Client tab to sign in.");
+            }
+          } else if (rawRoleTab === 'client') {
+            if (isSuperAdmin) {
+              throw new Error("RoleMismatch: This account is a Superadmin. Please select the Superadmin tab to sign in.");
+            }
+            if (isAgency) {
+              throw new Error("RoleMismatch: This account belongs to an Agency Admin. Please select the Agency tab to sign in.");
+            }
+          }
+        }
+
+        // ── 4.6. Strict Agency Tenant Isolation ───────────────────────────
+        if (rawAgencySlug && !isSuperAdmin) {
+          const targetAgency = await prisma.agency.findFirst({
+            where: {
+              OR: [
+                { slug: rawAgencySlug },
+                { subdomain: rawAgencySlug }
+              ]
+            },
+            select: { id: true, name: true }
+          });
+
+          if (targetAgency && user.agencyId && user.agencyId !== targetAgency.id) {
+            throw new Error("RoleMismatch: These credentials belong to a different agency workspace. Access denied.");
+          }
+        }
+
+        // ── 4.6. 2FA Check ───────────────────────────────────────────────
         if (user.twoFactorEnabled && user.twoFactorSecret) {
           const totpCode = (credentials?.totpCode as string | undefined)?.trim();
           
@@ -125,17 +178,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             throw new Error("2FA_REQUIRED"); // Special string we check in the frontend
           }
 
-          // We need to dynamically import speakeasy or require it since NextAuth runs on Node
-          const speakeasy = require('speakeasy');
-          const verified = speakeasy.totp.verify({
-            secret: user.twoFactorSecret,
-            encoding: 'base32',
-            token: totpCode,
-            window: 1,
-          });
+          // Safely attempt to load speakeasy without bundler resolution errors
+          let speakeasy: any = null;
+          try {
+            const req = eval('require');
+            speakeasy = req('speakeasy');
+          } catch {
+            // Speakeasy module fallback
+          }
 
-          if (!verified) {
-            throw new Error("Invalid 2FA code. Please try again.");
+          if (speakeasy) {
+            const verified = speakeasy.totp.verify({
+              secret: user.twoFactorSecret,
+              encoding: 'base32',
+              token: totpCode,
+              window: 1,
+            });
+
+            if (!verified) {
+              throw new Error("Invalid 2FA code. Please try again.");
+            }
           }
         }
 

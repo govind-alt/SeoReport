@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { google } from 'googleapis';
 
 export async function GET(req: Request) {
   try {
@@ -9,7 +8,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const oauth2Client = new google.auth.OAuth2(
+    let googleModule: any;
+    try {
+      googleModule = eval('require')('googleapis').google;
+    } catch (e) {
+      // Fallback Google OAuth authorization URL when googleapis package is optional
+      const clientId = process.env.GOOGLE_CLIENT_ID || '389833425294-7lfg6488930sbm0svhe0a772lbl4284d.apps.googleusercontent.com';
+      const redirectUri = encodeURIComponent(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/agency/google/callback`);
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fwebmasters.readonly&access_type=offline&prompt=consent&state=${session.user.agencyId}`;
+      return NextResponse.redirect(authUrl);
+    }
+
+    const oauth2Client = new googleModule.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       `${process.env.NEXTAUTH_URL}/api/agency/google/callback`

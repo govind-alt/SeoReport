@@ -74,75 +74,13 @@ export async function GET(request: NextRequest) {
       ? 'localhost' 
       : returnUrl.split('//')[1].split('.')[0];
 
-    // Store GoogleCredential record
-    if (clientId) {
-      // Client-level override
-      const client = await prisma.client.findUnique({
-        where: { id: clientId },
-        include: { googleCredential: true },
-      });
-
-      if (!client) {
-        return new NextResponse('Client not found', { status: 404 });
-      }
-
-      let credential;
-      if (client.googleCredentialId) {
-        credential = await prisma.googleCredential.update({
-          where: { id: client.googleCredentialId },
-          data: {
-            email,
-            accessToken: encryptedAccess,
-            ...(refresh_token ? { refreshToken: encryptedRefresh } : {}),
-            expiresAt,
-          },
-        });
-      } else {
-        credential = await prisma.googleCredential.create({
-          data: {
-            email,
-            accessToken: encryptedAccess,
-            refreshToken: encryptedRefresh,
-            expiresAt,
-            agencyId,
-          },
-        });
-
-        await prisma.client.update({
-          where: { id: clientId },
-          data: {
-            googleCredentialId: credential.id,
-            gscConnected: true,
-          },
-        });
-      }
-    } else {
-      // Agency-level Google account
-      const existingCred = await prisma.googleCredential.findFirst({
-        where: { agencyId, email },
-      });
-
-      if (existingCred) {
-        await prisma.googleCredential.update({
-          where: { id: existingCred.id },
-          data: {
-            accessToken: encryptedAccess,
-            ...(refresh_token ? { refreshToken: encryptedRefresh } : {}),
-            expiresAt,
-          },
-        });
-      } else {
-        await prisma.googleCredential.create({
-          data: {
-            email,
-            accessToken: encryptedAccess,
-            refreshToken: encryptedRefresh,
-            expiresAt,
-            agencyId,
-          },
-        });
-      }
-    }
+    // Store Google OAuth Refresh Token on Agency
+    await prisma.agency.update({
+      where: { id: agencyId },
+      data: {
+        googleRefreshToken: encryptedRefresh,
+      },
+    });
 
     // Redirect user back to the correct tenant origin path
     const redirectUrl = clientId 

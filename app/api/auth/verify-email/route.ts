@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
 
-    const verificationToken = await prisma.emailVerificationToken.findUnique({
+    const verificationToken = await prisma.verificationToken.findFirst({
       where: { token },
     });
 
@@ -18,18 +18,18 @@ export async function POST(req: NextRequest) {
     }
 
     if (verificationToken.expires < new Date()) {
-      await prisma.emailVerificationToken.delete({ where: { token } });
+      await prisma.verificationToken.delete({ where: { identifier_token: { identifier: verificationToken.identifier, token } } });
       return NextResponse.json({ error: "Verification token has expired. Please request a new one." }, { status: 400 });
     }
 
     // Mark email as verified
     await prisma.user.update({
-      where: { id: verificationToken.userId },
+      where: { email: verificationToken.identifier },
       data: { emailVerified: new Date() },
     });
 
     // Delete the used token
-    await prisma.emailVerificationToken.delete({ where: { token } });
+    await prisma.verificationToken.delete({ where: { identifier_token: { identifier: verificationToken.identifier, token } } });
 
     return NextResponse.json({ success: true, message: "Email verified successfully" });
   } catch (error) {
@@ -52,16 +52,16 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Email is already verified" }, { status: 400 });
     }
 
-    // Delete any existing tokens
-    await prisma.emailVerificationToken.deleteMany({ where: { userId: user.id } });
+    // Delete any existing tokens for this email
+    await prisma.verificationToken.deleteMany({ where: { identifier: user.email! } });
 
     // Create new token
     const crypto = await import("crypto");
     const token = crypto.randomBytes(32).toString("hex");
     const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    await prisma.emailVerificationToken.create({
-      data: { userId: user.id, token, expires },
+    await prisma.verificationToken.create({
+      data: { identifier: user.email!, token, expires },
     });
 
     const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;

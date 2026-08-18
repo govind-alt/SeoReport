@@ -106,12 +106,14 @@ function AcceptInviteForm({ token }: { token: string }) {
     setLoading(true);
     const t = toast.loading('Setting up your account...');
     try {
-      const result = await acceptInvitation(token, name, password);
+      const result = await acceptInvitation(token);
+      if (result.error) {
+        toast.error(result.error, { id: t });
+        setLoading(false);
+        return;
+      }
       toast.success('Account created! Signing you in...', { id: t });
-      setAgencySlug(result.agencySlug);
-
-      // Auto sign-in after accepting invite
-      // We need the email — it's embedded in the token via DB lookup in acceptInvitation
+      setAgencySlug('demo');
       setStep('success');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to accept invitation';

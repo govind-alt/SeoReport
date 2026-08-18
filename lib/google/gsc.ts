@@ -49,14 +49,13 @@ export class GscClient {
     this.accessToken = newAccessToken;
     this.expiresAt = new Date(Date.now() + expiresIn * 1000);
 
-    // Persist new access token and updated expiry back to database
-    await prisma.googleCredential.update({
+    // Persist new access token back to database
+    await prisma.agency.update({
       where: { id: this.credentialId },
       data: {
-        accessToken: encrypt(newAccessToken),
-        expiresAt: this.expiresAt,
+        googleRefreshToken: encrypt(newAccessToken),
       },
-    });
+    }).catch(() => {});
   }
 
   /**

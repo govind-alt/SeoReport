@@ -82,25 +82,26 @@ export default function ClientLogin() {
       const res = await signIn('credentials', {
         email: email.trim().toLowerCase(),
         password,
+        roleTab: 'client',
         redirect: false,
-      });
+      }) as { error?: string; url?: string; ok?: boolean } | undefined;
 
       if (res?.error) {
-        setLoginError('Invalid email or password. Please check your credentials and try again.');
-        setLoading(false);
-      } else {
-        // Verify this user is actually a client role
-        const sessionRes = await fetch('/api/auth/session');
-        const session = await sessionRes.json();
-        const role = session?.user?.role;
-
-        if (role === 'admin' || role === 'superadmin') {
-          // Agency admin accidentally used client portal — redirect them to their dashboard
-          const slug = session?.user?.agencyId;
-          window.location.href = '/login';
-          return;
+        let actualError = res.error;
+        if (res.error === 'AccessDenied' && res.url && res.url.includes('?error=')) {
+          try {
+            const customError = new URL(res.url, window.location.origin).searchParams.get('error');
+            if (customError) actualError = customError;
+          } catch (e) {}
         }
 
+        if (actualError.includes('RoleMismatch:')) {
+          setLoginError(actualError.replace('RoleMismatch: ', ''));
+        } else {
+          setLoginError('Invalid client credentials. Please check your email and password.');
+        }
+        setLoading(false);
+      } else {
         window.location.href = buildClientDashboardUrl();
       }
     } catch {

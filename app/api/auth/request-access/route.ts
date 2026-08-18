@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (domain && domain !== 'localhost') {
       agency = await prisma.agency.findFirst({
         where: { OR: [{ slug: domain }, { subdomain: domain }] },
-        select: { id: true, name: true, contactEmail: true }
+        select: { id: true, name: true, notificationEmail: true }
       });
     }
 
@@ -31,8 +31,8 @@ export async function POST(req: NextRequest) {
     console.log(`Email: ${email}`);
     console.log(`Company: ${company || '—'}`);
     console.log(`Agency: ${agency?.name || 'Unknown'}`);
-    if (agency?.contactEmail) {
-      console.log(`Notify admin at: ${agency.contactEmail}`);
+    if (agency?.notificationEmail) {
+      console.log(`Notify admin at: ${agency.notificationEmail}`);
     }
 
     return NextResponse.json({ success: true, message: 'Access request received' });

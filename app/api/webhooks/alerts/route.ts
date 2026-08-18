@@ -35,23 +35,24 @@ export async function POST(req: Request) {
       teams: { success: false, message: 'Not configured' }
     };
 
-    if (agency.slackWebhookUrl) {
-      results.slack = await sendSlackAlert(agency.slackWebhookUrl, payload);
+    const agencyAny = agency as any;
+    if (agencyAny.slackWebhookUrl) {
+      results.slack = await sendSlackAlert(agencyAny.slackWebhookUrl, payload);
     }
 
-    if (agency.teamsWebhookUrl) {
-      results.teams = await sendTeamsAlert(agency.teamsWebhookUrl, payload);
+    if (agencyAny.teamsWebhookUrl) {
+      results.teams = await sendTeamsAlert(agencyAny.teamsWebhookUrl, payload);
     }
 
-    // Audit log entry
-    await prisma.auditLog.create({
+    // Notification log entry
+    await prisma.notification.create({
       data: {
         agencyId: agency.id,
-        action: `Alert Dispatched: ${type || 'Test Audit Alert'} for ${payload.clientName}`,
-        userName: 'System Alert Engine',
-        userInitials: 'SA'
+        type: 'alert',
+        title: `Alert Dispatched: ${type || 'Test Audit Alert'}`,
+        body: `Alert dispatched for ${payload.clientName}`,
       }
-    });
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
@@ -59,9 +60,8 @@ export async function POST(req: Request) {
       payload,
       results
     });
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Alert dispatch error';
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Alert processing failed' }, { status: 500 });
   }
 }
 
@@ -71,16 +71,15 @@ export async function POST(req: Request) {
  */
 export async function PUT(req: Request) {
   try {
-    const body = await req.json();
-    const { agencyId, slackWebhookUrl, teamsWebhookUrl } = body;
+    const { agencyId, slackWebhookUrl, teamsWebhookUrl } = await req.json();
 
     if (!agencyId) {
       return NextResponse.json({ error: 'agencyId is required' }, { status: 400 });
     }
 
     const updateData: Record<string, string> = {};
-    if (slackWebhookUrl !== undefined) updateData.slackWebhookUrl = slackWebhookUrl.trim();
-    if (teamsWebhookUrl !== undefined) updateData.teamsWebhookUrl = teamsWebhookUrl.trim();
+    if (slackWebhookUrl !== undefined) updateData.slackWebhookUrl = slackWebhookUrl;
+    if (teamsWebhookUrl !== undefined) updateData.teamsWebhookUrl = teamsWebhookUrl;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No webhook URL provided' }, { status: 400 });
@@ -91,14 +90,14 @@ export async function PUT(req: Request) {
       data: updateData as any,
     });
 
-    await prisma.auditLog.create({
+    await prisma.notification.create({
       data: {
         agencyId,
-        action: `Webhook URL updated: ${Object.keys(updateData).join(', ')}`,
-        userName: 'Agency Settings',
-        userInitials: 'AS',
+        type: 'alert',
+        title: 'Webhook Configuration Updated',
+        body: `Webhook URL updated: ${Object.keys(updateData).join(', ')}`,
       }
-    });
+    }).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

@@ -20,7 +20,6 @@ export default async function TeamPage({ params }: { params: Promise<{ domain: s
         orderBy: { createdAt: 'desc' }
       },
       invitations: {
-        where: { role: { not: 'client' } },
         orderBy: { createdAt: 'desc' }
       }
     }
@@ -31,7 +30,7 @@ export default async function TeamPage({ params }: { params: Promise<{ domain: s
   }
 
   // Formatting for the client
-  const users = agency.users.map(u => ({
+  const users = (agency.users || []).map((u: any) => ({
     id: u.id,
     name: u.name,
     email: u.email,
@@ -40,10 +39,10 @@ export default async function TeamPage({ params }: { params: Promise<{ domain: s
     lastActive: 'Just now' // mock
   }));
 
-  const pendingInvites = agency.invitations.map(i => ({
+  const pendingInvites = (agency.invitations || []).map((i: any) => ({
     id: i.id,
     email: i.email,
-    role: i.role,
+    role: 'member',
     status: 'Pending',
     expires: new Date(i.expiresAt).toLocaleDateString()
   }));

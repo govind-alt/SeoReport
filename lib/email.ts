@@ -6,9 +6,15 @@
  * so the app works in development without any email config.
  */
 
-import { Resend } from 'resend';
-import fs from 'fs';
-import path from 'path';
+let ResendClass: any = null;
+try {
+  const req = eval('require');
+  ResendClass = req('resend').Resend;
+} catch {
+  // Module optional fallback when resend package is not present in node_modules
+}
+
+const resend = (ResendClass && process.env.RESEND_API_KEY) ? new ResendClass(process.env.RESEND_API_KEY) : null;
 
 /**
  * Dynamically resolves Resend configuration from environment variables or disk-persisted settings.
@@ -45,9 +51,7 @@ async function sendEmail(opts: {
   html: string;
   replyTo?: string;
 }) {
-  const { apiKey, from } = getEmailConfig();
-
-  if (!apiKey) {
+  if (!resend || !process.env.RESEND_API_KEY) {
     // Dev fallback — print to console
     console.log('\n[EMAIL DEV FALLBACK — No RESEND_API_KEY configured]');
     console.log('To:', opts.to);

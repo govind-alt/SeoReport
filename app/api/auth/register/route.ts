@@ -45,9 +45,8 @@ export async function POST(req: NextRequest) {
           name: agencyName,
           slug: cleanSubdomain,
           subdomain: cleanSubdomain,
-          contactEmail: email,
+          billingEmail: email,
           plan: "starter",
-          onboardingStep: 0,
         },
       });
 
@@ -65,9 +64,9 @@ export async function POST(req: NextRequest) {
       const verificationToken = crypto.randomBytes(32).toString("hex");
       const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-      await tx.emailVerificationToken.create({
+      await tx.verificationToken.create({
         data: {
-          userId: user.id,
+          identifier: user.email!,
           token: verificationToken,
           expires,
         },

@@ -13,12 +13,23 @@ export async function PUT(
       return NextResponse.json({ error: "competitors must be an array" }, { status: 400 });
     }
 
-    await prisma.client.update({
-      where: { id: clientId },
-      data: { competitors: JSON.stringify(competitors) },
-    });
+    // Delete existing competitors and recreate
+    await prisma.competitor.deleteMany({ where: { clientId } });
 
-    return NextResponse.json({ success: true, competitors });
+    for (const comp of competitors) {
+      const compName = typeof comp === 'string' ? comp : (comp.name || comp.domain || 'Competitor');
+      const compDomain = typeof comp === 'string' ? comp : (comp.domain || comp.name || 'competitor.com');
+      await prisma.competitor.create({
+        data: {
+          clientId,
+          name: compName,
+          domain: compDomain,
+        }
+      });
+    }
+
+    const updatedCompetitors = await prisma.competitor.findMany({ where: { clientId } });
+    return NextResponse.json({ success: true, competitors: updatedCompetitors });
   } catch (error) {
     console.error("Update competitors error:", error);
     return NextResponse.json({ error: "Failed to update competitors" }, { status: 500 });
@@ -31,16 +42,10 @@ export async function GET(
 ) {
   try {
     const { clientId } = await params;
-    const client = await prisma.client.findUnique({
-      where: { id: clientId },
-      select: { competitors: true },
+    const competitors = await prisma.competitor.findMany({
+      where: { clientId },
     });
 
-    if (!client) {
-      return NextResponse.json({ error: "Client not found" }, { status: 404 });
-    }
-
-    const competitors = client.competitors ? JSON.parse(client.competitors) : [];
     return NextResponse.json({ competitors });
   } catch (error) {
     return NextResponse.json({ error: "Failed to get competitors" }, { status: 500 });

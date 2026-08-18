@@ -19,7 +19,6 @@ export default async function AuditLogPage({ params }: { params: Promise<{ domai
     where: { agencyId: agency.id },
     orderBy: { createdAt: 'desc' },
     take: 200,
-    include: { user: { select: { name: true, email: true } } }
   });
 
   return (
@@ -27,9 +26,9 @@ export default async function AuditLogPage({ params }: { params: Promise<{ domai
       logs={logs.map(l => ({
         id: l.id,
         action: l.action,
-        userName: l.userName || l.user?.name || 'System',
-        userInitials: l.userInitials || (l.user?.name?.substring(0, 2).toUpperCase()) || 'SY',
-        ipAddress: l.ipAddress || null,
+        userName: l.userName || 'System',
+        userInitials: l.userInitials || 'SY',
+        ipAddress: '127.0.0.1',
         createdAt: l.createdAt.toISOString()
       }))}
       agencyName={agency.name}

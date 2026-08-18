@@ -12,7 +12,6 @@ export async function GET(
       where: { id },
       select: {
         id: true,
-        title: true,
         status: true,
         pdfUrl: true,
         createdAt: true,
@@ -27,7 +26,7 @@ export async function GET(
 
     return NextResponse.json({
       id: report.id,
-      title: report.title,
+      title: `SEO Performance Report`,
       status: report.status,
       pdfUrl: report.pdfUrl,
       clientName: report.client?.name,

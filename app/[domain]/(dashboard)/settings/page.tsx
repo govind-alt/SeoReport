@@ -773,7 +773,7 @@ function SettingsContent() {
                     <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>Google Search Console</div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Clicks · Impressions · CTR · Average Position</div>
                   </div>
-                  {hasGsc ? <StatusBadge status="active" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { window.location.href = '/api/agency/google/auth'; }}>Connect OAuth</button>}
+                  {hasGsc ? <StatusBadge status="connected" /> : <button className="btn btn-primary" style={{ fontSize: 11, padding: '6px 12px', borderRadius: 6 }} onClick={() => { window.location.href = '/api/agency/google/auth'; }}>Connect OAuth</button>}
                 </div>
                 <div style={{ padding: '16px 24px', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>OAuth 2.0 GSC integration pulls real click, impression and CTR data directly from your Google property.</span>

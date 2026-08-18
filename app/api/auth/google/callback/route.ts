@@ -72,31 +72,13 @@ export async function GET(request: NextRequest) {
     const expiresAt = new Date(Date.now() + (expires_in * 1000));
 
     // Find or create GoogleCredential record for this agency
-    const existingCred = await prisma.googleCredential.findFirst({
-      where: { agencyId: agency.id, email: userInfo.email }
+    // Store Google OAuth Refresh Token on Agency
+    await prisma.agency.update({
+      where: { id: agency.id },
+      data: {
+        googleRefreshToken: refresh_token ? encrypt(refresh_token) : undefined,
+      }
     });
-
-    if (existingCred) {
-      await prisma.googleCredential.update({
-        where: { id: existingCred.id },
-        data: {
-          accessToken: encrypt(access_token),
-          refreshToken: refresh_token ? encrypt(refresh_token) : existingCred.refreshToken,
-          expiresAt,
-          updatedAt: new Date()
-        }
-      });
-    } else {
-      await prisma.googleCredential.create({
-        data: {
-          email: userInfo.email,
-          accessToken: encrypt(access_token),
-          refreshToken: encrypt(refresh_token || ''),
-          expiresAt,
-          agencyId: agency.id
-        }
-      });
-    }
 
     console.log(`[GSC OAUTH] Connected Google account ${userInfo.email} to agency ${agency.name}`);
     return NextResponse.redirect(`${appUrl}/${domain}/integrations?success=gsc_connected`);

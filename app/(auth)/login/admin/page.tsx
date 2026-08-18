@@ -53,27 +53,27 @@ export default function AdminLogin() {
       const res = await signIn('credentials', {
         email: email.trim().toLowerCase(),
         password,
+        roleTab: 'admin',
         redirect: false,
-      });
+      }) as { error?: string; url?: string; ok?: boolean } | undefined;
 
       if (res?.error) {
-        setLoginError('Invalid superadmin credentials. Access denied.');
+        let actualError = res.error;
+        if (res.error === 'AccessDenied' && res.url && res.url.includes('?error=')) {
+          try {
+            const customError = new URL(res.url, window.location.origin).searchParams.get('error');
+            if (customError) actualError = customError;
+          } catch (e) {}
+        }
+
+        if (actualError.includes('RoleMismatch:')) {
+          setLoginError(actualError.replace('RoleMismatch: ', ''));
+        } else {
+          setLoginError('Invalid superadmin credentials. Access denied.');
+        }
         setLoading(false);
       } else {
-        // Verify the user actually has superadmin role
-        const sessionRes = await fetch('/api/auth/session');
-        const session = await sessionRes.json();
-        const role = (session?.user?.role as string)?.toLowerCase();
-
-        if (role === 'superadmin') {
-          window.location.href = '/superadmin';
-        } else if (role === 'admin' || role === 'member') {
-          // Agency admin accidentally used superadmin login — redirect to their dashboard
-          window.location.href = '/login';
-        } else {
-          setLoginError('Access denied. This portal is for Superadmins only.');
-          setLoading(false);
-        }
+        window.location.href = '/superadmin';
       }
     } catch {
       setLoginError('Something went wrong. Please try again.');

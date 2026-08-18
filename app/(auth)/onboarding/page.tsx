@@ -18,16 +18,11 @@ export default async function OnboardingPage() {
     redirect('/login');
   }
 
-  // If already fully onboarded, redirect to dashboard
-  if (user.agency.onboardingStep >= 5 || user.agency.onboardingSkipped) {
-    redirect(`/${user.agency.slug}`);
-  }
-
   return (
     <OnboardingClient 
       agencyName={user.agency.name} 
       slug={user.agency.slug}
-      initialStep={user.agency.onboardingStep || 1} 
+      initialStep={1} 
     />
   );
 }
