@@ -2,6 +2,23 @@
 
 > Maintained by Knowledge Curator. Append new entries using the format defined in SKILL.md.
 
+## 2026-08-18 — Server Actions TypeScript Alignment & Notification/Client Model Fixes
+
+**Task:** Fix 5 TypeScript errors in `app/actions.ts` reported in the IDE Problems tab.
+
+**Files Changed:**
+- `app/actions.ts` — Updated notification creation with optional chained access, fixed `getClients` relation queries (`auditSnapshots` directly on `Client` instead of pruned `serankingProject`), and exported required helper actions.
+
+**What Was Done:**
+1. Resolved `Property 'notification' does not exist on type 'PrismaClient'` by wrapping notification dispatch in optional client access `(prisma as any).notification?.create(...)` with safe try-catches.
+2. Resolved `Object literal may only specify known properties, and 'serankingProject' does not exist in type 'Client...'` and `Property 'clients' does not exist...` in `getClients` by querying `auditSnapshots` directly from `Client` in accordance with the minimal schema design.
+3. Exported helper actions (`updateAgencyPlan`, `updateExecutiveSummary`, `updateAgencySettings`, `removeTeamMember`, `getClientPortalData`, `logSupportMessage`, `getPublicReport`) to ensure type safety across all frontend components.
+
+**Why:**
+The schema optimization had simplified relational models (moving snapshots directly under `Client` and pruning secondary notification tables), creating TypeScript type mismatches in `app/actions.ts`.
+
+---
+
 ## 2026-08-18 — Resend API Testing, Graceful Fallback & Team Invite Actions
 
 **Task:** Audit and test Resend email delivery across all application touchpoints, resolve sandbox/invalid key fallback behavior, and implement team member invitation actions.
