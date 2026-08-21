@@ -14,7 +14,8 @@ import {
   Check, UserPlus, ExternalLink, FileText, LayoutDashboard, CreditCard,
   Plus, Edit2, Trash2, CheckCircle, AlertTriangle, Layers, Wifi,
   Menu, ChevronDown, Filter, MoreVertical, Clock, Cpu, HardDrive,
-  TrendingDown, Radio, Key, Power, User
+  TrendingDown, Radio, Key, Power, User, ToggleLeft, ToggleRight, Send,
+  Megaphone, SlidersHorizontal
 } from 'lucide-react';
 
 /* ─── Colour tokens (navy-blue + white theme) ─── */
@@ -54,7 +55,7 @@ const statusStyle: Record<string, { bg: string; color: string; dot: string }> = 
   suspended: { bg: '#FEF2F2', color: '#DC2626', dot: '#DC2626' },
 };
 
-type Tab = 'overview' | 'agencies' | 'clients' | 'reports' | 'users' | 'system' | 'billing' | 'settings';
+type Tab = 'overview' | 'agencies' | 'clients' | 'reports' | 'users' | 'system' | 'billing' | 'broadcast' | 'feature-flags' | 'integrations' | 'settings';
 
 /* ─── Shared UI helpers ─── */
 function Badge({ label, style }: { label: string; style: { bg: string; color: string; border?: string } }) {
@@ -224,6 +225,23 @@ export default function AdminPage() {
   const [deleteUser, setDeleteUser] = useState<any>(null);
   const [editUser, setEditUser] = useState<any>(null);
 
+  /* ── Broadcasts ── */
+  interface Broadcast { id: string; title: string; message: string; target: string; type: string; date: string; status: 'active' | 'archived'; reach: string; actionUrl: string; }
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([
+    { id: '1', title: 'Scheduled Platform Maintenance Notice', message: 'RankFlow will undergo scheduled maintenance on Sunday, 2–4 AM UTC. Expect brief downtime.', target: 'All Agencies & Clients', type: 'System Warning', date: 'Aug 20, 2026', status: 'active', reach: '29 agencies', actionUrl: '' },
+    { id: '2', title: 'New Strategic SEO Recommendations Available', message: 'Upgraded recommendation engine now generates richer, more actionable SEO summaries inside report PDFs.', target: 'Pro & Enterprise', type: 'Feature Release', date: 'Aug 15, 2026', status: 'active', reach: '24 agencies', actionUrl: '' },
+    { id: '3', title: 'SE Ranking Gateway Update Required', message: 'Please re-sync your SE Ranking project to pick up improved keyword data accuracy.', target: 'All Agencies', type: 'Critical Alert', date: 'Aug 02, 2026', status: 'archived', reach: '29 agencies', actionUrl: '' },
+  ]);
+  const [newBroadcast, setNewBroadcast] = useState({ title: '', message: '', target: 'All Agencies & Clients', type: 'Feature Release', actionUrl: '' });
+
+  /* ── Feature flags ── */
+  const [featureFlags, setFeatureFlags] = useState({ publicSignups: true, aiRecommendations: true, autoSslProvisioning: false, whiteLabelPdfs: true, staggeredSync: true, directMessaging: false });
+  const [tierLimits, setTierLimits] = useState({
+    starter:    { price: 99,  maxClients: 5,   maxKeywords: 500,  maxReports: 10 },
+    pro:        { price: 299, maxClients: 25,  maxKeywords: 2000, maxReports: 50 },
+    enterprise: { price: 999, maxClients: 999, maxKeywords: 9999, maxReports: 999 },
+  });
+
   /* ── Plan filter ── */
   const [planFilter, setPlanFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -380,14 +398,17 @@ export default function AdminPage() {
 
   /* ─── Nav items ─── */
   const navItems: { id: Tab; label: string; icon: React.ReactNode; count?: number }[] = [
-    { id: 'overview',  label: 'Overview',    icon: <LayoutDashboard size={17} /> },
-    { id: 'agencies',  label: 'Agencies',    icon: <Building2 size={17} />,   count: agencies.length },
-    { id: 'clients',   label: 'Clients',     icon: <Users size={17} />,       count: clients.length },
-    { id: 'reports',   label: 'Reports',     icon: <FileText size={17} />,    count: reports.length },
-    { id: 'users',     label: 'Users',       icon: <User size={17} />,        count: users.length },
-    { id: 'system',    label: 'System Health', icon: <Activity size={17} /> },
-    { id: 'billing',   label: 'Billing',     icon: <CreditCard size={17} /> },
-    { id: 'settings',  label: 'Settings',    icon: <Settings size={17} /> },
+    { id: 'overview',      label: 'Overview',       icon: <LayoutDashboard size={17} /> },
+    { id: 'agencies',      label: 'Agencies',       icon: <Building2 size={17} />,       count: agencies.length },
+    { id: 'clients',       label: 'Clients',        icon: <Users size={17} />,           count: clients.length },
+    { id: 'reports',       label: 'Reports',        icon: <FileText size={17} />,        count: reports.length },
+    { id: 'users',         label: 'Users',          icon: <User size={17} />,            count: users.length },
+    { id: 'system',        label: 'System Health',  icon: <Activity size={17} /> },
+    { id: 'billing',       label: 'Billing',        icon: <CreditCard size={17} /> },
+    { id: 'broadcast',     label: 'Broadcasts',     icon: <Megaphone size={17} />,       count: broadcasts.filter(b=>b.status==='active').length },
+    { id: 'feature-flags', label: 'Feature Flags',  icon: <SlidersHorizontal size={17} /> },
+    { id: 'integrations',  label: 'Integrations',   icon: <Zap size={17} /> },
+    { id: 'settings',      label: 'Settings',       icon: <Settings size={17} /> },
   ];
 
   /* ════ RENDER ════ */
@@ -944,6 +965,218 @@ export default function AdminPage() {
                     );
                   })}
                 </div>
+              </Card>
+            </div>
+          )}
+
+          {/* ──────────────── BROADCASTS ──────────────── */}
+          {tab === 'broadcast' && (
+            <div className="section-fade">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                {/* Compose */}
+                <Card style={{ padding: 24 }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Dispatch Platform Announcement</div>
+                  <div style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Send a notice to all agencies and clients on the platform</div>
+                  <form onSubmit={e => {
+                    e.preventDefault();
+                    const nb: any = { id: Date.now().toString(), ...newBroadcast, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), status: 'active', reach: `${agencies.length} agencies` };
+                    setBroadcasts(prev => [nb, ...prev]);
+                    setNewBroadcast({ title: '', message: '', target: 'All Agencies & Clients', type: 'Feature Release', actionUrl: '' });
+                    showToast('Announcement dispatched to all tenants!');
+                  }}>
+                    <Field label="Announcement Title *"><input required value={newBroadcast.title} onChange={e => setNewBroadcast({ ...newBroadcast, title: e.target.value })} style={inputStyle} placeholder="e.g. New Feature Available" /></Field>
+                    <Field label="Audience Target">
+                      <select value={newBroadcast.target} onChange={e => setNewBroadcast({ ...newBroadcast, target: e.target.value })} style={inputStyle}>
+                        <option>All Agencies & Clients</option>
+                        <option>Agencies Only</option>
+                        <option>Pro & Enterprise</option>
+                        <option>Clients Only</option>
+                      </select>
+                    </Field>
+                    <Field label="Category">
+                      <select value={newBroadcast.type} onChange={e => setNewBroadcast({ ...newBroadcast, type: e.target.value })} style={inputStyle}>
+                        <option>Feature Release</option>
+                        <option>System Warning</option>
+                        <option>Critical Alert</option>
+                        <option>Billing Notice</option>
+                      </select>
+                    </Field>
+                    <Field label="Message Content *">
+                      <textarea required rows={4} value={newBroadcast.message} onChange={e => setNewBroadcast({ ...newBroadcast, message: e.target.value })} style={{ ...inputStyle, resize: 'vertical' as any }} placeholder="Type announcement for users..." />
+                    </Field>
+                    <Field label="Action URL (Optional)"><input value={newBroadcast.actionUrl} onChange={e => setNewBroadcast({ ...newBroadcast, actionUrl: e.target.value })} style={inputStyle} placeholder="/settings or https://docs.rankflow.app" /></Field>
+                    <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}><Send size={13} /> Dispatch Announcement</button>
+                  </form>
+                </Card>
+
+                {/* History */}
+                <Card style={{ overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Broadcast History ({broadcasts.length})</div>
+                    <span style={{ fontSize: 11, color: C.success, fontWeight: 700 }}>● {broadcasts.filter(b=>b.status==='active').length} Active</span>
+                  </div>
+                  <div style={{ maxHeight: 520, overflowY: 'auto' }}>
+                    {broadcasts.map(b => (
+                      <div key={b.id} style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: b.status === 'active' ? C.white : C.bg }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{b.title}</div>
+                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: b.status === 'active' ? '#ECFDF5' : C.bg, color: b.status === 'active' ? C.success : C.muted }}>{b.status.toUpperCase()}</span>
+                        </div>
+                        <div style={{ fontSize: 11, color: C.textSub, marginBottom: 8 }}>{b.message}</div>
+                        <div style={{ fontSize: 11, color: C.muted, display: 'flex', gap: 12, marginBottom: 10 }}>
+                          <span>Audience: <strong>{b.target}</strong></span>
+                          <span>Reach: <strong>{b.reach}</strong></span>
+                          <span>Date: <strong>{b.date}</strong></span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                          <button onClick={() => { setBroadcasts(prev => prev.map(x => x.id===b.id?{...x,status:x.status==='active'?'archived':'active'}:x)); showToast(`Broadcast ${b.status==='active'?'archived':'restored'}`); }} className="btn-ghost" style={{ padding: '4px 10px', fontSize: 11 }}>{b.status==='active'?'Archive':'Restore'}</button>
+                          <button onClick={() => { setBroadcasts(prev => prev.filter(x=>x.id!==b.id)); showToast('Broadcast deleted','info'); }} className="btn-danger" style={{ padding: '4px 10px', fontSize: 11 }}>Delete</button>
+                        </div>
+                      </div>
+                    ))}
+                    {broadcasts.length===0 && <div style={{ padding: 30, textAlign: 'center', color: C.muted, fontSize: 13 }}>No broadcasts yet</div>}
+                  </div>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* ──────────────── FEATURE FLAGS ──────────────── */}
+          {tab === 'feature-flags' && (
+            <div className="section-fade">
+              <Card style={{ padding: 24, marginBottom: 20 }}>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Global Feature Flags</div>
+                <div style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Enable or disable global system capabilities across all tenants</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+                  {([
+                    { key: 'publicSignups',       title: 'Public Self-Serve Signups',    desc: 'Allows new agencies to register directly from /login' },
+                    { key: 'aiRecommendations',   title: 'Strategic Recommendations',    desc: 'Generates automated SEO tips inside report PDFs' },
+                    { key: 'autoSslProvisioning', title: 'Automatic SSL Certificates',   desc: 'Auto-provisions Let\'s Encrypt SSL for custom CNAMEs' },
+                    { key: 'whiteLabelPdfs',      title: 'White-Label Branding',         desc: 'Removes RankFlow watermarks for Pro and Enterprise plans' },
+                    { key: 'staggeredSync',       title: 'Staggered API Rate-Limiter',   desc: 'Queues background SE Ranking API checks to prevent 429 errors' },
+                    { key: 'directMessaging',     title: 'Client Portal Direct Chat',    desc: 'Enables 2-way messaging between clients and agencies' },
+                  ] as { key: keyof typeof featureFlags; title: string; desc: string }[]).map(flag => {
+                    const enabled = featureFlags[flag.key];
+                    return (
+                      <div key={flag.key} style={{ background: C.bg, border: `1.5px solid ${enabled ? C.blue + '40' : C.border}`, borderRadius: 12, padding: 16, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', transition: 'border-color 0.2s' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{flag.title}</span>
+                            <button onClick={() => { const next=!enabled; setFeatureFlags(prev=>({...prev,[flag.key]:next})); showToast(`${flag.title} ${next?'enabled':'disabled'}`); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: enabled ? C.success : C.muted, padding: 0 }}>
+                              {enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
+                            </button>
+                          </div>
+                          <div style={{ fontSize: 11, color: C.textSub, lineHeight: 1.5 }}>{flag.desc}</div>
+                        </div>
+                        <div style={{ marginTop: 12, fontSize: 10, fontWeight: 700, color: enabled ? C.success : C.muted }}>
+                          {enabled ? '● ACTIVE GLOBALLY' : '○ DISABLED'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+
+              <Card style={{ padding: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Subscription Tier Resource Limits</div>
+                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Define pricing and quotas per plan tier</div>
+                  </div>
+                  <button onClick={() => showToast('Tier configurations saved!')} className="btn-primary"><Check size={13} /> Save Tier Config</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 18 }}>
+                  {(['starter','pro','enterprise'] as const).map(tier => {
+                    const data = tierLimits[tier];
+                    return (
+                      <div key={tier} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 18 }}>
+                        <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, textTransform: 'capitalize', marginBottom: 14, display: 'flex', justifyContent: 'space-between' }}>
+                          <span>{tier}</span>
+                          <span style={{ fontSize: 13, color: C.blue }}>${data.price}/mo</span>
+                        </div>
+                        {[['Price ($/mo)', 'price'], ['Max Clients', 'maxClients'], ['Max Keywords', 'maxKeywords'], ['Max Reports/mo', 'maxReports']].map(([label, field]) => (
+                          <div key={field} style={{ marginBottom: 10 }}>
+                            <label style={{ fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>{label}</label>
+                            <input type="number" value={(data as any)[field]} onChange={e => setTierLimits({ ...tierLimits, [tier]: { ...data, [field]: Number(e.target.value) } })} style={{ ...inputStyle, background: C.white }} />
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* ──────────────── INTEGRATIONS ──────────────── */}
+          {tab === 'integrations' && (
+            <div className="section-fade">
+              <Card style={{ overflow: 'hidden', marginBottom: 20 }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, fontSize: 15, fontWeight: 800, color: C.navy }}>API Gateway Status</div>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: C.bg }}>
+                      {['Service', 'API Key (masked)', 'Status', 'Rate Limit', 'Latency', 'Last Tested'].map(h => (
+                        <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: `1px solid ${C.border}` }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { name: 'SE Ranking API Gateway', key: 'ser_live_948f2j48****', status: 'Operational', limit: '1,000 req/min', latency: '34ms', tested: '1 min ago' },
+                      { name: 'Resend Email Gateway',    key: 're_498dh28h_****',       status: 'Operational', limit: '500 emails/day', latency: '45ms', tested: '12 mins ago' },
+                      { name: 'Stripe Billing Webhooks', key: 'whsec_9482jd98****',     status: 'Operational', limit: 'Live Handler', latency: '18ms', tested: '3 mins ago' },
+                      { name: 'Supabase Database',       key: 'postgres://****',        status: health?.dbStatus === 'operational' ? 'Operational' : 'Degraded', limit: 'Unlimited', latency: health ? `${health.dbLatency}ms` : '…', tested: 'Live' },
+                    ].map((row, i) => (
+                      <tr key={i} className="table-row">
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 13, fontWeight: 700, color: C.navy }}>{row.name}</td>
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontFamily: 'monospace', color: C.textSub }}>{row.key}</td>
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}` }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: row.status === 'Operational' ? C.success : C.danger }}>
+                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: row.status === 'Operational' ? C.success : C.danger, display: 'inline-block', boxShadow: `0 0 5px ${row.status === 'Operational' ? C.success : C.danger}` }} />
+                            {row.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, color: C.muted }}>{row.limit}</td>
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.latency}</td>
+                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.tested}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card>
+
+              <Card style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Webhook & Event Dispatch Log</div>
+                  <span style={{ fontSize: 11, color: C.success, fontWeight: 700 }}>● Listening on /api/webhooks/*</span>
+                </div>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: C.bg }}>
+                      {['Event ID', 'Gateway / Source', 'Event Type', 'Status', 'HTTP', 'Time'].map(h => (
+                        <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: `1px solid ${C.border}` }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { id: 'evt_3Mj84d29hd92', source: 'Stripe Gateway',     type: 'customer.subscription.created',     status: 'Success', code: 200, time: '2 mins ago' },
+                      { id: 'evt_94Kf92kd92kd', source: 'SE Ranking Proxy',   type: 'project.audit.completed',            status: 'Success', code: 200, time: '14 mins ago' },
+                      { id: 'evt_10X83jd92hd9', source: 'Resend Mailer',      type: 'email.delivered.report_ready',       status: 'Success', code: 200, time: '1 hour ago' },
+                      { id: 'evt_48K2kd92hd92', source: 'Supabase Realtime',  type: 'db.agency.created',                  status: 'Success', code: 200, time: '3 hours ago' },
+                    ].map((row, i) => (
+                      <tr key={i} className="table-row">
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, fontFamily: 'monospace', color: C.textSub }}>{row.id}</td>
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.source}</td>
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.blue, fontFamily: 'monospace' }}>{row.type}</td>
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}><Badge label={row.status} style={{ bg: '#ECFDF5', color: C.success, border: '#BBF7D0' }} /></td>
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.success }}>{row.code}</td>
+                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.time}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </Card>
             </div>
           )}
