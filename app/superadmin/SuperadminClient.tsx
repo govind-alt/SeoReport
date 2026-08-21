@@ -465,7 +465,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
         { id: 'reports', label: 'Reports', icon: '📄' },
         { id: 'tickets', label: 'Support Tickets', icon: '💬' },
         { id: 'api-limits', label: 'API Quotas', icon: '⚡' },
-        { id: 'broadcast', label: 'Broadcast Banners', icon: '📢' },
+
         { id: 'security', label: 'Security Trail', icon: '🛡️' },
         { id: 'system', label: 'System Health', icon: '🖥️' },
         { id: 'billing', label: 'Billing', icon: '💰' }
@@ -1412,74 +1412,6 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
           </div>
         )}
 
-        {/* TAB: BROADCAST BANNERS */}
-        {activeTab === 'broadcast' && (
-          <div className="fade-in">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <div>
-                <h2 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '6px' }}>📢 Global System Announcements &amp; Banners</h2>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '14px' }}>Publish real-time notification banners across all agency tenant dashboards.</p>
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px' }}>Broadcast Announcement Configuration</h3>
-
-                <form onSubmit={e => {
-                  e.preventDefault();
-                  setBroadcastActive(true);
-                  toast.success('Global broadcast banner updated and published live!');
-                }}>
-                  <div className="form-group" style={{ marginBottom: '20px' }}>
-                    <label className="form-label">Banner Text / Alert Message *</label>
-                    <textarea
-                      className="form-input"
-                      rows={3}
-                      value={broadcastMessage}
-                      onChange={e => setBroadcastMessage(e.target.value)}
-                      required
-                      style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', fontFamily: 'inherit' }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                    <div>
-                      <div style={{ fontSize: '14px', fontWeight: 700 }}>Banner Visibility Status</div>
-                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>Toggle banner display across agency tenant dashboards.</div>
-                    </div>
-                    <button
-                      type="button"
-                      className={`btn ${broadcastActive ? 'btn-success' : 'btn-secondary'} btn-sm`}
-                      onClick={() => {
-                        setBroadcastActive(!broadcastActive);
-                        toast.info(broadcastActive ? 'Broadcast banner hidden.' : 'Broadcast banner published live!');
-                      }}
-                    >
-                      {broadcastActive ? '🟢 Live Broadcast' : '⚪ Hidden'}
-                    </button>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                    <button type="submit" className="btn btn-primary">
-                      📢 Publish Global Broadcast Banner
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '28px' }}>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '16px' }}>Live Banner Preview</h3>
-                <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '20px' }}>This is how the broadcast announcement appears at the top of agency dashboards:</div>
-
-                <div style={{ background: 'linear-gradient(90deg, #6366F1, #8B5CF6)', color: 'white', padding: '12px 20px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>📢 {broadcastMessage}</div>
-                  <span style={{ fontSize: '12px', opacity: 0.7 }}>✕</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* TAB: SECURITY TRAIL */}
         {activeTab === 'security' && (
