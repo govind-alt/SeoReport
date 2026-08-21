@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-21 | Agency Sidebar & Route Inbox Removal | frontend | Removed Inbox item from Sidebar navigation and deleted /inbox dashboard route |
 | 2026-08-18 | Server Actions TypeScript Alignment & Notification/Client Model Fixes | api | Fixed notification and getClients relations in app/actions.ts to align with minimal Prisma schema |
 | 2026-08-18 | Dev Server Startup & Chrome Browser Launch | devops | Launched Next.js dev server on http://localhost:3000 and opened Google Chrome to the RankFlow login view |
 | 2026-08-18 | Google OAuth Configuration, Role Routing & /auth-success Page | auth | Configured Google OAuth credentials in .env, created /auth-success router handling role-based redirection to agency dashboard |

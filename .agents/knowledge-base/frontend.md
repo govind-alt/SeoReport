@@ -264,3 +264,30 @@ The user found the split-scroll partition and wide sign-in panel visually fragme
 - Ensure `html` and `body` do not have `overflow: hidden` when unified scrolling is desired.
 
 ---
+
+## [2026-08-21] Agency Sidebar & Route Inbox Removal
+
+**Task:** Remove the "Inbox" navigation item and `/inbox` route from the agency portal.  
+**Files Changed:**
+- `components/ui/Sidebar.tsx` — modified (removed Inbox item and icon)
+- `app/[domain]/(dashboard)/inbox/` — deleted (removed route directory)
+- `C:\SeoReport\components\ui\Sidebar.tsx` — synced
+- `C:\SeoReport\app\[domain]\(dashboard)\inbox\` — synced
+
+**What Was Done:**
+1. Cleaned up agency `Sidebar.tsx` navigation items list and Lucide icon imports to exclude `Inbox`.
+2. Removed the `/inbox` page directory under `app/[domain]/(dashboard)/inbox/`.
+3. Synchronized active working folders and verified via Chrome automation that the agency sidebar contains only the 9 essential navigation items (Dashboard, Clients, Reports, Keyword Research, Competitor Analysis, Report Schedules, SEO Action Tasks, Settings, Help & Support).
+
+**Why:**
+The client inbox was deprecated/removed in favor of streamlined client communication workflows, and the user requested removing the remaining Inbox item from the agency dashboard.
+
+**How It Works:**
+The `navItems` array in `Sidebar.tsx` defines the agency navigation menu dynamically. Removing the entry instantly removes the link and active state indicator from the UI.
+
+**Gotchas / Watch Out For:**
+Ensure any external links or redirects to `/inbox` point directly to the main agency dashboard `/[domain]`.
+
+---
+
+
