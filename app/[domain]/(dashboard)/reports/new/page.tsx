@@ -81,7 +81,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
   const [aiTone, setAiTone] = useState<ToneType>('executive');
   const [executiveSummary, setExecutiveSummary] = useState('');
   const [recommendations, setRecommendations] = useState<string[]>([
-    'Scale commercial landing pages targeting core category keywords.',
+    'Scale high-converting commercial landing pages targeting core category keywords.',
     'Implement structured schema data to capture rich SERP snippets.',
     'Strengthen backlink authority through industry-specific digital PR.',
   ]);
@@ -110,7 +110,6 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
 
   // Generation status
   const [generating, setGenerating] = useState(false);
-  const [batchProgress, setBatchProgress] = useState<{ total: number; done: number }>({ total: 0, done: 0 });
 
   const basePath = `/${domain}`;
 
@@ -387,7 +386,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
   const prevStep = () => setStep(s => Math.max(1, s - 1));
 
   return (
-    <div style={{ width: '100%', maxWidth: '1160px', margin: '0 auto', paddingBottom: '60px' }}>
+    <div style={{ width: '100%', paddingBottom: '60px' }}>
       
       {/* ── Top Header ── */}
       <div className="page-header" style={{ marginBottom: '20px', alignItems: 'center' }}>
@@ -615,7 +614,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                 )}
 
                 {/* Search Input */}
-                <div style={{ position: 'relative', width: '240px' }}>
+                <div style={{ position: 'relative', width: '260px' }}>
                   <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
                     type="text"
@@ -657,7 +656,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                 </Link>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '16px' }}>
                 {filteredClients.map(c => {
                   const isSingleSelected = selectedClientId === c.id;
                   const isBatchSelected = selectedBatchIds.includes(c.id);
@@ -683,7 +682,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                       style={{
                         border: isSelected ? '2px solid var(--primary)' : '1px solid var(--border)',
                         borderRadius: '12px',
-                        padding: '16px',
+                        padding: '18px',
                         background: isSelected ? 'rgba(229,62,62,0.03)' : '#fff',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
@@ -691,7 +690,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                         position: 'relative',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                         {generationMode === 'batch' && (
                           <div style={{ color: isSelected ? 'var(--primary)' : '#94A3B8', flexShrink: 0 }}>
                             {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
@@ -700,15 +699,15 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
 
                         <div
                           style={{
-                            width: '40px',
-                            height: '40px',
+                            width: '42px',
+                            height: '42px',
                             borderRadius: '10px',
                             background: isSelected ? 'var(--primary)' : '#1E293B',
                             color: '#fff',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '13px',
+                            fontSize: '14px',
                             fontWeight: 800,
                             flexShrink: 0,
                           }}
@@ -729,7 +728,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', fontSize: '10px' }}>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center', fontSize: '11px' }}>
                         <span style={{ padding: '2px 8px', borderRadius: '12px', fontWeight: 700, background: '#ECFDF5', color: '#059669' }}>
                           Active
                         </span>
@@ -761,30 +760,30 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                 boxShadow: 'var(--shadow-card)',
               }}
             >
-              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Activity size={16} style={{ color: 'var(--primary)' }} />
                 <span>Live Data Telemetry — <strong>{selectedClient.name}</strong> ({selectedClient.domain})</span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-                <div style={{ textAlign: 'center', padding: '12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>📊</div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Top 10 Rankings</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+                <div style={{ textAlign: 'center', padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>📊</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Top 10 Rankings</div>
                   <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, marginTop: '2px' }}>43 tracked positions</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>🔗</div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Backlink Trust Flow</div>
+                <div style={{ textAlign: 'center', padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🔗</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Backlink Trust Flow</div>
                   <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, marginTop: '2px' }}>42 Domain Trust</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>🛡️</div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Health Score Index</div>
+                <div style={{ textAlign: 'center', padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>🛡️</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Health Score Index</div>
                   <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, marginTop: '2px' }}>82 / 100 Optimized</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <div style={{ fontSize: '18px', marginBottom: '2px' }}>📈</div>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A' }}>Monthly Search Traffic</div>
+                <div style={{ textAlign: 'center', padding: '14px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '20px', marginBottom: '2px' }}>📈</div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>Monthly Search Traffic</div>
                   <div style={{ fontSize: '11px', color: '#10B981', fontWeight: 700, marginTop: '2px' }}>8,420 Sessions (+14%)</div>
                 </div>
               </div>
@@ -797,7 +796,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
               className="btn btn-primary"
               disabled={generationMode === 'single' ? !selectedClientId : selectedBatchIds.length === 0}
               onClick={nextStep}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 22px', fontSize: '14px', fontWeight: 800 }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 24px', fontSize: '14px', fontWeight: 800 }}
             >
               Continue to Period &amp; Benchmarks <ArrowRight size={15} />
             </button>
@@ -838,7 +837,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     handlePresetSelect('last-month');
                   }}
                   style={{
-                    padding: '4px 10px',
+                    padding: '4px 12px',
                     borderRadius: '6px',
                     fontSize: '11px',
                     fontWeight: 700,
@@ -857,7 +856,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     handlePresetSelect('yoy');
                   }}
                   style={{
-                    padding: '4px 10px',
+                    padding: '4px 12px',
                     borderRadius: '6px',
                     fontSize: '11px',
                     fontWeight: 700,
@@ -915,8 +914,8 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               
               {/* Primary Period */}
-              <div style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '18px', background: '#FAFAFA' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', background: '#FAFAFA' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Primary Report Cycle
                   </div>
@@ -939,7 +938,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                   {ALL_MONTHS.map((m, idx) => {
                     const isSelected = reportMonthIdx === idx;
                     return (
@@ -951,7 +950,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                           setSelectedPreset('custom');
                         }}
                         style={{
-                          padding: '10px 4px',
+                          padding: '12px 6px',
                           textAlign: 'center',
                           fontSize: '12px',
                           fontWeight: isSelected ? 800 : 600,
@@ -968,14 +967,14 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     );
                   })}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '10px', fontWeight: 600 }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px', fontWeight: 600 }}>
                   Active Period: <strong>{ALL_MONTHS[reportMonthIdx]} 1 – {new Date(reportYear, reportMonthIdx + 1, 0).getDate()}, {reportYear}</strong>
                 </div>
               </div>
 
               {/* Comparison Period */}
-              <div style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '18px', background: '#FAFAFA' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div style={{ border: '1px solid var(--border)', borderRadius: '12px', padding: '20px', background: '#FAFAFA' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     Comparison Benchmark
                   </div>
@@ -998,7 +997,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                   {ALL_MONTHS.map((m, idx) => {
                     const isSelected = compareMonthIdx === idx;
                     return (
@@ -1007,7 +1006,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                         type="button"
                         onClick={() => setCompareMonthIdx(idx)}
                         style={{
-                          padding: '10px 4px',
+                          padding: '12px 6px',
                           textAlign: 'center',
                           fontSize: '12px',
                           fontWeight: isSelected ? 800 : 600,
@@ -1024,7 +1023,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     );
                   })}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '10px', fontWeight: 600 }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '12px', fontWeight: 600 }}>
                   Baseline Period: <strong>{ALL_MONTHS[compareMonthIdx]} 1 – {new Date(compareYear, compareMonthIdx + 1, 0).getDate()}, {compareYear}</strong>
                 </div>
               </div>
@@ -1059,7 +1058,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
             <button className="btn btn-secondary" onClick={prevStep} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <ArrowLeft size={15} /> Back
             </button>
-            <button className="btn btn-primary" onClick={nextStep} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 22px', fontSize: '14px', fontWeight: 800 }}>
+            <button className="btn btn-primary" onClick={nextStep} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 24px', fontSize: '14px', fontWeight: 800 }}>
               Continue to AI Narrative &amp; Sections <ArrowRight size={15} />
             </button>
           </div>
@@ -1071,7 +1070,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {step === 3 && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '20px', alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.15fr) minmax(0, 0.85fr)', gap: '24px', alignItems: 'start' }}>
             
             {/* Left Column: 8 Granular Modules */}
             <div
@@ -1119,7 +1118,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '13px 12px',
+                        padding: '14px 12px',
                         borderBottom: idx < 7 ? '1px solid var(--border)' : 'none',
                         cursor: 'pointer',
                         borderRadius: '8px',
@@ -1233,7 +1232,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                           generateAiNarrative(t.id as ToneType);
                         }}
                         style={{
-                          padding: '5px 2px',
+                          padding: '6px 2px',
                           borderRadius: '6px',
                           fontSize: '11px',
                           fontWeight: 700,
@@ -1328,7 +1327,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
               className="btn btn-primary"
               onClick={nextStep}
               disabled={activeSectionsCount === 0}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 22px', fontSize: '14px', fontWeight: 800 }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 24px', fontSize: '14px', fontWeight: 800 }}
             >
               Continue to Delivery &amp; Review <ArrowRight size={15} />
             </button>
@@ -1341,7 +1340,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {step === 4 && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: '20px', alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)', gap: '24px', alignItems: 'start' }}>
             
             {/* Left: Email, Password & Format Dispatch Settings */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
