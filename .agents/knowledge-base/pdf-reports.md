@@ -52,6 +52,18 @@
 
 ---
 
+## [2026-08-21] PDF Download Filename Fix & Personal Note Box Resize
 
+**Task:** Fix downloaded PDF file naming (was saving as raw UUID without `.pdf` extension due to immediate Blob URL revocation race condition) and increase Personal Note box height in the report wizard.  
+**Files Changed:**
+- `app/reports/render/PrintButton.tsx` — delayed Blob URL revocation and enforced `{ type: 'application/pdf' }` MIME type with explicit `.pdf` download attribute
+- `app/api/reports/generate/route.ts` — added robust `Content-Disposition` header with UTF-8 filename support and `Content-Length`
+- `app/[domain]/(dashboard)/reports/page.tsx` — upgraded `downloadPdf` to fetch binary stream directly and save with human-readable `${clientName}_SEO_Report_${period}.pdf`
+- `app/[domain]/(dashboard)/reports/new/page.tsx` — increased Personal Note textarea height to `minHeight: 120px` and `rows={5}`
 
+**What Was Done:**
+1. Fixed the race condition in `PrintButton.tsx` where synchronous `window.URL.revokeObjectURL(blobUrl)` immediately after `a.click()` prevented Chrome from reading the download metadata, causing the file to be saved as an unnamed UUID without `.pdf`.
+2. Added `Content-Disposition: attachment; filename="<cleanFilename>.pdf"; filename*=UTF-8''<cleanFilename>.pdf` to `/api/reports/generate`.
+3. Updated the Personal Note box in the 4-step wizard to be spacious and easily editable without premature scrollbars.
 
+---

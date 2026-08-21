@@ -30,22 +30,29 @@ export default function PrintButton({ reportId, filename }: PrintButtonProps) {
     }
     cleanName = cleanName.replace(/\.pdf$/i, '').trim().replace(/\s+/g, '_');
 
-    // Attempt direct server PDF stream download
+    // Direct server PDF download with proper Content-Disposition and extension
     if (reportId) {
       try {
         const downloadUrl = `/api/reports/generate?id=${encodeURIComponent(reportId)}&filename=${encodeURIComponent(cleanName)}`;
+        
         const res = await fetch(downloadUrl);
         if (res.ok) {
           const blob = await res.blob();
-          const blobUrl = window.URL.createObjectURL(blob);
+          const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+          const blobUrl = window.URL.createObjectURL(pdfBlob);
           const a = document.createElement('a');
           a.style.display = 'none';
           a.href = blobUrl;
           a.download = `${cleanName}.pdf`;
           document.body.appendChild(a);
           a.click();
-          window.URL.revokeObjectURL(blobUrl);
-          a.remove();
+          
+          // Do NOT revoke immediately — allow browser I/O thread ample time to write .pdf file
+          setTimeout(() => {
+            window.URL.revokeObjectURL(blobUrl);
+            a.remove();
+          }, 45000);
+
           setStatus('success');
           setTimeout(() => setStatus('idle'), 2500);
           return;
@@ -57,7 +64,7 @@ export default function PrintButton({ reportId, filename }: PrintButtonProps) {
 
     // Direct client fallback
     const origTitle = document.title;
-    document.title = cleanName.replace(/_/g, ' ');
+    document.title = `${cleanName.replace(/_/g, ' ')}.pdf`;
     setTimeout(() => {
       window.print();
       setTimeout(() => {
@@ -71,7 +78,7 @@ export default function PrintButton({ reportId, filename }: PrintButtonProps) {
     status === 'loading'
       ? '⏳ Generating PDF…'
       : status === 'success'
-      ? '✓ Downloaded!'
+      ? '✓ Downloaded PDF!'
       : 'Download PDF';
 
   return (

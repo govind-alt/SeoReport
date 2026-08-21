@@ -1410,13 +1410,13 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     </div>
 
                     <div className="form-group" style={{ marginBottom: 0 }}>
-                      <label className="form-label" style={{ fontSize: '11px', fontWeight: 700 }}>Personal Note</label>
+                      <label className="form-label" style={{ fontSize: '12px', fontWeight: 700 }}>Personal Note</label>
                       <textarea
                         className="form-input"
-                        rows={2}
+                        rows={5}
                         value={personalMessage}
                         onChange={e => setPersonalMessage(e.target.value)}
-                        style={{ fontSize: '12px' }}
+                        style={{ fontSize: '13px', lineHeight: 1.6, minHeight: '120px', resize: 'vertical' }}
                       />
                     </div>
                   </div>

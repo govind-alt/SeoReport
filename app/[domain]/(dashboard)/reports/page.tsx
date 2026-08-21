@@ -343,7 +343,33 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
   };
 
   const viewReport = (id: string) => window.open(`/reports/render/${id}`, '_blank');
-  const downloadPdf = (id: string) => window.open(`/reports/render/${id}`, '_blank');
+  const downloadPdf = async (id: string) => {
+    const rep = reports.find(r => r.id === id);
+    const cleanName = rep ? `${rep.clientName}_SEO_Report_${rep.period}`.replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_') : `SEO_Report_${id}`;
+    const toastId = toast.loading(`Preparing ${cleanName}.pdf…`);
+    try {
+      const downloadUrl = `/api/reports/generate?id=${encodeURIComponent(id)}&filename=${encodeURIComponent(cleanName)}`;
+      const res = await fetch(downloadUrl);
+      if (!res.ok) throw new Error('PDF generation failed');
+      const blob = await res.blob();
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const blobUrl = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = blobUrl;
+      a.download = `${cleanName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+        a.remove();
+      }, 45000);
+      toast.success(`✓ Downloaded ${cleanName}.pdf`, { id: toastId });
+    } catch {
+      toast.dismiss(toastId);
+      window.open(`/reports/render/${id}`, '_blank');
+    }
+  };
 
   const filtered = reports.filter(r => {
     const q = search.toLowerCase();

@@ -61,14 +61,16 @@ export async function GET(request: NextRequest) {
     await browser.close();
 
     const rawFilename = searchParams.get('filename') || `SEO-Report-${id}`;
-    const cleanFilename = rawFilename.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_');
+    const cleanFilename = rawFilename.replace(/\.pdf$/i, '').replace(/[^a-zA-Z0-9_\- ]/g, '').trim().replace(/\s+/g, '_');
 
     // Return the PDF buffer directly for browser download
     return new NextResponse(pdfBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${cleanFilename}.pdf"`
+        'Content-Disposition': `attachment; filename="${cleanFilename}.pdf"; filename*=UTF-8''${encodeURIComponent(cleanFilename)}.pdf`,
+        'Content-Length': String(pdfBuffer.length),
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
       }
     });
   } catch (error) {

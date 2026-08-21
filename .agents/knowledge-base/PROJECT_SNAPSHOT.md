@@ -141,6 +141,7 @@ wireframes/          ← HTML wireframes (static, no server needed)
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-21 | PDF Download Filename Fix & Personal Note Box Resize | ✅ Resolved Blob revocation race condition causing raw UUID download filenames, added UTF-8 headers, and enlarged Personal Note box |
 | 2026-08-21 | Enterprise Advance-Level Report Studio & AI Generation Suite | ✅ Upgraded report generator with live AI narrative generation (4 tones), batch multi-client mode, YoY/MoM benchmarks, and 8 modules |
 | 2026-08-21 | Agency Sidebar & Route Inbox Removal | ✅ Removed Inbox item and icon from Sidebar.tsx and deleted /inbox dashboard route across workspaces |
 | 2026-08-18 | Actions & API TypeScript Alignment & Full Commit | ✅ Resolved 5 actions.ts errors, exported helper server actions, synchronized API routes with schema, committed & pushed to hrishita-work |
