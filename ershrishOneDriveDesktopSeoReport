@@ -1,0 +1,10 @@
+[33m3793adc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhrishita-work[m[33m, [m[1;31morigin/hrishita-work[m[33m)[m restore: revert SuperadminClient to original, fix getSuperadminData to return full metrics
+[33m142ce55[m fix: correct chart data keys to match Recharts dataKey props (name/value)
+[33m35357ac[m fix: resolve superadmin dashboard planStats undefined TypeError
+[33m71ceabb[m knowledge: Chrome browser subagent verification and screenshot capture
+[33m2c3e368[m knowledge: launch dev server and open on Chrome
+[33m60b4cf1[m knowledge: project snapshot updated with actions and api alignment commit
+[33mf981d7c[m fix(core): align server actions and API handlers with schema and resolve TypeScript errors
+[33m0ef070a[m knowledge: actions.ts typescript alignment and notification/client fixes
+[33m3abc00c[m knowledge: dev server launch on chrome
+[33ma53b6ab[m fix(auth): consolidate /auth-success route into (auth) group
