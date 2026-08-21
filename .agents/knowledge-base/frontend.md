@@ -285,9 +285,26 @@ The client inbox was deprecated/removed in favor of streamlined client communica
 **How It Works:**
 The `navItems` array in `Sidebar.tsx` defines the agency navigation menu dynamically. Removing the entry instantly removes the link and active state indicator from the UI.
 
-**Gotchas / Watch Out For:**
-Ensure any external links or redirects to `/inbox` point directly to the main agency dashboard `/[domain]`.
+---
+
+## [2026-08-21] Enterprise Advance-Level Report Studio & AI Generation Suite
+
+**Task:** Upgrade the agency Report Wizard and Reports page with advance-level features (AI narrative generation, single/batch multi-client mode, YoY/MoM period benchmarks, 8 analytical modules, password protection, and live preview).  
+**Files Changed:**
+- `app/[domain]/(dashboard)/reports/new/page.tsx` — upgraded to 4-step Advance Report Studio
+- `app/[domain]/(dashboard)/reports/page.tsx` — upgraded preview panel with AI insights & action roadmap
+- `app/[domain]/(dashboard)/page.tsx` — linked dashboard hero "+ New Report" directly to `/reports/new`
+- `app/api/reports/ai-narrative/route.ts` — created AI executive insights & recommendation generator
+- `app/api/reports/route.ts` — extended to support single & batch multi-client creation with rich AI metadata
+
+**What Was Done:**
+1. Built a real-time AI Executive Insights & Strategy engine that analyzes live client keyword and traffic telemetry to generate customizable commentary across 4 tones (*C-Suite, Growth, Technical, Friendly*).
+2. Implemented Single Client and Batch Multi-Client modes with tag filtering, multi-selection, and parallel compilation.
+3. Created an interactive Period & Benchmark matrix supporting MoM, YoY, and custom arbitrary ranges.
+4. Added 8 customizable analytical modules with sub-toggles, link expiration settings, and live miniature report canvas preview.
+5. Verified complete generation lifecycle and white-label preview in Chrome.
 
 ---
+
 
 

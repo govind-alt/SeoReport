@@ -193,7 +193,7 @@ export default function DashboardPage({ params }: { params: Promise<{ domain: st
                 <button className="hero-btn hero-btn-white" onClick={forceSync}>
                   <RefreshCw size={14} className={isSyncing ? 'spinner' : ''} /> Sync Data
                 </button>
-                <Link href={`${basePath}/reports`} className="hero-btn hero-btn-solid">
+                <Link href={`${basePath}/reports/new`} className="hero-btn hero-btn-solid">
                   <FileText size={14} /> New Report
                 </Link>
               </div>

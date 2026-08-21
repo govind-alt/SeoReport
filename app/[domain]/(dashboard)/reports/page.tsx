@@ -73,7 +73,16 @@ function mapDbReport(dbRep: any): Report {
   const clientName = dbRep.client?.name ?? 'Unknown Client';
   const date = dbRep.periodStart ? new Date(dbRep.periodStart) : new Date();
   const periodStr = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  const sections = dbRep.sectionsJson ? JSON.parse(dbRep.sectionsJson) : {};
+  let sections = {};
+  try {
+    sections = dbRep.sectionsJson ? JSON.parse(dbRep.sectionsJson) : {};
+  } catch {}
+
+  let aiMetadata: any = {};
+  try {
+    aiMetadata = dbRep.aiRecsJson ? JSON.parse(dbRep.aiRecsJson) : {};
+  } catch {}
+
   const status: Report['status'] = dbRep.status === 'draft' ? 'pending' : dbRep.status;
 
   return {
@@ -89,11 +98,16 @@ function mapDbReport(dbRep: any): Report {
     views: dbRep.viewCount ?? 0,
     preview: status === 'done' ? {
       healthScore: 82,
-      summary: `${clientName} report generated successfully. View full details in the report preview.`,
+      summary: typeof aiMetadata === 'string' ? aiMetadata : aiMetadata?.notes || `${clientName} performance report generated successfully. View full analytics in the preview.`,
       metrics: [
         { label: 'Period', value: periodStr },
-        { label: 'Sections', value: Object.values(sections).filter(Boolean).length.toString() || '5' },
-        { label: 'Status', value: 'Done' },
+        { label: 'Sections', value: Object.values(sections).filter(Boolean).length.toString() || '8' },
+        { label: 'Format', value: (aiMetadata?.format || 'Web+PDF').toUpperCase() },
+      ],
+      recommendations: Array.isArray(aiMetadata?.recommendations) ? aiMetadata.recommendations : [
+        'Scale high-converting commercial landing pages.',
+        'Optimize crawl efficiency & structured schema data.',
+        'Fortify high-authority backlink profile.'
       ],
     } : undefined,
   };
@@ -549,8 +563,22 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
 
                 {/* Summary */}
                 <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 8 }}>Executive Summary</div>
-                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{selected.preview.summary}</p>
+                  <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 6 }}>Executive Summary</div>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 10px' }}>{selected.preview.summary}</p>
+
+                  {selected.preview.recommendations && selected.preview.recommendations.length > 0 && (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 4 }}>AI Strategic Priorities</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        {selected.preview.recommendations.slice(0, 3).map((r, i) => (
+                          <div key={i} style={{ fontSize: 11, color: 'var(--text-secondary)', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                            <span style={{ color: 'var(--primary)', fontWeight: 800 }}>•</span>
+                            <span>{r}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}

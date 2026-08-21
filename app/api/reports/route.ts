@@ -5,17 +5,16 @@ import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
 const CreateReportSchema = z.object({
-  clientId: z.string().min(1, 'Client is required'),
+  clientId: z.string().optional(),
+  clientIds: z.array(z.string()).optional(),
   periodStart: z.string(),
   periodEnd: z.string(),
-  sections: z.object({
-    keywords: z.boolean().default(true),
-    backlinks: z.boolean().default(true),
-    audit: z.boolean().default(true),
-    analytics: z.boolean().default(true),
-    competitors: z.boolean().default(false),
-    aiRecs: z.boolean().default(true),
-  }).optional(),
+  sections: z.record(z.string(), z.boolean()).optional(),
+  notes: z.string().optional(),
+  recommendations: z.array(z.string()).optional(),
+  format: z.string().optional(),
+  delivery: z.record(z.string(), z.any()).optional(),
+  branding: z.record(z.string(), z.any()).optional(),
 });
 
 /** GET /api/reports — list reports for the agency */
@@ -39,7 +38,7 @@ export async function GET(request: Request) {
       },
       include: {
         client: {
-          select: { id: true, name: true, domain: true },
+          select: { id: true, name: true, domain: true, contactEmail: true },
         },
       },
       orderBy: { createdAt: 'desc' },
@@ -53,7 +52,7 @@ export async function GET(request: Request) {
   }
 }
 
-/** POST /api/reports — create a new report */
+/** POST /api/reports — create a new single or batch report */
 export async function POST(request: Request) {
   try {
     const session = await auth();
@@ -70,40 +69,86 @@ export async function POST(request: Request) {
       );
     }
 
-    const { clientId, periodStart, periodEnd, sections } = parsed.data;
+    const {
+      clientId,
+      clientIds,
+      periodStart,
+      periodEnd,
+      sections,
+      notes,
+      recommendations,
+      delivery,
+      format,
+      branding,
+    } = parsed.data;
 
-    // Verify client belongs to this agency
-    const client = await prisma.client.findFirst({
-      where: { id: clientId, agencyId: session.user.agencyId as string },
-    });
-    if (!client) {
-      return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+    // Resolve list of client IDs to generate for
+    const targetClientIds = clientIds && clientIds.length > 0
+      ? clientIds
+      : clientId
+      ? [clientId]
+      : [];
+
+    if (targetClientIds.length === 0) {
+      return NextResponse.json({ error: 'At least one client must be selected' }, { status: 400 });
     }
 
-    const shareSlug = crypto.randomBytes(12).toString('base64url');
-
-    const report = await prisma.report.create({
-      data: {
-        clientId,
-        periodStart: new Date(periodStart),
-        periodEnd: new Date(periodEnd),
-        status: 'generating',
-        shareSlug,
-        sectionsJson: sections ? JSON.stringify(sections) : null,
+    // Verify all clients belong to this agency
+    const validClients = await prisma.client.findMany({
+      where: {
+        id: { in: targetClientIds },
+        agencyId: session.user.agencyId as string,
       },
-      include: {
-        client: { select: { id: true, name: true, domain: true } },
-      },
+      select: { id: true, name: true, domain: true, contactEmail: true },
     });
 
-    // Fire-and-forget: trigger background report processing
-    // We don't await this so the response is returned immediately
-    const processUrl = new URL(`/api/reports/${report.id}/process`, request.url);
-    fetch(processUrl.toString(), { method: 'POST' }).catch(err => {
-      console.error('[REPORTS_POST] Failed to trigger process:', err);
-    });
+    if (validClients.length === 0) {
+      return NextResponse.json({ error: 'No valid clients found' }, { status: 404 });
+    }
 
-    return NextResponse.json(report, { status: 201 });
+    const createdReports = [];
+
+    for (const client of validClients) {
+      const shareSlug = crypto.randomBytes(12).toString('base64url');
+
+      const aiMetadata = {
+        notes: notes || undefined,
+        recommendations: recommendations || undefined,
+        delivery: delivery || undefined,
+        format: format || 'web',
+        branding: branding || undefined,
+      };
+
+      const report = await prisma.report.create({
+        data: {
+          clientId: client.id,
+          periodStart: new Date(periodStart),
+          periodEnd: new Date(periodEnd),
+          status: 'generating',
+          shareSlug,
+          sectionsJson: sections ? JSON.stringify(sections) : null,
+          aiRecsJson: JSON.stringify(aiMetadata),
+        },
+        include: {
+          client: { select: { id: true, name: true, domain: true, contactEmail: true } },
+        },
+      });
+
+      createdReports.push(report);
+
+      // Fire-and-forget: trigger background report processing
+      const processUrl = new URL(`/api/reports/${report.id}/process`, request.url);
+      fetch(processUrl.toString(), { method: 'POST' }).catch(err => {
+        console.error(`[REPORTS_POST] Failed to trigger process for ${report.id}:`, err);
+      });
+    }
+
+    // If single report created, return single object for backward compatibility
+    if (createdReports.length === 1 && !clientIds) {
+      return NextResponse.json(createdReports[0], { status: 201 });
+    }
+
+    return NextResponse.json({ count: createdReports.length, reports: createdReports }, { status: 201 });
   } catch (error: unknown) {
     console.error('[REPORTS_POST]', error);
     return NextResponse.json({ error: 'Internal Error' }, { status: 500 });
