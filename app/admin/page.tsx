@@ -227,11 +227,8 @@ export default function AdminPage() {
 
   /* ── Broadcasts ── */
   interface Broadcast { id: string; title: string; message: string; target: string; type: string; date: string; status: 'active' | 'archived'; reach: string; actionUrl: string; }
-  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([
-    { id: '1', title: 'Scheduled Platform Maintenance Notice', message: 'RankFlow will undergo scheduled maintenance on Sunday, 2–4 AM UTC. Expect brief downtime.', target: 'All Agencies & Clients', type: 'System Warning', date: 'Aug 20, 2026', status: 'active', reach: '29 agencies', actionUrl: '' },
-    { id: '2', title: 'New Strategic SEO Recommendations Available', message: 'Upgraded recommendation engine now generates richer, more actionable SEO summaries inside report PDFs.', target: 'Pro & Enterprise', type: 'Feature Release', date: 'Aug 15, 2026', status: 'active', reach: '24 agencies', actionUrl: '' },
-    { id: '3', title: 'SE Ranking Gateway Update Required', message: 'Please re-sync your SE Ranking project to pick up improved keyword data accuracy.', target: 'All Agencies', type: 'Critical Alert', date: 'Aug 02, 2026', status: 'archived', reach: '29 agencies', actionUrl: '' },
-  ]);
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
+  const [broadcastsLoading, setBroadcastsLoading] = useState(true);
   const [newBroadcast, setNewBroadcast] = useState({ title: '', message: '', target: 'All Agencies & Clients', type: 'Feature Release', actionUrl: '' });
 
   /* ── Feature flags ── */
@@ -241,6 +238,18 @@ export default function AdminPage() {
     pro:        { price: 299, maxClients: 25,  maxKeywords: 2000, maxReports: 50 },
     enterprise: { price: 999, maxClients: 999, maxKeywords: 9999, maxReports: 999 },
   });
+  const [flagsSaving, setFlagsSaving] = useState(false);
+
+  /* ── Integrations ── */
+  const [integrations, setIntegrations] = useState<{ gateways: any[]; webhookLog: any[] }>({ gateways: [], webhookLog: [] });
+  const [intLoading, setIntLoading] = useState(true);
+
+  /* ── Activity feed ── */
+  const [activity, setActivity] = useState<any[]>([]);
+
+  /* ── Platform settings ── */
+  const [platformSettings, setPlatformSettings] = useState({ platformName: 'RankFlow', supportEmail: 'support@rankflow.app' });
+  const [settingsSaving, setSettingsSaving] = useState(false);
 
   /* ── Plan filter ── */
   const [planFilter, setPlanFilter] = useState('all');
@@ -256,6 +265,33 @@ export default function AdminPage() {
   }, []);
 
   /* ── Fetch all data ── */
+  const fetchBroadcasts = useCallback(async () => {
+    setBroadcastsLoading(true);
+    try { const r = await fetch('/api/admin/broadcasts'); if (r.ok) setBroadcasts(await r.json()); } catch {}
+    finally { setBroadcastsLoading(false); }
+  }, []);
+
+  const fetchIntegrations = useCallback(async () => {
+    setIntLoading(true);
+    try { const r = await fetch('/api/admin/integrations'); if (r.ok) setIntegrations(await r.json()); } catch {}
+    finally { setIntLoading(false); }
+  }, []);
+
+  const fetchActivity = useCallback(async () => {
+    try { const r = await fetch('/api/admin/activity'); if (r.ok) setActivity(await r.json()); } catch {}
+  }, []);
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const r = await fetch('/api/admin/settings');
+      if (r.ok) {
+        const s = await r.json();
+        setPlatformSettings({ platformName: s.platformName || 'RankFlow', supportEmail: s.supportEmail || 'support@rankflow.app' });
+        setFeatureFlags(prev => ({ ...prev, publicSignups: s.publicSignups ?? prev.publicSignups }));
+      }
+    } catch {}
+  }, []);
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
@@ -282,10 +318,10 @@ export default function AdminPage() {
       const r = await fetch('/api/admin/health');
       if (r.ok) setHealth(await r.json());
     } catch {}
-    finally { setHealthLoading(false); }
+    finally { setHealthLoading(false); setLastRefresh(new Date()); }
   }, []);
 
-  useEffect(() => { fetchAll(); fetchHealth(); }, [fetchAll, fetchHealth]);
+  useEffect(() => { fetchAll(); fetchHealth(); fetchBroadcasts(); fetchIntegrations(); fetchActivity(); fetchSettings(); }, [fetchAll, fetchHealth, fetchBroadcasts, fetchIntegrations, fetchActivity, fetchSettings]);
 
   /* Auto-refresh health every 15s */
   useEffect(() => {
@@ -378,6 +414,63 @@ export default function AdminPage() {
       setDeleteUser(null);
       fetchAll();
     } catch { showToast('Delete failed', 'error'); }
+  }
+
+  /* ── Broadcast CRUD ── */
+  async function handleDispatchBroadcast(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    try {
+      const body = { ...newBroadcast, reach: `${agencies.length} agencies` };
+      const r = await fetch('/api/admin/broadcasts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) throw new Error();
+      showToast('Announcement dispatched and saved!');
+      setNewBroadcast({ title: '', message: '', target: 'All Agencies & Clients', type: 'Feature Release', actionUrl: '' });
+      fetchBroadcasts();
+    } catch { showToast('Failed to dispatch', 'error'); }
+  }
+
+  async function handleToggleBroadcast(b: any) {
+    const newStatus = b.status === 'active' ? 'archived' : 'active';
+    try {
+      await fetch('/api/admin/broadcasts', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: b.id, status: newStatus }) });
+      showToast(`Broadcast ${newStatus === 'active' ? 'restored' : 'archived'}`);
+      fetchBroadcasts();
+    } catch { showToast('Failed to update', 'error'); }
+  }
+
+  async function handleDeleteBroadcast(id: string) {
+    try {
+      await fetch('/api/admin/broadcasts', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      showToast('Broadcast deleted', 'info');
+      fetchBroadcasts();
+    } catch { showToast('Failed to delete', 'error'); }
+  }
+
+  /* ── Save feature flags + tier limits ── */
+  async function handleSaveFlags() {
+    setFlagsSaving(true);
+    try {
+      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...featureFlags }) });
+      showToast('Feature flags saved!');
+    } catch { showToast('Save failed', 'error'); }
+    finally { setFlagsSaving(false); }
+  }
+
+  async function handleSaveTiers() {
+    try {
+      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tierLimits }) });
+      showToast('Tier configurations saved!');
+    } catch { showToast('Save failed', 'error'); }
+  }
+
+  /* ── Save platform settings ── */
+  async function handleSavePlatformSettings() {
+    setSettingsSaving(true);
+    try {
+      await fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(platformSettings) });
+      showToast('Platform settings saved!');
+    } catch { showToast('Save failed', 'error'); }
+    finally { setSettingsSaving(false); }
   }
 
   /* ── Filtered lists ── */
@@ -610,7 +703,7 @@ export default function AdminPage() {
               </div>
 
               {/* Agency growth + Top agencies */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 20 }}>
                 <Card style={{ padding: '20px 20px 10px' }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: C.navy, marginBottom: 16 }}>Agency Growth</div>
                   <ResponsiveContainer width="100%" height={180}>
@@ -650,6 +743,45 @@ export default function AdminPage() {
                   )}
                 </Card>
               </div>
+
+              {/* Real-time DB Activity Feed */}
+              <Card style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Activity size={16} color={C.blue} />
+                    <span style={{ fontSize: 14, fontWeight: 800, color: C.navy }}>Live Platform Activity</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: C.success, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: '50%', background: C.success, display: 'inline-block', boxShadow: `0 0 6px ${C.success}` }} />
+                    Live Sync
+                  </span>
+                </div>
+                <div>
+                  {activity.length === 0 ? (
+                    <div style={{ padding: 28, textAlign: 'center', color: C.muted, fontSize: 13 }}>No recent activity logged</div>
+                  ) : (
+                    activity.slice(0, 6).map((item, idx) => (
+                      <div key={item.id || idx} style={{ padding: '12px 20px', borderBottom: idx < 5 ? `1px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: idx % 2 === 0 ? C.white : C.bg }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{
+                            width: 30, height: 30, borderRadius: 8,
+                            background: item.type === 'signup' ? '#ECFDF5' : item.type === 'client' ? '#EFF6FF' : item.type === 'report' ? '#F5F3FF' : '#FEF3C7',
+                            color: item.type === 'signup' ? C.success : item.type === 'client' ? C.blue : item.type === 'report' ? C.purple : C.warn,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12
+                          }}>
+                            {item.type === 'signup' ? <Building2 size={15} /> : item.type === 'client' ? <Users size={15} /> : item.type === 'report' ? <FileText size={15} /> : <Bell size={15} />}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{item.title}</div>
+                            <div style={{ fontSize: 11, color: C.muted }}>{item.detail}</div>
+                          </div>
+                        </div>
+                        <span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>{item.time}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </Card>
             </div>
           )}
 
@@ -976,29 +1108,23 @@ export default function AdminPage() {
                 {/* Compose */}
                 <Card style={{ padding: 24 }}>
                   <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Dispatch Platform Announcement</div>
-                  <div style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Send a notice to all agencies and clients on the platform</div>
-                  <form onSubmit={e => {
-                    e.preventDefault();
-                    const nb: any = { id: Date.now().toString(), ...newBroadcast, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), status: 'active', reach: `${agencies.length} agencies` };
-                    setBroadcasts(prev => [nb, ...prev]);
-                    setNewBroadcast({ title: '', message: '', target: 'All Agencies & Clients', type: 'Feature Release', actionUrl: '' });
-                    showToast('Announcement dispatched to all tenants!');
-                  }}>
-                    <Field label="Announcement Title *"><input required value={newBroadcast.title} onChange={e => setNewBroadcast({ ...newBroadcast, title: e.target.value })} style={inputStyle} placeholder="e.g. New Feature Available" /></Field>
+                  <div style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Send a notice to all agencies and clients on the platform (persisted in DB)</div>
+                  <form onSubmit={handleDispatchBroadcast}>
+                    <Field label="Announcement Title *"><input required value={newBroadcast.title} onChange={e => setNewBroadcast({ ...newBroadcast, title: e.target.value })} style={inputStyle} placeholder="e.g. System Maintenance Scheduled" /></Field>
                     <Field label="Audience Target">
                       <select value={newBroadcast.target} onChange={e => setNewBroadcast({ ...newBroadcast, target: e.target.value })} style={inputStyle}>
-                        <option>All Agencies & Clients</option>
-                        <option>Agencies Only</option>
-                        <option>Pro & Enterprise</option>
-                        <option>Clients Only</option>
+                        <option value="All Agencies & Clients">All Agencies & Clients</option>
+                        <option value="Agencies Only">Agencies Only</option>
+                        <option value="Pro & Enterprise">Pro & Enterprise</option>
+                        <option value="Clients Only">Clients Only</option>
                       </select>
                     </Field>
                     <Field label="Category">
                       <select value={newBroadcast.type} onChange={e => setNewBroadcast({ ...newBroadcast, type: e.target.value })} style={inputStyle}>
-                        <option>Feature Release</option>
-                        <option>System Warning</option>
-                        <option>Critical Alert</option>
-                        <option>Billing Notice</option>
+                        <option value="Feature Release">Feature Release</option>
+                        <option value="System Warning">System Warning</option>
+                        <option value="Critical Alert">Critical Alert</option>
+                        <option value="Billing Notice">Billing Notice</option>
                       </select>
                     </Field>
                     <Field label="Message Content *">
@@ -1016,25 +1142,31 @@ export default function AdminPage() {
                     <span style={{ fontSize: 11, color: C.success, fontWeight: 700 }}>● {broadcasts.filter(b=>b.status==='active').length} Active</span>
                   </div>
                   <div style={{ maxHeight: 520, overflowY: 'auto' }}>
-                    {broadcasts.map(b => (
-                      <div key={b.id} style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: b.status === 'active' ? C.white : C.bg }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{b.title}</div>
-                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: b.status === 'active' ? '#ECFDF5' : C.bg, color: b.status === 'active' ? C.success : C.muted }}>{b.status.toUpperCase()}</span>
-                        </div>
-                        <div style={{ fontSize: 11, color: C.textSub, marginBottom: 8 }}>{b.message}</div>
-                        <div style={{ fontSize: 11, color: C.muted, display: 'flex', gap: 12, marginBottom: 10 }}>
-                          <span>Audience: <strong>{b.target}</strong></span>
-                          <span>Reach: <strong>{b.reach}</strong></span>
-                          <span>Date: <strong>{b.date}</strong></span>
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                          <button onClick={() => { setBroadcasts(prev => prev.map(x => x.id===b.id?{...x,status:x.status==='active'?'archived':'active'}:x)); showToast(`Broadcast ${b.status==='active'?'archived':'restored'}`); }} className="btn-ghost" style={{ padding: '4px 10px', fontSize: 11 }}>{b.status==='active'?'Archive':'Restore'}</button>
-                          <button onClick={() => { setBroadcasts(prev => prev.filter(x=>x.id!==b.id)); showToast('Broadcast deleted','info'); }} className="btn-danger" style={{ padding: '4px 10px', fontSize: 11 }}>Delete</button>
-                        </div>
+                    {broadcastsLoading ? (
+                      <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        {[1, 2, 3].map(i => <Skeleton key={i} h={64} />)}
                       </div>
-                    ))}
-                    {broadcasts.length===0 && <div style={{ padding: 30, textAlign: 'center', color: C.muted, fontSize: 13 }}>No broadcasts yet</div>}
+                    ) : broadcasts.length === 0 ? (
+                      <div style={{ padding: 30, textAlign: 'center', color: C.muted, fontSize: 13 }}>No broadcasts yet</div>
+                    ) : (
+                      broadcasts.map(b => (
+                        <div key={b.id} style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: b.status === 'active' ? C.white : C.bg }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{b.title}</div>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: b.status === 'active' ? '#ECFDF5' : C.bg, color: b.status === 'active' ? C.success : C.muted }}>{b.status.toUpperCase()}</span>
+                          </div>
+                          <div style={{ fontSize: 11, color: C.textSub, marginBottom: 8 }}>{b.message}</div>
+                          <div style={{ fontSize: 11, color: C.muted, display: 'flex', gap: 12, marginBottom: 10 }}>
+                            <span>Audience: <strong>{b.target}</strong></span>
+                            <span>Date: <strong>{b.date}</strong></span>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                            <button onClick={() => handleToggleBroadcast(b)} className="btn-ghost" style={{ padding: '4px 10px', fontSize: 11 }}>{b.status === 'active' ? 'Archive' : 'Restore'}</button>
+                            <button onClick={() => handleDeleteBroadcast(b.id)} className="btn-danger" style={{ padding: '4px 10px', fontSize: 11 }}>Delete</button>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </Card>
               </div>
@@ -1045,8 +1177,15 @@ export default function AdminPage() {
           {tab === 'feature-flags' && (
             <div className="section-fade">
               <Card style={{ padding: 24, marginBottom: 20 }}>
-                <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Global Feature Flags</div>
-                <div style={{ fontSize: 12, color: C.muted, marginBottom: 20 }}>Enable or disable global system capabilities across all tenants</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.navy, marginBottom: 4 }}>Global Feature Flags</div>
+                    <div style={{ fontSize: 12, color: C.muted }}>Enable or disable system capabilities in real-time across all tenants</div>
+                  </div>
+                  <button onClick={handleSaveFlags} disabled={flagsSaving} className="btn-primary">
+                    <Check size={13} /> {flagsSaving ? 'Saving...' : 'Save Flags'}
+                  </button>
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
                   {([
                     { key: 'publicSignups',       title: 'Public Self-Serve Signups',    desc: 'Allows new agencies to register directly from /login' },
@@ -1062,7 +1201,10 @@ export default function AdminPage() {
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                             <span style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{flag.title}</span>
-                            <button onClick={() => { const next=!enabled; setFeatureFlags(prev=>({...prev,[flag.key]:next})); showToast(`${flag.title} ${next?'enabled':'disabled'}`); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: enabled ? C.success : C.muted, padding: 0 }}>
+                            <button onClick={() => {
+                              const next = !enabled;
+                              setFeatureFlags(prev => ({ ...prev, [flag.key]: next }));
+                            }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: enabled ? C.success : C.muted, padding: 0 }}>
                               {enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
                             </button>
                           </div>
@@ -1081,9 +1223,9 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                   <div>
                     <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Subscription Tier Resource Limits</div>
-                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Define pricing and quotas per plan tier</div>
+                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Define pricing and quotas saved to the server per plan tier</div>
                   </div>
-                  <button onClick={() => showToast('Tier configurations saved!')} className="btn-primary"><Check size={13} /> Save Tier Config</button>
+                  <button onClick={handleSaveTiers} className="btn-primary"><Check size={13} /> Save Tier Config</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 18 }}>
                   {(['starter','pro','enterprise'] as const).map(tier => {
@@ -1112,69 +1254,80 @@ export default function AdminPage() {
           {tab === 'integrations' && (
             <div className="section-fade">
               <Card style={{ overflow: 'hidden', marginBottom: 20 }}>
-                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, fontSize: 15, fontWeight: 800, color: C.navy }}>API Gateway Status</div>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>API Gateway Status (Live Health Ping)</div>
+                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Real HTTP latency checks performed against third-party endpoints</div>
+                  </div>
+                  <button onClick={fetchIntegrations} className="btn-ghost">
+                    <RefreshCw size={13} style={{ animation: intLoading ? 'spin 1s linear infinite' : 'none' }} /> Refresh Pings
+                  </button>
+                </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: C.bg }}>
-                      {['Service', 'API Key (masked)', 'Status', 'Rate Limit', 'Latency', 'Last Tested'].map(h => (
+                      {['Service', 'API Key (masked)', 'Status', 'Rate Limit', 'Live Latency', 'Last Tested'].map(h => (
                         <th key={h} style={{ padding: '11px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: `1px solid ${C.border}` }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { name: 'SE Ranking API Gateway', key: 'ser_live_948f2j48****', status: 'Operational', limit: '1,000 req/min', latency: '34ms', tested: '1 min ago' },
-                      { name: 'Resend Email Gateway',    key: 're_498dh28h_****',       status: 'Operational', limit: '500 emails/day', latency: '45ms', tested: '12 mins ago' },
-                      { name: 'Stripe Billing Webhooks', key: 'whsec_9482jd98****',     status: 'Operational', limit: 'Live Handler', latency: '18ms', tested: '3 mins ago' },
-                      { name: 'Supabase Database',       key: 'postgres://****',        status: health?.dbStatus === 'operational' ? 'Operational' : 'Degraded', limit: 'Unlimited', latency: health ? `${health.dbLatency}ms` : '…', tested: 'Live' },
-                    ].map((row, i) => (
-                      <tr key={i} className="table-row">
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 13, fontWeight: 700, color: C.navy }}>{row.name}</td>
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontFamily: 'monospace', color: C.textSub }}>{row.key}</td>
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}` }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: row.status === 'Operational' ? C.success : C.danger }}>
-                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: row.status === 'Operational' ? C.success : C.danger, display: 'inline-block', boxShadow: `0 0 5px ${row.status === 'Operational' ? C.success : C.danger}` }} />
-                            {row.status}
-                          </span>
-                        </td>
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, color: C.muted }}>{row.limit}</td>
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.latency}</td>
-                        <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.tested}</td>
-                      </tr>
-                    ))}
+                    {intLoading && integrations.gateways.length === 0 ? (
+                      Array.from({ length: 4 }, (_, i) => <tr key={i}><td colSpan={6} style={{ padding: 14 }}><Skeleton h={24} /></td></tr>)
+                    ) : (
+                      integrations.gateways.map((row, i) => (
+                        <tr key={i} className="table-row">
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 13, fontWeight: 700, color: C.navy }}>{row.name}</td>
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontFamily: 'monospace', color: C.textSub }}>{row.key}</td>
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}` }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, fontWeight: 700, color: row.status === 'Operational' ? C.success : C.danger }}>
+                              <span style={{ width: 7, height: 7, borderRadius: '50%', background: row.status === 'Operational' ? C.success : C.danger, display: 'inline-block', boxShadow: `0 0 5px ${row.status === 'Operational' ? C.success : C.danger}` }} />
+                              {row.status}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, color: C.muted }}>{row.limit}</td>
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.latency}ms</td>
+                          <td style={{ padding: '14px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.tested}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </Card>
 
               <Card style={{ overflow: 'hidden' }}>
                 <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Webhook & Event Dispatch Log</div>
-                  <span style={{ fontSize: 11, color: C.success, fontWeight: 700 }}>● Listening on /api/webhooks/*</span>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.navy }}>Real Database Event Logs</div>
+                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Actual audit trail records queried directly from Prisma DB</div>
+                  </div>
+                  <span style={{ fontSize: 11, color: C.success, fontWeight: 700 }}>● Live DB Connected</span>
                 </div>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: C.bg }}>
-                      {['Event ID', 'Gateway / Source', 'Event Type', 'Status', 'HTTP', 'Time'].map(h => (
+                      {['Event ID', 'Source', 'Event Type', 'Status', 'HTTP Code', 'Timestamp'].map(h => (
                         <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.5px', borderBottom: `1px solid ${C.border}` }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { id: 'evt_3Mj84d29hd92', source: 'Stripe Gateway',     type: 'customer.subscription.created',     status: 'Success', code: 200, time: '2 mins ago' },
-                      { id: 'evt_94Kf92kd92kd', source: 'SE Ranking Proxy',   type: 'project.audit.completed',            status: 'Success', code: 200, time: '14 mins ago' },
-                      { id: 'evt_10X83jd92hd9', source: 'Resend Mailer',      type: 'email.delivered.report_ready',       status: 'Success', code: 200, time: '1 hour ago' },
-                      { id: 'evt_48K2kd92hd92', source: 'Supabase Realtime',  type: 'db.agency.created',                  status: 'Success', code: 200, time: '3 hours ago' },
-                    ].map((row, i) => (
-                      <tr key={i} className="table-row">
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, fontFamily: 'monospace', color: C.textSub }}>{row.id}</td>
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.source}</td>
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.blue, fontFamily: 'monospace' }}>{row.type}</td>
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}><Badge label={row.status} style={{ bg: '#ECFDF5', color: C.success, border: '#BBF7D0' }} /></td>
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.success }}>{row.code}</td>
-                        <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.time}</td>
-                      </tr>
-                    ))}
+                    {intLoading && integrations.webhookLog.length === 0 ? (
+                      Array.from({ length: 4 }, (_, i) => <tr key={i}><td colSpan={6} style={{ padding: 14 }}><Skeleton h={24} /></td></tr>)
+                    ) : integrations.webhookLog.length === 0 ? (
+                      <tr><td colSpan={6} style={{ padding: 24, textAlign: 'center', color: C.muted }}>No database events found</td></tr>
+                    ) : (
+                      integrations.webhookLog.map((row, i) => (
+                        <tr key={i} className="table-row">
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, fontFamily: 'monospace', color: C.textSub }}>{row.id}</td>
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.navy }}>{row.source}</td>
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.blue, fontFamily: 'monospace' }}>{row.type}</td>
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}` }}><Badge label={row.status} style={{ bg: '#ECFDF5', color: C.success, border: '#BBF7D0' }} /></td>
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, fontWeight: 700, color: C.success }}>{row.code}</td>
+                          <td style={{ padding: '12px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>{row.time}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </Card>
@@ -1186,23 +1339,48 @@ export default function AdminPage() {
             <div className="section-fade">
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
                 <Card style={{ padding: 24 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: C.navy, marginBottom: 16 }}>Platform Information</div>
-                  {[
-                    { label: 'Platform Name', value: 'RankFlow' },
-                    { label: 'Admin Email', value: 'superadmin@rankflow.app' },
-                    { label: 'Next.js Version', value: '16.2.10' },
-                    { label: 'Node.js Version', value: health?.nodeVersion || '…' },
-                    { label: 'Database', value: 'Supabase PostgreSQL' },
-                    { label: 'Auth Provider', value: 'NextAuth v5' },
-                  ].map((item, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < 5 ? `1px solid ${C.border}` : 'none' }}>
-                      <span style={{ fontSize: 13, color: C.textSub, fontWeight: 600 }}>{item.label}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.navy, fontFamily: i > 1 ? 'monospace' : 'inherit' }}>{item.value}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: C.navy }}>Platform Information & Configuration</div>
+                    <button onClick={handleSavePlatformSettings} disabled={settingsSaving} className="btn-primary">
+                      <Check size={13} /> {settingsSaving ? 'Saving...' : 'Save Settings'}
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 5 }}>Platform Name</label>
+                      <input
+                        type="text"
+                        value={platformSettings.platformName}
+                        onChange={e => setPlatformSettings(p => ({ ...p, platformName: e.target.value }))}
+                        style={inputStyle}
+                      />
                     </div>
-                  ))}
+                    <div>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: C.muted, textTransform: 'uppercase', display: 'block', marginBottom: 5 }}>Support Email</label>
+                      <input
+                        type="email"
+                        value={platformSettings.supportEmail}
+                        onChange={e => setPlatformSettings(p => ({ ...p, supportEmail: e.target.value }))}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {[
+                        { label: 'Next.js Version', value: '16.2.10' },
+                        { label: 'Node.js Version', value: health?.nodeVersion || '…' },
+                        { label: 'Database', value: 'Supabase PostgreSQL' },
+                        { label: 'Auth Provider', value: 'NextAuth v5 (Beta)' },
+                      ].map((item, i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 13, color: C.textSub, fontWeight: 600 }}>{item.label}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: C.navy, fontFamily: 'monospace' }}>{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </Card>
                 <Card style={{ padding: 24 }}>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: C.navy, marginBottom: 16 }}>Platform Stats</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: C.navy, marginBottom: 16 }}>Live Database Totals</div>
                   {[
                     { label: 'Total Agencies', value: stats?.totalAgencies || 0 },
                     { label: 'Total Users', value: stats?.totalUsers || 0 },
@@ -1210,7 +1388,7 @@ export default function AdminPage() {
                     { label: 'Total Reports', value: stats?.totalReports || 0 },
                     { label: 'Monthly Revenue', value: `$${(stats?.totalMrr || 0).toLocaleString()}` },
                   ].map((item, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < 4 ? `1px solid ${C.border}` : 'none' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: i < 4 ? `1px solid ${C.border}` : 'none' }}>
                       <span style={{ fontSize: 13, color: C.textSub, fontWeight: 600 }}>{item.label}</span>
                       <span style={{ fontSize: 16, fontWeight: 900, color: C.navy }}>{item.value}</span>
                     </div>
