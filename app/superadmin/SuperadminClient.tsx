@@ -12,7 +12,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   const [activeTab, setActiveTab] = useState('overview');
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState('all');
-  
+
   // Create Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newName, setNewName] = useState('');
@@ -239,9 +239,9 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   ];
 
   const filteredAgencies = agencies.filter((a: any) => {
-    const matchSearch = a.name.toLowerCase().includes(search.toLowerCase()) || 
-                        a.slug.toLowerCase().includes(search.toLowerCase()) ||
-                        (a.contactEmail && a.contactEmail.toLowerCase().includes(search.toLowerCase()));
+    const matchSearch = a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.slug.toLowerCase().includes(search.toLowerCase()) ||
+      (a.contactEmail && a.contactEmail.toLowerCase().includes(search.toLowerCase()));
     const matchPlan = planFilter === 'all' || a.plan === planFilter;
     return matchSearch && matchPlan;
   });
@@ -351,7 +351,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
     try {
       const { toggleSuspendAgencySuperadmin } = await import('@/app/actions');
       await toggleSuspendAgencySuperadmin(agencyId);
-      
+
       // Update local state
       setData((prev: any) => ({
         ...prev,
@@ -377,7 +377,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
     try {
       await deleteAgencySuperadmin(agencyId);
       toast.success('Agency deleted completely!', { id: t });
-      
+
       // Update state
       setData((prev: any) => {
         const updatedAgencies = prev.agencies.filter((a: any) => a.id !== agencyId);
@@ -423,8 +423,6 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
   };
 
   // Professional Superadmin Features State
-  const [broadcastMessage, setBroadcastMessage] = useState('🚨 Scheduled SERanking API sync maintenance on Saturday 2:00 AM UTC.');
-  const [broadcastActive, setBroadcastActive] = useState(true);
 
   // Agency API Quotas
   const [agencyQuotas, setAgencyQuotas] = useState<Record<string, number>>({
@@ -506,14 +504,8 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
         .fade-in { animation: fadeIn 0.4s ease-out; }
       `}</style>
 
-      {/* Broadcast Banner (if active) */}
-      {broadcastActive && (
-        <div style={{ background: 'linear-gradient(90deg, #FF1E42, #E01435)', color: 'white', padding: '8px 24px', fontSize: '13px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>📢 {broadcastMessage}</div>
-          <button onClick={() => setBroadcastActive(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 800 }}>✕</button>
-        </div>
-      )}
-      
+
+
       {/* Superadmin Header */}
       <header style={{ background: '#111114', color: '#F4F4F6', padding: '0 32px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -532,12 +524,12 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
       {renderTabNav()}
 
       <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px 24px' }}>
-        
+
         {activeTab === 'overview' && (
           <div className="fade-in">
             <h2 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '8px' }}>Platform Overview</h2>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '15px', marginBottom: '32px' }}>Real-time metrics across all agencies</p>
-            
+
             {/* KPI Summary cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
               <div className="kpi-card" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', backdropFilter: 'blur(8px)', padding: '24px', position: 'relative', overflow: 'hidden' }}>
@@ -547,7 +539,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Monthly Revenue</div>
                     <div style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px' }}>${mrr.toLocaleString()}</div>
                     <div style={{ fontSize: '12px', color: '#10B981', marginTop: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span> 
+                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span>
                       +18% vs last month
                     </div>
                   </div>
@@ -562,7 +554,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Total Agencies</div>
                     <div style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px' }}>{totalAgencies}</div>
                     <div style={{ fontSize: '12px', color: '#10B981', marginTop: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span> 
+                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span>
                       3 joined this month
                     </div>
                   </div>
@@ -577,7 +569,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Total Clients</div>
                     <div style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px' }}>{totalClients}</div>
                     <div style={{ fontSize: '12px', color: '#10B981', marginTop: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span> 
+                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span>
                       Across all agencies
                     </div>
                   </div>
@@ -592,7 +584,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                     <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Reports Generated</div>
                     <div style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px' }}>{totalReports}</div>
                     <div style={{ fontSize: '12px', color: '#10B981', marginTop: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span> 
+                      <span style={{ background: 'rgba(16,185,129,0.2)', borderRadius: '50%', width: 14, height: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '8px' }}>▲</span>
                       24 this week
                     </div>
                   </div>
@@ -603,7 +595,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
 
             {/* Charts & Audits */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px', marginBottom: '32px' }}>
-              
+
               {/* MRR Chart */}
               <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', backdropFilter: 'blur(8px)', padding: '24px' }}>
                 <div style={{ marginBottom: '24px' }}>
@@ -615,13 +607,13 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                     <AreaChart data={mrrChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                       <defs>
                         <linearGradient id="colorMrr" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                       <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                      <YAxis stroke="rgba(255,255,255,0.3)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val / 1000}k`} />
                       <Tooltip contentStyle={{ backgroundColor: 'rgba(10,15,28,0.9)', borderColor: 'rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', backdropFilter: 'blur(10px)' }} itemStyle={{ color: '#6366F1' }} />
                       <Area type="monotone" dataKey="value" stroke="#6366F1" strokeWidth={3} fillOpacity={1} fill="url(#colorMrr)" />
                     </AreaChart>
@@ -823,7 +815,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                         <td style={{ color: isCanceled(agency.plan) ? 'rgba(255,255,255,0.25)' : '#6366F1', fontWeight: 700, textDecoration: isCanceled(agency.plan) ? 'line-through' : 'none' }}>
                           {isCanceled(agency.plan) ? '—' : `$${getPlanMRR(agency.plan || 'starter')}/mo`}
                         </td>
-                        <td style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }} suppressHydrationWarning>{new Date(agency.createdAt).toLocaleDateString('en-US', {month: 'short', year: 'numeric'})}</td>
+                        <td style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }} suppressHydrationWarning>{new Date(agency.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</td>
                         <td>
                           {isCanceled(agency.plan) ? (
                             <span style={{ color: '#EF4444', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', padding: '4px 8px', borderRadius: '6px', fontWeight: 700, fontSize: '11px', display: 'inline-block' }}>🚫 Canceled</span>
@@ -920,7 +912,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                         <td style={{ padding: '16px 24px', color: 'rgba(255,255,255,0.7)' }}>{user.email}</td>
                         <td style={{ padding: '16px 24px', color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>{user.agency?.name || 'RankFlow Platform'}</td>
                         <td style={{ padding: '16px 24px' }}>
-                          <span style={{ 
+                          <span style={{
                             background: user.role === 'superadmin' ? 'rgba(239, 68, 68, 0.15)' : user.role === 'admin' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(16, 185, 129, 0.15)',
                             border: `1px solid ${user.role === 'superadmin' ? 'rgba(239,68,68,0.3)' : user.role === 'admin' ? 'rgba(59,130,246,0.3)' : 'rgba(16,185,129,0.3)'}`,
                             color: user.role === 'superadmin' ? '#EF4444' : user.role === 'admin' ? '#60A5FA' : '#10B981',
@@ -997,15 +989,15 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                         const statusColor = report.status === 'done' || report.status === 'generated'
                           ? '#10B981'
                           : report.status === 'failed'
-                          ? '#EF4444'
-                          : report.status === 'generating'
-                          ? '#F59E0B'
-                          : 'rgba(255,255,255,0.4)';
+                            ? '#EF4444'
+                            : report.status === 'generating'
+                              ? '#F59E0B'
+                              : 'rgba(255,255,255,0.4)';
                         const statusLabel = report.status === 'done' ? 'Ready'
                           : report.status === 'generated' ? 'Ready'
-                          : report.status === 'failed' ? 'Failed'
-                          : report.status === 'generating' ? 'Generating'
-                          : 'Draft';
+                            : report.status === 'failed' ? 'Failed'
+                              : report.status === 'generating' ? 'Generating'
+                                : 'Draft';
                         const isReady = report.status === 'done' || report.status === 'generated';
                         const isDownloading = downloadingPdf[report.id];
 
@@ -1080,7 +1072,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
           <div className="fade-in">
             <h2 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.5px', marginBottom: '8px' }}>System Health</h2>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '15px', marginBottom: '32px' }}>Real-time platform monitoring & diagnostics</p>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '32px' }}>
               <div className="kpi-card" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', backdropFilter: 'blur(8px)', padding: '24px' }}>
                 <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', letterSpacing: '0.5px' }}><span style={{ color: '#10B981' }}>🌐</span> API UPTIME</div>
@@ -1230,7 +1222,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
             </div>
           </div>
         )}
-        
+
         {/* SUPPORT TICKETS TAB */}
         {activeTab === 'tickets' && (
           <div className="fade-in">
@@ -1259,13 +1251,13 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                   <tbody>
                     {supportTickets.map((ticket: any) => {
                       const clientName = ticket.action.split('Client (')[1]?.split(') Support Request:')[0] || 'Client';
-                      
+
                       const parts = ticket.action.split('Support Request: "');
                       let messageContent = parts[1]?.split('" | Response: "')[0] || ticket.action;
                       if (messageContent.endsWith('"')) messageContent = messageContent.slice(0, -1);
-                      
+
                       let reply = parts[1]?.split('" | Response: "')[1]?.split('" [RESOLVED]')[0] || null;
-                      
+
                       const isResolved = ticket.action.includes('[RESOLVED]');
 
                       return (
@@ -1296,13 +1288,13 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
                             )}
                           </td>
                           <td style={{ textAlign: 'right' }}>
-                            <button 
-                              className="btn btn-ghost btn-sm" 
-                              style={{ 
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              style={{
                                 border: isResolved ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(139, 92, 246, 0.3)',
-                                color: isResolved ? 'rgba(255,255,255,0.6)' : '#8B5CF6', 
-                                padding: '6px 12px', 
-                                fontSize: '11px' 
+                                color: isResolved ? 'rgba(255,255,255,0.6)' : '#8B5CF6',
+                                padding: '6px 12px',
+                                fontSize: '11px'
                               }}
                               onClick={() => {
                                 setActiveTicketId(ticket.id);
@@ -1433,7 +1425,7 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
             <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '24px' }}>
               <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '28px' }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px' }}>Broadcast Announcement Configuration</h3>
-                
+
                 <form onSubmit={e => {
                   e.preventDefault();
                   setBroadcastActive(true);
@@ -1545,59 +1537,59 @@ export default function SuperadminClient({ initialData }: { initialData: any }) 
           </div>
         )}
 
-      {/* Ticket Response Modal */}
-      {activeTicketId && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(10, 15, 28, 0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: 'rgba(30, 41, 59, 0.95)', borderRadius: '12px', padding: '32px', width: '100%', maxWidth: '480px', boxShadow: 'var(--shadow-xl)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 800 }}>💬 Respond & Resolve Ticket</h3>
-              <button onClick={() => { setActiveTicketId(null); setReplyText(''); }} style={{ fontSize: '20px', color: 'rgba(255,255,255,0.45)', border: 'none', background: 'none', cursor: 'pointer' }}>✕</button>
+        {/* Ticket Response Modal */}
+        {activeTicketId && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(10, 15, 28, 0.8)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'rgba(30, 41, 59, 0.95)', borderRadius: '12px', padding: '32px', width: '100%', maxWidth: '480px', boxShadow: 'var(--shadow-xl)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 800 }}>💬 Respond & Resolve Ticket</h3>
+                <button onClick={() => { setActiveTicketId(null); setReplyText(''); }} style={{ fontSize: '20px', color: 'rgba(255,255,255,0.45)', border: 'none', background: 'none', cursor: 'pointer' }}>✕</button>
+              </div>
+
+              {(() => {
+                const ticket = supportTickets.find(t => t.id === activeTicketId);
+                if (!ticket) return null;
+
+                const clientName = ticket.action.split('Client (')[1]?.split(') Support Request:')[0] || 'Client';
+                const parts = ticket.action.split('Support Request: "');
+                let messageContent = parts[1]?.split('" | Response: "')[0] || ticket.action;
+                if (messageContent.endsWith('"')) messageContent = messageContent.slice(0, -1);
+
+                let existingReply = parts[1]?.split('" | Response: "')[1]?.split('" [RESOLVED]')[0] || '';
+
+                return (
+                  <form onSubmit={handleReplySubmit}>
+                    <div style={{ marginBottom: '20px', fontSize: '13px', background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontWeight: 700, marginBottom: '4px', color: '#6366F1' }}>Inquiry from {clientName} ({ticket.agency?.name || 'Agency'}):</div>
+                      <div style={{ color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', wordBreak: 'break-word', lineHeight: 1.4 }}>{`"${messageContent}"`}</div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                      <label className="form-label">Superadmin Support Reply *</label>
+                      <textarea
+                        className="form-input"
+                        value={replyText}
+                        onChange={e => setReplyText(e.target.value)}
+                        required
+                        placeholder="Write response message..."
+                        style={{ width: '100%', height: '120px', padding: '12px', resize: 'vertical', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', fontFamily: 'inherit', fontSize: '13px', lineHeight: 1.4 }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                      <button type="button" className="btn btn-secondary" onClick={() => { setActiveTicketId(null); setReplyText(''); }}>Cancel</button>
+                      <button type="submit" className="btn btn-primary" disabled={submittingReply}>
+                        {submittingReply ? 'Saving Response...' : '🚀 Submit Reply & Resolve'}
+                      </button>
+                    </div>
+                  </form>
+                );
+              })()}
             </div>
-            
-            {(() => {
-              const ticket = supportTickets.find(t => t.id === activeTicketId);
-              if (!ticket) return null;
-              
-              const clientName = ticket.action.split('Client (')[1]?.split(') Support Request:')[0] || 'Client';
-              const parts = ticket.action.split('Support Request: "');
-              let messageContent = parts[1]?.split('" | Response: "')[0] || ticket.action;
-              if (messageContent.endsWith('"')) messageContent = messageContent.slice(0, -1);
-              
-              let existingReply = parts[1]?.split('" | Response: "')[1]?.split('" [RESOLVED]')[0] || '';
-
-              return (
-                <form onSubmit={handleReplySubmit}>
-                  <div style={{ marginBottom: '20px', fontSize: '13px', background: 'rgba(255,255,255,0.03)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ fontWeight: 700, marginBottom: '4px', color: '#6366F1' }}>Inquiry from {clientName} ({ticket.agency?.name || 'Agency'}):</div>
-                    <div style={{ color: 'rgba(255,255,255,0.85)', fontStyle: 'italic', wordBreak: 'break-word', lineHeight: 1.4 }}>{`"${messageContent}"`}</div>
-                  </div>
-                  
-                  <div className="form-group" style={{ marginBottom: '24px' }}>
-                    <label className="form-label">Superadmin Support Reply *</label>
-                    <textarea 
-                      className="form-input" 
-                      value={replyText} 
-                      onChange={e => setReplyText(e.target.value)} 
-                      required 
-                      placeholder="Write response message..." 
-                      style={{ width: '100%', height: '120px', padding: '12px', resize: 'vertical', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '8px', fontFamily: 'inherit', fontSize: '13px', lineHeight: 1.4 }}
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => { setActiveTicketId(null); setReplyText(''); }}>Cancel</button>
-                    <button type="submit" className="btn btn-primary" disabled={submittingReply}>
-                      {submittingReply ? 'Saving Response...' : '🚀 Submit Reply & Resolve'}
-                    </button>
-                  </div>
-                </form>
-              );
-            })()}
           </div>
-        </div>
-      )}
+        )}
 
-        
+
       </main>
 
       {/* Register Agency Modal */}
