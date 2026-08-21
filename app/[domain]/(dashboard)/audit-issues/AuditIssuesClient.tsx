@@ -227,7 +227,7 @@ export default function AuditIssuesClient({ domain }: { domain: string }) {
             🩺 Site Audit Diagnostic &amp; Error Resolver Center
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>
-            Classify critical technical SEO errors, analyze root causes, and apply AI resolution guides to improve site health scores.
+            Classify critical technical SEO errors, analyze root causes, and apply remediation guides to improve site health scores.
           </p>
         </div>
       </div>
@@ -383,7 +383,7 @@ export default function AuditIssuesClient({ domain }: { domain: string }) {
                       className="btn btn-secondary btn-sm"
                       onClick={() => setActiveGuideModal(issue)}
                     >
-                      💡 AI Fix Guide
+                      💡 Fix Guide
                     </button>
                     <button
                       className="btn btn-primary btn-sm"
@@ -459,7 +459,7 @@ export default function AuditIssuesClient({ domain }: { domain: string }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '24px' }}>💡</span>
                 <div>
-                  <h2 style={{ fontSize: '20px', fontWeight: 800 }}>AI Resolution &amp; Remediation Guide</h2>
+                  <h2 style={{ fontSize: '20px', fontWeight: 800 }}>Resolution &amp; Remediation Guide</h2>
                   <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Step-by-step fix instructions for {activeGuideModal.title}</p>
                 </div>
               </div>

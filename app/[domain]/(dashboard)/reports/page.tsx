@@ -594,7 +594,7 @@ export default function ReportsPage({ params }: { params: Promise<{ domain: stri
 
                   {selected.preview.recommendations && selected.preview.recommendations.length > 0 && (
                     <div style={{ marginTop: 8 }}>
-                      <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 4 }}>AI Strategic Priorities</div>
+                      <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--text-muted)', marginBottom: 4 }}>Strategic Priorities</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         {selected.preview.recommendations.slice(0, 3).map((r, i) => (
                           <div key={i} style={{ fontSize: 11, color: 'var(--text-secondary)', display: 'flex', gap: 6, alignItems: 'flex-start' }}>

@@ -307,5 +307,18 @@ The `navItems` array in `Sidebar.tsx` defines the agency navigation menu dynamic
 
 ---
 
+## [2026-08-21] UI Text Polish & Removal of "AI" Terminology
 
+**Task:** Scan and replace all user-facing occurrences of the word "AI" across the application with natural, professional terminology (e.g., Executive Strategy, Strategic Recommendations, Fix Guides, Brand Search Visibility).  
+**Files Changed:**
+- `app/[domain]/(dashboard)/reports/new/page.tsx` — replaced AI Narrative & AI Strategy labels with Executive Strategy & Insights
+- `app/[domain]/(dashboard)/reports/page.tsx` — replaced AI Strategic Priorities with Strategic Priorities
+- `app/[domain]/client/dashboard/page.tsx` — replaced AI-Powered Recommendations with Strategic Recommendations
+- `app/report/[shareSlug]/page.tsx` — replaced AI-Generated Recommendations with Strategic Recommendations
+- `app/[domain]/(dashboard)/reports/builder/[id]/BuilderClient.tsx` — cleaned module description
+- `app/[domain]/(dashboard)/audit-issues/AuditIssuesClient.tsx` — replaced AI Fix Guide with Fix Guide & Resolution Guide
+- `app/[domain]/(dashboard)/help/guide/[id]/page.tsx` — updated help guide documentation text
 
+**What Was Done:**
+1. Replaced all user-facing "AI" labels and copy across agency report generation, client portals, public share pages, and site audit diagnostic centers with clean, enterprise-grade terminology.
+2. Synchronized all updated source files with local runtime environments.

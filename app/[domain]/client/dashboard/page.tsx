@@ -476,7 +476,7 @@ export default function ClientDashboardPage() {
           <div className="report-section-card">
             <div className="report-section-header">
               <div className="report-section-num">✨</div>
-              <div className="report-section-title">AI-Powered Recommendations</div>
+              <div className="report-section-title">Strategic Recommendations</div>
             </div>
             <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {aiRecsRaw.map((r: any, i: number) => {
@@ -783,7 +783,7 @@ export default function ClientDashboardPage() {
             <Card>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.border}` }}>
                 <div style={{ fontSize: 14, fontWeight: 800, color: T.textDark, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 15 }}>✨</span> AI Recommendations
+                  <span style={{ fontSize: 15 }}>✨</span> Strategic Recommendations
                 </div>
                 <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2 }}>Priority action items from your latest report</div>
               </div>

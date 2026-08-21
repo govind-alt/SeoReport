@@ -12,7 +12,7 @@ const nextModuleId = () => { moduleIdCounter += 1; return moduleIdCounter; };
 import { saveReportTemplate, updateExecutiveSummary } from '@/app/actions';
 
 const AVAILABLE_MODULES = [
-  { id: 'executive_summary', title: 'Executive Summary', icon: '📝', description: 'AI-generated summary of overall performance.' },
+  { id: 'executive_summary', title: 'Executive Summary', icon: '📝', description: 'Executive summary of overall performance.' },
   { id: 'seo_rankings', title: 'Keyword Rankings', icon: '📈', description: 'Position tracking for target keywords.' },
   { id: 'site_audit', title: 'Site Audit (Health)', icon: '🏥', description: 'Technical SEO health score and issues.' },
   { id: 'backlinks', title: 'Backlink Profile', icon: '🔗', description: 'New, lost, and total active backlinks.' },

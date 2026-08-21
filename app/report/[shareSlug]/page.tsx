@@ -206,7 +206,7 @@ export default async function SharedReportPage({
 
           {(!sections || sections.aiRecs) && (
             <div className="card">
-              <div className="card-header"><div className="card-title">🤖 AI-Generated Recommendations</div></div>
+              <div className="card-header"><div className="card-title">💡 Strategic Recommendations</div></div>
               <div className="card-body">
                 {(aiRecs.length > 0 ? aiRecs : [
                   { color: '#EF4444', text: '<strong>Fix 3 broken internal links</strong> — /blog/post-14 and /resources/guide-3 are causing crawlability issues.' },

@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-21 | UI Text Polish & Removal of "AI" Terminology | frontend | Replaced all user-facing occurrences of the word AI across reports, client portal, and diagnostics |
 | 2026-08-21 | PDF Download Filename Fix & Personal Note Box Resize | pdf-reports | Fixed PDF download race condition saving as raw UUID without .pdf; enlarged Personal Note box |
 | 2026-08-21 | Enterprise Advance-Level Report Studio & AI Generation Suite | frontend | Built 4-step Advance Studio with AI Narrative engine (4 tones), batch multi-client mode, YoY/MoM benchmarks, and 8 modules |
 | 2026-08-21 | Agency Sidebar & Route Inbox Removal | frontend | Removed Inbox item from Sidebar navigation and deleted /inbox dashboard route |

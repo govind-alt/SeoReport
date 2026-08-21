@@ -213,7 +213,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
       return;
     }
     setIsGeneratingAi(true);
-    const toastId = toast.loading(`Generating ${toneToUse} AI narrative for ${selectedClient.name}…`);
+    const toastId = toast.loading(`Generating ${toneToUse} executive narrative for ${selectedClient.name}…`);
     try {
       const res = await fetch('/api/reports/ai-narrative', {
         method: 'POST',
@@ -224,13 +224,13 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
           tone: toneToUse,
         }),
       });
-      if (!res.ok) throw new Error('AI generation failed');
+      if (!res.ok) throw new Error('Generation failed');
       const data = await res.json();
       setExecutiveSummary(data.executiveSummary);
       if (Array.isArray(data.recommendations)) {
         setRecommendations(data.recommendations);
       }
-      toast.success(`✨ AI Narrative generated (${toneToUse} tone)!`, { id: toastId });
+      toast.success(`✨ Executive narrative generated (${toneToUse} tone)!`, { id: toastId });
     } catch {
       // Fallback generator
       const fallbackSummary = `For ${periodLabel}, ${selectedClient.name} (${selectedClient.domain}) achieved continuous expansion across high-intent search visibility. Organic traffic climbed with solid growth across Top 10 Google positions. Overall technical domain health is indexed at 82/100, providing a robust base for ongoing keyword acquisition.`;
@@ -413,7 +413,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
             </h1>
           </div>
           <p className="page-subtitle" style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Automate multi-channel performance reports with intelligent AI narratives, YoY benchmarks, and custom branding.
+            Automate multi-channel performance reports with executive summaries, YoY benchmarks, and custom branding.
           </p>
         </div>
 
@@ -483,7 +483,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
         {[
           { num: 1, label: generationMode === 'batch' ? 'Batch Clients' : 'Select Client', desc: 'Target website & telemetry' },
           { num: 2, label: 'Period & Benchmarks', desc: 'MoM, YoY & custom ranges' },
-          { num: 3, label: 'AI Narrative & Sections', desc: 'Strategy, tone & 8 modules' },
+          { num: 3, label: 'Executive Strategy & Sections', desc: 'Strategy, tone & 8 modules' },
           { num: 4, label: 'Delivery & Canvas', desc: 'Merge tags, PDF & share link' },
         ].map((s, idx, arr) => {
           const isDone = step > s.num;
@@ -1042,14 +1042,14 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
               <ArrowLeft size={15} /> Back
             </button>
             <button className="btn btn-primary" onClick={nextStep} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 24px', fontSize: '14px', fontWeight: 800 }}>
-              Continue to AI Narrative &amp; Sections <ArrowRight size={15} />
+              Continue to Executive Strategy &amp; Sections <ArrowRight size={15} />
             </button>
           </div>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════ */}
-      {/* STEP 3: AI NARRATIVE & 8 CONFIGURABLE MODULES */}
+      {/* STEP 3: EXECUTIVE STRATEGY & 8 CONFIGURABLE MODULES */}
       {/* ═══════════════════════════════════════════════════════════════════════ */}
       {step === 3 && (
         <div>
@@ -1081,14 +1081,14 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {[
-                  { key: 'summary', name: 'Executive Scorecard & AI Strategy', desc: 'KPI scorecard, AI narrative, and ROI executive highlights', icon: Award },
+                  { key: 'summary', name: 'Executive Scorecard & Strategy', desc: 'KPI scorecard, strategic narrative, and ROI executive highlights', icon: Award },
                   { key: 'keywords', name: 'Keyword Rankings & Top Movers', desc: 'Top 3/10/30 positions, rank distribution & keyword movers', icon: TrendingUp },
                   { key: 'traffic', name: 'Organic Traffic & CTR Analytics', desc: 'Search console clicks, impressions, sessions & CTR curves', icon: Activity },
                   { key: 'backlinks', name: 'Backlink Authority & Trust Flow', desc: 'Domain authority/trust, new/lost links & referring domains', icon: LinkIcon },
                   { key: 'audit', name: 'Technical SEO & Core Web Vitals', desc: 'Health score, crawl errors, site speed & HTTPS check', icon: Shield },
                   { key: 'competitors', name: 'Competitor Benchmarking Matrix', desc: 'Direct keyword and authority overlap against 3 rivals', icon: BarChart2 },
-                  { key: 'aiSearch', name: 'AI Search Engine Visibility', desc: 'ChatGPT, Perplexity & Gemini brand citations', icon: Sparkles },
-                  { key: 'recommendations', name: 'Prioritized Strategic Action Roadmap', desc: 'AI-prioritized SEO roadmap & high-impact action items', icon: Zap },
+                  { key: 'aiSearch', name: 'Brand Search Visibility & Citations', desc: 'ChatGPT, Perplexity & Gemini brand citations', icon: Sparkles },
+                  { key: 'recommendations', name: 'Prioritized Strategic Action Roadmap', desc: 'Prioritized SEO roadmap & high-impact action items', icon: Zap },
                 ].map((s, idx) => {
                   const isEnabled = sections[s.key as keyof typeof sections];
                   const Icon = s.icon;
@@ -1163,10 +1163,10 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
               </div>
             </div>
 
-            {/* Right Column: AI Narrative & Strategy Generator */}
+            {/* Right Column: Executive Narrative & Strategy Generator */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
-              {/* AI Narrative Card */}
+              {/* Executive Narrative Card */}
               <div
                 style={{
                   background: 'white',
@@ -1180,7 +1180,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Sparkles size={16} style={{ color: 'var(--primary)' }} />
                     <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                      AI Executive Insights Generator
+                      Executive Insights Generator
                     </h3>
                   </div>
                   <button
@@ -1242,7 +1242,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     value={executiveSummary}
                     onChange={e => setExecutiveSummary(e.target.value)}
                     style={{ fontSize: '12px', lineHeight: 1.5, resize: 'vertical' }}
-                    placeholder="AI generated executive overview will appear here…"
+                    placeholder="Executive overview narrative will appear here…"
                   />
                 </div>
 
@@ -1612,7 +1612,7 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
                     <span style={{ color: '#10B981', fontWeight: 800 }}>{activeSectionsCount} Sections</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>AI Insights Tone:</span>
+                    <span style={{ color: 'rgba(255,255,255,0.5)' }}>Insights Tone:</span>
                     <span style={{ textTransform: 'capitalize', fontWeight: 700 }}>{aiTone}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>

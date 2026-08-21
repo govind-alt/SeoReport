@@ -53,7 +53,7 @@ const GUIDES: Record<string, {
       },
       {
         heading: 'Custom Report Sections',
-        content: 'When generating a report, you can toggle which sections to include: Keywords, Backlinks, Site Audit, Analytics, Competitors, and AI Recommendations. Each toggle is remembered per client.',
+        content: 'When generating a report, you can toggle which sections to include: Keywords, Backlinks, Site Audit, Analytics, Competitors, and Strategic Recommendations. Each toggle is remembered per client.',
       },
       {
         heading: 'White-Label PDF Reports',
