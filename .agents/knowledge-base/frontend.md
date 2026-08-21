@@ -303,7 +303,7 @@ The `navItems` array in `Sidebar.tsx` defines the agency navigation menu dynamic
 3. Implemented Single Client and Batch Multi-Client modes with tag filtering, multi-selection, and parallel compilation.
 4. Created an interactive Period & Benchmark matrix supporting MoM, YoY, and custom arbitrary ranges.
 5. Added 8 customizable analytical modules with sub-toggles, link expiration settings, and live miniature report canvas preview.
-6. Verified complete generation lifecycle and full-width layout in Chrome.
+6. Verified complete generation lifecycle, full-width layout, and removed title badge for clean header presentation.
 
 ---
 
