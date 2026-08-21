@@ -411,23 +411,6 @@ export default function AdvanceReportWizardPage({ params }: { params: Promise<{ 
             <h1 className="page-title" style={{ fontSize: '24px', fontWeight: 900, margin: 0 }}>
               Enterprise Report Studio
             </h1>
-            <span
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                padding: '3px 8px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(229,62,62,0.15) 0%, rgba(79,142,247,0.15) 100%)',
-                color: 'var(--primary)',
-                border: '1px solid rgba(229,62,62,0.2)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              <Sparkles size={11} /> AI Powered
-            </span>
           </div>
           <p className="page-subtitle" style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
             Automate multi-channel performance reports with intelligent AI narratives, YoY benchmarks, and custom branding.
