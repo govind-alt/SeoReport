@@ -2,6 +2,19 @@
 
 > Maintained by Knowledge Curator. Append new entries using the format defined in SKILL.md.
 
+## 2026-08-22 — Dynamic Auth Email Synchronization & User Input Integrity
+
+**Task:** Ensure all login and password reset flows dynamically use the user's entered email address with automatic form synchronization.
+
+**Files Changed:**
+- `app/(auth)/login/page.tsx` — Updated "Forgot password?" link handler to automatically pass and pre-fill whatever email was typed on the sign-in form into `forgotEmail`.
+- `app/api/auth/forgot-password/route.ts` — Verified dynamic normalization (`trim().toLowerCase()`), user token creation, and dispatch via `sendPasswordResetEmail`.
+
+**Why:**
+To guarantee that when users enter their specific email during login or password recovery, all verification links, reset tokens, and notifications are sent strictly and dynamically to that user's email address.
+
+---
+
 ## 2026-08-22 — Executive Professional Email System & Templates Documentation
 
 **Task:** Upgrade transactional email system to executive professional standard and create dedicated documentation in `docs/EMAIL_TEMPLATES.md`.
