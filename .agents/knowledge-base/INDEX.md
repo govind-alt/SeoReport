@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-22 | Dev Server Startup & Chrome Browser Launch | devops | Launched Next.js dev server on http://localhost:3000 and opened Google Chrome to the RankFlow login view |
 | 2026-08-21 | Super Admin Full Dynamic API Suite & Live Persistence | api | Converted Broadcasts, Integrations (live pings), Feature Flags, Tier Limits, and Settings to real persistent endpoints |
 | 2026-08-21 | UI Text Polish & Removal of "AI" Terminology | frontend | Replaced all user-facing occurrences of the word AI across reports, client portal, and diagnostics |
 | 2026-08-21 | PDF Download Filename Fix & Personal Note Box Resize | pdf-reports | Fixed PDF download race condition saving as raw UUID without .pdf; enlarged Personal Note box |
