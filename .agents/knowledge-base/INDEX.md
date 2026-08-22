@@ -35,6 +35,7 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-22 | Super Admin Header Clock Hydration Mismatch Fix | frontend | Added mounted state and suppressHydrationWarning to resolve SSR time format mismatch in Super Admin |
 | 2026-08-22 | Super Admin Direct Report View Fix | frontend | Updated Super Admin reports table to open /reports/render/[id] directly instead of agency portal redirect |
 | 2026-08-22 | Dynamic Auth Email Synchronization & User Input Integrity | api | Connected login email state to forgot password flow and verified dynamic recipient routing |
 | 2026-08-22 | Executive Professional Email System & Templates Documentation | api | Redesigned transactional email templates to executive standards and created docs/EMAIL_TEMPLATES.md |

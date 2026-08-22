@@ -202,6 +202,7 @@ const PLANS = ['starter', 'pro', 'agency', 'enterprise'];
    MAIN COMPONENT
 ════════════════════════════════════════════ */
 export default function AdminPage() {
+  const [mounted, setMounted] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [search, setSearch] = useState('');
@@ -321,7 +322,7 @@ export default function AdminPage() {
     finally { setHealthLoading(false); setLastRefresh(new Date()); }
   }, []);
 
-  useEffect(() => { fetchAll(); fetchHealth(); fetchBroadcasts(); fetchIntegrations(); fetchActivity(); fetchSettings(); }, [fetchAll, fetchHealth, fetchBroadcasts, fetchIntegrations, fetchActivity, fetchSettings]);
+  useEffect(() => { setMounted(true); fetchAll(); fetchHealth(); fetchBroadcasts(); fetchIntegrations(); fetchActivity(); fetchSettings(); }, [fetchAll, fetchHealth, fetchBroadcasts, fetchIntegrations, fetchActivity, fetchSettings]);
 
   /* Auto-refresh health every 15s */
   useEffect(() => {
@@ -606,8 +607,8 @@ export default function AdminPage() {
             <h1 style={{ fontSize: 18, fontWeight: 800, color: C.navy, letterSpacing: '-0.3px' }}>
               {navItems.find(n => n.id === tab)?.label}
             </h1>
-            <span style={{ fontSize: 11, color: C.muted, background: C.bg, padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>
-              {lastRefresh.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            <span suppressHydrationWarning style={{ fontSize: 11, color: C.muted, background: C.bg, padding: '2px 8px', borderRadius: 6, fontWeight: 600 }}>
+              {mounted ? lastRefresh.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'Live'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

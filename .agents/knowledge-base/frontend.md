@@ -41,6 +41,18 @@ app/
       layout.tsx                      â†� Client portal layout
 ```
 
+## 2026-08-22 — Super Admin Header Clock Hydration Mismatch Fix
+
+**Task:** Fix React SSR hydration mismatch error on `app/admin/page.tsx` line 609 where `lastRefresh.toLocaleTimeString` caused server/client time string mismatch during initial mount.
+
+**Files Changed:**
+- `app/admin/page.tsx` — Added `mounted` client-side state gate and `suppressHydrationWarning` to the header timestamp `<span>`.
+
+**Why:**
+Next.js SSR rendered the timestamp in server timezone/locale (`10:25 AM`) while client hydration evaluated to the client's current time (`03:36 PM`), causing a recoverable hydration error overlay. Client-mounting prevents SSR mismatch.
+
+---
+
 ## 2026-08-22 — Super Admin Direct Report View Fix
 
 **Task:** Fix Super Admin Reports tab so clicking on a report directly opens the standalone report viewer (`/reports/render/[id]`) instead of redirecting to the agency client portal dashboard (`/[domain]/reports/[shareSlug]`).
