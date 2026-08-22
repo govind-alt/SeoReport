@@ -258,7 +258,7 @@ export default function AdminPage() {
 
   /* ── Toast ── */
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const toastRef = useRef<ReturnType<typeof setTimeout>>();
+  const toastRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const showToast = useCallback((msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ msg, type });
     clearTimeout(toastRef.current);

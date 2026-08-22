@@ -9,12 +9,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [notifications, recentAgencies, recentClients, recentReports] = await Promise.all([
-      prisma.notification.findMany({
-        take: 15,
-        orderBy: { createdAt: 'desc' },
-        include: { agency: { select: { name: true } } }
-      }),
+    const [recentAgencies, recentClients, recentReports] = await Promise.all([
       prisma.agency.findMany({
         take: 5,
         orderBy: { createdAt: 'desc' },
@@ -33,18 +28,6 @@ export async function GET() {
     ]);
 
     const activityFeed: Array<{ id: string; type: string; title: string; detail: string; agency: string; time: string; timestamp: Date }> = [];
-
-    notifications.forEach((n) => {
-      activityFeed.push({
-        id: `notif-${n.id}`,
-        type: n.type || 'alert',
-        title: n.title,
-        detail: n.body,
-        agency: n.agency?.name || 'Agency',
-        time: new Date(n.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        timestamp: n.createdAt
-      });
-    });
 
     recentAgencies.forEach((a) => {
       activityFeed.push({
