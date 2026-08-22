@@ -44,14 +44,14 @@ export async function GET() {
       prisma.report.findMany({ take: 3, orderBy: { createdAt: 'desc' }, include: { client: { select: { name: true, agency: { select: { name: true } } } } } }),
     ]);
 
-    const webhookLog: any[] = [];
-    recentAgencies.forEach(a => webhookLog.push({
+    const webhookLog: Array<{ id: string; source: string; type: string; status: string; code: number; time: string }> = [];
+    recentAgencies.forEach((a) => webhookLog.push({
       id: `evt_agency_${a.id.substring(0, 8)}`, source: 'Platform Core', type: 'agency.created', status: 'Success', code: 200, time: new Date(a.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
     }));
-    recentClients.forEach(c => webhookLog.push({
+    recentClients.forEach((c) => webhookLog.push({
       id: `evt_client_${c.id.substring(0, 8)}`, source: 'Platform Core', type: 'client.onboarded', status: 'Success', code: 200, time: new Date(c.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
     }));
-    recentReports.forEach(r => webhookLog.push({
+    recentReports.forEach((r) => webhookLog.push({
       id: `evt_report_${r.id.substring(0, 8)}`, source: 'Report Engine', type: 'report.generated', status: 'Success', code: 200, time: new Date(r.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
     }));
 
