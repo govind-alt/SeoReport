@@ -926,7 +926,9 @@ export default function AdminPage() {
                       : filteredReports.slice(0, 50).map(r => (
                         <tr key={r.id} className="table-row">
                           <td style={{ padding: '13px 16px', borderBottom: `1px solid ${C.border}` }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{r.clientName}</div>
+                            <a href={`/reports/render/${r.id}`} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                              <div style={{ fontSize: 13, fontWeight: 700, color: C.blue, cursor: 'pointer' }}>{r.clientName}</div>
+                            </a>
                             <div style={{ fontSize: 11, color: C.muted, fontFamily: 'monospace' }}>{r.clientDomain}</div>
                           </td>
                           <td style={{ padding: '13px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 12, color: C.textSub, fontWeight: 600 }}>{r.agencyName}</td>
@@ -938,16 +940,16 @@ export default function AdminPage() {
                           <td style={{ padding: '13px 16px', borderBottom: `1px solid ${C.border}`, fontSize: 13, fontWeight: 700, color: C.navy }}>{r.viewCount || 0}</td>
                           <td style={{ padding: '13px 16px', borderBottom: `1px solid ${C.border}` }}>
                             <div style={{ display: 'flex', gap: 6 }}>
-                              {r.shareSlug && (
-                                <a href={`/${r.agencySubdomain}/reports/${r.shareSlug}`} target="_blank" rel="noreferrer">
-                                  <button className="btn-ghost" style={{ padding: '4px 8px' }}><Eye size={12} /></button>
-                                </a>
-                              )}
-                              {r.pdfUrl && (
-                                <a href={r.pdfUrl} target="_blank" rel="noreferrer">
-                                  <button className="btn-ghost" style={{ padding: '4px 8px' }}><Download size={12} /></button>
-                                </a>
-                              )}
+                              <a href={`/reports/render/${r.id}`} target="_blank" rel="noreferrer">
+                                <button className="btn-ghost" title="View Full Report" style={{ padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <Eye size={12} /> View
+                                </button>
+                              </a>
+                              <a href={r.pdfUrl || `/reports/render/${r.id}?print=1`} target="_blank" rel="noreferrer">
+                                <button className="btn-ghost" title="Download / Export PDF" style={{ padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  <Download size={12} />
+                                </button>
+                              </a>
                             </div>
                           </td>
                         </tr>

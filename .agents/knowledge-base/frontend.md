@@ -41,6 +41,16 @@ app/
       layout.tsx                      â†� Client portal layout
 ```
 
+## 2026-08-22 — Super Admin Direct Report View Fix
+
+**Task:** Fix Super Admin Reports tab so clicking on a report directly opens the standalone report viewer (`/reports/render/[id]`) instead of redirecting to the agency client portal dashboard (`/[domain]/reports/[shareSlug]`).
+
+**Files Changed:**
+- `app/admin/page.tsx` — Updated report table to point the Client Name link, Eye View button, and Download PDF button directly to `/reports/render/${r.id}`.
+
+**Why:**
+Super Admin users inspecting platform-wide reports should see the clean, dedicated report view directly without being redirected or framed within an agency's workspace/client portal layout.
+
 ---
 
 ## 2026-07-27 â€” Color Scheme Updated to Black/Red
