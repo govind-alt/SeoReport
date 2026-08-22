@@ -2,6 +2,62 @@
 
 > Maintained by Knowledge Curator. Append new entries using the format defined in SKILL.md.
 
+## 2026-08-22 — Dynamic Auth Email Synchronization & User Input Integrity
+
+**Task:** Ensure all login and password reset flows dynamically use the user's entered email address with automatic form synchronization.
+
+**Files Changed:**
+- `app/(auth)/login/page.tsx` — Updated "Forgot password?" link handler to automatically pass and pre-fill whatever email was typed on the sign-in form into `forgotEmail`.
+- `app/api/auth/forgot-password/route.ts` — Verified dynamic normalization (`trim().toLowerCase()`), user token creation, and dispatch via `sendPasswordResetEmail`.
+
+**Why:**
+To guarantee that when users enter their specific email during login or password recovery, all verification links, reset tokens, and notifications are sent strictly and dynamically to that user's email address.
+
+---
+
+## 2026-08-22 — Executive Professional Email System & Templates Documentation
+
+**Task:** Upgrade transactional email system to executive professional standard and create dedicated documentation in `docs/EMAIL_TEMPLATES.md`.
+
+**Files Changed:**
+- `lib/email.ts` — Upgraded `baseTemplate` to executive slate-card layout with badges, meta boxes, verified CTA gradients, raw fallback links, and refined copy across all 7 email functions.
+- `docs/EMAIL_TEMPLATES.md` — Created complete master reference catalog detailing specifications, subject lines, payloads, and production setup guidelines for all transactional email templates.
+
+**Why:**
+To replace legacy plain dark templates with an ultra-professional, cross-client optimized (Gmail, Outlook, Apple Mail) corporate design tailored for agency white-label SaaS communications.
+
+---
+
+## 2026-08-22 — Target Email Recipient Updated to Real Inbox
+
+**Task:** Configure default target recipient and support ticket receiver to `hrishitavinherkar1234@gmail.com`.
+
+**Files Changed:**
+- `data/platform-settings.json` — Updated `supportEmail` to `hrishitavinherkar1234@gmail.com`.
+- `app/api/support/route.ts` — Updated to dynamically read support recipient from platform settings with fallback to `hrishitavinherkar1234@gmail.com`.
+- `app/api/admin/settings/test-email/route.ts` — Confirmed default test recipient uses `hrishitavinherkar1234@gmail.com`.
+
+**Why:**
+Previous placeholder addresses (e.g. `@example.com` or `@rankflow.app`) were non-existent demonstration domains. Updated the system to direct all test notifications and support messages to the active target address `hrishitavinherkar1234@gmail.com`.
+
+---
+
+## 2026-08-21 — Super Admin Full Dynamic API Suite & Live Persistence
+
+**Task:** Audit and convert all static sections of the Super Admin dashboard into real dynamic, database-backed, and live-ping endpoints.
+
+**Files Changed:**
+- `app/api/admin/broadcasts/route.ts` — Created file-backed JSON persistent API for platform announcements with GET, POST, PATCH (toggle status), and DELETE.
+- `app/api/admin/integrations/route.ts` — Created real live HTTP HEAD ping monitor for SE Ranking, Resend, and Stripe endpoints with live latency and real Prisma DB event queries.
+- `app/api/admin/settings/route.ts` — File-backed platform configuration router storing feature flags, tier limits, and platform contact info in `data/platform-settings.json`.
+- `app/api/admin/activity/route.ts` — Real DB activity feed aggregating agency registrations, client onboardings, and report generations.
+
+**What Was Done:**
+1. Built `broadcasts/route.ts` allowing announcements to persist across server restarts.
+2. Built `integrations/route.ts` executing concurrent live network latency checks against upstream gateways and streaming real database audit logs.
+3. Connected frontend state to synchronize seamlessly with these routes.
+
+
 ## 2026-08-18 — Server Actions TypeScript Alignment & Notification/Client Model Fixes
 
 **Task:** Fix 5 TypeScript errors in `app/actions.ts` reported in the IDE Problems tab.

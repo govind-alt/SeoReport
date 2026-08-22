@@ -832,7 +832,7 @@ export async function updateExecutiveSummary(reportId: string, summary: string) 
     try {
       aiRecs = report.aiRecsJson ? JSON.parse(report.aiRecsJson) : [];
     } catch { aiRecs = []; }
-    
+
     await prisma.report.update({
       where: { id: reportId },
       data: { aiRecsJson: JSON.stringify(aiRecs) }
@@ -849,7 +849,7 @@ export async function getClientPortalData(domain: string, clientId?: string) {
     include: { clients: true }
   });
   if (!agency) return null;
-  const client = clientId 
+  const client = clientId
     ? await prisma.client.findUnique({ where: { id: clientId } })
     : agency.clients[0];
   return { agency, client };

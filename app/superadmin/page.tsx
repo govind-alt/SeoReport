@@ -1,7 +1,5 @@
-import { getSuperadminData } from '@/app/actions';
-import SuperadminClient from './SuperadminClient';
+import { redirect } from 'next/navigation';
 
-export default async function SuperadminPage() {
-  const data = await getSuperadminData();
-  return <SuperadminClient initialData={data} />;
+export default function SuperadminPage() {
+  redirect('/admin');
 }

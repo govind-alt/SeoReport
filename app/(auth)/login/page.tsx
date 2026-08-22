@@ -335,7 +335,7 @@ function LoginFormContent() {
                     <div className="form-group">
                       <label className="form-label" htmlFor="loginPassword">
                         Password
-                        <a className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}} onClick={() => setActiveTab('forgot')}>Forgot password?</a>
+                        <a className="link" style={{float: 'right', fontSize: '12px', fontWeight: '500'}} onClick={() => { if (email) setForgotEmail(email); setActiveTab('forgot'); }}>Forgot password?</a>
                       </label>
                       <div className="input-with-icon">
                         <input className="form-input" id="loginPassword" type={showPassword ? "text" : "password"} placeholder="••••••••••" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} />

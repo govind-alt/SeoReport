@@ -35,6 +35,13 @@ This knowledge base is maintained automatically by the **Knowledge Curator** age
 
 | Date | Title | Category | Summary |
 |------|-------|----------|---------|
+| 2026-08-22 | Super Admin Header Clock Hydration Mismatch Fix | frontend | Added mounted state and suppressHydrationWarning to resolve SSR time format mismatch in Super Admin |
+| 2026-08-22 | Super Admin Direct Report View Fix | frontend | Updated Super Admin reports table to open /reports/render/[id] directly instead of agency portal redirect |
+| 2026-08-22 | Dynamic Auth Email Synchronization & User Input Integrity | api | Connected login email state to forgot password flow and verified dynamic recipient routing |
+| 2026-08-22 | Executive Professional Email System & Templates Documentation | api | Redesigned transactional email templates to executive standards and created docs/EMAIL_TEMPLATES.md |
+| 2026-08-22 | Target Email Recipient Updated to Real Inbox | api | Configured default target email and support receiver to hrishitavinherkar1234@gmail.com |
+| 2026-08-22 | Dev Server Startup & Chrome Browser Launch | devops | Launched Next.js dev server on http://localhost:3000 and opened Google Chrome to the RankFlow login view |
+| 2026-08-21 | Super Admin Full Dynamic API Suite & Live Persistence | api | Converted Broadcasts, Integrations (live pings), Feature Flags, Tier Limits, and Settings to real persistent endpoints |
 | 2026-08-21 | UI Text Polish & Removal of "AI" Terminology | frontend | Replaced all user-facing occurrences of the word AI across reports, client portal, and diagnostics |
 | 2026-08-21 | PDF Download Filename Fix & Personal Note Box Resize | pdf-reports | Fixed PDF download race condition saving as raw UUID without .pdf; enlarged Personal Note box |
 | 2026-08-21 | Enterprise Advance-Level Report Studio & AI Generation Suite | frontend | Built 4-step Advance Studio with AI Narrative engine (4 tones), batch multi-client mode, YoY/MoM benchmarks, and 8 modules |

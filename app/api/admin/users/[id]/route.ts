@@ -10,19 +10,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
     const { id } = await params;
     const body = await req.json();
-    const { plan, status, name, subdomain } = body;
-    const updated = await prisma.agency.update({
+    const { role, status } = body;
+    const updated = await prisma.user.update({
       where: { id },
       data: {
-        ...(plan !== undefined && { plan }),
-        ...(status !== undefined && { status }),
-        ...(name !== undefined && { name }),
-        ...(subdomain !== undefined && { subdomain, slug: subdomain }),
+        ...(role !== undefined && { role }),
       },
     });
-    return NextResponse.json(updated);
+    return NextResponse.json({ ...updated, status: status || 'active' });
   } catch (error) {
-    console.error('[ADMIN_AGENCY_PATCH]', error);
+    console.error('[ADMIN_USER_PATCH]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -34,10 +31,10 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const { id } = await params;
-    await prisma.agency.delete({ where: { id } });
+    await prisma.user.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[ADMIN_AGENCY_DELETE]', error);
+    console.error('[ADMIN_USER_DELETE]', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

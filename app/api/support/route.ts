@@ -25,9 +25,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'All support fields are required' }, { status: 400 });
     }
 
-    // Call simulated support ticket email dispatch
+    // Resolve support recipient from platform settings or default
+    let supportRecipient = 'hrishitavinherkar1234@gmail.com';
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const settingsFile = path.join(process.cwd(), 'data', 'platform-settings.json');
+      if (fs.existsSync(settingsFile)) {
+        const parsed = JSON.parse(fs.readFileSync(settingsFile, 'utf-8'));
+        if (parsed.supportEmail) supportRecipient = parsed.supportEmail;
+      }
+    } catch {}
+
+    // Call support ticket email dispatch
     await sendSupportTicketEmail(
-      'support@rankflow.app',
+      supportRecipient,
       user.email || 'unknown@user.com',
       user.name || 'Agency User',
       user.agency?.name || 'Unknown Agency',

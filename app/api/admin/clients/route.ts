@@ -18,12 +18,8 @@ export async function GET() {
         _count: {
           select: {
             reports: true,
-            messages: true
           }
         },
-        serankingProject: {
-          select: { serankingId: true, name: true, lastSyncedAt: true }
-        }
       }
     });
 
@@ -38,8 +34,7 @@ export async function GET() {
       agencyName: c.agency.name,
       agencyDomain: c.agency.subdomain || c.agency.slug,
       reportsCount: c._count.reports,
-      messagesCount: c._count.messages,
-      serankingLinked: !!c.serankingProject,
+      serankingLinked: !!c.serankingProjectId,
       createdAt: c.createdAt,
       joined: new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     }));
