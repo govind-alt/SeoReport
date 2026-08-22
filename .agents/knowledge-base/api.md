@@ -2,6 +2,20 @@
 
 > Maintained by Knowledge Curator. Append new entries using the format defined in SKILL.md.
 
+## 2026-08-22 — Target Email Recipient Updated to Real Inbox
+
+**Task:** Configure default target recipient and support ticket receiver to `hrishitavinherkar1234@gmail.com`.
+
+**Files Changed:**
+- `data/platform-settings.json` — Updated `supportEmail` to `hrishitavinherkar1234@gmail.com`.
+- `app/api/support/route.ts` — Updated to dynamically read support recipient from platform settings with fallback to `hrishitavinherkar1234@gmail.com`.
+- `app/api/admin/settings/test-email/route.ts` — Confirmed default test recipient uses `hrishitavinherkar1234@gmail.com`.
+
+**Why:**
+Previous placeholder addresses (e.g. `@example.com` or `@rankflow.app`) were non-existent demonstration domains. Updated the system to direct all test notifications and support messages to the active target address `hrishitavinherkar1234@gmail.com`.
+
+---
+
 ## 2026-08-21 — Super Admin Full Dynamic API Suite & Live Persistence
 
 **Task:** Audit and convert all static sections of the Super Admin dashboard into real dynamic, database-backed, and live-ping endpoints.
